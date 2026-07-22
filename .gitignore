@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific state
+xcuserdata/
+*.xcuserstate
+
+# Xcode 수동 빌드 산출물
+build/
