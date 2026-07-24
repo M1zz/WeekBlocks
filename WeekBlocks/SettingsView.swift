@@ -1,8 +1,12 @@
 import SwiftUI
+import LeeoKit
 
 /// 설정 화면 — iOS '욕망의 무지개'의 Form + Section 패턴을 macOS로 미러링.
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+
+    /// 일정 공유 시작·업데이트 시점의 최신 스냅숏을 만들어주는 클로저.
+    var scheduleSnapshots: () -> [SharedScheduleSnapshot] = { [] }
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -19,6 +23,7 @@ struct SettingsView: View {
 
             Divider()
 
+            NavigationStack {
             Form {
                 Section {
                     HStack {
@@ -63,6 +68,8 @@ struct SettingsView: View {
                     Text("iCloud")
                 }
 
+                ScheduleShareSettingsSection(snapshotsProvider: scheduleSnapshots)
+
                 Section {
                     HStack {
                         Text("버전")
@@ -81,8 +88,15 @@ struct SettingsView: View {
                 }
 
                 DeveloperContactSection()
+
+                Section {
+                    LeeoSupportSection<WeekBlocksSpec>()
+                } header: {
+                    Text("피드백 & 리뷰")
+                }
             }
             .formStyle(.grouped)
+            }
 
             Divider()
 

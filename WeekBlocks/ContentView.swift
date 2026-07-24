@@ -19,6 +19,7 @@ struct ContentView: View {
     @State private var showingSampleAlert = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
+    @State private var shareStore = ScheduleShareStore.shared
 
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
@@ -55,8 +56,11 @@ struct ContentView: View {
                 dayTimelineSection
                 weekGridSection
                 BacklogSection(allItems: backlogItems, weekStart: selectedWeek, canPlan: hasFixedRoutines)
-                FamilyTodoSection()
                 routinesSection
+                // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
+                if !shareStore.received.isEmpty {
+                    ReceivedSchedulesSection()
+                }
             }
             .padding(28)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -124,7 +128,9 @@ struct ContentView: View {
                 .frame(minWidth: 560, minHeight: 520)
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsView()
+            SettingsView(scheduleSnapshots: {
+                ScheduleSnapshotBuilder.snapshots(routines: routines, allBlocks: allBlocks, currentWeek: selectedWeek)
+            })
         }
         .alert("샘플 데이터 추가", isPresented: $showingSampleAlert) {
             Button("추가") { addSampleData() }
@@ -144,15 +150,35 @@ struct ContentView: View {
                 seedDefaultsIfNeeded()
             }
             reconcileOccurrences(for: selectedWeek)
+            await shareStore.refresh()
+            await autoPublishSharedSchedule()
         }
         .onChange(of: selectedWeek) { _, newWeek in
             reconcileOccurrences(for: newWeek)
+            Task { await autoPublishSharedSchedule() }
         }
         .onChange(of: routineSignature) { _, _ in
             // 루틴 추가·삭제·편집(이름·요일·종류) 시 모든 주의 occurrence를 현재 루틴에 맞게 재동기화.
             let weeks = Set(allOccurrences.map(\.weekStartDate)).union([selectedWeek])
             for w in weeks { reconcileOccurrences(for: w) }
         }
+        .onChange(of: shareSignature) { _, _ in
+            // 루틴·블록이 바뀌면 공유 중인 일정을 자동 갱신.
+            Task { await autoPublishSharedSchedule() }
+        }
+    }
+
+    /// 공유 중일 때만 현재 일정으로 스냅숏을 갱신한다.
+    private func autoPublishSharedSchedule() async {
+        guard shareStore.isSharing else { return }
+        await shareStore.publish(
+            ScheduleSnapshotBuilder.snapshots(routines: routines, allBlocks: allBlocks, currentWeek: selectedWeek)
+        )
+    }
+
+    /// 공유용 시그니처(루틴·블록) — 바뀌면 자동 재발행.
+    private var shareSignature: String {
+        ScheduleSnapshotBuilder.signature(routines: routines, allBlocks: allBlocks)
     }
 
     /// 루틴 구성이 바뀌면 onChange가 감지하도록 만드는 시그니처(이름·종류·요일).

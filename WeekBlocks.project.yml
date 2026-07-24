@@ -5,6 +5,9 @@ options:
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
+packages:
+  LeeoKit:
+    path: ../LeeoKit
 settings:
   base:
     MARKETING_VERSION: "1.0.4"
@@ -18,6 +21,8 @@ targets:
     platform: macOS
     sources:
       - path: WeekBlocks
+    dependencies:
+      - package: LeeoKit
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp

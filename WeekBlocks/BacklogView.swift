@@ -134,7 +134,7 @@ struct BacklogSection: View {
                 }
             }
         }
-        .task { seedCategoriesIfNeeded() }
+        .task { await reconcileCategories() }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
                 .frame(minWidth: 540, minHeight: 560)
@@ -180,7 +180,16 @@ struct BacklogSection: View {
         .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
     }
 
-    private func seedCategoriesIfNeeded() {
+    private func reconcileCategories() async {
+        // CloudKit 동기화가 아직 기존 카테고리를 내려받기 전이면 categories가
+        // 비어 보여서 기본값이 중복 시딩된다. 초기 임포트가 정착할 시간을 잠깐 준다.
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+
+        // (A) 같은 이름의 중복 카테고리를 하나로 합친다.
+        //     (과거 동기화 경쟁으로 생긴 "업무 업무 / 개인 개인" 정리)
+        dedupeCategoriesByName()
+
+        // (B) 정말로 카테고리가 하나도 없을 때만, 그리고 한 번만 기본값을 넣는다.
         guard !didSeedCategories, categories.isEmpty else { return }
         didSeedCategories = true
         let defaults: [(String, String, String)] = [
@@ -189,8 +198,39 @@ struct BacklogSection: View {
             ("건강", "orange", "heart"),
             ("학습", "purple", "book"),
         ]
-        for (i, d) in defaults.enumerated() {
+        var existingNames = Set(categories.map { $0.name.trimmingCharacters(in: .whitespaces) })
+        for (i, d) in defaults.enumerated() where !existingNames.contains(d.0) {
             context.insert(BacklogCategory(name: d.0, colorName: d.1, iconName: d.2, sortIndex: i))
+            existingNames.insert(d.0)
+        }
+        try? context.save()
+    }
+
+    /// 이름이 같은 카테고리를 가장 먼저 만들어진 하나로 합치고,
+    /// 나머지를 쓰던 항목은 살아남은 카테고리로 재연결한 뒤 중복을 삭제한다.
+    private func dedupeCategoriesByName() {
+        var survivors: [String: BacklogCategory] = [:]   // 이름(정규화) → 살아남을 카테고리
+        var duplicates: [BacklogCategory] = []
+        // createdAt 오름차순으로 훑으며 각 이름의 첫 번째를 살린다.
+        for c in categories.sorted(by: { $0.createdAt < $1.createdAt }) {
+            let key = c.name.trimmingCharacters(in: .whitespaces).lowercased()
+            guard !key.isEmpty else { continue }
+            if survivors[key] == nil {
+                survivors[key] = c
+            } else {
+                duplicates.append(c)
+            }
+        }
+        guard !duplicates.isEmpty else { return }
+
+        for dup in duplicates {
+            let key = dup.name.trimmingCharacters(in: .whitespaces).lowercased()
+            guard let keep = survivors[key] else { continue }
+            // 중복 카테고리를 참조하던 항목을 살아남은 카테고리로 옮긴다.
+            for item in allItems where item.categoryID == dup.uuid {
+                item.categoryID = keep.uuid
+            }
+            context.delete(dup)
         }
         try? context.save()
     }

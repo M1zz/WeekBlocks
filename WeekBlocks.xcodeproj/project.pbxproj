@@ -9,10 +9,8 @@
 /* Begin PBXBuildFile section */
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
-		24CE78D8C69195427B529712 /* FamilyTodoSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDDB43A9052FCA6589CDC561 /* FamilyTodoSection.swift */; };
 		2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28ADD71097A3C0E497BF731A /* BlockEditorView.swift */; };
 		33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EF8BFE32D234EF9576302C /* ReflectionView.swift */; };
-		35860277A44FEC09F81B6655 /* FamilyShareStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296DE86340191FA228DAFCA4 /* FamilyShareStore.swift */; };
 		4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482967041DBF8581050A3138 /* DayTimelineView.swift */; };
 		55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29F659737698D0D348D6468 /* ContentView.swift */; };
 		58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */; };
@@ -25,16 +23,21 @@
 		80A02C44C4632837BA134587 /* BacklogCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */; };
 		837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EB398D348B2377FA8540BF /* WeekGridView.swift */; };
 		83DE0994DCC6B215222A482D /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DAA819E703DC5BE377B3688 /* Routine.swift */; };
+		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
+		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
+		EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 144D087CE2C3CFFED2EABEE8 /* LeeoKit */; };
 		EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */; };
+		F8624EF27CC9E3AE1AEEFE83 /* ScheduleShareStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0DAA819E703DC5BE377B3688 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
+		1297ADF7DC5BCD1BBC7AFE76 /* LeeoKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = LeeoKit; path = ../LeeoKit; sourceTree = SOURCE_ROOT; };
 		28ADD71097A3C0E497BF731A /* BlockEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditorView.swift; sourceTree = "<group>"; };
 		295B1036D16FB52A4E7D0C74 /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
-		296DE86340191FA228DAFCA4 /* FamilyShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyShareStore.swift; sourceTree = "<group>"; };
+		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
 		3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOccurrence.swift; sourceTree = "<group>"; };
 		3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogCategory.swift; sourceTree = "<group>"; };
 		45EF8BFE32D234EF9576302C /* ReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionView.swift; sourceTree = "<group>"; };
@@ -42,9 +45,11 @@
 		482967041DBF8581050A3138 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
 		5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5CC172BAFFE573306711B4CE /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
+		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
 		90641A10CE63E76FFACFD63E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksSpec.swift; sourceTree = "<group>"; };
 		9F541E3039606B54D810E610 /* RoutineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineDetailView.swift; sourceTree = "<group>"; };
 		A47970A792B8AE57E021D9CB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		C368657EE69104A4BA70BA52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -53,11 +58,29 @@
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogItem.swift; sourceTree = "<group>"; };
-		FDDB43A9052FCA6589CDC561 /* FamilyTodoSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyTodoSection.swift; sourceTree = "<group>"; };
 		FE2891429087F31216F7F774 /* WeekBlocks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeekBlocks.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		066E0521B58884D419671397 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
+		1464CD88462A5360D3D283EF /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				1297ADF7DC5BCD1BBC7AFE76 /* LeeoKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 		5F00D51242891307C101F90D /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -77,8 +100,6 @@
 				ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */,
 				E29F659737698D0D348D6468 /* ContentView.swift */,
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
-				296DE86340191FA228DAFCA4 /* FamilyShareStore.swift */,
-				FDDB43A9052FCA6589CDC561 /* FamilyTodoSection.swift */,
 				C368657EE69104A4BA70BA52 /* Info.plist */,
 				CC4A396C6929CB1C576DBA52 /* Models.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
@@ -87,10 +108,13 @@
 				9F541E3039606B54D810E610 /* RoutineDetailView.swift */,
 				3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */,
 				D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */,
+				73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */,
 				5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */,
+				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
 				FE2891429087F31216F7F774 /* WeekBlocks.entitlements */,
 				77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */,
+				9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */,
 				87EB398D348B2377FA8540BF /* WeekGridView.swift */,
 			);
 			path = WeekBlocks;
@@ -99,6 +123,7 @@
 		C7495016D461ABB1DF0D0252 = {
 			isa = PBXGroup;
 			children = (
+				1464CD88462A5360D3D283EF /* Packages */,
 				973BF38AE3DB330122685508 /* WeekBlocks */,
 				5F00D51242891307C101F90D /* Products */,
 			);
@@ -113,6 +138,7 @@
 			buildPhases = (
 				E4D02E4967B3D8CEBF703E86 /* Sources */,
 				541F11E22B4F2947FA4944EF /* Resources */,
+				066E0521B58884D419671397 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -120,6 +146,7 @@
 			);
 			name = WeekBlocks;
 			packageProductDependencies = (
+				144D087CE2C3CFFED2EABEE8 /* LeeoKit */,
 			);
 			productName = WeekBlocks;
 			productReference = 46C009263003E5FA4C9F764D /* WeekBlocks.app */;
@@ -150,6 +177,9 @@
 			);
 			mainGroup = C7495016D461ABB1DF0D0252;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CF0D77F4B91E32D50080FBD9 /* XCLocalSwiftPackageReference "../LeeoKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
@@ -182,8 +212,6 @@
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,
 				55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */,
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
-				35860277A44FEC09F81B6655 /* FamilyShareStore.swift in Sources */,
-				24CE78D8C69195427B529712 /* FamilyTodoSection.swift in Sources */,
 				12DCD47B097FBED701EECC11 /* Models.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
 				33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */,
@@ -191,9 +219,12 @@
 				E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */,
 				BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */,
 				651A1BCE01591AEDA87AEFAA /* RoutinesView.swift in Sources */,
+				F8624EF27CC9E3AE1AEEFE83 /* ScheduleShareStore.swift in Sources */,
 				7EE825830848CC825A252ABD /* SettingsView.swift in Sources */,
+				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
 				58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */,
+				D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */,
 				837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -404,6 +435,20 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CF0D77F4B91E32D50080FBD9 /* XCLocalSwiftPackageReference "../LeeoKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../LeeoKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		144D087CE2C3CFFED2EABEE8 /* LeeoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LeeoKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B0B47E06A2E7F1E74F5231B4 /* Project object */;
 }
