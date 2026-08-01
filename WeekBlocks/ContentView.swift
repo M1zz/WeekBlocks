@@ -19,7 +19,11 @@ struct ContentView: View {
     @State private var showingSampleAlert = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
+    /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
+    @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
     @State private var shareStore = ScheduleShareStore.shared
+    /// 전파 계약이 붙은 백로그 항목을 요일에 떨어뜨렸을 때 확인을 받기 위한 보류 상태.
+    @State private var pendingBroadcastDrop: BroadcastDropContext?
 
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
@@ -53,6 +57,9 @@ struct ContentView: View {
                     metricsRow
                     WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
                 }
+                // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
+                // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
+                BroadcastPlanSection(allItems: backlogItems, allBlocks: allBlocks)
                 dayTimelineSection
                 weekGridSection
                 BacklogSection(allItems: backlogItems, weekStart: selectedWeek, canPlan: hasFixedRoutines)
@@ -144,6 +151,27 @@ struct ContentView: View {
         } message: {
             Text("루틴·계획 블록·백로그를 모두 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")
         }
+        .alert("전파 계약이 있는 할 일입니다",
+               isPresented: Binding(get: { pendingBroadcastDrop != nil },
+                                    set: { if !$0 { pendingBroadcastDrop = nil } })) {
+            Button("배치하고 계약 유지") {
+                if let ctx = pendingBroadcastDrop {
+                    convertBacklogItem(ctx.item, to: ctx.day)
+                }
+                pendingBroadcastDrop = nil
+            }
+            Button("취소", role: .cancel) { pendingBroadcastDrop = nil }
+        } message: {
+            if let ctx = pendingBroadcastDrop {
+                Text("""
+                \(ctx.item.title)
+                \(ctx.item.broadcastCarryOverSummary)
+
+                \(ctx.day.longLabel)에 배치하면 이 할 일은 백로그에서 사라지고 계획 블록이 됩니다. \
+                전파 계약은 블록으로 그대로 넘어가고, '전파 필요' 섹션에도 계속 남습니다.
+                """)
+            }
+        }
         .task {
             if !didSeed {
                 didSeed = true
@@ -181,6 +209,15 @@ struct ContentView: View {
         ScheduleSnapshotBuilder.signature(routines: routines, allBlocks: allBlocks)
     }
 
+    /// 타임라인에 그릴 시간 범위. 수면 숨김이 꺼져 있으면 하루 전체.
+    private var timelineWindow: HourWindow {
+        TimelineLayout.visibleWindow(
+            fixedRoutines: routines.filter { $0.kind == .fixed },
+            blocks: weekBlocks,
+            hideSleep: hideSleepInTimeline
+        )
+    }
+
     /// 루틴 구성이 바뀌면 onChange가 감지하도록 만드는 시그니처(이름·종류·요일).
     private var routineSignature: String {
         routines.map { "\($0.name)|\($0.kindRaw)|\($0.dayMask)" }.joined(separator: ";")
@@ -197,11 +234,11 @@ struct ContentView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(weekRangeString)
-                    .font(.system(size: 30, weight: .bold))
+                    .font(.system(size: 32, weight: .bold))
                     .monospacedDigit()
                 Text(weekSubtitle)
                     .font(.callout.weight(.medium))
-                    .foregroundStyle(weekOffset == 0 ? Color.accentColor : .secondary)
+                    .foregroundStyle(weekOffset == 0 ? Color.red : .secondary)
             }
             .frame(minWidth: 280, alignment: .leading)
 
@@ -263,11 +300,12 @@ struct ContentView: View {
                 unit: "h",
                 subtitle: "하루 약 \(String(format: "%.1f", routineHours / 7))h"
             )
+            // 자유 시간은 '아직 계획이 없는 시간' — 계획(파랑)과 같은 색을 쓰면 뜻이 겹친다.
+            // 아래 막대에서도 남은 자유는 빈 구간으로 그리므로 여기서도 색을 주지 않는다.
             MetricCard(
                 label: "남은 자유 시간",
                 value: String(format: "%.1f", freeHours),
                 unit: "h",
-                tint: .accentColor,
                 subtitle: "하루 약 \(String(format: "%.1f", freeHours / 7))h"
             )
         }
@@ -407,15 +445,22 @@ struct ContentView: View {
     private var dayTimelineSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Label("요일별 하루 24시간", systemImage: "clock")
+                Text(timelineWindow.isFullDay
+                     ? "요일별 하루 24시간"
+                     : "요일별 하루 \(Int(timelineWindow.start))–\(Int(timelineWindow.end))시")
                     .font(.headline)
+                if !timelineWindow.isFullDay {
+                    Text("수면 시간 숨김")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
                 Text("실선=고정 · 점선=유연 쿼터 · 계획은 빈 구간에")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            HourAxis()
+            HourAxis(window: timelineWindow)
 
             VStack(spacing: 4) {
                 ForEach(DayOfWeek.allCases) { day in
@@ -432,7 +477,8 @@ struct ContentView: View {
                         quotaPlacements: allQuotaPlacements.filter {
                             $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: selectedWeek)
                         },
-                        weekStart: selectedWeek
+                        weekStart: selectedWeek,
+                        window: timelineWindow
                     )
                 }
             }
@@ -463,6 +509,9 @@ struct ContentView: View {
                         },
                         onEditRoutine: { routine in
                             routineDetailSheet = routine
+                        },
+                        onEditRoutineSchedule: { routine in
+                            routineSheet = RoutineSheetContext(routine: routine)
                         },
                         onDropBacklog: { token in
                             dropBacklogItem(token: token, day: day)
@@ -538,22 +587,37 @@ struct ContentView: View {
             context.insert(block)
         } else {
             guard let item = backlogItems.first(where: { $0.dragToken == token }) else { return }
-            let block = PlanBlock(
-                day: day,
-                timeBand: TimelineLayout.suggestedBand(
-                    routines: fixedRoutines(on: day),
-                    blocks: weekBlocks.filter { $0.day == day }
-                ),
-                durationHours: item.durationHours,
-                title: item.title,
-                successCriteria: "",
-                deliverable: "",
-                weekStartDate: selectedWeek,
-                concreteVerified: false
-            )
-            context.insert(block)
-            context.delete(item)
+            // 전파 계약이 붙은 항목은 배치하면 백로그에서 사라지므로 먼저 확인을 받는다.
+            // (계약은 블록으로 승계되지만, 백로그에서 찾을 수 없게 되는 건 알려야 한다)
+            if item.needsBroadcast {
+                pendingBroadcastDrop = BroadcastDropContext(item: item, day: day)
+                return
+            }
+            convertBacklogItem(item, to: day)
         }
+        try? context.save()
+    }
+
+    /// 백로그 항목 → 계획 블록. 전파 계약을 그대로 승계한다.
+    private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek) {
+        let block = PlanBlock(
+            day: day,
+            timeBand: TimelineLayout.suggestedBand(
+                routines: fixedRoutines(on: day),
+                blocks: weekBlocks.filter { $0.day == day }
+            ),
+            durationHours: item.durationHours,
+            title: item.title,
+            successCriteria: "",
+            deliverable: "",
+            weekStartDate: selectedWeek,
+            concreteVerified: false
+        )
+        // 대상·두 날짜·넘길 형태·이미 보낸 시점까지 통째로 넘긴다.
+        // 보낸 기록을 빼먹으면 이미 보낸 전파를 다시 보내라고 뜬다.
+        item.copyBroadcastContract(to: block)
+        context.insert(block)
+        context.delete(item)
         try? context.save()
     }
 
@@ -634,13 +698,19 @@ struct RoutineSheetContext: Identifiable {
     let routine: Routine?
 }
 
+/// 전파 계약이 붙은 백로그 항목을 요일에 떨어뜨렸을 때, 확인을 받는 동안 붙잡아 두는 값.
+struct BroadcastDropContext: Identifiable {
+    let id = UUID()
+    let item: BacklogItem
+    let day: DayOfWeek
+}
+
 // MARK: Components
 
 struct MetricCard: View {
     let label: String
     let value: String
     let unit: String
-    var tint: Color = .primary
     var subtitle: String? = nil
 
     var body: some View {
@@ -652,14 +722,13 @@ struct MetricCard: View {
                 Text(value)
                     .font(.title.weight(.medium))
                     .monospacedDigit()
-                    .foregroundStyle(tint)
                 Text(unit)
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
             if let subtitle {
                 Text(subtitle)
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
@@ -705,7 +774,7 @@ struct WeekBarChart: View {
             HStack(spacing: 20) {
                 barLegend(color: .secondary.opacity(0.6), label: "루틴", hours: routineHours)
                 barLegend(color: isOverPlanned ? .red : .accentColor, label: "계획", hours: plannedHours)
-                barLegend(color: .secondary.opacity(0.3), label: "남은 자유", hours: freeRemaining)
+                barLegend(color: .secondary.opacity(0.15), label: "남은 자유 (계획 없음)", hours: freeRemaining)
             }
             .font(.caption)
             .foregroundStyle(.secondary)

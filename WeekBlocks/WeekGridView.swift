@@ -26,7 +26,10 @@ struct DayColumn: View {
     let items: [DayPlanItem]
     let onAdd: () -> Void
     let onEdit: (PlanBlock) -> Void
+    /// 루틴을 눌렀을 때 — 상세(정보·실행 전략·프리모템)
     let onEditRoutine: (Routine) -> Void
+    /// 루틴 '수정' — 이름·요일·시각을 바꾸는 편집기
+    var onEditRoutineSchedule: ((Routine) -> Void)? = nil
     let onDropBacklog: (String) -> Void
 
     @State private var isDropTargeted = false
@@ -42,16 +45,16 @@ struct DayColumn: View {
         VStack(alignment: .leading, spacing: 6) {
             VStack(spacing: 1) {
                 Text(day.shortLabel)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(isToday ? Color.accentColor : .secondary)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(isToday ? Color.red : .secondary)
                 Text(dayNumber)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
                     .monospacedDigit()
                     .foregroundStyle(isToday ? .white : .primary)
                     .frame(width: 30, height: 30)
                     .background {
                         if isToday {
-                            Circle().fill(Color.accentColor)
+                            Circle().fill(Color.red)
                         }
                     }
             }
@@ -64,11 +67,13 @@ struct DayColumn: View {
                 case .fixedRoutine(let routine, _, let atHour, let hours):
                     // 자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 되도록.
                     RoutineChip(routine: routine,
-                                subtitleOverride: "\(formatHour(atHour))  \(String(format: "%.1fh", hours))") {
+                                subtitleOverride: "\(formatHour(atHour))  \(String(format: "%.1fh", hours))",
+                                onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
                         onEditRoutine(routine)
                     }
                 case .quotaSession(let routine, _, let atHour):
-                    RoutineChip(routine: routine, subtitleOverride: formatHour(atHour)) { onEditRoutine(routine) }
+                    RoutineChip(routine: routine, subtitleOverride: formatHour(atHour),
+                                onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) { onEditRoutine(routine) }
                 case .block(let block):
                     BlockChip(block: block) { onEdit(block) }
                 }
@@ -76,7 +81,7 @@ struct DayColumn: View {
 
             Button(action: onAdd) {
                 Image(systemName: canPlan ? "plus" : "lock")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .frame(height: 28)
@@ -116,6 +121,8 @@ struct RoutineChip: View {
     let routine: Routine
     /// 컬럼에서 끼니 세션처럼 '이 occurrence의 시각'을 보여주고 싶을 때 부제를 대체.
     var subtitleOverride: String? = nil
+    /// '수정' — 이름·요일·시각을 바꾸는 편집기로. 없으면 버튼을 띄우지 않는다.
+    var onEdit: (() -> Void)? = nil
     let onTap: () -> Void
 
     @State private var hovering = false
@@ -134,27 +141,47 @@ struct RoutineChip: View {
     }
 
     var body: some View {
+        // 겉을 Button으로 두면 안에 놓은 '수정' 버튼이 클릭을 못 받는다.
+        chipBody
+            .contentShape(RoundedRectangle(cornerRadius: 7))
+            .onTapGesture(perform: onTap)
+            .overlay(alignment: .topTrailing) {
+                if hovering, let onEdit {
+                    Button("수정", action: onEdit)
+                        .buttonStyle(.plain)
+                        .font(.system(size: 11))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(nsColor: .controlBackgroundColor), in: Capsule())
+                        .overlay(Capsule().stroke(routine.displayColor.opacity(0.5), lineWidth: 0.5))
+                        .padding(4)
+                }
+            }
+            .onHover { hovering = $0 }
+            .help("\(routine.scheduleDescription)\n눌러서 상세 · '수정'으로 요일·시각 변경")
+    }
+
+    private var chipBody: some View {
         let color = routine.displayColor
-        Button(action: onTap) {
-            HStack(spacing: 6) {
+        return HStack(spacing: 6) {
                 Image(systemName: routine.iconName)
-                    .font(.system(size: 11))
+                    .font(.system(size: 13))
                     .foregroundStyle(color)
                     .frame(width: 14)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(routine.name)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .lineLimit(1)
                     Text(subtitle)
-                        .font(.system(size: 10))
+                        .font(.system(size: 12))
                         .opacity(0.7)
                 }
 
                 Spacer()
 
                 Image(systemName: isQuota ? "arrow.left.and.right" : "lock.fill")
-                    .font(.system(size: 9))
+                    .font(.system(size: 11))
                     .opacity(isQuota ? 0.5 : 0.35)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -168,10 +195,6 @@ struct RoutineChip: View {
                             style: isQuota ? StrokeStyle(lineWidth: 1, dash: [3, 2]) : StrokeStyle(lineWidth: 1))
             )
             .foregroundStyle(color)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering = $0 }
-        .help("\(routine.scheduleDescription)")
     }
 }
 
@@ -190,16 +213,44 @@ struct BlockChip: View {
     }
 
     var body: some View {
-        Button(action: onTap) {
+        // 겉을 Button으로 두면 안에 놓은 '수정' 버튼이 클릭을 못 받는다.
+        // 칩 전체는 탭 제스처로, 수정은 별도 버튼으로 분리한다.
+        chipBody
+            .contentShape(RoundedRectangle(cornerRadius: 7))
+            .onTapGesture(perform: onTap)
+            .overlay(alignment: .topTrailing) { editButton }
+            .onHover { hovering = $0 }
+            // 다른 요일로 끌어 옮기기 — 드롭 대상(DayColumn)에서 요일을 바꾼다.
+            .draggable("block:" + String(describing: block.persistentModelID))
+            .help(block.successCriteria.isEmpty
+                  ? "구체성 미검증 — 눌러서 다듬기 · 드래그해서 다른 요일로 옮기기"
+                  : block.successCriteria + "\n드래그해서 다른 요일로 옮길 수 있습니다.")
+    }
+
+    @ViewBuilder
+    private var editButton: some View {
+        if hovering {
+            Button("수정", action: onTap)
+                .buttonStyle(.plain)
+                .font(.system(size: 11))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color(nsColor: .controlBackgroundColor), in: Capsule())
+                .overlay(Capsule().stroke(palette.stroke, lineWidth: 0.5))
+                .padding(4)
+        }
+    }
+
+    private var chipBody: some View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     if let status = block.reviewStatus {
                         Image(systemName: status.systemImage)
-                            .font(.system(size: 11))
+                            .font(.system(size: 13))
                             .foregroundStyle(reviewTint(status))
                     }
                     Text(block.title)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                 }
@@ -208,7 +259,7 @@ struct BlockChip: View {
                     Text("·")
                     Text(String(format: "%.1fh", block.durationHours))
                 }
-                .font(.system(size: 11))
+                .font(.system(size: 13))
                 .opacity(0.8)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -220,14 +271,6 @@ struct BlockChip: View {
                     .stroke(palette.stroke, lineWidth: hovering ? 1.5 : 1)
             )
             .foregroundStyle(palette.fg)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering = $0 }
-        // 다른 요일로 끌어 옮기기 — 드롭 대상(DayColumn)에서 요일을 바꾼다.
-        .draggable("block:" + String(describing: block.persistentModelID))
-        .help(block.successCriteria.isEmpty
-              ? "구체성 미검증 — 클릭해서 다듬기 · 드래그해서 다른 요일로 옮기기"
-              : block.successCriteria + "\n드래그해서 다른 요일로 옮길 수 있습니다.")
     }
 
     private func reviewTint(_ status: ReviewStatus) -> Color {

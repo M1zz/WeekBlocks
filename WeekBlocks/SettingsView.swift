@@ -8,6 +8,8 @@ struct SettingsView: View {
     /// 일정 공유 시작·업데이트 시점의 최신 스냅숏을 만들어주는 클로저.
     var scheduleSnapshots: () -> [SharedScheduleSnapshot] = { [] }
 
+    @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
+
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
@@ -37,6 +39,16 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 } header: {
                     Text("주간 계획")
+                }
+
+                Section {
+                    Toggle("타임라인에서 수면 시간 숨기기", isOn: $hideSleepInTimeline)
+                } header: {
+                    Text("요일별 하루")
+                } footer: {
+                    Text("하루 양끝의 수면 시간을 잘라내 남은 시간을 더 넓게 봅니다. 이름에 '수면·잠·취침'이 들어간 고정 루틴을 수면으로 봅니다. 잘라낼 자리에 다른 일정이 걸쳐 있으면 그 일정이 보이도록 범위를 도로 넓힙니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section {

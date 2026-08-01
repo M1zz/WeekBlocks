@@ -6,6 +6,8 @@ struct RoutineDetailView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
+    @State private var showingEditor = false
+
     var body: some View {
         VStack(spacing: 0) {
             header
@@ -31,7 +33,7 @@ struct RoutineDetailView: View {
                     .fill(routine.displayColor.opacity(0.15))
                     .frame(width: 40, height: 40)
                 Image(systemName: routine.iconName)
-                    .font(.system(size: 18))
+                    .font(.system(size: 20))
                     .foregroundStyle(routine.displayColor)
             }
             VStack(alignment: .leading, spacing: 2) {
@@ -42,12 +44,20 @@ struct RoutineDetailView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            // 이 화면은 정보·실행 전략만 다룬다. 이름·요일·시각을 바꾸려면 편집기가 필요한데
+            // 여기서 갈 길이 없으면 막다른 길이 된다.
+            Button("수정") { showingEditor = true }
+                .buttonStyle(.borderless)
             Button("닫기") { dismiss() }
                 .buttonStyle(.borderless)
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
         .background(routine.displayColor.opacity(0.06))
+        .sheet(isPresented: $showingEditor) {
+            RoutineEditorView(existing: routine)
+                .frame(minWidth: 520, minHeight: 480)
+        }
     }
 
     // MARK: Tab 1 — 정보
@@ -82,7 +92,7 @@ struct RoutineDetailView: View {
     private func infoCard(icon: String, title: String, value: String, color: Color) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
-                .font(.system(size: 15))
+                .font(.system(size: 17))
                 .foregroundStyle(color)
                 .frame(width: 22)
             VStack(alignment: .leading, spacing: 2) {
@@ -171,7 +181,7 @@ struct RoutineDetailView: View {
     private func sectionHeader(icon: String, color: Color, title: String, subtitle: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 20))
+                .font(.system(size: 22))
                 .foregroundStyle(color)
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 4) {

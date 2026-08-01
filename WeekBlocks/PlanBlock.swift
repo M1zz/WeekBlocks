@@ -29,6 +29,27 @@ final class PlanBlock {
     var reviewNote: String? = nil
     var reviewedAt: Date? = nil
 
+    // MARK: - 전파 계약
+    //
+    // 백로그 항목을 요일에 드롭하면 이 블록이 되고 항목은 삭제된다.
+    // 그때 계약이 함께 넘어오지 않으면 대상·두 날짜·이미 보낸 시점 기록이 전부 사라진다.
+    // 필드 구성과 의미는 BacklogItem과 같고, 접근자는 BroadcastContractHolder가 공용으로 제공한다.
+    // CloudKit 라이트웨이트 마이그레이션을 위해 전부 기본값 또는 옵셔널이다.
+
+    var needsBroadcast: Bool = false
+    var deadline: Date? = nil
+    var broadcastAudienceRaw: String = "decisionMaker"
+    var broadcastRecipient: String = ""
+    var handoffForm: String = ""
+    var earliestDate: Date? = nil
+    var latestDate: Date? = nil
+    var broadcastConfidenceRaw: String = "medium"
+    var openVariable: String = ""
+    var variableResolveDate: Date? = nil
+    var noSignalRuleAgreed: Bool = false
+    var broadcastContractVerified: Bool = false
+    var sentCheckpointsRaw: String = ""
+
     init(day: DayOfWeek,
          timeBand: TimeBand,
          durationHours: Double,
@@ -83,3 +104,7 @@ final class PlanBlock {
         }
     }
 }
+
+// 전파 계약 접근자는 BroadcastContract.swift의 프로토콜 익스텐션이 제공한다
+// (BacklogItem과 같은 구현을 쓴다).
+extension PlanBlock: BroadcastContractHolder { }

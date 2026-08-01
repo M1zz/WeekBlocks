@@ -19,6 +19,45 @@ enum SegmentSource {
     }
 }
 
+/// 타임라인에 실제로 그릴 시간 범위. 기본은 하루 전체(0–24).
+/// 수면을 숨기면 양끝의 수면 시간을 잘라내 남은 시간이 더 넓게 그려진다.
+struct HourWindow: Equatable {
+    var start: Double = 0
+    var end: Double = 24
+
+    static let full = HourWindow()
+
+    var span: Double { max(1, end - start) }
+    var isFullDay: Bool { start <= 0 && end >= 24 }
+
+    /// 시각 → 가로 위치.
+    func x(_ hour: Double, width: CGFloat) -> CGFloat {
+        CGFloat((hour - start) / span) * width
+    }
+
+    /// 창 밖으로 나간 부분을 잘라낸다. 완전히 벗어나면 nil.
+    func clamp(_ s: Double, _ e: Double) -> (start: Double, end: Double)? {
+        let cs = max(s, start), ce = min(e, end)
+        return ce - cs > 0.0001 ? (cs, ce) : nil
+    }
+
+    /// 축에 숫자를 찍을 시각들 — 창의 양끝 + 그 사이 3시간 배수.
+    var axisHours: [Int] {
+        let lo = Int(start.rounded(.up)), hi = Int(end.rounded(.down))
+        var hours = [lo]
+        hours += stride(from: lo, through: hi, by: 1).filter { $0 % 3 == 0 && $0 != lo && $0 != hi }
+        if hi != lo { hours.append(hi) }
+        return hours
+    }
+
+    /// 세로 격자를 그릴 시각들 (창 안쪽 정시).
+    var gridHours: [Int] {
+        let lo = Int(start.rounded(.down)) + 1, hi = Int(end.rounded(.up)) - 1
+        guard lo <= hi else { return [] }
+        return Array(lo...hi)
+    }
+}
+
 struct TimeSegment: Identifiable {
     let id: String                 // 재계산해도 같은 출처면 같은 id (드래그 중 안정성)
     let start: Double      // 0...24
@@ -195,6 +234,57 @@ enum TimelineLayout {
         return best?.band ?? .afternoon
     }
 
+    /// 수면을 숨겼을 때 실제로 그릴 시간 범위.
+    ///
+    /// 하루 양끝(0시에서 이어지는 / 24시에 닿는)의 수면만 잘라낸다. 한가운데 낮잠은 자르지 않는데,
+    /// 가운데를 도려내면 시간 축이 끊겨서 앞뒤 시각을 읽을 수 없기 때문이다.
+    /// 잘라낸 구간에 수면이 아닌 일정이 하나라도 걸치면 그 일정이 보이도록 창을 도로 넓힌다.
+    static func visibleWindow(fixedRoutines: [Routine],
+                              blocks: [PlanBlock],
+                              hideSleep: Bool) -> HourWindow
+    {
+        guard hideSleep else { return .full }
+
+        var sleep: [(Double, Double)] = []
+        var protected: [(Double, Double)] = []
+        for r in fixedRoutines {
+            let parts = splitAtMidnight(r.startHour, r.startHour + r.durationHours)
+            if r.isSleepRoutine { sleep.append(contentsOf: parts) } else { protected.append(contentsOf: parts) }
+        }
+        // 시각이 정해진 계획만 보호 대상. 시각이 없는 계획은 빈 구간(=수면 밖)에 배치되므로 안전하다.
+        for b in blocks where b.startHour >= 0 {
+            protected.append(contentsOf: splitAtMidnight(b.startHour, b.startHour + b.durationHours))
+        }
+        guard !sleep.isEmpty else { return .full }
+
+        var start = 0.0, end = 24.0
+        var moved = true
+        while moved {                       // 0시에서 이어지는 수면을 앞에서 밀어낸다
+            moved = false
+            for (s, e) in sleep where s <= start + 1e-6 && e > start + 1e-6 { start = e; moved = true }
+        }
+        moved = true
+        while moved {                       // 24시에 닿는 수면을 뒤에서 당긴다
+            moved = false
+            for (s, e) in sleep where e >= end - 1e-6 && s < end - 1e-6 { end = s; moved = true }
+        }
+
+        for (s, e) in protected {           // 다른 일정을 자르지 않는다
+            if s < start { start = s }
+            if e > end { end = e }
+        }
+
+        // 너무 좁아지면(수면이 비정상적으로 길게 잡혀 있으면) 그냥 하루 전체를 보여준다.
+        // 이 검사는 아래 안전 클램프보다 **먼저** 와야 한다. 클램프가 창을 넓히기 때문에
+        // 순서가 바뀌면 4시간짜리 이상한 창이 10시간으로 부풀려져 검사를 통과해 버린다.
+        guard end - start >= 6 else { return .full }
+
+        // 정오는 언제나 보이게 (판별이 어긋나도 하루 한복판은 잘리지 않는다).
+        start = max(0, min(start, 12))
+        end = min(24, max(end, 12))
+        return HourWindow(start: start.rounded(.down), end: end.rounded(.up))
+    }
+
     /// 구간들의 합집합 총 길이. 서로 겹치는 부분은 한 번만 센다.
     /// (유연 블록이 다른 일정과 겹치면 그만큼은 자유 시간을 깎지 않도록 하는 데 사용.)
     static func unionLength(_ intervals: [(Double, Double)]) -> Double {
@@ -246,6 +336,8 @@ struct DayTimelineRow: View {
     var occurrences: [RoutineOccurrence] = []      // 이 요일·주의 고정 루틴 배치(위치 override 저장처)
     var quotaPlacements: [QuotaPlacement] = []      // 이 요일·주의 식사 등 위치 저장처
     var weekStart: Date = .currentWeekStart
+    /// 그릴 시간 범위. 수면을 숨기면 양끝이 잘린 창이 들어온다.
+    var window: HourWindow = .full
 
     // 드래그 중인 세그먼트와 이동량(px). 같은 행 안에서만 유효.
     @State private var dragId: String? = nil
@@ -294,14 +386,14 @@ struct DayTimelineRow: View {
         HStack(spacing: 10) {
             VStack(spacing: 0) {
                 Text(day.shortLabel)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(isToday ? Color.accentColor : .secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(isToday ? Color.red : .secondary)
                 Text(dayNumber)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .monospacedDigit()
-                    .foregroundStyle(isToday ? Color.accentColor : .primary)
+                    .foregroundStyle(isToday ? Color.red : .primary)
             }
-            .frame(width: 26)
+            .frame(width: 30)
 
             GeometryReader { geo in
                 let w = geo.size.width
@@ -309,34 +401,36 @@ struct DayTimelineRow: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.primary.opacity(0.05))
 
-                    // 시간 격자 (24칸) — 3시간마다 굵은 선으로 시간대를 더 잘게 구분.
-                    ForEach(1..<24) { h in
+                    // 시간 격자 — 3시간마다 굵은 선으로 시간대를 더 잘게 구분.
+                    ForEach(window.gridHours, id: \.self) { h in
                         let isMajor = (h % 3 == 0)
                         Rectangle()
                             .fill(Color.secondary.opacity(isMajor ? 0.18 : 0.07))
                             .frame(width: isMajor ? 1 : 0.5)
-                            .offset(x: CGFloat(h) / 24 * w)
+                            .offset(x: window.x(Double(h), width: w))
                     }
 
-                    // 활동 구간
+                    // 활동 구간 — 창 밖은 그리지 않고, 걸친 것은 잘라서 그린다.
                     ForEach(segments) { seg in
-                        let x = CGFloat(seg.start) / 24 * w
-                        let segW = CGFloat(seg.end - seg.start) / 24 * w
-                        let dragOffset = (seg.id == dragId) ? dragPx : 0
-                        segmentView(seg, width: max(1, segW), rowWidth: w)
-                            .offset(x: x + dragOffset)
-                            .zIndex(seg.id == dragId ? 1 : 0)
+                        if let vis = window.clamp(seg.start, seg.end) {
+                            let x = window.x(vis.start, width: w)
+                            let segW = window.x(vis.end, width: w) - x
+                            let dragOffset = (seg.id == dragId) ? dragPx : 0
+                            segmentView(seg, width: max(1, segW), rowWidth: w)
+                                .offset(x: x + dragOffset)
+                                .zIndex(seg.id == dragId ? 1 : 0)
+                        }
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 4))
             }
-            .frame(height: 24)
+            .frame(height: 28)
 
             Text("남은 시간 \(fmtHours(freeHours))h")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 13, weight: .medium))
                 .monospacedDigit()
                 .foregroundStyle(isOverbooked ? .red : .secondary)
-                .frame(width: 90, alignment: .trailing)
+                .frame(width: 96, alignment: .trailing)
         }
     }
 
@@ -369,7 +463,7 @@ struct DayTimelineRow: View {
         .overlay(alignment: .leading) {
             if width > 18 {
                 Text(seg.title)
-                    .font(.system(size: 9, weight: seg.isNested ? .semibold : .medium))
+                    .font(.system(size: 11, weight: seg.isNested ? .semibold : .medium))
                     .foregroundStyle(ghost ? seg.color.opacity(0.55) : (seg.isFlexible ? seg.color : Color.white))
                     .strikethrough(ghost, color: seg.color.opacity(0.5))
                     .lineLimit(1)
@@ -391,7 +485,8 @@ struct DayTimelineRow: View {
                 }
                 .onEnded { v in
                     guard !seg.isGhost else { return }
-                    let deltaHours = Double(v.translation.width / max(rowWidth, 1)) * 24
+                    // 창이 좁아졌으면 같은 픽셀이 더 적은 시간을 의미한다.
+                    let deltaHours = Double(v.translation.width / max(rowWidth, 1)) * window.span
                     commitDrag(seg, deltaHours: deltaHours)
                     dragId = nil
                     dragPx = 0
@@ -516,23 +611,25 @@ struct DayTimelineRow: View {
 // MARK: - 시간 축 (0·6·12·18·24)
 
 struct HourAxis: View {
+    var window: HourWindow = .full
+
     var body: some View {
         HStack(spacing: 10) {
-            Spacer().frame(width: 26)
+            Spacer().frame(width: 30)
             GeometryReader { geo in
                 let w = geo.size.width
                 ZStack(alignment: .leading) {
-                    ForEach([0, 3, 6, 9, 12, 15, 18, 21, 24], id: \.self) { h in
+                    ForEach(window.axisHours, id: \.self) { h in
                         Text("\(h)")
-                            .font(.system(size: 9))
+                            .font(.system(size: 13))
                             .foregroundStyle(.tertiary)
                             .monospacedDigit()
-                            .offset(x: min(w - 12, CGFloat(h) / 24 * w))
+                            .offset(x: min(w - 14, max(0, window.x(Double(h), width: w))))
                     }
                 }
             }
-            .frame(height: 12)
-            Spacer().frame(width: 90)
+            .frame(height: 14)
+            Spacer().frame(width: 96)
         }
     }
 }

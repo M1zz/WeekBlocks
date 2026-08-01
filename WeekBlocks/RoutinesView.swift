@@ -16,7 +16,7 @@ struct RoutineRow: View {
                     .frame(width: 32, height: 32)
                 Image(systemName: routine.iconName)
                     .foregroundStyle(routine.displayColor)
-                    .font(.system(size: 14))
+                    .font(.system(size: 16))
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(routine.name)
@@ -47,7 +47,7 @@ struct RoutineRow: View {
                     // 협상 불가 고정 루틴은 실수 삭제 방지를 위해 목록에선 잠금.
                     // 삭제는 편집(연필) → 삭제 버튼에서 확인 후 가능.
                     Button { onEdit() } label: {
-                        Image(systemName: "lock.fill").font(.system(size: 12))
+                        Image(systemName: "lock.fill").font(.system(size: 14))
                     }
                     .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
@@ -61,7 +61,7 @@ struct RoutineRow: View {
                 }
             } else if routine.kind == .fixed {
                 Image(systemName: "lock.fill")
-                    .font(.system(size: 10))
+                    .font(.system(size: 12))
                     .foregroundStyle(.secondary.opacity(0.45))
             }
         }
@@ -89,35 +89,35 @@ struct RoutineBlock: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: routine.iconName)
-                    .font(.system(size: 12))
+                    .font(.system(size: 14))
                     .foregroundStyle(color)
                     .frame(width: 16)
                 Text(routine.name)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .lineLimit(1)
                 Spacer(minLength: 4)
                 if hovering {
                     Button { onEdit() } label: {
-                        Image(systemName: "pencil").font(.system(size: 11))
+                        Image(systemName: "pencil").font(.system(size: 13))
                     }
                     .buttonStyle(.plain)
                     if routine.kind == .fixed {
                         // 협상 불가 고정 루틴 — 실수 삭제 방지로 잠금(편집에서만 삭제).
-                        Image(systemName: "lock.fill").font(.system(size: 10)).foregroundStyle(.secondary)
+                        Image(systemName: "lock.fill").font(.system(size: 12)).foregroundStyle(.secondary)
                     } else {
                         Button(role: .destructive) { onDelete() } label: {
-                            Image(systemName: "trash").font(.system(size: 11))
+                            Image(systemName: "trash").font(.system(size: 13))
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(.red)
                     }
                 } else if routine.kind == .fixed {
-                    Image(systemName: "lock.fill").font(.system(size: 10)).foregroundStyle(.secondary.opacity(0.45))
+                    Image(systemName: "lock.fill").font(.system(size: 12)).foregroundStyle(.secondary.opacity(0.45))
                 }
             }
 
             Text(routine.scheduleDescription)
-                .font(.system(size: 11))
+                .font(.system(size: 13))
                 .foregroundStyle(.secondary)
                 .lineLimit(2, reservesSpace: true)   // 1줄짜리도 2줄 공간 확보 → 모든 블록 높이 통일
                 .fixedSize(horizontal: false, vertical: true)
@@ -125,10 +125,10 @@ struct RoutineBlock: View {
             HStack(spacing: 6) {
                 if routine.kind == .fixed {
                     Text(String(format: "%.1fh/일", routine.durationHours))
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                 }
                 Text(String(format: "%.1fh/주", routine.totalWeeklyHours))
-                    .font(.system(size: 11))
+                    .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
             .monospacedDigit()

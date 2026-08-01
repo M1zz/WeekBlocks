@@ -152,7 +152,7 @@ private struct ReflectionRow: View {
                     onChange()
                 } label: {
                     Image(systemName: status.systemImage)
-                        .font(.system(size: 18))
+                        .font(.system(size: 20))
                         .foregroundStyle(tint(for: status, selected: block.reviewStatus == status))
                 }
                 .buttonStyle(.borderless)

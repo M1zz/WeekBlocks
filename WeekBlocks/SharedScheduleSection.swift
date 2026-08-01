@@ -203,7 +203,7 @@ private struct ReceivedScheduleCard: View {
                 Text(schedule.ownerName)
                     .font(.callout.weight(.semibold))
                 Text("보기 전용")
-                    .font(.caption2.weight(.medium))
+                    .font(.caption.weight(.medium))
                     .padding(.horizontal, 7)
                     .padding(.vertical, 2)
                     .background(Color.secondary.opacity(0.15), in: Capsule())
@@ -289,10 +289,10 @@ struct SharedScheduleWeekView: View {
                                 .fill(sharedTokenColor(r.color).opacity(0.85))
                                 .frame(width: 9, height: 9)
                             Text(r.name)
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .lineLimit(1)
                             Text(r.scheduleDesc)
-                                .font(.system(size: 10))
+                                .font(.system(size: 12))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
@@ -339,12 +339,12 @@ private struct SharedDayRow: View {
         HStack(spacing: 10) {
             VStack(spacing: 0) {
                 Text(day.shortLabel)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(isToday ? Color.accentColor : .secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(isToday ? Color.red : .secondary)
                 Text(dayNumber)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .monospacedDigit()
-                    .foregroundStyle(isToday ? Color.accentColor : .primary)
+                    .foregroundStyle(isToday ? Color.red : .primary)
             }
             .frame(width: 26)
 
@@ -396,7 +396,7 @@ private struct SharedDayRow: View {
         .overlay(alignment: .leading) {
             if width > 18 {
                 Text(seg.title)
-                    .font(.system(size: 9, weight: seg.isNested ? .semibold : .medium))
+                    .font(.system(size: 11, weight: seg.isNested ? .semibold : .medium))
                     .foregroundStyle(seg.isFlexible ? color : Color.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -423,7 +423,7 @@ private struct SharedHourAxis: View {
                 ZStack(alignment: .leading) {
                     ForEach([0, 3, 6, 9, 12, 15, 18, 21, 24], id: \.self) { h in
                         Text("\(h)")
-                            .font(.system(size: 9))
+                            .font(.system(size: 11))
                             .foregroundStyle(.tertiary)
                             .monospacedDigit()
                             .offset(x: min(w - 12, CGFloat(h) / 24 * w))

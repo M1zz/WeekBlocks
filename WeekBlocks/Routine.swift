@@ -76,6 +76,14 @@ final class Routine {
     /// 쿼터 루틴의 하루 평균 시간 (주간 합계 ÷ 7).
     var dailyQuotaHours: Double { weeklyHours / 7 }
 
+    /// 수면 루틴인가 — 타임라인에서 '수면 시간 숨기기'가 잘라낼 대상.
+    /// 별도 플래그 대신 이름으로 판별해 기존 데이터도 설정 없이 그대로 동작한다.
+    var isSleepRoutine: Bool {
+        guard kind == .fixed else { return false }
+        let n = name.lowercased().replacingOccurrences(of: " ", with: "")
+        return ["수면", "잠", "취침", "sleep"].contains { n.contains($0) }
+    }
+
     var scheduleDescription: String {
         switch kind {
         case .fixed:
