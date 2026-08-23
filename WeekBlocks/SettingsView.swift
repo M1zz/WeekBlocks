@@ -3,6 +3,8 @@ import LeeoKit
 
 /// 설정 화면 — iOS '욕망의 무지개'의 Form + Section 패턴을 macOS로 미러링.
 struct SettingsView: View {
+    /// 할 일 조언(TipKit) 다시 보기를 눌렀는지.
+    @State private var tipsResetDone = false
     @Environment(\.dismiss) private var dismiss
 
     /// 일정 공유 시작·업데이트 시점의 최신 스냅숏을 만들어주는 클로저.
@@ -97,6 +99,23 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("정보")
+                }
+
+                Section {
+                    Button {
+                        TodoTips.resetAll()
+                        tipsResetDone = true
+                    } label: {
+                        Label(tipsResetDone ? "다시 보기로 바꿨습니다" : "할 일 조언 다시 보기",
+                              systemImage: tipsResetDone ? "checkmark.circle.fill" : "lightbulb")
+                    }
+                    .disabled(tipsResetDone)
+
+                    Text("할 일 화면에서 닫았던 조언(라벨·비중·쪼개기 팁)을 처음부터 다시 봅니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("조언")
                 }
 
                 DeveloperContactSection()

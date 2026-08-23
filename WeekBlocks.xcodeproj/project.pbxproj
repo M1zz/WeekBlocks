@@ -12,10 +12,13 @@
 		2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28ADD71097A3C0E497BF731A /* BlockEditorView.swift */; };
 		33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EF8BFE32D234EF9576302C /* ReflectionView.swift */; };
 		4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482967041DBF8581050A3138 /* DayTimelineView.swift */; };
+		4AD3E0852C409C709566599A /* TodoTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */; };
+		3E552E7CDB3A156B74223199 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B46E9BCC91A4B7D8F08BF6 /* TodoTips.swift */; };
 		55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29F659737698D0D348D6468 /* ContentView.swift */; };
 		58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */; };
 		5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */; };
 		651A1BCE01591AEDA87AEFAA /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */; };
+		67A12313C3A920C6F3B8C092 /* TodoSplitAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */; };
 		6E64A7D05163E580F592B679 /* BroadcastContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBCEF723DD8D9B9742E5A52 /* BroadcastContract.swift */; };
 		713B8E11B7AAFE0B8BFD42DF /* BroadcastContractView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04D37A04F3663F8A8DC36E5 /* BroadcastContractView.swift */; };
 		7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC172BAFFE573306711B4CE /* PlanBlock.swift */; };
@@ -26,6 +29,7 @@
 		837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EB398D348B2377FA8540BF /* WeekGridView.swift */; };
 		83DE0994DCC6B215222A482D /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DAA819E703DC5BE377B3688 /* Routine.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
+		ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
 		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
@@ -52,11 +56,13 @@
 		5CC172BAFFE573306711B4CE /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
 		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
+		8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSplitAdvisor.swift; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
 		90641A10CE63E76FFACFD63E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksSpec.swift; sourceTree = "<group>"; };
 		9F541E3039606B54D810E610 /* RoutineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineDetailView.swift; sourceTree = "<group>"; };
 		A47970A792B8AE57E021D9CB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStepsView.swift; sourceTree = "<group>"; };
 		C368657EE69104A4BA70BA52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C60C6E514ED08597EFA6E7D1 /* BroadcastPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastPlanner.swift; sourceTree = "<group>"; };
 		CC4A396C6929CB1C576DBA52 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -64,6 +70,8 @@
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		F04D37A04F3663F8A8DC36E5 /* BroadcastContractView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastContractView.swift; sourceTree = "<group>"; };
+		FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTree.swift; sourceTree = "<group>"; };
+		E4B46E9BCC91A4B7D8F08BF6 /* TodoTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTips.swift; sourceTree = "<group>"; };
 		FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogItem.swift; sourceTree = "<group>"; };
 		FE2891429087F31216F7F774 /* WeekBlocks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeekBlocks.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -115,6 +123,10 @@
 				5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */,
 				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
+				8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */,
+				C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */,
+				FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */,
+				E4B46E9BCC91A4B7D8F08BF6 /* TodoTips.swift */,
 				FE2891429087F31216F7F774 /* WeekBlocks.entitlements */,
 				77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */,
 				9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */,
@@ -229,6 +241,10 @@
 				7EE825830848CC825A252ABD /* SettingsView.swift in Sources */,
 				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
+				67A12313C3A920C6F3B8C092 /* TodoSplitAdvisor.swift in Sources */,
+				ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */,
+				4AD3E0852C409C709566599A /* TodoTree.swift in Sources */,
+				3E552E7CDB3A156B74223199 /* TodoTips.swift in Sources */,
 				58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */,
 				D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */,
 				837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */,

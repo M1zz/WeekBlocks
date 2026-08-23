@@ -18,6 +18,8 @@ struct WeekBlocksApp: App {
     init() {
         // LeeoKit 사용량 트래커 — 리뷰 요청·만족도 프롬프트 게이팅에 쓰인다.
         _ = LeeoEngagement.shared.registerLaunch()
+        // 할 일 화면의 조언은 전부 TipKit으로 낸다 (→ TodoTips.swift).
+        TodoTips.configure()
     }
 
     let container: ModelContainer = {

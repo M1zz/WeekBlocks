@@ -599,15 +599,22 @@ struct ContentView: View {
     }
 
     /// 백로그 항목 → 계획 블록. 전파 계약을 그대로 승계한다.
+    ///
+    /// 단계로 쪼갠 할 일은 **지금 할 단계 하나만** 요일에 올리고 항목은 백로그에 남긴다.
+    /// 남은 단계가 여전히 할 일이기 때문이다. 단계가 없는 할 일은 종전대로
+    /// 통째로 옮겨지고(백로그에서 사라지고) 블록이 그 자리를 대신한다.
     private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek) {
+        let tree = TodoTree(backlogItems)
+        let step = tree.hasChildren(item) ? tree.currentStep(of: item) : nil
+
         let block = PlanBlock(
             day: day,
             timeBand: TimelineLayout.suggestedBand(
                 routines: fixedRoutines(on: day),
                 blocks: weekBlocks.filter { $0.day == day }
             ),
-            durationHours: item.durationHours,
-            title: item.title,
+            durationHours: step?.durationHours ?? item.durationHours,
+            title: step.map { "\(item.title) · \($0.title)" } ?? item.title,
             successCriteria: "",
             deliverable: "",
             weekStartDate: selectedWeek,
@@ -617,7 +624,7 @@ struct ContentView: View {
         // 보낸 기록을 빼먹으면 이미 보낸 전파를 다시 보내라고 뜬다.
         item.copyBroadcastContract(to: block)
         context.insert(block)
-        context.delete(item)
+        if step == nil { context.delete(item) }
         try? context.save()
     }
 

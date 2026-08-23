@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import TipKit
 
 struct BacklogSection: View {
     @Environment(\.modelContext) private var context
@@ -22,14 +23,20 @@ struct BacklogSection: View {
     /// 전파 필요 항목만 보기.
     @State private var broadcastOnly = false
     @State private var contractSheetItem: BacklogItem?
+    /// 단계(뎁스)를 들여다보는 시트.
+    @State private var stepsSheetItem: BacklogItem?
 
     private let cal = Calendar(identifier: .iso8601)
+
+    /// 할 일의 단계(뎁스) 계산기. iOS와 같은 로직(TodoTree.swift)을 쓴다.
+    private var tree: TodoTree { TodoTree(allItems) }
 
     /// 아직 안 한 할 일 **전부**. 주를 옮겨도 목록에서 사라지지 않는다.
     /// (해야 할 일이 보이는 주에 따라 나타났다 사라지면 빠뜨리게 된다)
     /// iOS Todo에서 완료 처리한 항목만 제외.
+    /// 단계는 자기 카드를 갖지 않으므로 최상위 할 일만 세운다.
     private var weekItems: [BacklogItem] {
-        allItems.filter { !$0.isCompleted }.sorted { a, b in
+        tree.roots.filter { !$0.isCompleted }.sorted { a, b in
             let (ba, bb) = (weekBucket(a), weekBucket(b))
             if ba != bb { return ba < bb }
             // 같은 묶음 안에서는 주차순 → 원래 정렬(sortIndex, createdAt) 유지.
@@ -151,7 +158,15 @@ struct BacklogSection: View {
                             categories: categories,
                             tint: itemColorMap[item.dragToken] ?? .secondary,
                             weekNote: weekNote(for: item),
-                            onDelete: { context.delete(item); try? context.save() },
+                            steps: stepsInfo(for: item),
+                            onAdvance: { advance(item) },
+                            onRewind: { rewind(item) },
+                            onEditSteps: { stepsSheetItem = item },
+                            // 단계까지 통째로 지운다.
+                            onDelete: {
+                                for node in tree.subtree(of: item) { context.delete(node) }
+                                try? context.save()
+                            },
                             onSetCategory: { id in
                                 item.categoryID = id
                                 // 전파 카테고리로 옮기면 전파 필요를 켜고 계약을 받으러 간다.
@@ -192,6 +207,41 @@ struct BacklogSection: View {
         .sheet(item: $contractSheetItem) { item in
             BroadcastContractView(item: item)
                 .frame(minWidth: 560, minHeight: 640)
+        }
+        .sheet(item: $stepsSheetItem) { item in
+            TodoStepsView(root: item)
+        }
+    }
+
+    /// 카드에 그릴 단계 요약. 단계가 없으면 nil.
+    private func stepsInfo(for item: BacklogItem) -> BacklogBlock.StepsInfo? {
+        let tree = self.tree
+        guard tree.hasChildren(item) else { return nil }
+        return BacklogBlock.StepsInfo(
+            currentTitle: tree.currentStep(of: item)?.title,
+            progress: tree.progress(of: item),
+            count: tree.leafCount(of: item),
+            number: tree.currentStepNumber(of: item),
+            totalHours: tree.totalHours(of: item),
+            canRewind: tree.lastDoneStep(of: item) != nil,
+            currentLabel: tree.currentStep(of: item)?.label,
+            currentHours: tree.currentStep(of: item)?.durationHours ?? 0
+        )
+    }
+
+    /// 지금 할 단계를 끝내고 다음 단계로 넘긴다.
+    private func advance(_ item: BacklogItem) {
+        withAnimation {
+            tree.advance(item)
+            try? context.save()
+        }
+    }
+
+    /// 마지막으로 끝낸 단계를 되돌린다.
+    private func rewind(_ item: BacklogItem) {
+        withAnimation {
+            tree.rewind(item)
+            try? context.save()
         }
     }
 
@@ -357,11 +407,33 @@ struct FilterChip: View {
 
 /// 드래그해서 요일에 떨어뜨리기 좋은 백로그 블록(카드).
 struct BacklogBlock: View {
+    /// 할 일 안의 단계(뎁스) 요약. 단계가 없는 할 일이면 nil.
+    struct StepsInfo {
+        /// 지금 해야 할 단계. 전부 끝났으면 nil.
+        let currentTitle: String?
+        let progress: Double
+        let count: Int
+        /// 몇 번째 단계인지 (1부터). 전부 끝났으면 nil.
+        let number: Int?
+        let totalHours: Double
+        let canRewind: Bool
+        /// 지금 할 단계의 라벨과 배정 시간 — "5분 났는데 뭐 하지"에 답한다.
+        let currentLabel: TodoLabel?
+        let currentHours: Double
+    }
+
     let item: BacklogItem
     let categories: [BacklogCategory]
     let tint: Color
     /// 보고 있는 주가 아닐 때 붙는 표시 ("지난 주", "2주 전"). 같은 주면 nil.
     var weekNote: String? = nil
+    var steps: StepsInfo? = nil
+    /// 지금 할 단계를 끝내고 다음으로 넘기기.
+    var onAdvance: () -> Void = { }
+    /// 마지막으로 끝낸 단계 되돌리기.
+    var onRewind: () -> Void = { }
+    /// 단계 시트 열기.
+    var onEditSteps: () -> Void = { }
     let onDelete: () -> Void
     let onSetCategory: (String?) -> Void
     /// 전파 계약 시트를 열어달라는 요청.
@@ -406,16 +478,58 @@ struct BacklogBlock: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
+
+                if let steps {
+                    // 단계가 있는 할 일은 '지금 할 단계'가 곧 지금 해야 하는 일이다.
+                    Button(action: onAdvance) {
+                        HStack(spacing: 4) {
+                            Image(systemName: steps.currentTitle == nil
+                                  ? "checkmark.circle.fill"
+                                  : "arrowtriangle.right.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundStyle(steps.currentTitle == nil ? .green : .orange)
+                            Text(steps.currentTitle ?? "모든 단계 완료")
+                                .font(.system(size: 12, weight: .medium))
+                                .lineLimit(1)
+                            if let label = steps.currentLabel {
+                                TodoLabelChip(label: label, hours: steps.currentHours)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .help(steps.currentTitle == nil ? "모든 단계를 마쳤습니다" : "이 단계를 끝내고 다음으로 넘기기")
+
+                    HStack(spacing: 5) {
+                        ProgressView(value: steps.progress)
+                            .tint(steps.progress >= 1 ? .green : tint)
+                            .frame(maxWidth: 80)
+                        Text("\(Int((steps.progress * 100).rounded()))%")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                        if let number = steps.number {
+                            Text("\(steps.count)단계 중 \(number)")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.tertiary)
+                                .monospacedDigit()
+                        }
+                    }
+                }
+
                 HStack(spacing: 5) {
                     if let category {
                         Text(category.name)
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(tint)
                     }
-                    Text(String(format: "%.1fh", item.durationHours))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
+                    if steps == nil {
+                        TodoLabelChip(label: item.label, hours: item.durationHours)
+                    } else {
+                        Text("전체 \(formatDuration(steps?.totalHours ?? item.durationHours))")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
 
                     if let weekNote {
                         Text(weekNote)
@@ -449,6 +563,16 @@ struct BacklogBlock: View {
         .onHover { hovering = $0 }
         .help(broadcastHelp)
         .contextMenu {
+            Button(steps == nil ? "단계로 쪼개기…" : "단계 보기·편집…", action: onEditSteps)
+            if let steps {
+                if steps.currentTitle != nil {
+                    Button("지금 단계 끝내기", action: onAdvance)
+                }
+                if steps.canRewind {
+                    Button("이전 단계로 되돌리기", action: onRewind)
+                }
+            }
+            Divider()
             if item.needsBroadcast {
                 Button(item.broadcastContractVerified ? "전파 계약 열기" : "전파 계약 마치기",
                        action: onOpenBroadcastContract)
@@ -495,14 +619,17 @@ struct BacklogComposerView: View {
 
     @State private var newTitle = ""
     @State private var defaultCategoryID: String? = nil
+    /// 적으면서 고르는 라벨 = 예상 시간. 고르기 전에는 추가할 수 없다.
+    @State private var newLabel: TodoLabel? = nil
     @State private var showingCategoryManager = false
     @FocusState private var focused: Bool
 
     private let cal = Calendar(identifier: .iso8601)
 
     /// 아직 안 한 할 일 전부 (백로그와 같은 범위). 보고 있는 주가 위로 온다.
+    /// 단계는 부모 안에서만 보이므로 최상위만 세운다.
     private var weekItems: [BacklogItem] {
-        allItems.filter { !$0.isCompleted }.sorted { a, b in
+        TodoTree(allItems).roots.filter { !$0.isCompleted }.sorted { a, b in
             let (ba, bb) = (bucket(a), bucket(b))
             if ba != bb { return ba < bb }
             if !cal.isDate(a.weekStartDate, inSameDayAs: b.weekStartDate) {
@@ -535,16 +662,41 @@ struct BacklogComposerView: View {
             Divider()
 
             // TODO 방식 입력 줄 — 제목 입력 후 Enter 로 즉시 추가, 포커스 유지
-            HStack(spacing: 10) {
-                categoryDefaultMenu
-                TextField("할 일 입력 후 Enter", text: $newTitle)
-                    .textFieldStyle(.plain)
-                    .font(.title3)
-                    .focused($focused)
-                    .onSubmit(addAndContinue)
-                Button("추가", action: addAndContinue)
-                    .buttonStyle(.borderless)
-                    .disabled(newTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 10) {
+                    categoryDefaultMenu
+                    TextField("할 일 입력 후 Enter", text: $newTitle)
+                        .textFieldStyle(.plain)
+                        .font(.title3)
+                        .focused($focused)
+                        .onSubmit(addAndContinue)
+                    Button("추가", action: addAndContinue)
+                        .buttonStyle(.borderless)
+                        .disabled(!canAdd)
+                }
+
+                // 라벨을 고르는 순간 예상 시간도 정해진다.
+                // 이 시간이 그 할 일의 100%이고, 단계를 나누면 단계들이 나눠 갖는다.
+                TipView(LabelPickTip())
+
+                HStack(spacing: 8) {
+                    Text(newLabel.map(\.hint) ?? "얼마나 걸릴 일인가요?")
+                        .font(.caption)
+                        .foregroundStyle(newLabel == nil ? Color.orange : Color.secondary)
+                        .frame(width: 190, alignment: .leading)
+                    ForEach(TodoLabel.allCases) { label in
+                        Button {
+                            newLabel = label
+                            LabelPickTip.hasPicked = true
+                        } label: {
+                            TodoLabelChip(label: label,
+                                          hours: label.defaultHours,
+                                          isSelected: newLabel == label)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    Spacer()
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
@@ -612,12 +764,18 @@ struct BacklogComposerView: View {
         .help("새 항목의 기본 카테고리")
     }
 
+    /// 제목만으로는 추가할 수 없다 — 얼마나 걸릴 일인지(라벨)를 반드시 고르게 한다.
+    private var canAdd: Bool {
+        !newTitle.trimmingCharacters(in: .whitespaces).isEmpty && newLabel != nil
+    }
+
     private func addAndContinue() {
         let t = newTitle.trimmingCharacters(in: .whitespaces)
-        guard !t.isEmpty else { return }
+        guard !t.isEmpty, let label = newLabel else { return }
         let maxIndex = allItems.map(\.sortIndex).max() ?? -1
-        let item = BacklogItem(title: t, durationHours: 1, sortIndex: maxIndex + 1,
-                               categoryID: defaultCategoryID, weekStartDate: weekStart)
+        let item = BacklogItem(title: t, durationHours: label.defaultHours, sortIndex: maxIndex + 1,
+                               categoryID: defaultCategoryID, weekStartDate: weekStart,
+                               label: label)
         // 전파 카테고리로 넣은 항목은 곧바로 전파 필요가 된다.
         // 계약은 아직 미확정 상태로 남아 '전파 예정' 섹션에서 계속 눈에 띈다.
         if let broadcast = categories.broadcastCategory, defaultCategoryID == broadcast.uuid {
@@ -634,6 +792,7 @@ struct ComposerItemRow: View {
     @Bindable var item: BacklogItem
     let categories: [BacklogCategory]
     @Environment(\.modelContext) private var context
+    @Query private var allItems: [BacklogItem]
     let onDelete: () -> Void
 
     @State private var showingContract = false
@@ -650,13 +809,15 @@ struct ComposerItemRow: View {
 
             broadcastToggle
 
+            labelMenu
+
             HStack(spacing: 2) {
-                TextField("", value: $item.durationHours, format: .number.precision(.fractionLength(0...1)))
+                TextField("", value: hoursBinding, format: .number.precision(.fractionLength(0...1)))
                     .frame(width: 38)
                     .multilineTextAlignment(.trailing)
                 Text("h").font(.callout).foregroundStyle(.secondary)
             }
-            Stepper("", value: $item.durationHours, in: 0.25...12, step: 0.25)
+            Stepper("", value: hoursBinding, in: 0.25...12, step: 0.25)
                 .labelsHidden()
 
             Button("삭제", role: .destructive, action: onDelete)
@@ -667,11 +828,38 @@ struct ComposerItemRow: View {
         .padding(.vertical, 7)
         .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
         .onChange(of: item.title) { _, _ in try? context.save() }
-        .onChange(of: item.durationHours) { _, _ in try? context.save() }
         .sheet(isPresented: $showingContract) {
             BroadcastContractView(item: item)
                 .frame(minWidth: 560, minHeight: 640)
         }
+    }
+
+    /// 이 할 일 전체가 몇 시간인가 = 100%.
+    /// 단계가 있으면 그 단계들이 비율을 지킨 채 함께 늘고 준다.
+    private var hoursBinding: Binding<Double> {
+        Binding(get: { item.durationHours },
+                set: { value in
+                    TodoTree(allItems).setTotalHours(item, to: max(0, value))
+                    try? context.save()
+                })
+    }
+
+    /// 라벨 = 이건 어떤 타입의 일인가. 고르면 예상 시간도 그 라벨의 기본값이 된다.
+    private var labelMenu: some View {
+        Menu {
+            ForEach(TodoLabel.allCases) { label in
+                Button("\(label.name) · \(formatDuration(label.defaultHours))") {
+                    item.labelRaw = label.rawValue
+                    TodoTree(allItems).setTotalHours(item, to: label.defaultHours)
+                    try? context.save()
+                }
+            }
+        } label: {
+            TodoLabelChip(label: item.label)
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
     }
 
     /// 카테고리 지정. 전파 카테고리면 전파 필요를 켜고 계약 시트로 바로 넘긴다.
@@ -745,10 +933,18 @@ struct AllBacklogView: View {
 
     private let cal = Calendar(identifier: .iso8601)
 
+    private var tree: TodoTree { TodoTree(allItems) }
+
+    /// 최상위 할 일만 (단계는 부모 안에서 본다). 정렬은 @Query 순서를 그대로 쓴다.
+    private var rootItems: [BacklogItem] {
+        let roots = Set(tree.roots.map(\.dragToken))
+        return allItems.filter { roots.contains($0.dragToken) }
+    }
+
     /// 항목이 존재하는 주들 (최신 주 우선).
     private var weeks: [Date] {
         var seen = Set<Date>(); var result: [Date] = []
-        for it in allItems where !seen.contains(it.weekStartDate) {
+        for it in rootItems where !seen.contains(it.weekStartDate) {
             seen.insert(it.weekStartDate); result.append(it.weekStartDate)
         }
         return result
@@ -769,7 +965,7 @@ struct AllBacklogView: View {
 
             Divider()
 
-            if allItems.isEmpty {
+            if rootItems.isEmpty {
                 Spacer()
                 Text("백로그가 비어 있습니다.").foregroundStyle(.secondary)
                 Spacer()
@@ -777,7 +973,7 @@ struct AllBacklogView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(weeks, id: \.self) { week in
-                            let items = allItems.filter { cal.isDate($0.weekStartDate, inSameDayAs: week) }
+                            let items = rootItems.filter { cal.isDate($0.weekStartDate, inSameDayAs: week) }
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack {
                                     Text(weekLabel(week))
@@ -785,7 +981,7 @@ struct AllBacklogView: View {
                                         .foregroundStyle(isCurrent(week) ? Color.red : .primary)
                                     Text("\(items.count)개").font(.caption).foregroundStyle(.secondary)
                                     Spacer()
-                                    Text("합계 \(formatDuration(items.reduce(0) { $0 + $1.durationHours }))")
+                                    Text("합계 \(formatDuration(items.reduce(0) { $0 + tree.totalHours(of: $1) }))")
                                         .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                                 }
                                 ForEach(items) { item in
@@ -793,8 +989,14 @@ struct AllBacklogView: View {
                                         item: item,
                                         categories: categories,
                                         isCurrentWeek: isCurrent(week),
-                                        onCarry: { item.weekStartDate = currentWeek; try? context.save() },
-                                        onDelete: { context.delete(item); try? context.save() }
+                                        onCarry: {
+                                            for node in tree.subtree(of: item) { node.weekStartDate = currentWeek }
+                                            try? context.save()
+                                        },
+                                        onDelete: {
+                                            for node in tree.subtree(of: item) { context.delete(node) }
+                                            try? context.save()
+                                        }
                                     )
                                 }
                             }

@@ -8,6 +8,15 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<!-- CloudKit 환경 고정.
+	     기본값은 서명 방식을 따라가서 Xcode 디버그 빌드는 Development, App Store 빌드는
+	     Production을 쓰는데, 두 환경은 같은 컨테이너 ID라도 데이터가 완전히 분리된다.
+	     iOS '욕망의 무지개'가 Production으로 못박혀 있으므로, 맥 개발 빌드에서 만든 계획·
+	     백로그를 아이폰에서 보려면 이쪽도 Production이어야 한다. App Store 빌드는 어차피
+	     Production이라 이 값이 배포 동작을 바꾸지 않는다.
+	     ⚠️ 이 설정 때문에 디버그 빌드도 실제 사용자 데이터를 읽고 쓴다. -->
+	<key>com.apple.developer.icloud-container-environment</key>
+	<string>Production</string>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
 		<string>CloudKit</string>
