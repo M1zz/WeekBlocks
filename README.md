@@ -1,113 +1,79 @@
-# 일정 밀도 앱 (Schedule Density App)
+# 무지개 공방 (macOS)
 
-일정의 밀도를 시각화하고, 비어있는 시간대를 추천해주는 iOS 앱입니다.
+한 주를 요일과 시간대로 짜는 작업대. 할 일을 끌어다 요일에 놓고 계획 블록으로 만든다.
 
-> 🌈 **WeekBlocks(macOS) 지원 페이지** → https://m1zz.github.io/ScheduleDensity/
-> 주간 타임블로킹 앱 WeekBlocks의 사용 안내·FAQ·문의 페이지입니다.
+- **소개 페이지** — https://m1zz.github.io/WeekBlocks/
+- **개인정보 처리방침** — https://m1zz.github.io/WeekBlocks/privacy.html
+- **릴리즈 노트** — [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
 
-> **패밀리 구조**: 이 프로젝트(`ScheduleDensityApp.xcodeproj`)는 두 개의 타깃을 포함합니다.
-> - **ScheduleDensityApp** (iOS) — 일정 밀도 시각화 + 빈 시간 추천 (`com.example.ScheduleDensityApp`)
-> - **WeekBlocks** (macOS) — 주간 타임블로킹 + 구체성 검사 (표시이름 ScheduleDensity, `com.devkoan.ScheduleDensityApp`)
->
-> iCloud(CloudKit) 동기화: 패밀리 공유 컨테이너 `iCloud.com.devkoan.ScheduleDensity` 사용.
-> macOS 타깃은 적용 완료(SwiftData `cloudKitDatabase: .private(...)`). iOS 타깃은 미적용(아래 todo 참고).
->
-> 빌드:
-> ```
-> xcodebuild -scheme ScheduleDensityApp -destination 'generic/platform=iOS' build
-> xcodebuild -scheme WeekBlocks -destination 'platform=macOS' build
-> ```
-> macOS 앱 소스는 `WeekBlocks/` 폴더에 있습니다.
+iOS 앱 **욕망의 무지개** 는 별도 저장소입니다 → https://github.com/M1zz/ScheduleDensity
+같은 CloudKit 컨테이너를 쓰므로 두 앱을 함께 수정해야 하는 변경이 많습니다.
 
-## 📱 주요 기능
+## 화면
 
-1. **주간 캘린더 뷰**
-   - 30분 단위로 일정 표시
-   - 일정이 겹칠수록 색상이 진해짐
-   - 좌우 스와이프로 주 이동
+- **주간 그리드** — 요일 x 시간대. 백로그 할 일을 끌어다 놓으면 계획 블록이 된다.
+- **하루 타임라인** — 요일 하나를 세로로 펼쳐 실제 시각으로 본다.
+- **고정 루틴** — 수면·식사·회사처럼 협상 불가한 시간을 먼저 깐다.
+- **백로그** — 할 일과 그 단계. 카테고리로 걸러 본다.
+- **전파 계약** — 남에게 알려야 끝나는 일의 전처리와 전파 시점 역산.
 
-2. **반복 일정 지원**
-   - 매일, 평일, 주말, 월수금, 화목 등
-   - 사용자 지정 요일 선택 가능
-   - 기간 설정 (시작일 ~ 종료일)
+## 착수 조건
 
-3. **시간대 추천**
-   - 일정 밀도가 낮은 시간대 자동 추천
-   - 주간 밀도 분석
-   - 점수 기반 추천 순위
+쪼갤 때 묻는 것은 "이 단계가 전체의 몇 %냐"가 아니라 **"지금 시작할 수 있나"** 다.
+근거는 [`TodoSplitAdvisor.swift`](WeekBlocks/TodoSplitAdvisor.swift) 머리주석에 있다.
 
-4. **샘플 데이터**
-   - 수업 (매일 09:00-18:00)
-   - 운동 (월수금, 2시간)
-   - 스터디 (주말, 2시간)
-   - 스터디 준비 (수요일, 2시간)
+| 속성 | 뜻 | 기본 시간 |
+|---|---|---|
+| 바로 | 먼저 할 것도 정할 것도 없다 | 15분 |
+| 펼치고 | 자료를 펼쳐야 시작된다 | 30분 |
+| 몰입해서 | 끊기면 다시 올라와야 한다 | 1시간 |
+| 정하고 | 안 정한 것이 막고 있다 | 30분 |
+| 기다림 | 내 손을 떠나 있다 | 내 시간 아님 |
 
-## 🛠 기술 스택
+시간은 **아래에서 위로** 쌓인다. 상위 할 일의 시간은 단계들의 합이다.
 
-- **SwiftUI**: 모던 UI 프레임워크
-- **Swift Data**: 데이터 영속화
-- **iOS 17.0+**: 최소 지원 버전
+## 타깃
 
-## 📂 프로젝트 구조
+| 타깃 | 번들 ID | 설명 |
+|---|---|---|
+| `WeekBlocks` | `com.devkoan.ScheduleDensityApp` | 본체 (macOS 14+) |
+| `TodoShareExtension` | `...TodoShare` | 공유 메뉴에서 백로그에 추가 |
 
-```
-ScheduleDensityApp/
-├── Models/
-│   ├── Event.swift              # 일정 데이터 모델
-│   └── RecurrencePattern.swift  # 반복 패턴 정의
-├── ViewModels/
-│   └── ScheduleViewModel.swift  # 비즈니스 로직
-├── Views/
-│   ├── ContentView.swift        # 메인 화면
-│   ├── WeekView.swift           # 주간 캘린더
-│   ├── AddEventView.swift       # 일정 추가
-│   └── RecommendationView.swift # 추천 화면
-└── Utilities/
-    ├── DateExtensions.swift     # 날짜 유틸리티
-    └── DensityCalculator.swift  # 밀도 계산
+## 빌드
+
+프로젝트 파일은 [XcodeGen](https://github.com/yonaskolb/XcodeGen)으로 생성한다.
+
+```sh
+xcodegen generate --spec WeekBlocks.project.yml
+xcodebuild -project WeekBlocks.xcodeproj -scheme WeekBlocks \
+  -destination 'platform=macOS' build
 ```
 
-## 🚀 실행 방법
+`.xcodeproj`를 직접 고치지 말고 `WeekBlocks.project.yml`을 고친 뒤 재생성한다.
 
-1. Xcode 15.0 이상 필요
-2. `ScheduleDensityApp.xcodeproj` 열기
-3. 시뮬레이터 또는 실제 기기 선택
-4. ⌘ + R 로 실행
+## 두 저장소를 함께 고쳐야 하는 것
 
-## 💡 사용 방법
+다음 파일은 [ScheduleDensity](https://github.com/M1zz/ScheduleDensity) 저장소에 **같은 내용으로 복제**되어 있다.
+한쪽만 고치면 두 앱의 동작이 갈라진다.
 
-### 일정 추가
-1. 상단 `+` 버튼 클릭
-2. 일정 정보 입력
-3. 반복 패턴 선택 (선택사항)
-4. `추가` 버튼 클릭
+- `TodoSplitAdvisor.swift`
+- `TodoTree.swift`
+- `TodoTips.swift`
+- `BacklogItem+Label.swift`
 
-### 시간대 추천
-1. 상단 💡 버튼 클릭
-2. 새 일정의 소요 시간 설정
-3. `추천 시간 찾기` 클릭
-4. 추천 리스트 확인
+`BacklogItem` / `BacklogCategory` 는 같은 CloudKit 스키마를 쓰므로 **필드 추가·삭제는 반드시 양쪽 동시에** 한다.
+전파 계약 필드는 맥에만 있으므로 전부 옵셔널 또는 기본값이다.
 
-### 샘플 데이터 추가
-1. 상단 `⋯` 메뉴 클릭
-2. `샘플 데이터 추가` 선택
-3. 확인
+## 데이터
 
-## 🎨 디자인 특징
+- SwiftData 기본 스토어, CloudKit `iCloud.com.devkoan.ScheduleDensity` (private)
+- 공유 익스텐션 통로: App Group `QGAQ3AY3R3.group.com.devkoan.ScheduleDensity`
+  (맥의 App Group ID는 iOS와 달리 팀 ID가 앞에 붙는다)
 
-- **무지개 시각화**: 일정이 겹칠수록 색이 진해짐
-- **30분 단위**: 세밀한 시간 관리
-- **직관적인 UI**: 한눈에 보는 주간 일정
-- **밀도 분석**: 데이터 기반 추천
+> ⚠️ `ModelConfiguration`에 `groupContainer: .none` 이 명시돼 있다.
+> App Group entitlement가 붙으면 SwiftData 기본 저장 위치가 앱 샌드박스에서 App Group으로 옮겨가서,
+> 이미 배포된 사용자의 루틴·계획·백로그를 못 찾고 전부 사라진 것처럼 보인다. 빼지 말 것.
 
-## 📝 라이선스
+## 문의
 
-MIT License
-
-## 👤 개발자
-
-Created by Claude (2025)
-
----
-
-**참고**: 이 앱은 iOS 17.0 이상에서만 작동합니다 (Swift Data 사용).
+mizzking75@gmail.com

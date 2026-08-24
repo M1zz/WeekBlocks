@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WeekBlocks 지원 — 주간 타임블로킹 + 구체성 검사</title>
-<meta name="description" content="WeekBlocks(macOS) 사용 안내, 자주 묻는 질문, 개인정보 처리, 문의 — 무지개 공방 패밀리 앱." />
+<title>무지개 공방 — 주간 타임블로킹</title>
+<meta name="description" content="한 주를 요일과 시간대로 짜는 macOS 앱. 할 일을 단계로 쪼개고 지금 시작할 수 있는 것부터 집습니다. 사용 안내, 자주 묻는 질문, 개인정보, 문의." />
+<meta property="og:title" content="무지개 공방" />
+<meta property="og:description" content="한 주를 요일과 시간대로 짜는 작업대. 할 일을 끌어다 놓고 계획을 세웁니다." />
+<meta property="og:type" content="website" />
 <style>
   :root {
     --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
@@ -26,7 +29,7 @@
   header.hero { text-align:center; padding:72px 24px 56px; }
   .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
   h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
-  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:520px; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
   section { padding:40px 0; border-top:1px solid var(--line); }
   section:first-of-type { border-top:none; }
   h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
@@ -51,7 +54,7 @@
   details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
   details summary::-webkit-details-marker { display:none; }
   details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
-  details[open] summary::after { content:"–"; }
+  details[open] summary::after { content:"\2013"; }
   details p { margin:0 0 16px; color:var(--sub); }
   .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
   .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
@@ -60,107 +63,146 @@
   footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
   footer .fam { margin-top:6px; font-size:13px; }
   .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
 </style>
 </head>
 <body>
+
 <div class="rainbow-bar"></div>
 
 <header class="hero">
-  <span class="badge">무지개 공방 · macOS</span>
-  <h1>WeekBlocks</h1>
-  <p class="tagline">한 주를 블록으로 계획하고, “구체성 검사”로 막연함을 걸러내는 주간 타임블로킹 앱입니다.</p>
+  <span class="badge">macOS 앱</span>
+  <h1>무지개 공방</h1>
+  <p class="tagline">한 주를 요일과 시간대로 짜는 작업대입니다. 할 일을 끌어다 요일에 놓고, 무엇이 몇 시간짜리인지 눈으로 확인하면서 계획을 세웁니다.</p>
 </header>
 
 <main class="wrap">
 
-  <section id="features">
-    <h2><span class="dot" style="background:var(--red)"></span>주요 기능</h2>
-    <p class="lead">계획 → 실행 → 회고로 이어지는 한 주의 흐름을 한 화면에서 관리합니다.</p>
-    <div class="grid">
-      <div class="card"><span class="emoji">🧱</span><h3>주간 타임블로킹</h3><p>월요일 시작(ISO 8601) 기준으로 요일·시간대에 할 일을 블록으로 배치합니다.</p></div>
-      <div class="card"><span class="emoji">🔍</span><h3>구체성 검사</h3><p>활동·성공 기준·산출물을 적고, “열심히/대충” 같은 모호한 표현이 있으면 저장 전에 짚어 드립니다.</p></div>
-      <div class="card"><span class="emoji">🔁</span><h3>루틴 관리</h3><p>고정 시간대 루틴과 “주간 쿼터(시간 유연)” 루틴을 함께 다룹니다. 일 평균·회당 시간을 자동 계산합니다.</p></div>
-      <div class="card"><span class="emoji">📋</span><h3>백로그</h3><p>이번 주 할 일을 모아 두고, 지난 주에 못 한 항목은 이번 주로 가져옵니다. 카테고리로 분류할 수 있습니다.</p></div>
-      <div class="card"><span class="emoji">🕒</span><h3>하루 24시간 타임라인</h3><p>7요일을 가로 막대로 펼쳐 루틴과 계획을 겹침 없이 배치하고, 요일별 남은 “자유 시간”을 보여 줍니다.</p></div>
-      <div class="card"><span class="emoji">✅</span><h3>회고</h3><p>지난 날의 블록을 달성·부분 달성·건너뜀으로 돌아보며 한 주를 정리합니다.</p></div>
-      <div class="card"><span class="emoji">☁️</span><h3>iCloud 동기화</h3><p>같은 iCloud 계정의 기기끼리 자동으로 동기화됩니다. 별도 계정 가입이 필요 없습니다.</p></div>
-      <div class="card"><span class="emoji">🌈</span><h3>무지개 디자인</h3><p>iOS 앱 ‘욕망의 무지개’와 동일한 7색 팔레트로 색을 통일했습니다.</p></div>
+<section>
+  <h2><span class="dot" style="background:var(--blue)"></span>주간 타임블로킹</h2>
+  <p class="lead">할 일 목록만으로는 한 주에 그게 다 들어가는지 알 수 없습니다. 자리에 놓아봐야 압니다.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="emoji">📐</span>
+      <h3>요일에 끌어다 놓기</h3>
+      <p>백로그의 할 일을 요일 칸으로 끌면 계획 블록이 됩니다. 블록은 옮기고 늘리고 지울 수 있습니다.</p>
     </div>
-  </section>
-
-  <section id="howto">
-    <h2><span class="dot" style="background:var(--orange)"></span>사용 방법</h2>
-    <p class="lead">처음이라면 이 순서를 따라 한 주를 채워 보세요.</p>
-    <ol class="steps">
-      <li><b>고정 루틴부터 추가하기</b><span>더보기(⋯) 메뉴 또는 루틴 섹션에서 수업·근무·식사 같은 고정 루틴을 먼저 등록합니다. 루틴이 하나 이상 있어야 계획 블록을 추가할 수 있습니다.</span></li>
-      <li><b>백로그에 할 일 모으기</b><span>“할 일 작성”에서 이번 주에 하고 싶은 일을 줄줄이 적고, 카테고리와 예상 시간을 정합니다.</span></li>
-      <li><b>블록으로 계획하기</b><span>요일·시간대를 골라 블록을 만들고, 활동·성공 기준·산출물을 적습니다. 구체성 검사를 통과하면 저장됩니다.</span></li>
-      <li><b>타임라인으로 확인하기</b><span>요일별 24시간 타임라인에서 루틴과 계획이 겹치지 않는지, 남은 자유 시간이 충분한지 점검합니다.</span></li>
-      <li><b>회고로 마무리하기</b><span>하루가 지나면 각 블록을 달성·부분 달성·건너뜀으로 돌아보며 다음 주 계획에 반영합니다.</span></li>
-    </ol>
-  </section>
-
-  <section id="faq">
-    <h2><span class="dot" style="background:var(--green)"></span>자주 묻는 질문</h2>
-
-    <details>
-      <summary>“구체성 검사”를 통과하지 못하면 저장할 수 없나요?</summary>
-      <p>네. 활동(3자 이상), 성공 기준(10자 이상·모호한 표현 금지), 산출물(5자 이상) 세 가지를 모두 통과해야 블록이 저장됩니다. “열심히·노력·대충·적당히·조금·많이·그냥·어느 정도·잘” 같은 표현은 측정 가능한 문장으로 바꿔 주세요.</p>
-    </details>
-
-    <details>
-      <summary>왜 주가 월요일에 시작하나요?</summary>
-      <p>ISO 8601 달력 기준으로 주를 계산하기 때문입니다. 지역 설정이 바뀌어도 항상 월요일 시작이 유지됩니다.</p>
-    </details>
-
-    <details>
-      <summary>“고정 시간대”와 “주간 쿼터” 루틴은 어떻게 다른가요?</summary>
-      <p>고정 시간대 루틴은 매주 정해진 요일·시각에 반복됩니다. 주간 쿼터 루틴은 “주당 몇 시간”만 정하고 시간대는 유연하게 두는 방식으로, 일 평균·회당 시간을 자동으로 계산해 보여 드립니다.</p>
-    </details>
-
-    <details>
-      <summary>여러 기기에서 같은 계획을 볼 수 있나요?</summary>
-      <p>네. 같은 iCloud 계정으로 로그인한 기기끼리 자동으로 동기화됩니다. 별도의 회원가입이나 로그인 과정은 없습니다.</p>
-    </details>
-
-    <details>
-      <summary>지난 주에 못 끝낸 할 일은 어떻게 하나요?</summary>
-      <p>“전체 백로그”에서 주별로 모아 볼 수 있고, 지난 주 미완료 항목은 “이번 주로 가져오기”로 이월할 수 있습니다.</p>
-    </details>
-
-    <details>
-      <summary>지원 운영체제는 무엇인가요?</summary>
-      <p>WeekBlocks는 macOS용 앱입니다. 같은 패밀리의 iOS 앱은 ‘욕망의 무지개(ScheduleDensity)’입니다.</p>
-    </details>
-  </section>
-
-  <section id="privacy">
-    <h2><span class="dot" style="background:var(--indigo)"></span>개인정보 처리</h2>
-    <p class="lead">WeekBlocks는 별도의 서버를 운영하지 않습니다.</p>
-    <div class="grid">
-      <div class="card"><h3>수집하지 않습니다</h3><p>계정·이메일·위치·사용 분석 등 어떤 개인정보도 개발자에게 전송하거나 수집하지 않습니다.</p></div>
-      <div class="card"><h3>내 기기와 iCloud에 저장</h3><p>계획·루틴·백로그 데이터는 기기 내부와 사용자 본인의 iCloud(개인 데이터베이스)에만 저장됩니다. 동기화는 Apple iCloud를 통해 이루어지며 Apple의 개인정보 정책이 적용됩니다.</p></div>
+    <div class="card">
+      <span class="emoji">🕒</span>
+      <h3>고정 루틴</h3>
+      <p>수면, 식사, 회사처럼 협상할 수 없는 시간을 먼저 깔아둡니다. 남는 자리가 실제로 쓸 수 있는 시간입니다.</p>
     </div>
-    <p class="muted" style="margin-top:16px;">데이터 삭제: 앱을 삭제하면 기기의 데이터가 제거되며, iCloud 데이터는 설정에서 관리할 수 있습니다.</p>
-    <p style="margin-top:8px;"><a href="./privacy.html">개인정보 처리방침 전문 보기 →</a></p>
-  </section>
-
-  <section id="support">
-    <h2><span class="dot" style="background:var(--purple)"></span>문의 / 지원</h2>
-    <p class="lead">버그 제보나 기능 제안을 환영합니다. 편하게 연락 주세요.</p>
-    <div class="contact">
-      <div>이메일로 문의하기</div>
-      <a class="btn" href="mailto:mizzking75@gmail.com?subject=%5BWeekBlocks%5D%20%EB%AC%B8%EC%9D%98">mizzking75@gmail.com</a>
-      <p class="muted" style="margin:18px 0 0;">소스 코드 및 이슈: <a href="https://github.com/M1zz/ScheduleDensity">github.com/M1zz/ScheduleDensity</a></p>
+    <div class="card">
+      <span class="emoji">📊</span>
+      <h3>하루 타임라인</h3>
+      <p>요일별로 시간대를 세로로 펼쳐 봅니다. 어디가 비었고 어디가 겹치는지 바로 보입니다.</p>
     </div>
-  </section>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--green)"></span>할 일을 단계로 쪼갠다</h2>
+  <p class="lead">큰 일이 안 굴러가는 건 대개 게을러서가 아니라, 손대기 전에 남아 있는 것이 있어서입니다.</p>
+
+  <p>쪼갤 때 고르는 건 하나뿐입니다. <b>이 단계를 지금 시작할 수 있는가.</b></p>
+
+  <table class="attrs">
+    <tr><td class="k" style="color:var(--green)">바로</td><td class="v">지금 손에 잡히는 것만으로 끝납니다. 짬이 나면 집으세요.</td></tr>
+    <tr><td class="k" style="color:#00A0A0">펼치고</td><td class="v">자료나 도구를 펼쳐야 시작됩니다. 준비할 짬이 났을 때 하세요.</td></tr>
+    <tr><td class="k" style="color:var(--indigo)">몰입해서</td><td class="v">끊기면 처음부터 다시 올라와야 합니다. 방해 없는 시간에 두세요.</td></tr>
+    <tr><td class="k" style="color:var(--orange)">정하고</td><td class="v">아직 정하지 않은 것이 있어 시작이 안 됩니다. 정하는 것이 이 단계의 일입니다.</td></tr>
+    <tr><td class="k" style="color:var(--sub)">기다림</td><td class="v">내 손을 떠나 있습니다. 상대의 답이 와야 움직입니다.</td></tr>
+  </table>
+
+  <p style="margin-top:20px">고른 속성이 예상 시간을 데려오고, 그 일 전체에 걸리는 시간은 단계들의 합이 됩니다. 지금 할 단계에는 언제 하면 되는지가 함께 나옵니다.</p>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--purple)"></span>전파 계약</h2>
+  <p class="lead">누군가에게 알려야 끝나는 일은, 알리는 시점을 미리 정해두지 않으면 늘 늦습니다.</p>
+  <p>전파가 필요한 할 일에는 대상과 넘길 형태, 빠르면 언제 늦어도 언제인지를 적어둡니다. 그러면 진짜 마감에서 거꾸로 계산해 언제 무엇을 알려야 하는지가 나옵니다. 상대는 늦어도 언제까지라는 약속을 기준으로 자기 일을 짤 수 있습니다.</p>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--orange)"></span>아이폰과 이어짐</h2>
+  <p class="lead">같은 iCloud 계정을 쓰면 iOS 앱 욕망의 무지개와 자동으로 이어집니다.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>할 일이 오간다</h3>
+      <p>맥에서 적은 백로그가 아이폰의 할 일 탭에 나타나고, 반대도 마찬가지입니다.</p>
+    </div>
+    <div class="card">
+      <h3>오늘 계획이 보인다</h3>
+      <p>맥에서 오늘로 배정한 일이 아이폰의 무지개 화면과 위젯에 함께 나타납니다.</p>
+    </div>
+    <div class="card">
+      <h3>공유로 추가</h3>
+      <p>사파리 등에서 공유하면 목록에 무지개 공방이 나타납니다. 속성만 고르면 백로그에 들어갑니다.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--yellow)"></span>자주 묻는 것</h2>
+
+  <details>
+    <summary>iCloud 로그인이 꼭 필요한가요?</summary>
+    <p>혼자 맥에서만 쓸 때는 필요 없습니다. 아이폰과 이어 보려면, 그리고 공유 기능을 쓰려면 필요합니다.</p>
+  </details>
+
+  <details>
+    <summary>기존에 적어둔 할 일과 계획은 어떻게 되나요?</summary>
+    <p>그대로 유지됩니다. 예전에 고른 라벨은 새 착수 조건으로 자동으로 옮겨 읽고, 배정해둔 시간도 바뀌지 않습니다.</p>
+  </details>
+
+  <details>
+    <summary>창을 닫으면 앱이 꺼지나요?</summary>
+    <p>아니요. 창을 닫아도 앱은 남아 있고, 상단 메뉴의 윈도우에서 다시 열 수 있습니다. Dock 아이콘을 눌러도 됩니다.</p>
+  </details>
+
+  <details>
+    <summary>기다림으로 표시한 단계는 시간에 안 잡히나요?</summary>
+    <p>네. 기다리는 동안 시간이 흐르기는 하지만 내가 쓰는 시간은 아니라서, 그 일에 걸리는 시간 합계에 넣지 않습니다.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--green)"></span>개인정보</h2>
+  <p class="lead">서버를 따로 두지 않습니다. 적은 내용은 기기와 본인의 iCloud에만 저장됩니다.</p>
+  <div class="note">
+    광고 식별자, 사용 분석, 위치 정보를 수집하지 않습니다. 회원가입도 없습니다.
+    자세한 내용은 <a href="privacy.html">개인정보 처리방침</a>에 있습니다.
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--indigo)"></span>바뀐 것</h2>
+  <p class="lead">버전별로 무엇이 달라졌는지 적어둡니다.</p>
+  <p><a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">릴리즈 노트 보기</a></p>
+</section>
+
+<section>
+  <div class="contact">
+    <h2 style="margin-bottom:6px">문의</h2>
+    <p class="lead" style="margin-bottom:0">쓰다가 막히거나 이상한 점이 있으면 알려주세요. 앱 안 설정에도 문의 항목이 있습니다.</p>
+    <a class="btn" href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>
+  </div>
+</section>
 
 </main>
 
 <footer>
-  <div><a href="./privacy.html">개인정보 처리방침</a></div>
-  <div style="margin-top:10px;">© 2025 무지개 공방 · WeekBlocks</div>
-  <div class="fam">패밀리: 욕망의 무지개(iOS) · WeekBlocks(macOS)</div>
+  <div>2026 무지개 공방</div>
+  <div class="fam">무지개 공방 (macOS) · 욕망의 무지개 (iOS)</div>
+  <div class="fam"><a href="privacy.html">개인정보 처리방침</a></div>
 </footer>
 </body>
 </html>
