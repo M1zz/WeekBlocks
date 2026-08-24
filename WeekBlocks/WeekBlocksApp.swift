@@ -14,6 +14,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct WeekBlocksApp: App {
     @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         // LeeoKit 사용량 트래커 — 리뷰 요청·만족도 프롬프트 게이팅에 쓰인다.
@@ -24,9 +25,15 @@ struct WeekBlocksApp: App {
 
     let container: ModelContainer = {
         let schema = Schema([Routine.self, PlanBlock.self, BacklogItem.self, RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self])
+        // ⚠️ groupContainer: .none 을 반드시 명시한다.
+        //    공유 익스텐션용 App Group entitlement가 붙으면 SwiftData의 기본 저장 위치가
+        //    앱 샌드박스 → App Group 컨테이너로 바뀐다. 그러면 이미 배포된 사용자의
+        //    기존 store를 못 찾고 빈 스토어를 새로 만들어, 루틴·계획·백로그가 전부
+        //    사라진 것처럼 보인다. (iOS '욕망의 무지개'도 같은 이유로 못박아 두었다.)
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
+            groupContainer: .none,
             cloudKitDatabase: .private("iCloud.com.devkoan.ScheduleDensity")
         )
         do {
@@ -42,6 +49,12 @@ struct WeekBlocksApp: App {
         Window("무지개 공방", id: "main") {
             ContentView()
                 .leeoSatisfactionCheck(WeekBlocksSpec.self)
+                // 다른 앱에서 공유한 할 일 받기. 공유 익스텐션은 SwiftData에 직접 못 쓰고
+                // App Group에 쌓아만 두므로, 앱이 켜지고 앞으로 나올 때 그 상자를 비운다.
+                .task { TodoShareIntake.drain(into: container.mainContext) }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { TodoShareIntake.drain(into: container.mainContext) }
+                }
         }
         .modelContainer(container)
         .defaultSize(width: 1080, height: 760)

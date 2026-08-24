@@ -283,28 +283,31 @@ enum TodoSplitAdvisor {
 
     struct TemplateStep {
         let title: String
-        let hours: Double
+        /// 이 단계의 착수 조건. 시간에서 짐작하지 않고 여기서 못박는다 —
+        /// 뼈대는 각 단계가 무슨 성격인지 이미 알고 있고, 시간으로 되짚으면
+        /// "무엇을 할지 정하기"에 '펼치고'가 붙는 식으로 어긋난다.
+        let label: TodoLabel
         let note: String
     }
 
     /// 아직 단계가 없을 때 제안하는 기본 뼈대.
-    /// 연구의 배정표를 그대로 옮겼다 — 결정(덩어리) → 준비(조각) → 작업(덩어리) → 마감(조각).
+    /// 일이 굴러가는 순서대로다 — 정하고 → 펼치고 → 몰입해서 → 바로.
     static func template(for rootTitle: String) -> [TemplateStep] {
         let name = rootTitle.trimmingCharacters(in: .whitespaces)
         let subject = name.isEmpty ? "이 일" : name
         return [
             TemplateStep(title: "무엇을 할지 정하기",
-                         hours: 0.5,
-                         note: "탐색이 필요한 결정. 조각에서는 안 닫히니 먼저 끝내둡니다."),
+                         label: .decide,
+                         note: "안 정해진 게 남아 있으면 아래 단계가 전부 안 열립니다."),
             TemplateStep(title: "필요한 것 모아두기",
-                         hours: 0.25,
-                         note: "조각에서 집을 수 있는 단계. 링크·자료를 담기만 합니다."),
+                         label: .setup,
+                         note: "링크·자료를 펼쳐만 둡니다. 본 작업의 시동 비용을 여기서 미리 냅니다."),
             TemplateStep(title: "\(subject) 실제로 하기",
-                         hours: 1.5,
-                         note: "시동 비용이 큰 본 작업. 지킨 시간에 배정합니다."),
+                         label: .deep,
+                         note: "끊기면 다시 올라와야 합니다. 방해 없는 시간에 두세요."),
             TemplateStep(title: "마무리해서 보내기",
-                         hours: 0.25,
-                         note: "끝을 닫는 단계. 잔여물을 없애는 조각의 최고 용도입니다."),
+                         label: .ready,
+                         note: "끝을 닫는 단계. 짬이 나면 바로 집을 수 있습니다."),
         ]
     }
 
@@ -323,95 +326,126 @@ enum TodoSplitAdvisor {
 
 /// 할 일·단계를 적으면서 한 번에 고르는 '이건 어떤 타입인가'.
 ///
-/// 화면에 조언을 잔뜩 늘어놓는 대신, **적는 순간 사용자가 직접 고르게** 한다.
-/// 고르는 순간 예상 시간이 함께 정해진다 — 예상 시간을 따로 묻지 않고도
-/// 모든 할 일이 시간을 갖게 하는 장치다. 상위 할 일의 이 시간이 곧 100%이고,
-/// 그 아래 단계들은 이 시간을 나눠 갖는다 (→ TodoTree.swift).
+/// 묻는 것은 '얼마나 걸리나'가 아니라 **'지금 시작할 수 있나'**다.
+/// 단계를 실제로 하느냐 마느냐를 가르는 건 그 단계가 전체의 몇 %냐가 아니라,
+/// 손을 대기 전에 남아 있는 것이 무엇이냐이기 때문이다.
+///
+/// - 바로     GTD의 next action 4조건을 통과한 상태 — 물리적 동작이고, 한 번에 닫히고,
+///           구체적이고, 먼저 해야 할 것이 없다.
+/// - 펼치고   활성화 에너지. 시작에 드는 힘이 이어가는 힘보다 크다.
+/// - 몰입해서 재개 지연(평균 23분). 비용은 방해 자체가 아니라 맥락 재구성이다.
+/// - 정하고   "정하다"는 next action이 아니다. 안 닫힌 결정이 다음 단계를 막는다.
+/// - 기다림   기다림은 막힘이 아니다. 내 손을 떠난 일은 내 목록에서 주의를 갉으면 안 된다.
+///
+/// 고르는 순간 예상 시간도 함께 정해진다 — 시간을 따로 묻지 않고도 모든 단계가
+/// 시간을 갖게 하는 장치다. 상위 할 일의 시간은 단계들의 합이다 (→ TodoTree.swift).
 enum TodoLabel: String, CaseIterable, Identifiable, Sendable {
-    /// 짬이 나면 바로 집어서 끝나는 일 (15분).
-    case now
-    /// 앉아야 하지만 한자리에서 닫히는 일 (30분).
-    case sit
-    /// 방해 없이 한 시간 (1시간).
-    case focus
-    /// 미리 자리를 비워둬야 하는 일 (2시간).
-    case block
-    /// 하루의 절반을 내주는 일 (4시간).
-    case halfDay
+    /// 지금 손에 잡히는 것만으로 끝난다. 먼저 해야 할 것도, 정할 것도 남아 있지 않다.
+    case ready
+    /// 자료·도구를 펼쳐야 시작된다. 시작만 하면 쉬운데, 그 시작이 무겁다.
+    case setup
+    /// 끊기면 처음부터 다시 올라와야 한다. 조각 시간에 집으면 수확이 없다.
+    case deep
+    /// 아직 정하지 않은 것이 있어 손이 안 나간다. 정하는 것 자체가 이 단계의 일이다.
+    case decide
+    /// 내 손을 떠나 있다. 상대의 답이 와야 움직인다.
+    case waiting
 
     var id: String { rawValue }
 
     /// 칩에 쓰는 짧은 이름.
     var name: String {
         switch self {
-        case .now:     return "지금 바로"
-        case .sit:     return "앉아서 한 번"
-        case .focus:   return "집중 한 판"
-        case .block:   return "시간 잡고"
-        case .halfDay: return "반나절"
+        case .ready:   return "바로"
+        case .setup:   return "펼치고"
+        case .deep:    return "몰입해서"
+        case .decide:  return "정하고"
+        case .waiting: return "기다림"
         }
     }
 
-    /// 왜 그 타입인지 한 줄.
+    /// 왜 그 속성인지 한 줄.
     var hint: String {
         switch self {
-        case .now:     return "짬이 나면 바로 집어서 끝냅니다."
-        case .sit:     return "앉아야 하지만 한자리에서 닫힙니다."
-        case .focus:   return "방해 없는 한 시간이 필요합니다."
-        case .block:   return "미리 자리를 비워둬야 하는 일입니다."
-        case .halfDay: return "하루의 절반을 내주는 일입니다."
+        case .ready:   return "지금 손에 잡히는 것만으로 끝납니다. 짬이 나면 집으세요."
+        case .setup:   return "자료·도구를 펼쳐야 시작됩니다. 시작만 하면 쉽습니다."
+        case .deep:    return "끊기면 처음부터 다시 올라와야 합니다. 방해 없는 시간에 두세요."
+        case .decide:  return "아직 정하지 않은 것이 있어 시작이 안 됩니다. 이 단계의 일은 정하는 것입니다."
+        case .waiting: return "내 손을 떠나 있습니다. 상대의 답이 와야 움직입니다."
         }
     }
 
-    /// 이 라벨을 고르면 잡히는 예상 시간.
+    /// 이 속성을 고르면 잡히는 예상 시간.
+    /// '기다림'은 0이다 — 달력에서 시간이 흐를 뿐 내가 쓰는 시간이 아니다.
     var defaultHours: Double {
         switch self {
-        case .now:     return 0.25
-        case .sit:     return 0.5
-        case .focus:   return 1
-        case .block:   return 2
-        case .halfDay: return 4
+        case .ready:   return 0.25
+        case .setup:   return 0.5
+        case .deep:    return 1
+        case .decide:  return 0.5
+        case .waiting: return 0
+        }
+    }
+
+    /// 내 시간을 쓰는 단계인가. '기다림'만 아니다.
+    var costsMyTime: Bool { self != .waiting }
+
+    /// **언제 하면 되는가.** 속성을 고르는 값어치가 여기 있다 —
+    /// "이건 펼치고 30분짜리"라는 사실 자체는 쓸모가 없고,
+    /// "준비할 짬이 났을 때 하세요"가 되어야 손이 움직인다.
+    var whenToDo: String {
+        switch self {
+        case .ready:   return "짬이 나면 바로"
+        case .setup:   return "자료를 펼칠 짬이 났을 때"
+        case .deep:    return "방해 없는 시간이 잡혔을 때"
+        case .decide:  return "머리가 맑을 때 먼저"
+        case .waiting: return "상대의 답이 오면"
         }
     }
 
     var symbol: String {
         switch self {
-        case .now:     return "bolt.fill"
-        case .sit:     return "cup.and.saucer.fill"
-        case .focus:   return "scope"
-        case .block:   return "calendar.badge.clock"
-        case .halfDay: return "hourglass"
+        case .ready:   return "bolt.fill"
+        case .setup:   return "folder.fill"
+        case .deep:    return "scope"
+        case .decide:  return "arrow.triangle.branch"
+        case .waiting: return "hourglass"
         }
     }
 
     /// 조각이냐 덩어리냐 — 기존 판정기와 이어 붙이는 자리.
     var kind: ChunkKind {
         switch self {
-        case .now:                 return .fragment
-        case .sit:                 return .short
-        case .focus, .block, .halfDay: return .block
+        case .ready:           return .fragment
+        case .setup, .decide:  return .short
+        case .deep:            return .block
+        case .waiting:         return .fragment   // 내 시간을 안 쓰므로 언제든 걸쳐 둘 수 있다
         }
     }
 
-    /// 5분이 생겼을 때 집을 수 있는 라벨인가.
-    var isPickableInFragment: Bool { self == .now }
+    /// 5분이 생겼을 때 집을 수 있는 속성인가.
+    var isPickableInFragment: Bool { self == .ready }
 
-    /// 예상 시간에서 가장 가까운 라벨. 라벨을 고르기 전에 만들어진 옛 데이터를 위해.
+    /// 저장된 값에서 속성을 읽는다.
+    ///
+    /// 속성이 '얼마나 걸리나'(지금 바로 / 앉아서 한 번 / 집중 한 판 / 시간 잡고 / 반나절)였던
+    /// 시절의 값도 여기서 받아 준다. 그때 값은 크기만 말했으므로 착수 조건으로 옮겨 읽는다.
+    /// 실제 배정 시간은 `durationHours`에 따로 들어 있어 이 변환으로 사라지지 않는다.
+    static func resolve(_ raw: String) -> TodoLabel? {
+        if let value = TodoLabel(rawValue: raw) { return value }
+        switch raw {
+        case "now":                       return .ready
+        case "sit":                       return .setup
+        case "focus", "block", "halfDay": return .deep
+        default:                          return nil
+        }
+    }
+
+    /// 예상 시간에서 가장 가까운 속성. 속성을 고르기 전에 만들어진 옛 데이터를 위해.
+    /// '기다림'은 시간이 0이라 시간만으로는 짐작할 수 없으므로 후보에서 뺀다.
     static func nearest(toHours hours: Double) -> TodoLabel {
-        allCases.min { abs($0.defaultHours - hours) < abs($1.defaultHours - hours) } ?? .focus
-    }
-}
-
-extension BacklogItem {
-    /// 이 항목에 붙은 라벨. 아직 고르지 않았으면 예상 시간에서 짐작한다.
-    var label: TodoLabel {
-        if let raw = labelRaw, let value = TodoLabel(rawValue: raw) { return value }
-        return .nearest(toHours: durationHours)
-    }
-
-    /// 사용자가 직접 고른 라벨인가 (짐작이 아니라).
-    var hasLabel: Bool {
-        guard let raw = labelRaw else { return false }
-        return TodoLabel(rawValue: raw) != nil
+        allCases
+            .filter(\.costsMyTime)
+            .min { abs($0.defaultHours - hours) < abs($1.defaultHours - hours) } ?? .deep
     }
 }

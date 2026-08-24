@@ -30,7 +30,8 @@ struct TodoStepsView: View {
     @State private var addTarget: BacklogItem?
     @State private var newTitle = ""
     /// 새 단계의 라벨. nil이면 '자동' — 형제들과 N분의 1로 나눠 갖는다.
-    @State private var newLabel: TodoLabel?
+    /// 새 단계의 속성. 백로그의 빈 줄과 같은 키를 써서, 어디서 적든 지난번 값이 따라온다.
+    @AppStorage("todo.newLabel") private var newLabelRaw: String = TodoLabel.ready.rawValue
     @FocusState private var focused: Bool
 
     private var tree: TodoTree { TodoTree(allItems) }
@@ -75,14 +76,18 @@ struct TodoStepsView: View {
                         }
 
                         ForEach(Array(TodoSplitAdvisor.template(for: root.title).enumerated()), id: \.offset) { _, step in
-                            HStack(alignment: .top, spacing: 10) {
-                                TodoLabelChip(label: TodoLabel.nearest(toHours: step.hours))
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(step.title).font(.system(size: 13, weight: .medium))
-                                    Text(step.note).font(.system(size: 12)).foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 5) {
+                                HStack(spacing: 10) {
+                                    Text(step.title)
+                                        .font(.system(size: 14))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    TodoLabelChip(label: step.label)
                                 }
-                                Spacer()
+                                Text(step.note)
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(.secondary)
                             }
+                            .padding(.vertical, 3)
                         }
 
                         if let hint = topHint, SplitHintTip(hint: hint).shouldDisplay {
@@ -96,45 +101,27 @@ struct TodoStepsView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 2) {
                         HStack {
-                            Text("단계 · 합쳐서 100%")
-                                .font(.caption.weight(.semibold))
+                            Text("단계")
+                                .font(.system(size: 13, weight: .semibold))
                                 .foregroundStyle(.secondary)
                             Spacer()
-                            Button {
-                                withAnimation {
-                                    tree.splitEvenly(under: root)
-                                    try? context.save()
-                                }
-                            } label: {
-                                Label("N분의 1로 다시", systemImage: "equal.square")
-                                    .font(.caption)
-                            }
-                            .buttonStyle(.borderless)
                         }
                         .padding(.horizontal, 8)
                         .padding(.bottom, 4)
 
-                        // 비중이 어떻게 굴러가는지는 여기서 한 번만 설명한다.
+                        // 단계에 무엇을 정해 주면 되는지 여기서 한 번만 설명한다.
                         if ShareSplitTip().shouldDisplay {
                             TipView(ShareSplitTip()).padding(.bottom, 6)
-                        }
-                        // 자물쇠 설명은 실제로 하나 잠근 뒤에만.
-                        if LockedShareTip().shouldDisplay {
-                            TipView(LockedShareTip()).padding(.bottom, 6)
                         }
 
                         ForEach(rows, id: \.item.id) { row in
                             StepRow(
                                 item: row.item,
                                 depth: row.depth,
-                                percent: tree.weightInRoot(of: row.item),
-                                weightInParent: tree.weight(of: row.item),
                                 isCurrent: row.item.dragToken == tree.currentStep(of: root)?.dragToken,
                                 hasChildren: tree.hasChildren(row.item),
                                 progress: tree.progress(of: row.item),
                                 onToggle: { toggle(row.item) },
-                                onWeight: { setWeight(row.item, $0) },
-                                onRelease: { release(row.item) },
                                 onLabel: { setLabel(row.item, $0) },
                                 onAddChild: { addTarget = row.item; focused = true },
                                 onMoveUp: { move(row.item, by: -1) },
@@ -172,19 +159,19 @@ struct TodoStepsView: View {
                     Text(root.title)
                         .font(.title3.weight(.semibold))
                     if let step = tree.currentStep(of: root) {
-                        HStack(spacing: 5) {
+                        HStack(spacing: 6) {
                             Image(systemName: "arrowtriangle.right.fill")
-                                .font(.system(size: 8))
+                                .font(.system(size: 11))
                                 .foregroundStyle(.orange)
                             Text(step.title)
-                                .font(.callout)
-                            if let number = tree.currentStepNumber(of: root), stepCount > 0 {
-                                Text("· \(stepCount)단계 중 \(number)번째")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .monospacedDigit()
-                            }
+                                .font(.system(size: 14, weight: .medium))
+                                .lineLimit(1)
+                            TodoLabelChip(label: step.label, hours: step.durationHours)
                         }
+                        // 속성이 말해야 하는 건 '무슨 종류냐'가 아니라 '언제 하면 되냐'다.
+                        Label(step.label.whenToDo, systemImage: "clock")
+                            .font(.system(size: 13))
+                            .foregroundStyle(step.label.tint)
                     } else if stepCount > 0 {
                         Label("모든 단계를 마쳤습니다", systemImage: "checkmark.circle.fill")
                             .font(.callout)
@@ -218,41 +205,25 @@ struct TodoStepsView: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                 Spacer()
-                if stepCount > 0 {
-                    Text("\(formatDuration(tree.doneHours(of: root))) 완료")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .monospacedDigit()
-                }
+
             }
         }
         .padding(20)
     }
 
-    /// 전체 예상 시간을 고치는 메뉴. 바꾸면 단계들이 비율을 지킨 채 같이 늘고 준다.
+    /// 이 일 전체에 걸리는 시간. 고르는 게 아니라 **단계들의 합**이다 —
+    /// 단계를 더하거나 속성을 바꾸면 여기 숫자가 따라 움직인다.
     private var totalHoursMenu: some View {
-        Menu {
-            ForEach(TodoLabel.allCases) { label in
-                Button("\(label.name) · \(formatDuration(label.defaultHours))") {
-                    setRootHours(label.defaultHours, label: label)
-                }
-            }
-            Divider()
-            ForEach([6.0, 8.0, 12.0], id: \.self) { h in
-                Button(formatDuration(h)) { setRootHours(h, label: nil) }
-            }
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: root.label.symbol).font(.system(size: 10))
-                Text("이 일 전체 \(formatDuration(tree.totalHours(of: root)))")
-                    .font(.system(size: 12, weight: .semibold))
-                    .monospacedDigit()
-            }
-            .foregroundStyle(root.label.tint)
+        HStack(spacing: 5) {
+            Image(systemName: "sum").font(.system(size: 13))
+            Text("다 하면 \(formatDuration(tree.totalHours(of: root)))")
+                .font(.system(size: 14, weight: .semibold))
+                .monospacedDigit()
         }
-        .menuStyle(.borderlessButton)
+        .foregroundStyle(.secondary)
         .fixedSize()
     }
+
 
     // MARK: - 조언 (전부 TipKit)
 
@@ -266,10 +237,6 @@ struct TodoStepsView: View {
     // MARK: - 추가 입력 줄
 
     private var inputBar: some View {
-        let parent = addTarget ?? root
-        let evenShare = tree.totalHours(of: parent) / Double(tree.children(of: parent).count + 1)
-        let isFirstStep = !tree.hasChildren(parent)
-
         return VStack(alignment: .leading, spacing: 6) {
             if let target = addTarget {
                 HStack(spacing: 5) {
@@ -288,38 +255,25 @@ struct TodoStepsView: View {
             }
 
             if !newTitle.trimmingCharacters(in: .whitespaces).isEmpty {
-                HStack(spacing: 8) {
-                    Button {
-                        newLabel = nil
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "equal.square").font(.system(size: 10))
-                            Text("자동 N분의 1").font(.system(size: 11, weight: .medium))
+                // 칩 다섯 개는 창이 좁으면 한 줄에 안 들어간다. 접히게 두지 말고 밀어서 보게 한다.
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(TodoLabel.allCases) { label in
+                            Button {
+                                newLabelRaw = label.rawValue
+                            } label: {
+                                TodoLabelChip(label: label,
+                                              isSelected: draftLabel == label,
+                                              style: .full)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .foregroundStyle(newLabel == nil ? Color.white : Color.secondary)
-                        .padding(.horizontal, 8).padding(.vertical, 4)
-                        .background(Capsule().fill(newLabel == nil ? Color.accentColor : Color.secondary.opacity(0.15)))
                     }
-                    .buttonStyle(.plain)
-
-                    ForEach(TodoLabel.allCases) { label in
-                        Button {
-                            newLabel = label
-                        } label: {
-                            TodoLabelChip(label: label,
-                                          hours: label.defaultHours,
-                                          isSelected: newLabel == label)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    Spacer()
+                    .padding(.vertical, 2)
                 }
 
-                Text(isFirstStep
-                     ? "첫 단계라 전체 \(formatDuration(tree.totalHours(of: parent)))를 그대로 물려받습니다. 단계를 더하면 나눠 갖습니다."
-                     : (newLabel.map { "이 단계에 \(formatDuration(min($0.defaultHours, tree.totalHours(of: parent))))를 떼어 주고, 나머지 단계가 남은 몫을 나눠 가집니다." }
-                        ?? "자동으로 N분의 1 — 이 단계는 \(formatDuration(evenShare))쯤이 됩니다."))
-                    .font(.system(size: 11))
+                Text(draftLabel.hint)
+                    .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
 
@@ -339,6 +293,9 @@ struct TodoStepsView: View {
         .padding(.vertical, 14)
     }
 
+    /// 지금 빈 줄에 적히면 붙을 속성.
+    private var draftLabel: TodoLabel { TodoLabel.resolve(newLabelRaw) ?? .ready }
+
     // MARK: - 동작
 
     private func addStep() {
@@ -349,18 +306,17 @@ struct TodoStepsView: View {
         let step = TodoTree.makeStep(under: parent,
                                      title: title,
                                      sortIndex: tree.nextSortIndex(under: parent),
-                                     label: newLabel)
+                                     label: draftLabel)
         context.insert(step)
 
         // 새로 만든 단계까지 넣어 트리를 다시 세운다 (@Query 갱신 전에도 계산이 맞도록).
+        // 시간은 손댈 게 없다 — 위쪽 숫자는 이 단계가 더해지면서 저절로 커진다.
         let updated = TodoTree(allItems + [step])
-        updated.giveInitialShare(step, hours: newLabel?.defaultHours)
         if updated.children(of: parent).count >= 2 { ShareSplitTip.hasSplit = true }
         updated.rollUp(from: step)
         try? context.save()
 
         newTitle = ""
-        newLabel = nil
         focused = true
     }
 
@@ -374,16 +330,13 @@ struct TodoStepsView: View {
             let node = TodoTree.makeStep(under: root,
                                          title: step.title,
                                          sortIndex: index,
-                                         seedHours: step.hours,
-                                         label: TodoLabel.nearest(toHours: step.hours))
-            node.isManualWeight = true   // 일부러 정해둔 비율이라 자동 재분배에서 빠진다
+                                         label: step.label)
             context.insert(node)
             made.append(node)
             index += 1
         }
         let updated = TodoTree(allItems + made)
         updated.rollUp(from: root)
-        updated.fit(under: root)
         try? context.save()
     }
 
@@ -394,35 +347,12 @@ struct TodoStepsView: View {
         }
     }
 
-    /// 이 일 전체의 예상 시간을 바꾼다. 아래 단계들은 비율을 지킨 채 함께 조정된다.
-    private func setRootHours(_ hours: Double, label: TodoLabel?) {
-        withAnimation {
-            if let label { root.labelRaw = label.rawValue }
-            tree.setTotalHours(root, to: hours)
-            try? context.save()
-        }
-    }
-
-    /// 한 단계의 비중을 직접 정한다. 나머지 단계들이 남은 몫을 다시 나눈다.
-    private func setWeight(_ item: BacklogItem, _ fraction: Double) {
-        LockedShareTip.hasLocked = true
-        withAnimation {
-            tree.setWeight(item, to: fraction)
-            try? context.save()
-        }
-    }
-
-    /// 직접 정한 비중을 풀고 자동(N분의 1)으로 되돌린다.
-    private func release(_ item: BacklogItem) {
-        withAnimation {
-            tree.releaseManual(item)
-            try? context.save()
-        }
-    }
-
+    /// 속성을 바꾸면 시간도 그 속성의 것으로 따라간다 — 고르는 건 하나뿐이라는 약속을 지킨다.
     private func setLabel(_ item: BacklogItem, _ label: TodoLabel) {
-        item.labelRaw = label.rawValue
-        try? context.save()
+        withAnimation {
+            tree.setLabel(item, to: label)
+            try? context.save()
+        }
     }
 
     private func remove(_ item: BacklogItem) {
@@ -432,10 +362,9 @@ struct TodoStepsView: View {
         withAnimation {
             for node in tree.subtree(of: item) { context.delete(node) }
             if let parent {
-                // 남은 단계들이 빈 몫을 비율대로 나눠 갖는다.
+                // 시간은 남은 단계들의 합이라 저절로 줄어든다. 완료 상태만 다시 굴려 준다.
                 let updated = TodoTree(allItems.filter { !victims.contains($0.dragToken) })
                 updated.rollUp(from: parent)
-                updated.fit(under: parent)
             }
             try? context.save()
         }
@@ -459,16 +388,10 @@ struct TodoStepsView: View {
 private struct StepRow: View {
     let item: BacklogItem
     let depth: Int
-    /// 최상위 할 일 전체에서 차지하는 비중.
-    let percent: Double
-    /// 바로 위 부모 안에서 차지하는 비중 (조정은 이 값으로 한다).
-    let weightInParent: Double
     let isCurrent: Bool
     let hasChildren: Bool
     let progress: Double
     let onToggle: () -> Void
-    let onWeight: (Double) -> Void
-    let onRelease: () -> Void
     let onLabel: (TodoLabel) -> Void
     let onAddChild: () -> Void
     let onMoveUp: () -> Void
@@ -501,28 +424,9 @@ private struct StepRow: View {
                     .font(.system(size: 13, weight: isCurrent ? .semibold : .regular))
                     .strikethrough(item.isCompleted)
                     .foregroundStyle(item.isCompleted ? Color.secondary : Color.primary)
-
-                HStack(spacing: 5) {
-                    Menu {
-                        ForEach(TodoLabel.allCases) { label in
-                            Button("\(label.name) · \(formatDuration(label.defaultHours))") { onLabel(label) }
-                        }
-                    } label: {
-                        TodoLabelChip(label: item.label, hours: item.durationHours)
-                    }
-                    .menuStyle(.borderlessButton)
-                    .menuIndicator(.hidden)
-                    .fixedSize()
-
-                    if item.isManualWeight {
-                        Button(action: onRelease) {
-                            Image(systemName: "lock.fill").font(.system(size: 9))
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.tertiary)
-                        .help("직접 정한 비중입니다. 누르면 자동 N분의 1로 돌아갑니다.")
-                    }
-                }
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 if hasChildren {
                     ProgressView(value: progress)
@@ -534,18 +438,20 @@ private struct StepRow: View {
 
             Spacer()
 
-            // 비중 조정 — 올리면 나머지 단계가 남은 몫을 다시 나눈다.
-            Stepper(value: Binding(get: { (weightInParent * 100).rounded() },
-                                   set: { onWeight($0 / 100) }),
-                    in: 0...100, step: 5) {
-                Text("\(percentText)%")
-                    .font(.system(size: 13, weight: .semibold))
-                    .monospacedDigit()
-                    .foregroundStyle(item.isCompleted ? .green : item.label.tint)
-                    .frame(width: 44, alignment: .trailing)
+            // 이 단계를 지금 시작할 수 있는지 — 줄에서 가장 크게 읽혀야 하는 것.
+            // (예전에는 이 자리에 '전체의 몇 %'가 있었다. 아무도 그 숫자로 결정하지 않았다.)
+            Menu {
+                ForEach(TodoLabel.allCases) { label in
+                    Button(label.costsMyTime
+                           ? "\(label.name) · \(formatDuration(label.defaultHours))"
+                           : label.name) { onLabel(label) }
+                }
+            } label: {
+                TodoLabelChip(label: item.label, hours: item.durationHours)
             }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
             .fixedSize()
-            .opacity(hovering ? 1 : 0.6)
 
             if hovering {
                 Button(action: onAddChild) {
@@ -567,62 +473,11 @@ private struct StepRow: View {
         .onHover { hovering = $0 }
         .contextMenu {
             Button("하위 단계 추가", action: onAddChild)
-            if item.isManualWeight {
-                Button("자동 분배로 되돌리기", action: onRelease)
-            }
             Button("위로", action: onMoveUp)
             Button("아래로", action: onMoveDown)
             Divider()
             Button("삭제", role: .destructive, action: onDelete)
         }
-    }
-
-    /// 0.5% 미만이라도 0%로 보이지 않게 소수 한 자리까지 쓴다.
-    private var percentText: String {
-        let value = percent * 100
-        if value > 0 && value < 1 { return String(format: "%.1f", value) }
-        return String(Int(value.rounded()))
-    }
-}
-
-// MARK: - 라벨 칩
-
-extension TodoLabel {
-    /// 라벨의 색. iOS·맥이 같은 색을 쓰도록 라벨마다 하나씩 못 박아 둔다.
-    var tint: Color {
-        switch self {
-        case .now:     return .green
-        case .sit:     return .teal
-        case .focus:   return .indigo
-        case .block:   return .purple
-        case .halfDay: return .orange
-        }
-    }
-}
-
-/// 목록·상세·입력창 어디서나 같은 모양으로 쓰는 라벨 칩.
-struct TodoLabelChip: View {
-    let label: TodoLabel
-    var hours: Double? = nil
-    var isSelected: Bool = false
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: label.symbol)
-                .font(.system(size: 9, weight: .semibold))
-            Text(label.name)
-                .font(.system(size: 11, weight: .medium))
-            if let hours {
-                Text(formatDuration(hours))
-                    .font(.system(size: 10))
-                    .monospacedDigit()
-                    .opacity(0.75)
-            }
-        }
-        .foregroundStyle(isSelected ? Color.white : label.tint)
-        .padding(.horizontal, 7)
-        .padding(.vertical, 3)
-        .background(Capsule().fill(isSelected ? label.tint : label.tint.opacity(0.14)))
     }
 }
 
@@ -634,10 +489,10 @@ struct ChunkTag: View {
 
     var body: some View {
         Text(kind.label)
-            .font(.system(size: 11, weight: .semibold))
+            .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(color)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
             .background(Capsule().fill(color.opacity(0.12)))
     }
 

@@ -42,7 +42,7 @@ struct LabelPickTip: Tip {
 
     var title: Text { Text("라벨이 곧 예상 시간입니다") }
     var message: Text? {
-        Text("고른 라벨의 시간이 이 할 일의 100%가 됩니다. 안에서 단계를 나누면 단계들이 이 시간을 나눠 가집니다.")
+        Text("지금 시작할 수 있는 일인지 고르면 예상 시간도 따라옵니다. 안에서 단계를 나누면 이 할 일의 시간은 단계들의 합이 됩니다.")
     }
     var image: Image? { Image(systemName: "bolt.badge.clock") }
     var rules: [Rule] {
@@ -69,33 +69,18 @@ struct FragmentFilterTip: Tip {
 
 // MARK: - 단계 나누기
 
-/// 한 할 일 안에 단계가 둘 이상 생긴 순간, 비중이 어떻게 굴러가는지 한 번만 설명한다.
+/// 한 할 일 안에 단계가 둘 이상 생긴 순간, 단계에 무엇을 정해 주면 되는지 한 번만 설명한다.
 struct ShareSplitTip: Tip {
     /// 단계를 둘 이상 만들어 본 적이 있는가.
     @Parameter static var hasSplit: Bool = false
 
-    var title: Text { Text("단계들이 100%를 나눠 갖습니다") }
+    var title: Text { Text("단계마다 ‘지금 시작할 수 있나’만 고르세요") }
     var message: Text? {
-        Text("기본은 N분의 1입니다. 한 단계의 비중을 올리면 나머지 단계가 남은 몫을 다시 나눠, 합계는 언제나 100%가 됩니다.")
+        Text("바로 / 펼치고 / 몰입해서 / 정하고 / 기다림 중 하나면 됩니다. 시간은 고른 속성이 데려오고, 이 일 전체 시간은 단계들의 합이 됩니다.")
     }
-    var image: Image? { Image(systemName: "equal.square") }
+    var image: Image? { Image(systemName: "bolt.fill") }
     var rules: [Rule] {
         #Rule(Self.$hasSplit) { $0 == true }
-    }
-}
-
-/// 비중을 처음 직접 정했을 때, 자물쇠의 뜻을 알려준다.
-struct LockedShareTip: Tip {
-    /// 비중을 직접 정해 본 적이 있는가.
-    @Parameter static var hasLocked: Bool = false
-
-    var title: Text { Text("직접 정한 비중에는 자물쇠가 붙습니다") }
-    var message: Text? {
-        Text("다른 단계를 고쳐도 이 단계는 그대로 남습니다. 자물쇠를 누르면 자동 N분의 1로 돌아갑니다.")
-    }
-    var image: Image? { Image(systemName: "lock.fill") }
-    var rules: [Rule] {
-        #Rule(Self.$hasLocked) { $0 == true }
     }
 }
 

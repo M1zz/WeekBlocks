@@ -29,8 +29,9 @@ final class BacklogItem {
     /// 상위 할 일의 dragToken. nil이면 최상위 할 일(= 그 자체가 100%).
     var parentToken: String? = nil
 
-    /// 사용자가 이 단계의 비중을 직접 정했는가.
-    /// true면 형제들이 몫을 다시 나눌 때 이 단계는 건드리지 않는다(자동 N분의 1에서 빠진다).
+    /// ⚠️ 더 이상 쓰지 않는다. 비중(%)으로 단계를 나누던 시절의 필드로,
+    ///    이미 배포된 사용자·iOS 앱과 공유하는 CloudKit 스키마에 들어 있어 지우지 못한다.
+    ///    (지우면 라이트웨이트 마이그레이션이 깨진다.) 읽지도 쓰지도 말 것.
     var isManualWeight: Bool = false
 
     /// 적을 때 고른 라벨(`TodoLabel.rawValue`). nil이면 아직 안 고른 것 = 예상 시간으로 짐작한다.

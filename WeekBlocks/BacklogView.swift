@@ -223,9 +223,7 @@ struct BacklogSection: View {
             count: tree.leafCount(of: item),
             number: tree.currentStepNumber(of: item),
             totalHours: tree.totalHours(of: item),
-            canRewind: tree.lastDoneStep(of: item) != nil,
-            currentLabel: tree.currentStep(of: item)?.label,
-            currentHours: tree.currentStep(of: item)?.durationHours ?? 0
+            canRewind: tree.lastDoneStep(of: item) != nil
         )
     }
 
@@ -417,9 +415,6 @@ struct BacklogBlock: View {
         let number: Int?
         let totalHours: Double
         let canRewind: Bool
-        /// 지금 할 단계의 라벨과 배정 시간 — "5분 났는데 뭐 하지"에 답한다.
-        let currentLabel: TodoLabel?
-        let currentHours: Double
     }
 
     let item: BacklogItem
@@ -486,62 +481,47 @@ struct BacklogBlock: View {
                             Image(systemName: steps.currentTitle == nil
                                   ? "checkmark.circle.fill"
                                   : "arrowtriangle.right.circle.fill")
-                                .font(.system(size: 11))
+                                .font(.system(size: 13))
                                 .foregroundStyle(steps.currentTitle == nil ? .green : .orange)
                             Text(steps.currentTitle ?? "모든 단계 완료")
-                                .font(.system(size: 12, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .lineLimit(1)
-                            if let label = steps.currentLabel {
-                                TodoLabelChip(label: label, hours: steps.currentHours)
-                            }
                         }
                     }
                     .buttonStyle(.plain)
                     .help(steps.currentTitle == nil ? "모든 단계를 마쳤습니다" : "이 단계를 끝내고 다음으로 넘기기")
 
-                    HStack(spacing: 5) {
-                        ProgressView(value: steps.progress)
-                            .tint(steps.progress >= 1 ? .green : tint)
-                            .frame(maxWidth: 80)
-                        Text("\(Int((steps.progress * 100).rounded()))%")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                        if let number = steps.number {
-                            Text("\(steps.count)단계 중 \(number)")
-                                .font(.system(size: 11))
-                                .foregroundStyle(.tertiary)
-                                .monospacedDigit()
-                        }
-                    }
+                    // 진행바만 남긴다. 퍼센트와 "3단계 중 2"는 같은 말을 글씨로 되풀이했다.
+                    ProgressView(value: steps.progress)
+                        .tint(steps.progress >= 1 ? .green : tint)
+                        .frame(maxWidth: 110)
                 }
 
-                HStack(spacing: 5) {
+                // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
+                // 단계가 있으면 이 카드를 끌어다 놓을 때 잡히는 건 전체 시간이라 그걸 쓴다.
+                HStack(spacing: 6) {
+                    TodoLabelChip(label: item.label,
+                                  hours: steps?.totalHours ?? item.durationHours)
+
                     if let category {
                         Text(category.name)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(tint)
+                            .lineLimit(1)
                     }
-                    if steps == nil {
-                        TodoLabelChip(label: item.label, hours: item.durationHours)
-                    } else {
-                        Text("전체 \(formatDuration(steps?.totalHours ?? item.durationHours))")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    }
-
                     if let weekNote {
                         Text(weekNote)
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                    }
-                    if let broadcastMark {
-                        Text(broadcastMark)
-                            .font(.system(size: 12))
+                            .font(.system(size: 13))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
+                    if let broadcastMark {
+                        Text(broadcastMark)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0)
                 }
             }
 
@@ -691,7 +671,8 @@ struct BacklogComposerView: View {
                         } label: {
                             TodoLabelChip(label: label,
                                           hours: label.defaultHours,
-                                          isSelected: newLabel == label)
+                                          isSelected: newLabel == label,
+                                          style: .full)
                         }
                         .buttonStyle(.plain)
                     }
@@ -834,23 +815,24 @@ struct ComposerItemRow: View {
         }
     }
 
-    /// 이 할 일 전체가 몇 시간인가 = 100%.
-    /// 단계가 있으면 그 단계들이 비율을 지킨 채 함께 늘고 준다.
+    /// 이 할 일에 걸리는 시간. 단계가 있으면 그 합이라 여기서는 손대지 않는다.
     private var hoursBinding: Binding<Double> {
         Binding(get: { item.durationHours },
                 set: { value in
-                    TodoTree(allItems).setTotalHours(item, to: max(0, value))
+                    guard !TodoTree(allItems).hasChildren(item) else { return }
+                    item.durationHours = max(0, value)
                     try? context.save()
                 })
     }
 
-    /// 라벨 = 이건 어떤 타입의 일인가. 고르면 예상 시간도 그 라벨의 기본값이 된다.
+    /// 속성 = 이 일을 지금 시작할 수 있는가. 고르면 시간도 그 속성의 것으로 따라간다.
     private var labelMenu: some View {
         Menu {
             ForEach(TodoLabel.allCases) { label in
-                Button("\(label.name) · \(formatDuration(label.defaultHours))") {
-                    item.labelRaw = label.rawValue
-                    TodoTree(allItems).setTotalHours(item, to: label.defaultHours)
+                Button(label.costsMyTime
+                       ? "\(label.name) · \(formatDuration(label.defaultHours))"
+                       : label.name) {
+                    TodoTree(allItems).setLabel(item, to: label)
                     try? context.save()
                 }
             }

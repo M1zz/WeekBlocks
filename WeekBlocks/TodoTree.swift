@@ -4,22 +4,16 @@
 //  할 일의 뎁스(단계) 계산 — 순수 로직.
 //
 //  시간은 **위에서 아래로** 내려간다.
-//  할 일을 적을 때 "몇 시간 걸릴까"를 먼저 받는다 — 그게 그 일의 100%다.
-//  그 안의 단계들은 이 시간을 **나눠 갖는다**. 기본은 N분의 1이고, 한 단계를
-//  사용자가 직접 조정하면 나머지 단계들이 남은 몫을 다시 나눠, 합계는 언제나
-//  부모의 예상 시간(=100%)이 된다.
+//  단계는 같은 BacklogItem이고, `parentToken`(부모의 dragToken)으로 매달린다.
 //
-//  - 부모의 예상 시간 = 사용자가 정한 값 (자식이 늘어도 총량은 그대로)
-//  - 자식들의 시간 합 = 부모의 예상 시간 (언제나 100%)
-//  - 사용자가 직접 정한 단계(isManualWeight)는 자동 재분배에서 빠진다
-//  - 진행률 = 완료한 잎(더 못 쪼갠 단계)들의 시간 합 / 전체 시간
-//  - '지금 할 일' = 순서상 첫 번째 미완료 잎
+//  시간은 **아래에서 위로** 쌓인다: 단계마다 착수 조건(→ TodoLabel)을 고르면 그 속성이
+//  시간을 데려오고, 상위 할 일의 시간은 단계들의 합이다.
 //
-//  ⚠️ 이 파일은 iOS('욕망의 무지개')와 macOS('무지개 공방') 두 레포에 **같은 내용으로**
-//     복제돼 있다. 한쪽을 고치면 다른 쪽도 반드시 같이 고칠 것 — 두 앱이 같은 CloudKit
-//     데이터를 읽고 쓰기 때문에 계산이 갈라지면 같은 할 일의 진행률이 기기마다 달라진다.
+//  예전에는 반대였다 — 상위 할 일의 시간이 100%이고 단계들이 그걸 나눠 갖는 구조로,
+//  비중 슬라이더·자물쇠·N분의 1이 딸려 있었다. 그 구조는 "이 단계가 전체의 몇 %냐"에
+//  답했는데, 쪼개는 사람은 그 물음에 답할 수가 없다. 단계를 실제로 하느냐 마느냐를
+//  가르는 건 비율이 아니라 '지금 시작할 수 있느냐'였다.
 //
-
 import Foundation
 
 /// 부모-자식 관계를 한 번만 색인해두고 쓰는 조회기.
@@ -29,7 +23,7 @@ struct TodoTree {
     private let childrenByParent: [String: [BacklogItem]]
     /// 자식 토큰 → 부모.
     private let parentByToken: [String: BacklogItem]
-    /// 최상위 할 일들 (= 각자가 100%인 단위).
+    /// 최상위 할 일들 (= 단계를 매다는 단위).
     let roots: [BacklogItem]
 
     /// 잘못된 데이터(부모-자식 순환)로 무한 재귀에 빠지지 않도록 두는 한계.
@@ -125,14 +119,17 @@ struct TodoTree {
 
     // MARK: - 시간·비중·진행률
 
-    /// 이 항목에 배정된 예상 시간 = 사용자가 정한 값(부모가 있으면 부모에게서 나눠 받은 몫).
+    /// 이 일에 걸리는 예상 시간. **아래에서 위로 합산한다** —
+    /// 단계가 있으면 단계들의 합이고, 없으면 자기 속성이 정한 시간이다.
     ///
-    /// 예산이 비어 있는 이상한 데이터(다른 기기에서 반쯤 동기화된 중간 상태 등)에서만
-    /// 아래 단계들의 합으로 대신 답한다.
+    /// 예전에는 반대였다(상위가 100%이고 단계들이 그걸 나눠 가짐). 그 구조는
+    /// "이 단계가 전체의 몇 %냐"에 답했는데, 단계를 실제로 하느냐 마느냐를 가르는 건
+    /// 비율이 아니라 착수 조건이었다 (→ TodoLabel). 그래서 비중을 걷어내고,
+    /// 시간은 단계를 하나씩 더할 때마다 위로 쌓이게 했다.
     func totalHours(of item: BacklogItem) -> Double {
-        let own = max(0, item.durationHours)
-        if own > 0 { return own }
-        return leaves(of: item).reduce(0) { $0 + max(0, $1.durationHours) }
+        let kids = children(of: item)
+        guard !kids.isEmpty else { return max(0, item.durationHours) }
+        return kids.reduce(0) { $0 + totalHours(of: $1) }
     }
 
     /// 완료한 잎들의 시간 합.
@@ -140,43 +137,14 @@ struct TodoTree {
         leaves(of: item).filter(\.isCompleted).reduce(0) { $0 + max(0, $1.durationHours) }
     }
 
-    /// 0...1 진행률. 시간이 모두 0이면 개수 비율로 떨어뜨린다.
+    /// 0...1 진행률 = 끝낸 단계 수 ÷ 전체 단계 수.
+    ///
+    /// 시간으로 재지 않는다. '기다림'은 내 시간을 0으로 쓰는데, 시간으로 재면 그 단계를
+    /// 끝내도 진행률이 꿈쩍하지 않는다. 사람이 세는 방식(4개 중 2개)과도 맞다.
     func progress(of item: BacklogItem) -> Double {
-        let total = totalHours(of: item)
-        if total > 0 { return min(1, doneHours(of: item) / total) }
         let all = leaves(of: item)
         guard !all.isEmpty else { return item.isCompleted ? 1 : 0 }
         return Double(all.filter(\.isCompleted).count) / Double(all.count)
-    }
-
-    /// 부모 안에서 이 단계가 차지하는 비중 (0...1). 부모가 없으면 1(= 그 자체가 100%).
-    func weight(of item: BacklogItem) -> Double {
-        guard let parent = parentByToken[item.dragToken] else { return 1 }
-        let parentTotal = totalHours(of: parent)
-        guard parentTotal > 0 else {
-            let count = children(of: parent).count
-            return count > 0 ? 1 / Double(count) : 1
-        }
-        return min(1, totalHours(of: item) / parentTotal)
-    }
-
-    /// 최상위 할 일 전체에서 이 단계가 차지하는 비중 (0...1).
-    /// 중첩된 단계는 조상들의 비중이 곱해진다 (50% 안의 60% → 30%).
-    func weightInRoot(of item: BacklogItem) -> Double {
-        var result = 1.0
-        var current = item
-        var depth = 0
-        while parentByToken[current.dragToken] != nil, depth < Self.maxDepth {
-            result *= weight(of: current)
-            current = parentByToken[current.dragToken]!
-            depth += 1
-        }
-        return result
-    }
-
-    /// 자동으로 몫을 받는(= 사용자가 직접 정하지 않은) 형제가 몇 개인지.
-    func autoShareCount(under parent: BacklogItem) -> Int {
-        children(of: parent).filter { !$0.isManualWeight }.count
     }
 
     // MARK: - 지금 할 일
@@ -234,8 +202,8 @@ struct TodoTree {
     /// 조상들의 완료 상태를 자식 기준으로 다시 계산한다.
     /// (자식이 전부 끝났으면 부모도 완료, 하나라도 남았으면 부모는 미완료)
     ///
-    /// 시간은 건드리지 않는다 — 부모의 예상 시간은 사용자가 정한 값이고,
-    /// 자식들이 그걸 나눠 갖는 구조이기 때문이다.
+    /// 시간은 건드리지 않는다 — 부모의 시간은 저장된 값이 아니라 자식들의 합으로
+    /// 그때그때 계산되기 때문이다 (→ totalHours).
     func rollUp(from item: BacklogItem, now: Date = Date()) {
         var current = item
         var depth = 0
@@ -249,130 +217,16 @@ struct TodoTree {
         }
     }
 
-    // MARK: - 예산 나눠 갖기 (위 → 아래)
-    //
-    // 나누다 보면 1분이 남는다(60분을 7단계로). 그 1분을 버리면 합이 99%가 되므로
-    // 분 단위 정수로 계산하고 남는 분은 앞 단계부터 하나씩 얹는다 — 합은 언제나 정확히 100%.
+    // MARK: - 속성 정하기
 
-    private static func minutes(_ hours: Double) -> Int { max(0, Int((hours * 60).rounded())) }
-    private static func hours(_ minutes: Int) -> Double { Double(max(0, minutes)) / 60 }
-
-    /// `total`분을 `weights` 비율대로 나눈다. 비율이 모두 0이면 N분의 1.
-    private static func split(_ total: Int, by weights: [Int]) -> [Int] {
-        guard !weights.isEmpty else { return [] }
-        let total = max(0, total)
-        let sum = weights.reduce(0, +)
-        var result = sum > 0
-            ? weights.map { total * max(0, $0) / sum }
-            : Array(repeating: total / weights.count, count: weights.count)
-        // 정수 나눗셈에서 잘려나간 분을 앞에서부터 되돌려준다 (남는 분 < 단계 수).
-        var left = total - result.reduce(0, +)
-        var index = 0
-        while left > 0 && index < result.count {
-            result[index] += 1
-            left -= 1
-            index += 1
-        }
-        return result
-    }
-
-    /// 이 항목에 `minutes`분을 배정하고, 아래 단계들은 지금 비율을 지킨 채 같이 늘고 준다.
-    private func assign(_ item: BacklogItem, minutes total: Int, depth: Int = 0) {
-        item.durationHours = Self.hours(total)
-        guard depth < Self.maxDepth else { return }
-        let kids = children(of: item)
-        guard !kids.isEmpty else { return }
-        let shares = Self.split(total, by: kids.map { Self.minutes($0.durationHours) })
-        for (kid, share) in zip(kids, shares) { assign(kid, minutes: share, depth: depth + 1) }
-    }
-
-    /// 이 일 전체가 몇 시간인지를 바꾼다 (최상위 할 일이면 그게 곧 100%).
-    /// 아래 단계들은 비율을 지킨 채 함께 조정된다.
-    func setTotalHours(_ item: BacklogItem, to hours: Double) {
-        assign(item, minutes: Self.minutes(hours))
-    }
-
-    /// 한 단계의 예상 시간을 사용자가 직접 정한다.
-    /// 나머지 형제들이 남은 몫을 나눠 가져, 부모 안의 합계는 언제나 100%로 유지된다.
+    /// 이 단계가 어떤 속성인지 정한다. 시간은 속성이 데려온다 —
+    /// 쪼갤 때 사람이 고르는 건 착수 조건 하나뿐이고, 나머지는 앱이 맡는다.
     ///
-    /// - Parameter manual: 사용자가 손으로 정한 것인지. true면 이 단계는 다음 자동 분배에서 빠진다.
-    func setHours(_ item: BacklogItem, to hours: Double, manual: Bool = true) {
-        guard let parent = parentByToken[item.dragToken] else {
-            setTotalHours(item, to: hours)
-            return
-        }
-        let budget = Self.minutes(totalHours(of: parent))
-        let siblings = children(of: parent).filter { $0.dragToken != item.dragToken }
-
-        // 단계가 하나뿐이면 그 단계가 곧 부모 전부다 — 조정할 여지가 없다.
-        guard !siblings.isEmpty else {
-            item.isManualWeight = false
-            assign(item, minutes: budget)
-            return
-        }
-
-        let want = min(max(0, Self.minutes(hours)), budget)
-        if manual { item.isManualWeight = true }
-        assign(item, minutes: want)
-
-        // 남은 몫은 '자동'인 형제들끼리 나눈다. 사용자가 직접 정해 둔 형제는 그대로 둔다.
-        var pool = siblings.filter { !$0.isManualWeight }
-        var rest = budget - want
-        let fixed = siblings.filter(\.isManualWeight).reduce(0) { $0 + Self.minutes($1.durationHours) }
-        if pool.isEmpty || fixed > rest {
-            // 자동인 형제가 없거나, 고정해 둔 형제들만으로도 남은 몫을 넘는다
-            // → 어쩔 수 없이 형제 전부가 비율대로 물러난다 (합계 100%가 먼저다).
-            pool = siblings
-        } else {
-            rest -= fixed
-        }
-        let shares = Self.split(rest, by: pool.map { Self.minutes($0.durationHours) })
-        for (sibling, share) in zip(pool, shares) { assign(sibling, minutes: share) }
-    }
-
-    /// 한 단계의 비중(0...1)을 직접 정한다. 나머지는 `setHours`와 같다.
-    func setWeight(_ item: BacklogItem, to fraction: Double) {
-        guard let parent = parentByToken[item.dragToken] else { return }
-        setHours(item, to: max(0, min(1, fraction)) * totalHours(of: parent))
-    }
-
-    /// 새로 붙인 단계에 첫 몫을 준다 — 형제가 n개가 됐으니 N분의 1.
-    /// 직접 정해 둔 형제의 몫은 건드리지 않고, 자동인 형제들끼리 다시 나눈다.
-    func giveInitialShare(_ item: BacklogItem, hours: Double? = nil) {
-        guard let parent = parentByToken[item.dragToken] else { return }
-        let count = max(1, children(of: parent).count)
-        item.isManualWeight = false
-        setHours(item, to: hours ?? totalHours(of: parent) / Double(count), manual: hours != nil)
-    }
-
-    /// 직접 정해 둔 비중을 풀고 자동(N분의 1)으로 되돌린다.
-    /// 다른 형제가 정해 둔 몫은 그대로 두고, 자동인 형제들끼리만 남은 몫을 다시 나눈다.
-    func releaseManual(_ item: BacklogItem) {
-        guard let parent = parentByToken[item.dragToken] else { return }
-        item.isManualWeight = false
-        let kids = children(of: parent)
-        let autos = kids.filter { !$0.isManualWeight }
-        guard !autos.isEmpty else { return }
-        let fixed = kids.filter(\.isManualWeight).reduce(0) { $0 + Self.minutes($1.durationHours) }
-        let rest = max(0, Self.minutes(totalHours(of: parent)) - fixed)
-        let shares = Self.split(rest, by: Array(repeating: 1, count: autos.count))
-        for (kid, share) in zip(autos, shares) { assign(kid, minutes: share) }
-    }
-
-    /// 단계들을 다시 N분의 1로. 직접 정해 둔 비중도 모두 풀린다.
-    func splitEvenly(under parent: BacklogItem) {
-        let kids = children(of: parent)
-        guard !kids.isEmpty else { return }
-        for kid in kids { kid.isManualWeight = false }
-        let shares = Self.split(Self.minutes(totalHours(of: parent)),
-                                by: Array(repeating: 1, count: kids.count))
-        for (kid, share) in zip(kids, shares) { assign(kid, minutes: share) }
-    }
-
-    /// 자식들의 합을 부모의 예산에 다시 맞춘다 (지금 비율은 유지).
-    /// 단계를 지웠을 때, 또는 다른 기기에서 온 데이터가 어긋났을 때 쓴다.
-    func fit(under parent: BacklogItem) {
-        assign(parent, minutes: Self.minutes(totalHours(of: parent)))
+    /// 상위 할 일의 시간은 따로 손대지 않는다. 아래에서 위로 합산되므로
+    /// 이 한 줄만 바꾸면 위쪽 숫자는 저절로 따라온다.
+    func setLabel(_ item: BacklogItem, to label: TodoLabel) {
+        item.labelRaw = label.rawValue
+        item.durationHours = label.defaultHours
     }
 
     /// 단계를 새로 붙일 때 쓸 sortIndex (형제들 맨 뒤).
@@ -386,17 +240,16 @@ struct TodoTree {
 extension TodoTree {
     /// 부모 아래에 새 단계를 만든다. 저장(insert/save)은 호출한 쪽에서 한다.
     ///
-    /// 시간은 여기서 정하지 않는다 — 만든 뒤 `giveInitialShare(_:)`로 부모의 예산에서
-    /// N분의 1을 받아 간다. `seedHours`는 그 전까지 임시로 들고 있을 값(비율의 씨앗)이다.
+    /// 시간은 속성이 데려온다 — 고른 속성의 기본 시간이 그대로 이 단계의 시간이 되고,
+    /// 상위 할 일의 시간은 그만큼 늘어난다(아래에서 위로).
     /// 주(weekStartDate)와 카테고리는 부모를 따라간다 — 단계는 부모와 한 덩어리로 움직인다.
     static func makeStep(under parent: BacklogItem,
                          title: String,
                          sortIndex: Int,
-                         seedHours: Double = 0,
-                         label: TodoLabel? = nil) -> BacklogItem
+                         label: TodoLabel) -> BacklogItem
     {
         let step = BacklogItem(title: title,
-                               durationHours: max(0, seedHours),
+                               durationHours: label.defaultHours,
                                sortIndex: sortIndex,
                                categoryID: parent.categoryID,
                                weekStartDate: parent.weekStartDate,
