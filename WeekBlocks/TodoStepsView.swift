@@ -31,7 +31,6 @@ struct TodoStepsView: View {
     @State private var newTitle = ""
     /// 새 단계의 라벨. nil이면 '자동' — 형제들과 N분의 1로 나눠 갖는다.
     /// 새 단계의 속성. 백로그의 빈 줄과 같은 키를 써서, 어디서 적든 지난번 값이 따라온다.
-    @AppStorage("todo.newLabel") private var newLabelRaw: String = TodoLabel.ready.rawValue
     @FocusState private var focused: Bool
 
     private var tree: TodoTree { TodoTree(allItems) }
@@ -45,7 +44,7 @@ struct TodoStepsView: View {
         let tree = self.tree
         let leaves = tree.hasChildren(root) ? tree.leaves(of: root) : []
         return TodoSplitAdvisor.hints(rootTitle: root.title,
-                                      steps: leaves.map { ($0.title, $0.durationHours, $0.label) })
+                                      steps: leaves.map { ($0.title, $0.durationHours) })
     }
 
     var body: some View {
@@ -81,7 +80,6 @@ struct TodoStepsView: View {
                                     Text(step.title)
                                         .font(.system(size: 14))
                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                    TodoLabelChip(label: step.label)
                                 }
                                 Text(step.note)
                                     .font(.system(size: 13))
@@ -122,7 +120,6 @@ struct TodoStepsView: View {
                                 hasChildren: tree.hasChildren(row.item),
                                 progress: tree.progress(of: row.item),
                                 onToggle: { toggle(row.item) },
-                                onLabel: { setLabel(row.item, $0) },
                                 onAddChild: { addTarget = row.item; focused = true },
                                 onMoveUp: { move(row.item, by: -1) },
                                 onMoveDown: { move(row.item, by: 1) },
@@ -166,12 +163,8 @@ struct TodoStepsView: View {
                             Text(step.title)
                                 .font(.system(size: 14, weight: .medium))
                                 .lineLimit(1)
-                            TodoLabelChip(label: step.label, hours: step.durationHours)
                         }
                         // 속성이 말해야 하는 건 '무슨 종류냐'가 아니라 '언제 하면 되냐'다.
-                        Label(step.label.whenToDo, systemImage: "clock")
-                            .font(.system(size: 13))
-                            .foregroundStyle(step.label.tint)
                     } else if stepCount > 0 {
                         Label("모든 단계를 마쳤습니다", systemImage: "checkmark.circle.fill")
                             .font(.callout)
@@ -255,26 +248,6 @@ struct TodoStepsView: View {
             }
 
             if !newTitle.trimmingCharacters(in: .whitespaces).isEmpty {
-                // 칩 다섯 개는 창이 좁으면 한 줄에 안 들어간다. 접히게 두지 말고 밀어서 보게 한다.
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(TodoLabel.allCases) { label in
-                            Button {
-                                newLabelRaw = label.rawValue
-                            } label: {
-                                TodoLabelChip(label: label,
-                                              isSelected: draftLabel == label,
-                                              style: .full)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.vertical, 2)
-                }
-
-                Text(draftLabel.hint)
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
             }
 
             HStack(spacing: 10) {
@@ -294,7 +267,6 @@ struct TodoStepsView: View {
     }
 
     /// 지금 빈 줄에 적히면 붙을 속성.
-    private var draftLabel: TodoLabel { TodoLabel.resolve(newLabelRaw) ?? .ready }
 
     // MARK: - 동작
 
@@ -305,8 +277,7 @@ struct TodoStepsView: View {
 
         let step = TodoTree.makeStep(under: parent,
                                      title: title,
-                                     sortIndex: tree.nextSortIndex(under: parent),
-                                     label: draftLabel)
+                                     sortIndex: tree.nextSortIndex(under: parent))
         context.insert(step)
 
         // 새로 만든 단계까지 넣어 트리를 다시 세운다 (@Query 갱신 전에도 계산이 맞도록).
@@ -329,8 +300,7 @@ struct TodoStepsView: View {
         for step in TodoSplitAdvisor.template(for: root.title) {
             let node = TodoTree.makeStep(under: root,
                                          title: step.title,
-                                         sortIndex: index,
-                                         label: step.label)
+                                         sortIndex: index)
             context.insert(node)
             made.append(node)
             index += 1
@@ -348,13 +318,6 @@ struct TodoStepsView: View {
     }
 
     /// 속성을 바꾸면 시간도 그 속성의 것으로 따라간다 — 고르는 건 하나뿐이라는 약속을 지킨다.
-    private func setLabel(_ item: BacklogItem, _ label: TodoLabel) {
-        withAnimation {
-            tree.setLabel(item, to: label)
-            try? context.save()
-        }
-    }
-
     private func remove(_ item: BacklogItem) {
         let tree = self.tree
         let parent = tree.parent(of: item)
@@ -392,7 +355,6 @@ private struct StepRow: View {
     let hasChildren: Bool
     let progress: Double
     let onToggle: () -> Void
-    let onLabel: (TodoLabel) -> Void
     let onAddChild: () -> Void
     let onMoveUp: () -> Void
     let onMoveDown: () -> Void
@@ -441,13 +403,7 @@ private struct StepRow: View {
             // 이 단계를 지금 시작할 수 있는지 — 줄에서 가장 크게 읽혀야 하는 것.
             // (예전에는 이 자리에 '전체의 몇 %'가 있었다. 아무도 그 숫자로 결정하지 않았다.)
             Menu {
-                ForEach(TodoLabel.allCases) { label in
-                    Button(label.costsMyTime
-                           ? "\(label.name) · \(formatDuration(label.defaultHours))"
-                           : label.name) { onLabel(label) }
-                }
             } label: {
-                TodoLabelChip(label: item.label, hours: item.durationHours)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)

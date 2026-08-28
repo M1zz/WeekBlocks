@@ -26,12 +26,10 @@ enum TodoShareIntake {
             .map(\.sortIndex).max().map { $0 + 1 } ?? 0
 
         for draft in drafts {
-            let label = TodoLabel.resolve(draft.labelRaw) ?? .ready
             context.insert(BacklogItem(title: draft.title,
-                                       durationHours: label.defaultHours,
+                                       durationHours: TodoTree.defaultStepHours,
                                        sortIndex: nextIndex,
-                                       weekStartDate: .currentWeekStart,
-                                       label: label))
+                                       weekStartDate: .currentWeekStart))
             nextIndex += 1
         }
 

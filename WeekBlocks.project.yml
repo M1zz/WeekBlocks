@@ -76,7 +76,6 @@ targets:
       - path: TodoShare
       # 앱과 함께 쓰는 파일만 골라 넣는다.
       - path: WeekBlocks/TodoShareInbox.swift
-      - path: WeekBlocks/TodoLabelChip.swift
       # TodoLabel 정의. 모델에 얹힌 확장은 BacklogItem+Label.swift로 떼어냈으므로
       # 이 파일만으로 충분하다 (SwiftData 모델이 따라오지 않는다).
       - path: WeekBlocks/TodoSplitAdvisor.swift

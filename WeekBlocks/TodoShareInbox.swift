@@ -19,7 +19,9 @@ struct SharedTodoDraft: Codable, Identifiable {
     var id: String
     var title: String
     /// `TodoLabel.rawValue`. 익스텐션에서 고른 값 = 예상 시간.
-    var labelRaw: String
+    /// ⚠️ 더 이상 안 쓴다. 예전 공유 익스텐션이 넣어 둔 값이 상자에 남아 있을 수 있어
+    ///    디코딩만 되게 남겨 둔다.
+    var labelRaw: String?
     var receivedAt: Date
 
     // 링크는 따로 들고 오지 않는다. 할 일 한 줄에 URL을 통째로 붙이면 목록에서
@@ -29,7 +31,7 @@ struct SharedTodoDraft: Codable, Identifiable {
 
     init(id: String = UUID().uuidString,
          title: String,
-         labelRaw: String,
+         labelRaw: String? = nil,
          receivedAt: Date = Date())
     {
         self.id = id

@@ -66,7 +66,6 @@ final class ShareTodoModel {
     /// 어디서 온 것인지 보여주기 위한 링크. 제목을 만드는 데만 쓰고 따로 저장하지는 않는다.
     var link: String?
     /// 고른 시간. 지난번에 고른 값이 따라온다 (앱의 빈 줄과 같은 규칙).
-    var label: TodoLabel = .ready
     /// 받은 내용을 아직 읽는 중인가.
     var isLoading = true
     /// App Group을 못 열었을 때만 채워진다.
@@ -77,7 +76,6 @@ final class ShareTodoModel {
 
     /// 앱의 빈 줄과 같은 키를 쓴다 — 공유로 넣든 직접 적든 지난번 시간이 따라온다.
     /// (App Group의 UserDefaults라야 앱과 익스텐션이 같은 값을 본다.)
-    private static let labelKey = "todo.newLabel"
     private var sharedDefaults: UserDefaults? {
         UserDefaults(suiteName: TodoShareInbox.appGroupID)
     }
@@ -89,10 +87,6 @@ final class ShareTodoModel {
     // MARK: 받은 내용 읽기
 
     func load(from items: [NSExtensionItem]) async {
-        if let raw = sharedDefaults?.string(forKey: Self.labelKey),
-           let saved = TodoLabel.resolve(raw) {
-            label = saved
-        }
 
         for item in items {
             // 사파리에서 문장을 끌어 공유하면 여기에 그 문장이 온다.
@@ -129,12 +123,11 @@ final class ShareTodoModel {
         let text = title.trimmingCharacters(in: .whitespacesAndNewlines).firstLine
         guard !text.isEmpty else { return }
 
-        let ok = TodoShareInbox.add(SharedTodoDraft(title: text, labelRaw: label.rawValue))
+        let ok = TodoShareInbox.add(SharedTodoDraft(title: text))
         guard ok else {
             errorMessage = "할 일을 저장하지 못했습니다. 앱을 한 번 열고 다시 시도해 주세요."
             return
         }
-        sharedDefaults?.set(label.rawValue, forKey: Self.labelKey)
         onDone?()
     }
 

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
-		283A8D25A872232491583602 /* BacklogItem+Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FD07F266C0C40D84268A80 /* BacklogItem+Label.swift */; };
 		2BD0550462640DD942B3590F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28ADD71097A3C0E497BF731A /* BlockEditorView.swift */; };
 		33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EF8BFE32D234EF9576302C /* ReflectionView.swift */; };
@@ -31,7 +30,6 @@
 		7F70D1C2183A69BB4642EE6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90641A10CE63E76FFACFD63E /* Assets.xcassets */; };
 		7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295B1036D16FB52A4E7D0C74 /* BacklogView.swift */; };
 		80A02C44C4632837BA134587 /* BacklogCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */; };
-		81BF0270FEC49AFFC68C7D05 /* TodoLabelChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CAC523B2F77FC3AA63761B /* TodoLabelChip.swift */; };
 		82F6C212A68907007B4A9F96 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8A00620F11E5E0DA035BC8 /* ShareViewController.swift */; };
 		837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EB398D348B2377FA8540BF /* WeekGridView.swift */; };
 		83DE0994DCC6B215222A482D /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DAA819E703DC5BE377B3688 /* Routine.swift */; };
@@ -40,7 +38,6 @@
 		B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */; };
 		B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD35C8D5A757450762EFDC34 /* TodoTips.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
-		D54954EA2D2EDB7E61E898FB /* TodoLabelChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CAC523B2F77FC3AA63761B /* TodoLabelChip.swift */; };
 		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
 		E9FFE36F06A9BB955E706496 /* BroadcastPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60C6E514ED08597EFA6E7D1 /* BroadcastPlanner.swift */; };
@@ -94,7 +91,6 @@
 		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
 		7970A4DA39D1705294090BDC /* TodoShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodoShare.entitlements; sourceTree = "<group>"; };
-		83FD07F266C0C40D84268A80 /* BacklogItem+Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BacklogItem+Label.swift"; sourceTree = "<group>"; };
 		8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSplitAdvisor.swift; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
 		90641A10CE63E76FFACFD63E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -112,7 +108,6 @@
 		CD35C8D5A757450762EFDC34 /* TodoTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTips.swift; sourceTree = "<group>"; };
 		D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E2CAC523B2F77FC3AA63761B /* TodoLabelChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoLabelChip.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		F04D37A04F3663F8A8DC36E5 /* BroadcastContractView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastContractView.swift; sourceTree = "<group>"; };
 		FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTree.swift; sourceTree = "<group>"; };
@@ -158,7 +153,6 @@
 				90641A10CE63E76FFACFD63E /* Assets.xcassets */,
 				3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */,
 				FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */,
-				83FD07F266C0C40D84268A80 /* BacklogItem+Label.swift */,
 				295B1036D16FB52A4E7D0C74 /* BacklogView.swift */,
 				28ADD71097A3C0E497BF731A /* BlockEditorView.swift */,
 				1DBCEF723DD8D9B9742E5A52 /* BroadcastContract.swift */,
@@ -180,7 +174,6 @@
 				5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */,
 				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
-				E2CAC523B2F77FC3AA63761B /* TodoLabelChip.swift */,
 				B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */,
 				1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */,
 				8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */,
@@ -305,7 +298,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				80A02C44C4632837BA134587 /* BacklogCategory.swift in Sources */,
-				283A8D25A872232491583602 /* BacklogItem+Label.swift in Sources */,
 				5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */,
 				7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */,
 				2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */,
@@ -327,7 +319,6 @@
 				7EE825830848CC825A252ABD /* SettingsView.swift in Sources */,
 				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
-				D54954EA2D2EDB7E61E898FB /* TodoLabelChip.swift in Sources */,
 				4EA685D4C9D593CD84458458 /* TodoShareInbox.swift in Sources */,
 				B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */,
 				67A12313C3A920C6F3B8C092 /* TodoSplitAdvisor.swift in Sources */,
@@ -347,7 +338,6 @@
 				2BD0550462640DD942B3590F /* Models.swift in Sources */,
 				ED80D0BA5F1168CBEDCE0747 /* ShareTodoView.swift in Sources */,
 				82F6C212A68907007B4A9F96 /* ShareViewController.swift in Sources */,
-				81BF0270FEC49AFFC68C7D05 /* TodoLabelChip.swift in Sources */,
 				34C9F08D4446670D54F3BDD2 /* TodoShareInbox.swift in Sources */,
 				624A0F5C801F2937DDCA2691 /* TodoSplitAdvisor.swift in Sources */,
 			);

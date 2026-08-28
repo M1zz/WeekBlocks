@@ -39,29 +39,6 @@ struct ShareTodoView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("얼마나 걸릴 일인가요?")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.secondary)
-
-                // 백로그·단계 화면과 같은 칩. 여기서는 이름까지 보여준다 — 고르는 자리라서.
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(TodoLabel.allCases) { option in
-                            Button {
-                                model.label = option
-                            } label: {
-                                TodoLabelChip(label: option,
-                                              isSelected: model.label == option,
-                                              style: .full)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-
-                Text(model.label.hint)
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
             }
 
             if let errorMessage = model.errorMessage {

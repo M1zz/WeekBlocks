@@ -500,8 +500,10 @@ struct BacklogBlock: View {
                 // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
                 // 단계가 있으면 이 카드를 끌어다 놓을 때 잡히는 건 전체 시간이라 그걸 쓴다.
                 HStack(spacing: 6) {
-                    TodoLabelChip(label: item.label,
-                                  hours: steps?.totalHours ?? item.durationHours)
+                    Text(formatDuration(steps?.totalHours ?? item.durationHours))
+                        .font(.system(size: 13, weight: .medium))
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
 
                     if let category {
                         Text(category.name)
@@ -600,7 +602,6 @@ struct BacklogComposerView: View {
     @State private var newTitle = ""
     @State private var defaultCategoryID: String? = nil
     /// 적으면서 고르는 라벨 = 예상 시간. 고르기 전에는 추가할 수 없다.
-    @State private var newLabel: TodoLabel? = nil
     @State private var showingCategoryManager = false
     @FocusState private var focused: Bool
 
@@ -655,29 +656,6 @@ struct BacklogComposerView: View {
                         .disabled(!canAdd)
                 }
 
-                // 라벨을 고르는 순간 예상 시간도 정해진다.
-                // 이 시간이 그 할 일의 100%이고, 단계를 나누면 단계들이 나눠 갖는다.
-                TipView(LabelPickTip())
-
-                HStack(spacing: 8) {
-                    Text(newLabel.map(\.hint) ?? "얼마나 걸릴 일인가요?")
-                        .font(.caption)
-                        .foregroundStyle(newLabel == nil ? Color.orange : Color.secondary)
-                        .frame(width: 190, alignment: .leading)
-                    ForEach(TodoLabel.allCases) { label in
-                        Button {
-                            newLabel = label
-                            LabelPickTip.hasPicked = true
-                        } label: {
-                            TodoLabelChip(label: label,
-                                          hours: label.defaultHours,
-                                          isSelected: newLabel == label,
-                                          style: .full)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    Spacer()
-                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
@@ -745,18 +723,18 @@ struct BacklogComposerView: View {
         .help("새 항목의 기본 카테고리")
     }
 
-    /// 제목만으로는 추가할 수 없다 — 얼마나 걸릴 일인지(라벨)를 반드시 고르게 한다.
+    /// 이름만 있으면 추가된다. 시간은 나중에 줄에서 고친다.
     private var canAdd: Bool {
-        !newTitle.trimmingCharacters(in: .whitespaces).isEmpty && newLabel != nil
+        !newTitle.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     private func addAndContinue() {
         let t = newTitle.trimmingCharacters(in: .whitespaces)
-        guard !t.isEmpty, let label = newLabel else { return }
+        guard !t.isEmpty else { return }
         let maxIndex = allItems.map(\.sortIndex).max() ?? -1
-        let item = BacklogItem(title: t, durationHours: label.defaultHours, sortIndex: maxIndex + 1,
-                               categoryID: defaultCategoryID, weekStartDate: weekStart,
-                               label: label)
+        let item = BacklogItem(title: t, durationHours: TodoTree.defaultStepHours,
+                               sortIndex: maxIndex + 1,
+                               categoryID: defaultCategoryID, weekStartDate: weekStart)
         // 전파 카테고리로 넣은 항목은 곧바로 전파 필요가 된다.
         // 계약은 아직 미확정 상태로 남아 '전파 예정' 섹션에서 계속 눈에 띈다.
         if let broadcast = categories.broadcastCategory, defaultCategoryID == broadcast.uuid {
@@ -790,7 +768,6 @@ struct ComposerItemRow: View {
 
             broadcastToggle
 
-            labelMenu
 
             HStack(spacing: 2) {
                 TextField("", value: hoursBinding, format: .number.precision(.fractionLength(0...1)))
@@ -823,27 +800,6 @@ struct ComposerItemRow: View {
                     item.durationHours = max(0, value)
                     try? context.save()
                 })
-    }
-
-    /// 속성 = 이 일을 지금 시작할 수 있는가. 고르면 시간도 그 속성의 것으로 따라간다.
-    private var labelMenu: some View {
-        Menu {
-            ForEach(TodoLabel.allCases) { label in
-                // 이름만 나열하면 처음 보는 사람이 못 고른다. 왜 그 조건인지 같은 줄에 붙인다.
-                // (맥 메뉴는 두 줄짜리 항목을 제대로 못 그려서 한 줄로 잇는다.)
-                Button(label.costsMyTime
-                       ? "\(label.name) · \(formatDuration(label.defaultHours)) — \(label.pickHint)"
-                       : "\(label.name) — \(label.pickHint)") {
-                    TodoTree(allItems).setLabel(item, to: label)
-                    try? context.save()
-                }
-            }
-        } label: {
-            TodoLabelChip(label: item.label)
-        }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
     }
 
     /// 카테고리 지정. 전파 카테고리면 전파 필요를 켜고 계약 시트로 바로 넘긴다.

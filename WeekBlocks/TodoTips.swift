@@ -33,40 +33,6 @@ enum TodoTips {
     }
 }
 
-// MARK: - 적을 때
-
-/// 라벨을 아직 한 번도 안 골라본 사람에게.
-struct LabelPickTip: Tip {
-    /// 라벨을 골라 할 일을 만들어 본 적이 있는가.
-    @Parameter static var hasPicked: Bool = false
-
-    var title: Text { Text("라벨이 곧 예상 시간입니다") }
-    var message: Text? {
-        Text("지금 시작할 수 있는 일인지 고르면 예상 시간도 따라옵니다. 안에서 단계를 나누면 이 할 일의 시간은 단계들의 합이 됩니다.")
-    }
-    var image: Image? { Image(systemName: "bolt.badge.clock") }
-    var rules: [Rule] {
-        #Rule(Self.$hasPicked) { $0 == false }
-    }
-}
-
-// MARK: - 목록
-
-/// 할 일이 좀 쌓였을 때, 라벨로 걸러 보는 법을 알려준다.
-struct FragmentFilterTip: Tip {
-    /// 이번 주에 쌓인 할 일 수.
-    @Parameter static var itemCount: Int = 0
-
-    var title: Text { Text("지금 10분 났을 때") }
-    var message: Text? {
-        Text("라벨을 누르면 그 타입만 남습니다. ‘지금 바로’를 누르면 짬에 집어서 끝낼 것들만 보입니다.")
-    }
-    var image: Image? { Image(systemName: "line.3.horizontal.decrease.circle") }
-    var rules: [Rule] {
-        #Rule(Self.$itemCount) { $0 >= 3 }
-    }
-}
-
 // MARK: - 단계 나누기
 
 /// 한 할 일 안에 단계가 둘 이상 생긴 순간, 단계에 무엇을 정해 주면 되는지 한 번만 설명한다.
@@ -74,9 +40,9 @@ struct ShareSplitTip: Tip {
     /// 단계를 둘 이상 만들어 본 적이 있는가.
     @Parameter static var hasSplit: Bool = false
 
-    var title: Text { Text("단계마다 ‘지금 시작할 수 있나’만 고르세요") }
+    var title: Text { Text("한 자리에서 닫히는 크기로") }
     var message: Text? {
-        Text("바로 / 펼치고 / 몰입해서 / 정하고 / 기다림 중 하나면 됩니다. 시간은 고른 속성이 데려오고, 이 일 전체 시간은 단계들의 합이 됩니다.")
+        Text("단계는 한 번 앉아서 끝낼 수 있는 크기여야 합니다. 하다 만 단계는 다음 시간까지 주의를 끌고 갑니다.\n이 일 전체 시간은 단계들의 합이 됩니다.")
     }
     var image: Image? { Image(systemName: "bolt.fill") }
     var rules: [Rule] {
