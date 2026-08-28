@@ -196,7 +196,16 @@ enum TodoSplitAdvisor {
     // MARK: 구성 전체 판정
 
     /// 단계 구성을 보고 주는 조언. `steps`는 잎(실제로 하는 단계)들을 진행 순서대로.
-    static func hints(rootTitle: String, steps: [(title: String, hours: Double)]) -> [SplitHint] {
+    ///
+    /// `label`은 **사용자가 직접 고른 착수 조건**이다. 조각이냐 덩어리냐, 결정이 어디에
+    /// 있느냐는 이 값이 정한다 — 제목 낱말로 다시 짐작하지 않는다.
+    /// 고르라고 해놓고 앱이 낱말 사전으로 뒤엎으면, '바로'라고 말해 둔 단계를 앞에 두고도
+    /// "5분에 집을 단계가 없습니다"라는 소리를 듣게 된다.
+    ///
+    /// 낱말 사전은 이제 **경고**에만 쓴다 — 제목과 시간이 서로 어긋날 때
+    /// ("원고 쓰기"에 15분처럼) 알려주는 자리다. 그건 라벨이 답할 수 없는 물음이라서다.
+    static func hints(rootTitle: String,
+                      steps: [(title: String, hours: Double, label: TodoLabel)]) -> [SplitHint] {
         guard !steps.isEmpty else {
             return [SplitHint(
                 code: "before-split",
@@ -207,10 +216,11 @@ enum TodoSplitAdvisor {
         }
 
         var result: [SplitHint] = []
+        // 낱말 판정은 경고에만 쓴다 (아래 4번). 조각/덩어리 구분은 라벨이 이미 답했다.
         let advices = steps.map { advice(title: $0.title, durationHours: $0.hours) }
 
-        // 1. 조각용 단계가 하나도 없다.
-        if !advices.contains(where: { $0.kind.isPickableInFragment }) {
+        // 1. 조각용 단계가 하나도 없다. (판정은 사용자가 고른 조건으로 — '기다림'은 빼고)
+        if !steps.contains(where: { $0.label.isPickableInFragment }) {
             result.append(SplitHint(
                 code: "no-fragment",
                 tone: .caution,
@@ -254,9 +264,12 @@ enum TodoSplitAdvisor {
         }
 
         // 5. 결정이 안 끝난 채로 작업이 먼저 온다.
-        if let decisionIndex = steps.firstIndex(where: { contains(normalize($0.title), decisionWords) }),
-           let workIndex = steps.firstIndex(where: { contains(normalize($0.title), blockWords) }),
-           decisionIndex > workIndex {
+        //    '정하고'·'몰입해서'를 고른 자리가 먼저다. 라벨을 안 고른 옛 항목만 낱말로 짚는다.
+        let decisionIndex = steps.firstIndex { $0.label == .decide }
+            ?? steps.firstIndex { contains(normalize($0.title), decisionWords) }
+        let workIndex = steps.firstIndex { $0.label == .deep }
+            ?? steps.firstIndex { contains(normalize($0.title), blockWords) }
+        if let decisionIndex, let workIndex, decisionIndex > workIndex {
             result.append(SplitHint(
                 code: "decision-late",
                 tone: .caution,
@@ -267,12 +280,12 @@ enum TodoSplitAdvisor {
 
         // 6. 잘 쪼갠 경우엔 그렇다고 말해준다.
         if result.isEmpty {
-            let fragmentCount = advices.filter { $0.kind.isPickableInFragment }.count
+            let fragmentCount = steps.filter { $0.label.isPickableInFragment }.count
             result.append(SplitHint(
                 code: "well-split",
                 tone: .good,
                 title: "조각과 덩어리가 나뉘어 있습니다",
-                detail: "조각에서 집을 수 있는 단계가 \(fragmentCount)개, 지킨 시간에 할 단계가 \(advices.count - fragmentCount)개입니다. 5분이 생기면 조각 단계를, 확보한 시간에는 덩어리 단계를 하시면 됩니다.",
+                detail: "조각에서 집을 수 있는 단계가 \(fragmentCount)개, 지킨 시간에 할 단계가 \(steps.count - fragmentCount)개입니다. 5분이 생기면 조각 단계를, 확보한 시간에는 덩어리 단계를 하시면 됩니다. 두 몫은 서로 환산되지 않으니 더해서 보지 마세요.",
                 source: nil))
         }
 
@@ -353,14 +366,29 @@ enum TodoLabel: String, CaseIterable, Identifiable, Sendable {
 
     var id: String { rawValue }
 
-    /// 칩에 쓰는 짧은 이름.
+    /// 칩에 쓰는 이름.
+    ///
+    /// **조건을 그대로 말한다.** 예전에는 "바로 / 펼치고 / 몰입해서"처럼 동사 토막이었는데,
+    /// 옆에 시간이 붙으면 "바로 15분"이 되어 무슨 말인지 알 수 없었다. 쪼개는 사람이
+    /// 골라야 하는 건 '지금 시작할 수 있느냐'이므로, 그 답을 문장으로 적는다.
     var name: String {
         switch self {
-        case .ready:   return "바로"
-        case .setup:   return "펼치고"
-        case .deep:    return "몰입해서"
-        case .decide:  return "정하고"
-        case .waiting: return "기다림"
+        case .ready:   return "바로 가능"
+        case .setup:   return "준비가 필요"
+        case .deep:    return "몰입이 필요"
+        case .decide:  return "결정이 필요"
+        case .waiting: return "답을 기다림"
+        }
+    }
+
+    /// 이름만으로 부족할 때 한 줄 더. 고르는 자리(메뉴·공유 시트)에서 쓴다.
+    var pickHint: String {
+        switch self {
+        case .ready:   return "지금 손에 잡히는 것만으로 끝나요"
+        case .setup:   return "자료·도구를 펼쳐야 시작돼요"
+        case .deep:    return "끊기면 처음부터 다시 올라와야 해요"
+        case .decide:  return "아직 안 정한 게 있어 손이 안 나가요"
+        case .waiting: return "내 손을 떠나 있어요"
         }
     }
 

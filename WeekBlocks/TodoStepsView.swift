@@ -45,7 +45,7 @@ struct TodoStepsView: View {
         let tree = self.tree
         let leaves = tree.hasChildren(root) ? tree.leaves(of: root) : []
         return TodoSplitAdvisor.hints(rootTitle: root.title,
-                                      steps: leaves.map { ($0.title, $0.durationHours) })
+                                      steps: leaves.map { ($0.title, $0.durationHours, $0.label) })
     }
 
     var body: some View {

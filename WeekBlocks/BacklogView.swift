@@ -829,9 +829,11 @@ struct ComposerItemRow: View {
     private var labelMenu: some View {
         Menu {
             ForEach(TodoLabel.allCases) { label in
+                // 이름만 나열하면 처음 보는 사람이 못 고른다. 왜 그 조건인지 같은 줄에 붙인다.
+                // (맥 메뉴는 두 줄짜리 항목을 제대로 못 그려서 한 줄로 잇는다.)
                 Button(label.costsMyTime
-                       ? "\(label.name) · \(formatDuration(label.defaultHours))"
-                       : label.name) {
+                       ? "\(label.name) · \(formatDuration(label.defaultHours)) — \(label.pickHint)"
+                       : "\(label.name) — \(label.pickHint)") {
                     TodoTree(allItems).setLabel(item, to: label)
                     try? context.save()
                 }

@@ -45,17 +45,29 @@ struct TodoLabelChip: View {
     private var showsHours: Bool { label.costsMyTime && shownHours > 0 }
 
     var body: some View {
+        // ⚠️ 시간은 **칩 밖**에 둔다. 알약 안에 같이 넣으면 "바로 15분"처럼 한 덩어리로
+        //    읽혀서, 조건인지 길이인지 구분이 안 된다. 조건은 알약, 시간은 그 옆의 글자다.
+        //    (iOS '욕망의 무지개'와 같은 규칙.)
+        HStack(spacing: 6) {
+            capsuleBody
+            if showsHours {
+                Text(formatDuration(shownHours))
+                    .font(.system(size: 13))
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .fixedSize(horizontal: true, vertical: false)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(showsHours ? "\(label.name), \(formatDuration(shownHours))" : label.name)
+    }
+
+    private var capsuleBody: some View {
         HStack(spacing: 5) {
             Image(systemName: label.symbol)
                 .font(.system(size: 11, weight: .semibold))
             Text(label.name)
                 .font(.system(size: 13, weight: .semibold))
-            if showsHours {
-                Text(formatDuration(shownHours))
-                    .font(.system(size: 13))
-                    .monospacedDigit()
-                    .opacity(0.75)
-            }
         }
         .lineLimit(1)
         // ⚠️ 칩은 어떤 자리에서도 쪼그라들지 않는다.
@@ -66,8 +78,6 @@ struct TodoLabelChip: View {
         .padding(.horizontal, style == .full ? 10 : 8)
         .padding(.vertical, style == .full ? 6 : 4)
         .background(Capsule().fill(isSelected ? label.tint : label.tint.opacity(0.14)))
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(showsHours ? "\(label.name), \(formatDuration(shownHours))" : label.name)
     }
 }
 
