@@ -655,7 +655,6 @@ struct BacklogComposerView: View {
                         .buttonStyle(.borderless)
                         .disabled(!canAdd)
                 }
-
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)

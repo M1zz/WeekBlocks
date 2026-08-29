@@ -119,6 +119,8 @@ struct TodoStepsView: View {
                                 isCurrent: row.item.dragToken == tree.currentStep(of: root)?.dragToken,
                                 hasChildren: tree.hasChildren(row.item),
                                 progress: tree.progress(of: row.item),
+                                share: share(of: row.item),
+                                onHours: { setHours(row.item, $0) },
                                 onToggle: { toggle(row.item) },
                                 onAddChild: { addTarget = row.item; focused = true },
                                 onMoveUp: { move(row.item, by: -1) },
@@ -157,14 +159,17 @@ struct TodoStepsView: View {
                         .font(.title3.weight(.semibold))
                     if let step = tree.currentStep(of: root) {
                         HStack(spacing: 6) {
-                            Image(systemName: "arrowtriangle.right.fill")
-                                .font(.system(size: 11))
+                            // 기호 하나로는 이게 '지금 할 것'이라는 뜻이 안 읽힌다. 말로 적는다.
+                            Text("지금 단계")
+                                .font(.system(size: 11, weight: .semibold))
                                 .foregroundStyle(.orange)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(Color.orange.opacity(0.15)))
                             Text(step.title)
                                 .font(.system(size: 14, weight: .medium))
                                 .lineLimit(1)
                         }
-                        // 속성이 말해야 하는 건 '무슨 종류냐'가 아니라 '언제 하면 되냐'다.
                     } else if stepCount > 0 {
                         Label("모든 단계를 마쳤습니다", systemImage: "checkmark.circle.fill")
                             .font(.callout)
@@ -270,6 +275,21 @@ struct TodoStepsView: View {
 
     // MARK: - 동작
 
+    /// 이 단계가 전체에서 차지하는 몫. 분모는 잎(실제로 하는 단계)들의 합이다 —
+    /// 중간 묶음까지 더하면 두 번 센다.
+    private func share(of item: BacklogItem) -> Double? {
+        let total = tree.leaves(of: root).reduce(0) { $0 + $1.durationHours }
+        guard total > 0 else { return nil }
+        let hours = tree.hasChildren(item) ? tree.totalHours(of: item) : item.durationHours
+        return hours / total
+    }
+
+    /// 단계 시간을 직접 적는다. 상위 할 일의 시간은 아래에서 위로 저절로 따라온다.
+    private func setHours(_ item: BacklogItem, _ hours: Double) {
+        item.durationHours = hours
+        try? context.save()
+    }
+
     private func addStep() {
         let title = newTitle.trimmingCharacters(in: .whitespaces)
         guard !title.isEmpty else { return }
@@ -354,6 +374,9 @@ private struct StepRow: View {
     let isCurrent: Bool
     let hasChildren: Bool
     let progress: Double
+    /// 이 단계가 이 할 일 전체에서 차지하는 몫(0...1).
+    let share: Double?
+    let onHours: (Double) -> Void
     let onToggle: () -> Void
     let onAddChild: () -> Void
     let onMoveUp: () -> Void
@@ -361,6 +384,11 @@ private struct StepRow: View {
     let onDelete: () -> Void
 
     @State private var hovering = false
+
+    private var hoursBinding: Binding<Double> {
+        Binding(get: { item.durationHours },
+                set: { onHours(max(0.25, min(12, $0))) })
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -400,14 +428,26 @@ private struct StepRow: View {
 
             Spacer()
 
-            // 이 단계를 지금 시작할 수 있는지 — 줄에서 가장 크게 읽혀야 하는 것.
-            // (예전에는 이 자리에 '전체의 몇 %'가 있었다. 아무도 그 숫자로 결정하지 않았다.)
-            Menu {
-            } label: {
+            // 시간은 여기서 직접 적는다. 그리고 그게 전체에서 몇 %인지 바로 옆에 —
+            // 시간을 손으로 적게 된 뒤로는 이 숫자가 "어디를 더 쪼개야 하나"를 말해준다.
+            if !hasChildren {
+                HStack(spacing: 2) {
+                    TextField("", value: hoursBinding, format: .number.precision(.fractionLength(0...2)))
+                        .textFieldStyle(.plain)
+                        .frame(width: 34)
+                        .multilineTextAlignment(.trailing)
+                        .monospacedDigit()
+                    Text("h").font(.system(size: 11)).foregroundStyle(.secondary)
+                }
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
+
+            if let share {
+                Text("\(Int((share * 100).rounded()))%")
+                    .font(.system(size: 13, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(item.isCompleted ? Color.secondary : Color.primary)
+                    .frame(width: 40, alignment: .trailing)
+            }
 
             if hovering {
                 Button(action: onAddChild) {
@@ -433,30 +473,6 @@ private struct StepRow: View {
             Button("아래로", action: onMoveDown)
             Divider()
             Button("삭제", role: .destructive, action: onDelete)
-        }
-    }
-}
-
-// MARK: - 조각/덩어리 태그
-
-/// 이 단계를 언제 하는 게 맞는지 한 낱말로. 규칙은 TodoSplitAdvisor(공유)에 있다.
-struct ChunkTag: View {
-    let kind: ChunkKind
-
-    var body: some View {
-        Text(kind.label)
-            .font(.system(size: 13, weight: .semibold))
-            .foregroundStyle(color)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Capsule().fill(color.opacity(0.12)))
-    }
-
-    private var color: Color {
-        switch kind {
-        case .fragment: return .green
-        case .short:    return .blue
-        case .block:    return .indigo
         }
     }
 }
