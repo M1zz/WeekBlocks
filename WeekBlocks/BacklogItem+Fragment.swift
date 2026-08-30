@@ -62,3 +62,51 @@ extension BacklogItem {
         return value ? "y" : "n"
     }
 }
+
+// MARK: - 목록에서 줄을 가르는 규칙
+//
+// 두 앱이 같은 순서와 같은 색을 쓰기 위한 공통 판정. iOS는 목록의 띠로,
+// macOS는 카드 그리드의 순서와 배경색으로 옮긴다.
+
+extension BacklogItem {
+    /// 두 질문에 모두 '예'라고 **사용자가 직접** 답해 둔 줄인가 = '바로 하면 되는 일'.
+    ///
+    /// 앱 판정(→ `TodoSplitAdvisor`)과 일부러 구분한다. 짐작으로 올린 줄이 섞이면
+    /// 그 자리를 한 번 믿었다가 데인 뒤로 다시는 안 보게 된다.
+    var isMarkedNow: Bool {
+        let pick = fragmentPick
+        return pick.start == true && pick.closing == true
+    }
+}
+
+extension TodoTree {
+    /// 목록에서 이 줄이 서는 자리. 값이 곧 순서다 (작을수록 위).
+    enum Lane: Int, Comparable {
+        /// 바로 하면 되는 일 — 표시해 둔 줄, 또는 표시해 둔 단계를 품은 일.
+        case now = 0
+        /// 그냥 하면 되는 것 — 시간도 마감도 안 잡은 줄.
+        case errand = 1
+        /// 시간을 잡은 일.
+        case planned = 2
+
+        static func < (a: Lane, b: Lane) -> Bool { a.rawValue < b.rawValue }
+    }
+
+    /// 이 할 일 안에서 사용자가 표시해 둔, 아직 안 끝난 단계.
+    /// 차례와 상관없이 이게 있으면 줄에 세운다 — 표시해 둔 뜻이 그것이다.
+    func markedStep(of item: BacklogItem) -> BacklogItem? {
+        let candidates = hasChildren(item) ? leaves(of: item) : [item]
+        return candidates.first { !$0.isCompleted && $0.isMarkedNow }
+    }
+
+    /// 이 줄이 어느 자리에 서는가.
+    ///
+    /// `hasDeadline`은 무지개에 그어 둔 줄이 있는지 — 마감이 붙은 일은 시간이 0이어도
+    /// '그냥 하면 되는 것'이 아니다. 일정은 다른 스토어에 있어 여기서 못 보므로
+    /// 부르는 쪽이 알려준다.
+    func lane(of item: BacklogItem, hasDeadline: Bool = false) -> Lane {
+        if markedStep(of: item) != nil { return .now }
+        if isErrand(item), !hasDeadline { return .errand }
+        return .planned
+    }
+}

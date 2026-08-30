@@ -250,3 +250,24 @@ extension TodoTree {
     /// 새 단계·새 할 일의 기본 소요시간. 적을 때는 안 묻고, 상세에서 고친다.
     static let defaultStepHours: Double = 0.5
 }
+
+// MARK: - 그냥 하면 되는 것
+
+extension TodoTree {
+    /// '그냥 하면 되는 것' — 오는 길에 우유 사 오기처럼, 자리를 만들 필요 없이
+    /// **잊지만 않으면 되는** 한 줄.
+    ///
+    /// 별도의 종류 표시가 아니라 **적힌 것이 없는 상태**로 본다: 소요시간 0, 단계 없음.
+    /// 종류를 고르게 하면 제일 급하게 적는 줄이 제일 손이 많이 가게 된다 —
+    /// 착수 조건 라벨을 걷어냈던 이유와 같다. 그래서 필드를 더하지 않고,
+    /// 시간을 적는 순간 저절로 '할 일'로 올라가게 둔다.
+    ///
+    /// ⚠️ 마감(무지개에 그어 둔 줄)은 다른 스토어에 있어 여기서 못 본다.
+    ///    마감이 붙은 줄을 빼는 건 부르는 쪽에서 한다 (→ TodoView.splitErrands).
+    func isErrand(_ item: BacklogItem) -> Bool {
+        item.durationHours <= 0 && !hasChildren(item)
+    }
+
+    /// 시간을 잡지 않는 일의 소요시간. 0이라 주 밀도에 아무것도 얹지 않는다.
+    static let errandHours: Double = 0
+}

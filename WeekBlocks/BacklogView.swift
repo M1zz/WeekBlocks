@@ -36,7 +36,12 @@ struct BacklogSection: View {
     /// iOS Todo에서 완료 처리한 항목만 제외.
     /// 단계는 자기 카드를 갖지 않으므로 최상위 할 일만 세운다.
     private var weekItems: [BacklogItem] {
-        tree.roots.filter { !$0.isCompleted }.sorted { a, b in
+        let tree = self.tree
+        return tree.roots.filter { !$0.isCompleted }.sorted { a, b in
+            // 성질이 첫 번째 키다 — iOS 목록의 띠 순서를 카드 순서로 옮긴 것.
+            //   바로 하면 되는 일 → 그냥 하면 되는 것 → 시간을 잡은 일
+            let (la, lb) = (tree.lane(of: a), tree.lane(of: b))
+            if la != lb { return la < lb }
             let (ba, bb) = (weekBucket(a), weekBucket(b))
             if ba != bb { return ba < bb }
             // 같은 묶음 안에서는 주차순 → 원래 정렬(sortIndex, createdAt) 유지.
@@ -157,6 +162,7 @@ struct BacklogSection: View {
                             item: item,
                             categories: categories,
                             tint: itemColorMap[item.dragToken] ?? .secondary,
+                            lane: tree.lane(of: item),
                             weekNote: weekNote(for: item),
                             steps: stepsInfo(for: item),
                             onAdvance: { advance(item) },
@@ -189,7 +195,8 @@ struct BacklogSection: View {
                                 item.needsBroadcast = false
                                 item.broadcastContractVerified = false
                                 try? context.save()
-                            }
+                            },
+                            onToggleNow: { toggleNow(item) }
                         )
                     }
                 }
@@ -217,8 +224,12 @@ struct BacklogSection: View {
     private func stepsInfo(for item: BacklogItem) -> BacklogBlock.StepsInfo? {
         let tree = self.tree
         guard tree.hasChildren(item) else { return nil }
+        // 표시해 둔 단계가 있으면 그것을 세운다. 차례를 기다리지 않는 것이
+        // '바로 하면 되는 일'로 표시해 둔 뜻이다 (iOS 목록·위젯과 같은 규칙).
+        let marked = tree.markedStep(of: item)
         return BacklogBlock.StepsInfo(
-            currentTitle: tree.currentStep(of: item)?.title,
+            currentTitle: (marked ?? tree.currentStep(of: item))?.title,
+            isMarked: marked != nil,
             progress: tree.progress(of: item),
             count: tree.leafCount(of: item),
             number: tree.currentStepNumber(of: item),
@@ -229,8 +240,29 @@ struct BacklogSection: View {
 
     /// 지금 할 단계를 끝내고 다음 단계로 넘긴다.
     private func advance(_ item: BacklogItem) {
+        let tree = self.tree
         withAnimation {
-            tree.advance(item)
+            // 표시해 둔 단계를 세워 뒀으면 끝나는 것도 그 단계여야 한다.
+            if let marked = tree.markedStep(of: item), tree.hasChildren(item) {
+                tree.setCompleted(marked, true)
+            } else {
+                tree.advance(item)
+            }
+            try? context.save()
+        }
+    }
+
+    /// '바로 하면 되는 일' 표시를 켜고 끈다. 표시는 **그 줄 자체**에 붙는다 —
+    /// 쪼갠 일이면 지금 세워져 있는 단계에. (iOS와 같은 규칙)
+    private func toggleNow(_ item: BacklogItem) {
+        let tree = self.tree
+        let target = tree.markedStep(of: item)
+            ?? (tree.hasChildren(item) ? tree.currentStep(of: item) : item)
+        guard let target else { return }
+        let on = !target.isMarkedNow
+        withAnimation {
+            target.setFragmentAnswer(on ? true : nil, for: .start)
+            target.setFragmentAnswer(on ? true : nil, for: .closing)
             try? context.save()
         }
     }
@@ -408,7 +440,10 @@ struct BacklogBlock: View {
     /// 할 일 안의 단계(뎁스) 요약. 단계가 없는 할 일이면 nil.
     struct StepsInfo {
         /// 지금 해야 할 단계. 전부 끝났으면 nil.
+        /// 사용자가 '바로 하면 되는 일'로 표시해 둔 단계가 있으면 차례를 건너뛰고 그것이 온다.
         let currentTitle: String?
+        /// 위 단계가 표시해 둔 것인가 (차례를 건너뛰고 세운 단계).
+        var isMarked: Bool = false
         let progress: Double
         let count: Int
         /// 몇 번째 단계인지 (1부터). 전부 끝났으면 nil.
@@ -420,6 +455,8 @@ struct BacklogBlock: View {
     let item: BacklogItem
     let categories: [BacklogCategory]
     let tint: Color
+    /// 이 카드가 어느 자리에 서는가. 배경색이 여기서 나온다 (iOS 목록의 띠와 같은 규칙).
+    var lane: TodoTree.Lane = .planned
     /// 보고 있는 주가 아닐 때 붙는 표시 ("지난 주", "2주 전"). 같은 주면 nil.
     var weekNote: String? = nil
     var steps: StepsInfo? = nil
@@ -435,6 +472,8 @@ struct BacklogBlock: View {
     var onOpenBroadcastContract: () -> Void = { }
     /// 전파 필요 체크 해제.
     var onClearBroadcast: () -> Void = { }
+    /// '바로 하면 되는 일' 표시를 켜고 끈다.
+    var onToggleNow: () -> Void = { }
 
     @State private var hovering = false
 
@@ -461,6 +500,27 @@ struct BacklogBlock: View {
         return "\(BroadcastPlanner.dateLabel(next.date)) — \(who)에게 \(next.kind.label)"
     }
 
+    /// '바로 하면 되는 일'의 색. iOS와 같은 연두다.
+    static let nowGreen = Color(hue: 0.26, saturation: 0.72, brightness: 0.66)
+
+    /// 카드 배경. 성질이 곧 색이다.
+    ///   바로 하면 되는 일 → 연두, 그냥 하면 되는 것 → 회색, 나머지 → 카테고리 색.
+    private var laneBackground: Color {
+        switch lane {
+        case .now:     return Self.nowGreen.opacity(0.18)
+        case .errand:  return Color.secondary.opacity(0.09)
+        case .planned: return tint.opacity(0.10)
+        }
+    }
+
+    private var laneBorder: Color {
+        switch lane {
+        case .now:     return Self.nowGreen.opacity(0.45)
+        case .errand:  return Color.secondary.opacity(0.25)
+        case .planned: return tint.opacity(0.30)
+        }
+    }
+
     var body: some View {
         HStack(spacing: 7) {
             RoundedRectangle(cornerRadius: 2)
@@ -478,11 +538,14 @@ struct BacklogBlock: View {
                     // 단계가 있는 할 일은 '지금 할 단계'가 곧 지금 해야 하는 일이다.
                     Button(action: onAdvance) {
                         HStack(spacing: 4) {
+                            // 표시해 둔 단계는 원 안의 번개로 — 색만으로는 흑백에서 사라진다.
                             Image(systemName: steps.currentTitle == nil
                                   ? "checkmark.circle.fill"
-                                  : "arrowtriangle.right.circle.fill")
+                                  : (steps.isMarked ? "bolt.circle" : "arrowtriangle.right.circle.fill"))
                                 .font(.system(size: 13))
-                                .foregroundStyle(steps.currentTitle == nil ? .green : .orange)
+                                .foregroundStyle(steps.currentTitle == nil
+                                                 ? Color.green
+                                                 : (steps.isMarked ? Self.nowGreen : Color.orange))
                             Text(steps.currentTitle ?? "모든 단계 완료")
                                 .font(.system(size: 13, weight: .medium))
                                 .lineLimit(1)
@@ -500,6 +563,11 @@ struct BacklogBlock: View {
                 // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
                 // 단계가 있으면 이 카드를 끌어다 놓을 때 잡히는 건 전체 시간이라 그걸 쓴다.
                 HStack(spacing: 6) {
+                    if lane == .now, steps == nil {
+                        Image(systemName: "bolt.circle")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Self.nowGreen)
+                    }
                     Text(formatDuration(steps?.totalHours ?? item.durationHours))
                         .font(.system(size: 13, weight: .medium))
                         .monospacedDigit()
@@ -538,14 +606,16 @@ struct BacklogBlock: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(tint.opacity(0.30), lineWidth: 0.6))
+        .background(laneBackground, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(laneBorder, lineWidth: 0.6))
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .draggable(item.dragToken)
         .onHover { hovering = $0 }
         .help(broadcastHelp)
         .contextMenu {
             Button(steps == nil ? "단계로 쪼개기…" : "단계 보기·편집…", action: onEditSteps)
+            Button(lane == .now ? "'바로' 표시 거두기" : "바로 하면 되는 일로 표시",
+                   action: onToggleNow)
             if let steps {
                 if steps.currentTitle != nil {
                     Button("지금 단계 끝내기", action: onAdvance)
