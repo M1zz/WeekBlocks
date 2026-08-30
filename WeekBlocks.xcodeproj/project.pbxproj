@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
+		2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */; };
 		2BD0550462640DD942B3590F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28ADD71097A3C0E497BF731A /* BlockEditorView.swift */; };
 		33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45EF8BFE32D234EF9576302C /* ReflectionView.swift */; };
@@ -87,6 +88,7 @@
 		482967041DBF8581050A3138 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
 		5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5CC172BAFFE573306711B4CE /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
+		5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BacklogItem+Fragment.swift"; sourceTree = "<group>"; };
 		622A5D436D0F426C007C5246 /* ShareTodoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTodoView.swift; sourceTree = "<group>"; };
 		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 				90641A10CE63E76FFACFD63E /* Assets.xcassets */,
 				3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */,
 				FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */,
+				5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */,
 				295B1036D16FB52A4E7D0C74 /* BacklogView.swift */,
 				28ADD71097A3C0E497BF731A /* BlockEditorView.swift */,
 				1DBCEF723DD8D9B9742E5A52 /* BroadcastContract.swift */,
@@ -298,6 +301,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				80A02C44C4632837BA134587 /* BacklogCategory.swift in Sources */,
+				2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */,
 				5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */,
 				7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */,
 				2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */,

@@ -6,6 +6,14 @@
 //  근거는 조각 시간(fragmented time) 연구들이다. 사용자가 감으로 쪼개는 대신
 //  "이 단계는 5분에 집을 수 있는가 / 덩어리를 지켜야 하는가"를 앱이 말해준다.
 //
+//  판정은 **두 질문**으로만 이루어진다 (→ FragmentQuestion).
+//    하나. 시동 없이 바로 시작할 수 있는가.   ← 아니면 조각에서 시동만 걸다 끝난다.
+//    둘.   조각 안에서 완전히 끝나는가.       ← 아니면 잔여물이 다음 시간까지 따라온다.
+//  둘 다 '예'인 단계만 조각이다. 답은 앱이 낱말과 시간으로 먼저 적어두고,
+//  사용자는 틀렸을 때만 뒤집는다 (→ FragmentPick, BacklogItem+Fragment.swift).
+//  이름표 하나로 답을 주던 옛 '착수 조건'과 다른 점이 여기다 — 답이 아니라
+//  **묻는 문장**을 보여주기 때문에, 틀렸다는 것도 사용자가 알아볼 수 있다.
+//
 //  - 타임 컨페티 (Schulte 2014, Whillans 2020)
 //    5분 × 12 ≠ 60분. 조각은 총량으로 환산되지 않는다 → 조각용 단계가 따로 있어야 한다.
 //  - 주의 잔여물 (Leroy 2009, Leroy & Schmidt 2016)
@@ -44,6 +52,77 @@ enum ChunkKind: String {
     var isPickableInFragment: Bool { self == .fragment }
 }
 
+// MARK: - 조각에 넣어도 되는지를 가르는 두 질문
+
+/// 판정을 사람이 따라올 수 있는 두 물음으로 쪼갠 것.
+///
+/// 예전에는 '바로/펼치고/몰입해서' 같은 이름표 하나로 답을 줬는데, 그 이름표가
+/// 무슨 뜻인지가 안 통했다. 이름표를 없앤 자리에 **묻는 문장 그대로**를 둔다.
+/// 답은 앱이 먼저 적어두고, 사용자는 틀렸을 때만 뒤집는다 (→ FragmentPick).
+enum FragmentQuestion: String, CaseIterable, Identifiable {
+    /// 하나 — 시동 없이 바로 시작할 수 있는가.
+    case start
+    /// 둘 — 조각 안에서 완전히 끝나는가.
+    case closing
+
+    var id: String { rawValue }
+
+    /// 화면에 그대로 나가는 물음.
+    var text: String {
+        switch self {
+        case .start:   return "시동 없이 바로 시작되나요?"
+        case .closing: return "5분 안에 끝까지 가나요?"
+        }
+    }
+
+    /// 왜 이걸 묻는지 한 줄. (물음 아래 작게)
+    var why: String {
+        switch self {
+        case .start:
+            return "맥락을 다시 읽어 와야 하는 일은 조각에서 시동만 걸다 끝납니다."
+        case .closing:
+            return "끝나지 않은 일은 잔여물이 되어 그다음 덩어리 시간까지 갉아먹습니다."
+        }
+    }
+
+    /// 근거 표기.
+    var source: String {
+        switch self {
+        case .start:   return "Mark 2008"
+        case .closing: return "Leroy 2009"
+        }
+    }
+}
+
+/// 사용자가 두 질문에 직접 답한 것. 비어 있으면 앱 판정을 그대로 쓴다.
+///
+/// 저장은 `BacklogItem.fragmentPick` (→ BacklogItem+Fragment.swift). 여기서는
+/// 저장 방식을 모르는 순수 값으로만 다룬다.
+struct FragmentPick: Equatable {
+    /// 질문 하나에 대한 사용자의 답. nil이면 앱 판정을 쓴다.
+    var start: Bool?
+    /// 질문 둘에 대한 사용자의 답. nil이면 앱 판정을 쓴다.
+    var closing: Bool?
+
+    static let none = FragmentPick(start: nil, closing: nil)
+
+    var isSet: Bool { start != nil || closing != nil }
+
+    func answer(to question: FragmentQuestion) -> Bool? {
+        switch question {
+        case .start:   return start
+        case .closing: return closing
+        }
+    }
+
+    mutating func set(_ value: Bool?, for question: FragmentQuestion) {
+        switch question {
+        case .start:   start = value
+        case .closing: closing = value
+        }
+    }
+}
+
 /// 단계 하나에 대한 조언.
 struct StepAdvice {
     let kind: ChunkKind
@@ -51,11 +130,46 @@ struct StepAdvice {
     let reason: String?
     /// 이 단계에 붙는 경고 (있으면 화면에서 눈에 띄게).
     let warning: Warning?
+    /// 질문 하나 — 시동 없이 바로 시작할 수 있는가.
+    let start: Answer
+    /// 질문 둘 — 조각 안에서 완전히 끝나는가.
+    let closing: Answer
 
     struct Warning {
         let message: String
         /// 근거 표기 ("Mark 2008" 등).
         let source: String
+    }
+
+    /// 두 질문 각각에 대한 답. 앱이 먼저 답하고, 사용자가 뒤집으면 `isUserSet`이 된다.
+    struct Answer {
+        let isYes: Bool
+        /// 왜 그렇게 봤는지 한 줄. 사용자가 읽고 틀렸다고 판단할 수 있어야 한다.
+        let reason: String
+        /// 사용자가 직접 답한 것인가.
+        var isUserSet: Bool = false
+    }
+
+    func answer(to question: FragmentQuestion) -> Answer {
+        switch question {
+        case .start:   return start
+        case .closing: return closing
+        }
+    }
+
+    /// 두 질문에 모두 '예'인 단계만 조각이다.
+    var isFragment: Bool { kind.isPickableInFragment }
+
+    /// 판정 결과를 한 줄로. (시트 아래, 목록 표식의 말)
+    var verdict: String {
+        switch kind {
+        case .fragment:
+            return "조각입니다. 5분이 나면 이걸 집으면 됩니다."
+        case .short:
+            return "짧은 덩어리입니다. 앉아야 하지만 한 자리에서 끝납니다."
+        case .block:
+            return "덩어리입니다. 지켜 둔 시간에 두세요."
+        }
     }
 }
 
@@ -99,7 +213,8 @@ enum TodoSplitAdvisor {
     static let fragmentWords = [
         "보내기", "발송", "제출", "발행", "업로드", "공유하기", "답장", "회신", "승인",
         "예약", "확인", "체크", "결제", "신청", "등록", "캡처", "메모", "적기", "기록",
-        "복습", "암기", "카드", "고르기", "선택", "전화", "문자", "주문"
+        "복습", "암기", "카드", "고르기", "선택", "전화", "문자", "주문",
+        "올리기", "게시", "포스팅", "모아두기", "챙기기"
     ]
 
     /// 몸으로 하는 일 — 조각으로도 실제로 축적된다 (VILPA).
@@ -121,82 +236,173 @@ enum TodoSplitAdvisor {
     /// 끝을 닫는 마감 동작 — 마지막 단계에 이게 있으면 잔여물이 남지 않는다.
     static let closingWords = [
         "보내기", "발송", "제출", "발행", "업로드", "공유하기", "배포", "커밋", "머지",
-        "마무리", "제출하기", "회신", "답장", "결제", "청구"
+        "마무리", "제출하기", "회신", "답장", "결제", "청구", "올리기", "게시", "포스팅"
     ]
 
     // MARK: 단계 하나 판정
 
-    static func advice(title: String, durationHours: Double) -> StepAdvice {
+    /// 단계 하나를 두 질문으로 판정한다.
+    ///
+    /// `pick`은 사용자가 직접 뒤집은 답(→ `BacklogItem.fragmentPick`). 앱의 판정보다 세다 —
+    /// 낱말 사전은 남의 일에 대해서는 자주 틀리고, 틀린 판정을 못 고치면 판정 전체를 안 믿게 된다.
+    static func advice(title: String,
+                       durationHours: Double,
+                       pick: FragmentPick = .none) -> StepAdvice
+    {
         let text = normalize(title)
 
-        if contains(text, drainWords) {
-            return StepAdvice(
-                kind: .fragment,
-                reason: "조각이 새는 곳",
-                warning: .init(message: "이건 할 일이 아니라 조각이 새어 나가는 곳입니다. 단계로 두면 진행률만 부풀립니다.",
-                               source: "배수구")
-            )
-        }
-
-        if contains(text, bodyWords) {
-            return StepAdvice(
-                kind: .fragment,
-                reason: "몸으로 하는 일",
-                warning: nil
-            )
-        }
-
-        let looksBlock = contains(text, blockWords)
+        let looksDrain    = contains(text, drainWords)
+        let looksBody     = contains(text, bodyWords)
+        let looksBlock    = contains(text, blockWords)
         let looksFragment = contains(text, fragmentWords)
         let looksDecision = contains(text, decisionWords)
+        let looksClosing  = contains(text, closingWords)
 
+        // 질문 하나 — 시동 없이 바로 시작할 수 있는가.
+        var start: StepAdvice.Answer = {
+            if looksDecision {
+                return .init(isYes: false, reason: "안 정한 것이 먼저 막고 있습니다.")
+            }
+            if looksBlock {
+                return .init(isYes: false, reason: "어디까지 했는지 다시 읽어 와야 시작됩니다.")
+            }
+            if looksBody {
+                return .init(isYes: true, reason: "몸으로 하는 일이라 시동이 없습니다.")
+            }
+            if looksFragment || looksClosing {
+                return .init(isYes: true, reason: "할 것이 정해져 있어 바로 손이 갑니다.")
+            }
+            return .init(isYes: true, reason: "앞에서 막고 있는 것이 안 보입니다.")
+        }()
+
+        // 질문 둘 — 조각 안에서 완전히 끝나는가.
+        var closing: StepAdvice.Answer = {
+            // 몸으로 하는 일만은 나눠 해도 쌓인다 (VILPA). 크기로 자르지 않는다.
+            if looksBody {
+                return .init(isYes: true, reason: "몸으로 하는 일은 나눠 해도 쌓입니다.")
+            }
+            if looksDrain {
+                return .init(isYes: false, reason: "끝이 정해져 있지 않아 안 닫힙니다.")
+            }
+            if durationHours >= tooBigHours {
+                return .init(isYes: false, reason: "\(formatHours(durationHours))짜리입니다. 한 자리에서도 안 닫힙니다.")
+            }
+            if durationHours > fragmentMaxHours {
+                return .init(isYes: false, reason: "\(formatHours(durationHours))짜리라 조각에 안 들어갑니다.")
+            }
+            if looksBlock {
+                return .init(isYes: false, reason: "짧게 잡아 두어도 여기서 끝나지는 않습니다.")
+            }
+            if looksDecision {
+                return .init(isYes: false, reason: "뭘 할지 고르는 동안 조각이 끝납니다.")
+            }
+            if looksClosing || looksFragment {
+                return .init(isYes: true, reason: "끝이 정해져 있어 여기서 닫힙니다.")
+            }
+            if durationHours <= 0 {
+                return .init(isYes: true, reason: "시간을 안 잡은 줄이라 조각에 들어갑니다.")
+            }
+            return .init(isYes: true, reason: "\(formatHours(durationHours))짜리라 조각 안에 들어갑니다.")
+        }()
+
+        // 사용자가 답한 것이 있으면 그 자리만 갈아 끼운다.
+        if let yes = pick.start {
+            start = .init(isYes: yes, reason: "직접 정한 답입니다.", isUserSet: true)
+        }
+        if let yes = pick.closing {
+            closing = .init(isYes: yes, reason: "직접 정한 답입니다.", isUserSet: true)
+        }
+
+        let kind = self.kind(start: start, closing: closing, durationHours: durationHours)
+        let reason = self.reason(kind: kind, start: start, closing: closing)
+
+        return StepAdvice(kind: kind,
+                          reason: reason,
+                          warning: warning(kind: kind,
+                                           durationHours: durationHours,
+                                           looksDrain: looksDrain,
+                                           looksBlock: looksBlock,
+                                           looksDecision: looksDecision,
+                                           pick: pick),
+                          start: start,
+                          closing: closing)
+    }
+
+    /// 두 질문의 답에서 성질이 나온다. **둘 다 '예'여야 조각이다.**
+    private static func kind(start: StepAdvice.Answer,
+                             closing: StepAdvice.Answer,
+                             durationHours: Double) -> ChunkKind
+    {
+        if start.isYes && closing.isYes { return .fragment }
+        // 시동이 필요하면 크기와 상관없이 지켜 둔 시간에 놓아야 한다.
+        if !start.isYes || durationHours >= blockMinHours { return .block }
+        return .short
+    }
+
+    private static func reason(kind: ChunkKind,
+                               start: StepAdvice.Answer,
+                               closing: StepAdvice.Answer) -> String?
+    {
+        switch kind {
+        case .fragment: return nil
+        case .short, .block: return start.isYes ? closing.reason : start.reason
+        }
+    }
+
+    /// 경고는 두 답이 갈렸을 때만 낸다. 판정 자체(조각/덩어리)는 표식이 이미 말하고 있다.
+    private static func warning(kind: ChunkKind,
+                                durationHours: Double,
+                                looksDrain: Bool,
+                                looksBlock: Bool,
+                                looksDecision: Bool,
+                                pick: FragmentPick) -> StepAdvice.Warning?
+    {
+        // 사용자가 직접 답한 자리에는 훈수를 두지 않는다.
+        if pick.isSet { return nil }
+
+        if looksDrain {
+            return .init(message: "이건 할 일이 아니라 조각이 새어 나가는 곳입니다. 단계로 두면 진행률만 부풉니다.",
+                         source: "배수구")
+        }
         // 시동 비용이 큰 일을 조각 시간에 욱여넣은 경우.
         if looksBlock && durationHours <= fragmentMaxHours {
-            return StepAdvice(
-                kind: .block,
-                reason: "시동 비용이 큰 일",
-                warning: .init(message: "다시 붙잡는 데만 평균 23분이 듭니다. 조각에 넣으면 시동만 걸다 끝나니, 시간을 늘리거나 덩어리 시간에 두세요.",
-                               source: "Mark 2008")
-            )
+            return .init(message: "다시 붙잡는 데만 평균 23분이 듭니다. 조각에 넣으면 시동만 걸다 끝나니, 시간을 늘리거나 덩어리 시간에 두세요.",
+                         source: "Mark 2008")
         }
-
         // 아직 안 정해진 일은 조각 안에서 닫히지 않는다.
         if looksDecision && durationHours < blockMinHours {
-            return StepAdvice(
-                kind: .short,
-                reason: "결정이 필요한 일",
-                warning: .init(message: "뭘 할지 고르는 동안 조각이 끝납니다. 결정은 덩어리에서 하고, 정해진 것만 조각 단계로 보내세요.",
-                               source: "판정 기준 3")
-            )
+            return .init(message: "뭘 할지 고르는 동안 조각이 끝납니다. 결정은 덩어리에서 하고, 정해진 것만 조각 단계로 보내세요.",
+                         source: "판정 기준 3")
         }
-
         // 한 자리에서 안 닫히는 크기.
         if durationHours >= tooBigHours {
-            return StepAdvice(
-                kind: .block,
-                reason: nil,
-                warning: .init(message: "한 번에 못 끝내는 크기입니다. 끝이 닫히도록 더 쪼개지 않으면 '하다 만 상태'가 다음 시간까지 따라옵니다.",
-                               source: "Leroy 2009")
-            )
+            return .init(message: "한 번에 못 끝내는 크기입니다. 끝이 닫히도록 더 쪼개지 않으면 '하다 만 상태'가 다음 시간까지 따라옵니다.",
+                         source: "Leroy 2009")
         }
+        return nil
+    }
 
-        if looksFragment && durationHours <= blockMinHours {
-            return StepAdvice(kind: .fragment, reason: "결과가 정해진 일", warning: nil)
-        }
-        if looksBlock {
-            return StepAdvice(kind: .block, reason: "시동 비용이 큰 일", warning: nil)
-        }
-
-        // 낱말로 못 읽으면 시간만 본다.
-        if durationHours <= fragmentMaxHours { return StepAdvice(kind: .fragment, reason: nil, warning: nil) }
-        if durationHours >= blockMinHours { return StepAdvice(kind: .block, reason: nil, warning: nil) }
-        return StepAdvice(kind: .short, reason: nil, warning: nil)
+    /// 조언 문장에 넣을 시간 표기. (화면의 formatDuration과 달리 로직 파일 안에서 쓴다)
+    private static func formatHours(_ hours: Double) -> String {
+        let minutes = Int((max(0, hours) * 60).rounded())
+        if minutes < 60 { return "\(minutes)분" }
+        let h = minutes / 60
+        let m = minutes % 60
+        return m == 0 ? "\(h)시간" : "\(h)시간 \(m)분"
     }
 
     // MARK: 구성 전체 판정
 
     /// 단계 구성을 보고 주는 조언. `steps`는 잎(실제로 하는 단계)들을 진행 순서대로.
     static func hints(rootTitle: String, steps: [(title: String, hours: Double)]) -> [SplitHint] {
+        hints(rootTitle: rootTitle, steps: steps.map { ($0.title, $0.hours, FragmentPick.none) })
+    }
+
+    /// 사용자가 뒤집은 답까지 반영해서 보는 판. 구성 조언도 그 답을 따라야 한다 —
+    /// 한쪽에서 '조각'이라고 해 놓고 다른 쪽에서 "조각이 없습니다"라고 하면 둘 다 안 믿게 된다.
+    static func hints(rootTitle: String,
+                      steps: [(title: String, hours: Double, pick: FragmentPick)]) -> [SplitHint]
+    {
         guard !steps.isEmpty else {
             return [SplitHint(
                 code: "before-split",
@@ -207,7 +413,7 @@ enum TodoSplitAdvisor {
         }
 
         var result: [SplitHint] = []
-        let advices = steps.map { advice(title: $0.title, durationHours: $0.hours) }
+        let advices = steps.map { advice(title: $0.title, durationHours: $0.hours, pick: $0.pick) }
 
         // 1. 조각용 단계가 하나도 없다.
         if !advices.contains(where: { $0.kind.isPickableInFragment }) {

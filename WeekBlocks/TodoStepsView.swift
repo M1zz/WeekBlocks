@@ -44,7 +44,7 @@ struct TodoStepsView: View {
         let tree = self.tree
         let leaves = tree.hasChildren(root) ? tree.leaves(of: root) : []
         return TodoSplitAdvisor.hints(rootTitle: root.title,
-                                      steps: leaves.map { ($0.title, $0.durationHours) })
+                                      steps: leaves.map { ($0.title, $0.durationHours, $0.fragmentPick) })
     }
 
     var body: some View {
@@ -192,7 +192,8 @@ struct TodoStepsView: View {
             if let step = tree.currentStep(of: root),
                !tree.hasChildren(step),
                let warning = TodoSplitAdvisor.advice(title: step.title,
-                                                     durationHours: step.durationHours).warning {
+                                                     durationHours: step.durationHours,
+                                                     pick: step.fragmentPick).warning {
                 TipView(StepWarningTip(warning: warning))
             }
 
@@ -385,6 +386,13 @@ private struct StepRow: View {
 
     @State private var hovering = false
 
+    /// 두 질문 판정. 잎(실제로 하는 단계)일 때만 본다.
+    private var advice: StepAdvice {
+        TodoSplitAdvisor.advice(title: item.title,
+                                durationHours: item.durationHours,
+                                pick: item.fragmentPick)
+    }
+
     private var hoursBinding: Binding<Double> {
         Binding(get: { item.durationHours },
                 set: { onHours(max(0.25, min(12, $0))) })
@@ -422,6 +430,18 @@ private struct StepRow: View {
                     ProgressView(value: progress)
                         .tint(progress >= 1 ? .green : .accentColor)
                         .frame(maxWidth: 160)
+                } else if advice.isFragment {
+                    // 표식은 조각에만. iOS('욕망의 무지개')와 같은 말·같은 기준이다.
+                    HStack(spacing: 4) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 9, weight: .bold))
+                        Text("5분에 집기")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(Color.teal)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.teal.opacity(0.15)))
                 }
 
             }
