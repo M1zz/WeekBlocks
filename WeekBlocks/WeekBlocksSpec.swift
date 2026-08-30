@@ -20,4 +20,14 @@ enum WeekBlocksSpec: LeeoAppSpec {
         containerIdentifier: "iCloud.com.Ysoup.FeedbackHub",
         appIdentifier: "com.devkoan.ScheduleDensityApp"
     )
+
+    /// LeeoKit 3부터는 기본값이 없다 — 모든 앱이 한 번은 선언해야 하는 의무 링크.
+    static let legal = LeeoLegalConfig(
+        privacyURL: URL(string: "https://m1zz.github.io/WeekBlocks/privacy.html")!,
+        supportURL: URL(string: "https://m1zz.github.io/WeekBlocks/")!,
+        marketingURL: URL(string: "https://m1zz.github.io/WeekBlocks/")!
+    )
+
+    /// 결제가 없는 앱이다. 페이월·복원·약관 의무도 여기서 따라오지 않는다.
+    static let monetization = LeeoMonetization.free
 }

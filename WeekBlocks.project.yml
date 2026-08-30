@@ -8,7 +8,7 @@ options:
 packages:
   LeeoKit:
     url: https://github.com/M1zz/LeeoKit.git
-    from: "2.5.0"
+    from: "3.5.1"
 settings:
   base:
     MARKETING_VERSION: "1.0.9"
