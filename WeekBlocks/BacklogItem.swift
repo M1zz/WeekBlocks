@@ -38,49 +38,6 @@ final class BacklogItem {
     ///    → BacklogItem+Fragment.swift 의 `fragmentPick`으로만 드나든다.
     var labelRaw: String? = nil
 
-    // MARK: - 전파 계약
-    //
-    // '전파 필요'로 체크한 항목은 일반 항목과 다른 전처리를 밟는다.
-    // 아래 필드가 그 전처리(전파 계약)의 내용이고, 전파 시점은 여기서 역산된다.
-    // CloudKit 라이트웨이트 마이그레이션을 위해 전부 기본값 또는 옵셔널이다.
-
-    // 전파 계약. 아직 출시 전인 맥 전용 기능이다.
-    //
-    // ⚠️ CloudKit **Development** 환경이라 이 필드들은 서버에 자동으로 만들어진다
-    //    (→ WeekBlocks.entitlements). Production이었다면 콘솔에서 배포하기 전까지
-    //    서버가 모르는 필드라, 그 하나 때문에 미러링 초기화가 실패해 받기·보내기가
-    //    통째로 멈춘다. 실제로 그렇게 한 번 멈췄었다.
-    //
-    // ⚠️ iOS '욕망의 무지개'에도 **같은 필드가 있어야 한다.** 같은 스토어를 쓰는데
-    //    한쪽에만 칸이 없으면 그쪽이 저장할 때 남의 값을 지운다.
-
-    /// 이 할 일을 누군가에게 알려야 하는가.
-    var needsBroadcast: Bool = false
-    /// 진짜 마감. 전파 시점 역산의 출발점.
-    var deadline: Date? = nil
-    /// BroadcastAudience.rawValue
-    var broadcastAudienceRaw: String = "decisionMaker"
-    /// 누구에게 알리는가 (이름·역할).
-    var broadcastRecipient: String = ""
-    /// 어떤 모양으로 넘어가는가. 상대가 이걸 전제로 자기 일을 짠다.
-    var handoffForm: String = ""
-    /// 빠르면 이 날.
-    var earliestDate: Date? = nil
-    /// 늦어도 이 날 보장. 상대가 계획을 세우는 기준이고, 역산의 실제 기준일.
-    var latestDate: Date? = nil
-    /// BroadcastConfidence.rawValue
-    var broadcastConfidenceRaw: String = "medium"
-    /// 지금 미확정인 것 하나. "없음"이면 없는 것으로 본다.
-    var openVariable: String = ""
-    /// 그 변수가 판명되는 날.
-    var variableResolveDate: Date? = nil
-    /// "연락 없음 = 정상 진행" 규칙을 상대와 합의했는가.
-    var noSignalRuleAgreed: Bool = false
-    /// 전파 계약 전처리를 통과했는가. (일반 항목의 concreteVerified에 대응)
-    var broadcastContractVerified: Bool = false
-    /// 이미 보낸 전파 시점의 token 목록 (콤마 구분).
-    var sentCheckpointsRaw: String = ""
-
     init(title: String,
          durationHours: Double = 1,
          sortIndex: Int = 0,
@@ -95,7 +52,3 @@ final class BacklogItem {
         self.weekStartDate = weekStartDate
     }
 }
-
-// 전파 계약 접근자는 BroadcastContract.swift의 프로토콜 익스텐션이 제공한다
-// (PlanBlock과 같은 구현을 쓴다).
-extension BacklogItem: BroadcastContractHolder { }

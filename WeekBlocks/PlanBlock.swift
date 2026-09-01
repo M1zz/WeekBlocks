@@ -29,37 +29,6 @@ final class PlanBlock {
     var reviewNote: String? = nil
     var reviewedAt: Date? = nil
 
-    // MARK: - 전파 계약
-    //
-    // 백로그 항목을 요일에 드롭하면 이 블록이 되고 항목은 삭제된다.
-    // 그때 계약이 함께 넘어오지 않으면 대상·두 날짜·이미 보낸 시점 기록이 전부 사라진다.
-    // 필드 구성과 의미는 BacklogItem과 같고, 접근자는 BroadcastContractHolder가 공용으로 제공한다.
-    // CloudKit 라이트웨이트 마이그레이션을 위해 전부 기본값 또는 옵셔널이다.
-
-    // 전파 계약. 아직 출시 전인 맥 전용 기능이다.
-    //
-    // ⚠️ CloudKit **Development** 환경이라 이 필드들은 서버에 자동으로 만들어진다
-    //    (→ WeekBlocks.entitlements). Production이었다면 콘솔에서 배포하기 전까지
-    //    서버가 모르는 필드라, 그 하나 때문에 미러링 초기화가 실패해 받기·보내기가
-    //    통째로 멈춘다. 실제로 그렇게 한 번 멈췄었다.
-    //
-    // ⚠️ iOS '욕망의 무지개'에도 **같은 필드가 있어야 한다.** 같은 스토어를 쓰는데
-    //    한쪽에만 칸이 없으면 그쪽이 저장할 때 남의 값을 지운다.
-
-    var needsBroadcast: Bool = false
-    var deadline: Date? = nil
-    var broadcastAudienceRaw: String = "decisionMaker"
-    var broadcastRecipient: String = ""
-    var handoffForm: String = ""
-    var earliestDate: Date? = nil
-    var latestDate: Date? = nil
-    var broadcastConfidenceRaw: String = "medium"
-    var openVariable: String = ""
-    var variableResolveDate: Date? = nil
-    var noSignalRuleAgreed: Bool = false
-    var broadcastContractVerified: Bool = false
-    var sentCheckpointsRaw: String = ""
-
     init(day: DayOfWeek,
          timeBand: TimeBand,
          durationHours: Double,
@@ -115,6 +84,3 @@ final class PlanBlock {
     }
 }
 
-// 전파 계약 접근자는 BroadcastContract.swift의 프로토콜 익스텐션이 제공한다
-// (BacklogItem과 같은 구현을 쓴다).
-extension PlanBlock: BroadcastContractHolder { }

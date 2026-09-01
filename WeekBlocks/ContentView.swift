@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var showingReflection = false
     @State private var showingSettings = false
     @State private var showingSampleAlert = false
+    /// 처음 켠 사람에게 고정 루틴을 함께 세우자고 묻는 자리.
+    @State private var showingRoutineOnboarding = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
@@ -65,7 +67,7 @@ struct ContentView: View {
     var body: some View {
         ScrollView {
             ScrollViewReader { proxy in
-                VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: 22) {
                     weekHeader
                     // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
                     if showsWeekSummary {
@@ -73,12 +75,15 @@ struct ContentView: View {
                             metricsRow
                             WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
                         }
-                        .transition(.asymmetric(insertion: .push(from: .top).combined(with: .opacity),
-                                                removal: .opacity))
+                        // 접히고 펴지는 결이 양쪽으로 같아야 한 덩어리가 여닫히는 것으로 읽힌다.
+                        // 예전에는 펼 때만 밀려 내려오고 접을 때는 그 자리에서 사라져서,
+                        // 접는 순간 아래 화면이 툭 끊기며 올라왔다.
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .top).combined(with: .opacity),
+                            removal: .move(edge: .top).combined(with: .opacity)
+                        ))
+                        .clipped()
                     }
-                    // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
-                    // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
-                    BroadcastPlanSection(allItems: backlogItems, allBlocks: allBlocks)
                     weekLensSection
                     // 할 일 목록은 한 주를 보는 자리 **아래**에 둔다.
                     // 먼저 이번 주가 어떻게 생겼는지 보고, 그다음 무엇을 끌어다 놓을지 고른다.
@@ -97,7 +102,8 @@ struct ContentView: View {
                         ReceivedSchedulesSection()
                     }
                 }
-                .padding(28)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 // 툴바에서 '할 일 추가'를 누르면 아래로 내려가 있어도 목록으로 데려간다.
                 // 빈 칸이 열렸는데 화면 밖이면 누른 것이 아무 일도 안 한 것처럼 보인다.
@@ -178,6 +184,11 @@ struct ContentView: View {
             )
             .frame(minWidth: 520, minHeight: 540)
         }
+        .sheet(isPresented: $showingRoutineOnboarding) {
+            RoutineOnboardingView(onWriteMyOwn: {
+                routineSheet = RoutineSheetContext(routine: nil)
+            })
+        }
         .sheet(item: $routineSheet) { ctx in
             RoutineEditorView(existing: ctx.routine)
                 .frame(minWidth: 520, minHeight: 480)
@@ -207,12 +218,10 @@ struct ContentView: View {
         } message: {
             Text("루틴·계획 블록·할 일을 모두 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")
         }
-        // 전파 계약이 붙은 할 일을 요일에 떨어뜨릴 때 받던 확인은 걷어냈다 —
-        // 배치해도 할 일이 백로그에 그대로 남으므로 알릴 일이 없어졌다.
         .task {
             if !didSeed {
                 didSeed = true
-                await seedDefaultsIfNeeded()
+                await offerRoutineOnboardingIfNeeded()
                 dedupeRoutinesByName()
                 // 내려받기가 늦게 도착해 겹치는 일이 있어, 자리 잡은 뒤 한 번 더 본다.
                 Task { @MainActor in
@@ -269,26 +278,29 @@ struct ContentView: View {
     // MARK: subviews
 
     private var weekHeader: some View {
-        HStack(spacing: 14) {
+        // 날짜는 **한 줄**로 선다. 두 줄에 32pt로 세워 두었더니 화면 맨 위의 제일 좋은
+        // 자리를 늘 날짜가 차지했다 — 정작 봐야 할 것은 그 아래 한 주의 모양이다.
+        HStack(spacing: 8) {
             Button { shiftWeek(by: -1) } label: {
-                Image(systemName: "chevron.left").font(.title3.weight(.semibold))
+                Image(systemName: "chevron.left").font(.body.weight(.semibold))
             }
             .buttonStyle(.borderless)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(weekRangeString)
-                    .font(.system(size: 32, weight: .bold))
-                    .monospacedDigit()
-                Text(weekSubtitle)
-                    .font(.callout.weight(.medium))
-                    .foregroundStyle(weekOffset == 0 ? Color.red : .secondary)
-            }
-            .frame(minWidth: 280, alignment: .leading)
+            Text(weekRangeString)
+                .font(.system(size: 19, weight: .semibold))
+                .monospacedDigit()
+                .fixedSize()
 
             Button { shiftWeek(by: 1) } label: {
-                Image(systemName: "chevron.right").font(.title3.weight(.semibold))
+                Image(systemName: "chevron.right").font(.body.weight(.semibold))
             }
             .buttonStyle(.borderless)
+
+            Text(weekSubtitle)
+                .font(.callout.weight(.medium))
+                .foregroundStyle(weekOffset == 0 ? Color.red : .secondary)
+                .fixedSize()
+                .padding(.leading, 2)
 
             if weekOffset != 0 {
                 Button("이번 주로") { selectedWeek = .currentWeekStart }
@@ -296,17 +308,32 @@ struct ContentView: View {
                     .controlSize(.small)
             }
 
+            // 한 줄의 무게를 양 끝으로 나눈다. 왼쪽은 '언제'(날짜), 오른쪽은 '어떻게 볼까'.
+            // 가운데에 몰아 두면 오른쪽이 통째로 비어 한쪽으로 쏠려 보인다.
             Spacer()
+
+            // 한 주를 보는 두 자리. 날짜 줄에 함께 세운다 —
+            // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
+            Picker("", selection: lensBinding) {
+                ForEach(WeekLens.allCases) { lens in
+                    Label(lens.rawValue, systemImage: lens.symbol).tag(lens.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(maxWidth: 260)
+            .padding(.leading, 6)
 
             // 한 주 총량·고정 루틴·남은 자유 시간 요약.
             // 좋은 숫자지만 **매번 볼 숫자는 아니다** — 한 주에 한 번 확인하면 되는 값이
             // 화면 맨 위 제일 좋은 자리를 늘 차지하고 있었다. 버튼 뒤로 접고, 접힘 상태를 기억한다.
             Button {
-                withAnimation(.easeOut(duration: 0.2)) { showsWeekSummary.toggle() }
+                withAnimation(.snappy(duration: 0.3)) { showsWeekSummary.toggle() }
             } label: {
                 Label(showsWeekSummary ? "요약 접기" : "요약",
-                      systemImage: "chart.bar.xaxis")
+                      systemImage: showsWeekSummary ? "chevron.up" : "chart.bar.xaxis")
                     .labelStyle(.titleAndIcon)
+                    .contentTransition(.opacity)
             }
             .buttonStyle(.borderless)
             .help("한 주 총량 · 고정 루틴 · 남은 자유 시간")
@@ -328,9 +355,6 @@ struct ContentView: View {
     }
 
     private var weekSubtitle: String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy년"
-        let year = f.string(from: selectedWeek)
         let rel: String
         switch weekOffset {
         case 0: rel = "이번 주"
@@ -339,7 +363,13 @@ struct ContentView: View {
         case let n where n > 0: rel = "\(n)주 후"
         default: rel = "\(-weekOffset)주 전"
         }
-        return "\(year) · \(rel)"
+        // 연도는 올해가 아닐 때만 말한다. 늘 붙여 두면 매번 읽히지만 매번 필요하지는 않다.
+        let cal = Calendar.current
+        guard cal.component(.year, from: selectedWeek) != cal.component(.year, from: Date())
+        else { return rel }
+        let f = DateFormatter()
+        f.dateFormat = "yyyy년"
+        return "\(f.string(from: selectedWeek)) · \(rel)"
     }
 
     private func dayDate(_ day: DayOfWeek) -> Date {
@@ -382,12 +412,26 @@ struct ContentView: View {
             }
 
             if routines.isEmpty {
-                ContentUnavailableView(
-                    "루틴이 없습니다",
-                    systemImage: "lock.open",
-                    description: Text("수면 · 식사 · 운동처럼 빼놓을 수 없는 중요한 시간을 먼저 확보하세요.")
-                )
-                .frame(minHeight: 120)
+                // 비어 있다고만 말하지 않는다. 무엇을 해야 하는지와, 도와줄 길을 함께 준다.
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("고정으로 시간을 쓰는 일이 아직 없습니다")
+                        .font(.callout.weight(.medium))
+                    Text("잠, 끼니처럼 빼놓을 수 없는 시간을 먼저 세우면 남는 자리가 실제로 쓸 수 있는 시간이 됩니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 8) {
+                        Button("만드는 걸 도와드릴게요") { showingRoutineOnboarding = true }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+                        Button("직접 적기") { routineSheet = RoutineSheetContext(routine: nil) }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                    }
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 10))
             } else {
                 LazyVGrid(
                     columns: [GridItem(.adaptive(minimum: 180, maximum: 260), spacing: 8)],
@@ -507,39 +551,7 @@ struct ContentView: View {
     /// 세그먼트로 가르고, 그 옆에 이 자리가 무엇을 하는 자리인지 한 줄로 적는다.
     private var weekLensSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Picker("", selection: lensBinding) {
-                    ForEach(WeekLens.allCases) { lens in
-                        Label(lens.rawValue, systemImage: lens.symbol).tag(lens.rawValue)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .frame(maxWidth: 300)
-
-                Text(weekLens.purpose)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .contentTransition(.opacity)
-
-                Spacer(minLength: 12)
-
-                // 오른쪽 끝에는 그 자리에서만 필요한 범례를 둔다.
-                // 겹쳐 세워야 바뀌는 동안 옆 글이 밀리지 않는다.
-                ZStack(alignment: .trailing) {
-                    switch weekLens {
-                    case .plan:
-                        Legend()
-                            .transition(.opacity)
-                    case .day:
-                        Text(timelineLegend)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .transition(.opacity)
-                    }
-                }
-            }
-
+            // 자리를 고르는 세그먼트는 날짜 줄에 있다 (→ weekHeader).
             // 두 자리는 **겹쳐 세우고 옆으로 밀어** 바꾼다.
             // 위아래로 갈아 끼우면 새 자리가 어디서 왔는지 알 수 없어
             // 매번 화면을 처음부터 다시 읽게 된다.
@@ -577,15 +589,6 @@ struct ContentView: View {
             insertion: .offset(x: forward ? 28 : -28).combined(with: .opacity),
             removal: .offset(x: forward ? -28 : 28).combined(with: .opacity)
         )
-    }
-
-    /// 타임라인 오른쪽 끝의 범례. 잘라 보는 중이면 그 사실도 여기서 말한다
-    /// (제목을 세그먼트에 내주었으므로 "6–24시"가 갈 자리가 여기밖에 없다).
-    private var timelineLegend: String {
-        let window = timelineWindow.isFullDay
-            ? "하루 24시간"
-            : "\(Int(timelineWindow.start))–\(Int(timelineWindow.end))시 · 수면 숨김"
-        return "\(window) · 실선=고정 · 점선=유연 쿼터 · 계획은 빈 구간에"
     }
 
     private var dayTimelineSection: some View {
@@ -784,8 +787,6 @@ struct ContentView: View {
             concreteVerified: false,
             startHour: start ?? -1
         )
-        // 전파 계약은 넘기지 않는다 — 항목이 백로그에 남아 계약의 주인으로 계속 서 있다.
-        // 양쪽에 복사하면 '전파 필요' 섹션에 같은 전파가 두 줄로 선다.
         context.insert(block)
         try? context.save()
     }
@@ -805,36 +806,27 @@ struct ContentView: View {
         }
     }
 
-    /// 처음 켠 사람에게만 기본 루틴을 깔아 준다.
+    /// 처음 켠 사람에게 **고정 루틴을 함께 세우자고 묻는다.** 대신 깔아 주지 않는다.
+    ///
+    /// 회사를 안 다니는 사람도, 운동을 안 하는 사람도 있다. 내가 만들지 않은 일정이
+    /// 이미 놓여 있으면 그것부터 지우는 일로 앱을 시작하게 된다. (→ RoutineOnboardingView)
     ///
     /// ⚠️ "루틴이 비어 있다"를 곧바로 믿으면 안 된다. CloudKit이 아직 내려주기 전이면
-    ///    이미 쓰던 사람의 화면도 잠깐 비어 있고, 거기서 심으면 수면·식사·운동이
-    ///    **하나씩 더** 생겨 클라우드로 퍼진다. (실제로 그렇게 만들어 봤다.)
-    ///    그래서 ① 내려받을 시간을 주고 ② 한 번 심었으면 다시는 심지 않는다.
-    ///    (→ BacklogSection.reconcileCategories 와 같은 규칙)
+    ///    이미 쓰던 사람의 화면도 잠깐 비어 있어서, 쓰던 사람에게 첫 인사를 다시 건네게 된다.
+    ///    그래서 내려받을 시간을 준 뒤에 묻는다.
     @MainActor
-    private func seedDefaultsIfNeeded() async {
-        guard !UserDefaults.standard.bool(forKey: Self.seededKey) else { return }
+    private func offerRoutineOnboardingIfNeeded() async {
+        guard !RoutineOnboarding.wasShown else { return }
         guard routines.isEmpty else {
-            UserDefaults.standard.set(true, forKey: Self.seededKey)   // 이미 쓰던 사람
+            UserDefaults.standard.set(true, forKey: RoutineOnboarding.shownKey)  // 이미 쓰던 사람
             return
         }
         try? await Task.sleep(nanoseconds: 3_000_000_000)
         // 기다린 뒤에는 @Query가 아니라 스토어에 직접 묻는다 —
         // 기다리는 동안 뷰가 새로 만들어져 손에 든 값이 옛것일 수 있다.
         guard PlanStore.shared.fetch(Routine.self).isEmpty else { return }
-        seedDefaults()
+        showingRoutineOnboarding = true
     }
-
-    /// 기본 루틴을 실제로 깐다. 기다림 없이 부르는 자리(샘플 데이터)도 이것을 쓴다 —
-    /// "심었다"는 표시와 심는 내용이 두 곳에 흩어지면 한쪽만 고치게 된다.
-    private func seedDefaults() {
-        UserDefaults.standard.set(true, forKey: Self.seededKey)
-        for r in Self.defaultRoutines { context.insert(r) }
-        try? context.save()
-    }
-
-    private static let seededKey = "didSeedDefaultRoutines"
 
     /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.
     private static var defaultRoutines: [Routine] {
@@ -872,8 +864,11 @@ struct ContentView: View {
     }
 
     private func addSampleData() {
-        // 샘플을 부른 것은 사람의 뜻이므로 여기서는 기다리지 않고 바로 깐다.
-        if routines.isEmpty { seedDefaults() }
+        // 샘플을 부른 것은 사람의 뜻이므로 여기서는 묻지 않고 바로 깐다.
+        if routines.isEmpty {
+            UserDefaults.standard.set(true, forKey: RoutineOnboarding.shownKey)
+            for r in Self.defaultRoutines { context.insert(r) }
+        }
 
         let base = backlogItems.map(\.sortIndex).max() ?? -1
         let samples: [(String, Double)] = [
@@ -926,13 +921,6 @@ enum WeekLens: String, CaseIterable, Identifiable {
         }
     }
 
-    /// 세그먼트 옆 한 줄. 지금 무엇을 하는 중인지를 잊지 않게 한다.
-    var purpose: String {
-        switch self {
-        case .plan: "무엇을 어느 요일에 할지 정한다 — 할 일을 끌어다 놓는 자리"
-        case .day:  "그 일이 하루 어디에 들어가는지 본다 — 시간이 실제로 있는지"
-        }
-    }
 }
 
 // MARK: Sheet contexts
@@ -1038,28 +1026,3 @@ struct WeekBarChart: View {
     }
 }
 
-struct Legend: View {
-    var body: some View {
-        HStack(spacing: 14) {
-            legendDot(color: .accentColor, label: "구체적인 블록")
-            legendDot(color: .orange, label: "추상적인 블록")
-            legendDot(color: .secondary, label: "유연 쿼터", dashed: true)
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-    }
-
-    private func legendDot(color: Color, label: String, dashed: Bool = false) -> some View {
-        HStack(spacing: 5) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(color.opacity(dashed ? 0.10 : 0.25))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(color.opacity(0.5),
-                                style: dashed ? StrokeStyle(lineWidth: 0.8, dash: [2, 1.5]) : StrokeStyle(lineWidth: 0.5))
-                )
-                .frame(width: 10, height: 10)
-            Text(label)
-        }
-    }
-}

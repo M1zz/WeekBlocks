@@ -41,7 +41,17 @@ enum StoreBootstrap {
 
         _ = PlanStore.shared
         TodoStore.shared.pullForwardOverdueWeeks()
+        // 동기화가 막혀 있던 동안 두 기기가 각자 만든 같은 것이 한꺼번에 내려온다.
+        // 켤 때 한 번 정리하고, 늦게 도착하는 것은 아래 판정이 한 번 더 본다.
+        StoreBootstrap.dedupeAll()
         TodoStore.shared.scheduleArchiveReconcile()
+    }
+
+    /// 겹쳐 들어온 것들을 한 번에 정리한다. 켤 때, 그리고 내려받기가 자리 잡은 뒤 한 번 더.
+    static func dedupeAll() {
+        PlanStore.shared.dedupeBlocks()
+        TodoStore.shared.dedupeCategoriesByName()
+        TodoStore.shared.dedupeByDragToken()
     }
 }
 
@@ -96,6 +106,36 @@ final class PlanStore {
     }
 
     func save() { try? context.save() }
+
+    /// **같은 주·같은 요일·같은 제목**의 블록이 둘 이상이면 먼저 만든 것만 남긴다.
+    ///
+    /// 동기화가 멈춰 있는 동안 두 기기가 같은 할 일을 각자 요일에 올리면, 다시 이어졌을 때
+    /// 서로 다른 레코드로 둘 다 내려온다. 사람이 보기엔 같은 일이 두 번 잡힌 것이라
+    /// 남은 시간 계산까지 어긋난다.
+    /// 회고(reviewStatus)가 적힌 쪽이 있으면 그쪽을 남긴다 — 사람이 손댄 흔적이 우선이다.
+    func dedupeBlocks() {
+        struct Key: Hashable { let title: String; let day: Int; let week: Date }
+        var keep: [Key: PlanBlock] = [:]
+        var victims: [PlanBlock] = []
+        for block in fetch(PlanBlock.self) {
+            let key = Key(title: block.title, day: block.dayRaw, week: block.weekStartDate)
+            guard let kept = keep[key] else { keep[key] = block; continue }
+            let keptHasReview = kept.reviewStatusRaw != nil
+            let thisHasReview = block.reviewStatusRaw != nil
+            let thisWins = (thisHasReview && !keptHasReview)
+                || (thisHasReview == keptHasReview && block.createdAt < kept.createdAt)
+            if thisWins {
+                keep[key] = block
+                victims.append(kept)
+            } else {
+                victims.append(block)
+            }
+        }
+        guard !victims.isEmpty else { return }
+        for v in victims { context.delete(v) }
+        save()
+        print("🧹 [Dedupe] 겹쳐 있던 계획 블록 \(victims.count)개를 정리했다")
+    }
 }
 
 // MARK: - 할 일 스토어
@@ -207,6 +247,7 @@ final class TodoStore {
             // 처음 내려받기가 자리 잡을 시간을 준다. 내려오는 중에 판단하면 항상 '떠 둔 쪽이 최신'이 된다.
             try? await Task.sleep(nanoseconds: 90_000_000_000)
             reconcileWithArchive()
+            StoreBootstrap.dedupeAll()
         }
     }
 
@@ -263,6 +304,33 @@ final class TodoStore {
             return
         }
         LegacyTodoArchive.write(items: items, categories: categories)
+    }
+
+    /// 이름이 같은 분류를 **가장 먼저 만들어진 하나로** 합친다.
+    ///
+    /// 두 기기가 각자 기본 분류(업무·개인·건강·학습)를 심으면 이름은 같고 uuid는 다른
+    /// 짝이 생긴다. 항목은 uuid로 분류를 붙잡고 있으므로, 합치기 전에 참조부터 옮긴다.
+    func dedupeCategoriesByName() {
+        var survivors: [String: BacklogCategory] = [:]
+        var duplicates: [BacklogCategory] = []
+        for c in categories().sorted(by: { $0.createdAt < $1.createdAt }) {
+            let key = c.name.trimmingCharacters(in: .whitespaces).lowercased()
+            guard !key.isEmpty else { continue }
+            if survivors[key] == nil { survivors[key] = c } else { duplicates.append(c) }
+        }
+        guard !duplicates.isEmpty else { return }
+
+        let items = allItems()
+        for dup in duplicates {
+            let key = dup.name.trimmingCharacters(in: .whitespaces).lowercased()
+            guard let keep = survivors[key] else { continue }
+            for item in items where item.categoryID == dup.uuid {
+                item.categoryID = keep.uuid
+            }
+            context.delete(dup)
+        }
+        save()
+        print("🧹 [Dedupe] 이름이 겹치던 분류 \(duplicates.count)개를 합쳤다")
     }
 
     /// 같은 dragToken이 둘 이상이면 **가장 최근에 손댄 것 하나만** 남긴다.
@@ -401,20 +469,6 @@ enum LegacyTodoArchive {
         var completedAt: Date?
         var parentToken: String?
         var labelRaw: String?
-        // 전파 계약
-        var needsBroadcast: Bool
-        var deadline: Date?
-        var broadcastAudienceRaw: String
-        var broadcastRecipient: String
-        var handoffForm: String
-        var earliestDate: Date?
-        var latestDate: Date?
-        var broadcastConfidenceRaw: String
-        var openVariable: String
-        var variableResolveDate: Date?
-        var noSignalRuleAgreed: Bool
-        var broadcastContractVerified: Bool
-        var sentCheckpointsRaw: String
 
         init(_ m: BacklogItem) {
             title = m.title
@@ -428,19 +482,6 @@ enum LegacyTodoArchive {
             completedAt = m.completedAt
             parentToken = m.parentToken
             labelRaw = m.labelRaw
-            needsBroadcast = m.needsBroadcast
-            deadline = m.deadline
-            broadcastAudienceRaw = m.broadcastAudienceRaw
-            broadcastRecipient = m.broadcastRecipient
-            handoffForm = m.handoffForm
-            earliestDate = m.earliestDate
-            latestDate = m.latestDate
-            broadcastConfidenceRaw = m.broadcastConfidenceRaw
-            openVariable = m.openVariable
-            variableResolveDate = m.variableResolveDate
-            noSignalRuleAgreed = m.noSignalRuleAgreed
-            broadcastContractVerified = m.broadcastContractVerified
-            sentCheckpointsRaw = m.sentCheckpointsRaw
         }
 
         /// 되살릴 때는 dragToken까지 그대로 돌려놓는다 —
@@ -457,19 +498,6 @@ enum LegacyTodoArchive {
             m.completedAt = completedAt
             m.parentToken = parentToken
             m.labelRaw = labelRaw
-            m.needsBroadcast = needsBroadcast
-            m.deadline = deadline
-            m.broadcastAudienceRaw = broadcastAudienceRaw
-            m.broadcastRecipient = broadcastRecipient
-            m.handoffForm = handoffForm
-            m.earliestDate = earliestDate
-            m.latestDate = latestDate
-            m.broadcastConfidenceRaw = broadcastConfidenceRaw
-            m.openVariable = openVariable
-            m.variableResolveDate = variableResolveDate
-            m.noSignalRuleAgreed = noSignalRuleAgreed
-            m.broadcastContractVerified = broadcastContractVerified
-            m.sentCheckpointsRaw = sentCheckpointsRaw
             return m
         }
     }
@@ -481,7 +509,6 @@ enum LegacyTodoArchive {
         var iconName: String
         var sortIndex: Int
         var createdAt: Date
-        var isBroadcast: Bool
 
         init(_ m: BacklogCategory) {
             uuid = m.uuid
@@ -490,14 +517,12 @@ enum LegacyTodoArchive {
             iconName = m.iconName
             sortIndex = m.sortIndex
             createdAt = m.createdAt
-            isBroadcast = m.isBroadcast
         }
 
         /// uuid도 그대로 돌려놓는다 — 할 일이 categoryID로 이 값을 붙잡고 있다.
         func model() -> BacklogCategory {
             let m = BacklogCategory(name: name, colorName: colorName,
-                                    iconName: iconName, sortIndex: sortIndex,
-                                    isBroadcast: isBroadcast)
+                                    iconName: iconName, sortIndex: sortIndex)
             m.uuid = uuid
             m.createdAt = createdAt
             return m

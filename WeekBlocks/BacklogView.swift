@@ -37,8 +37,6 @@ struct BacklogSection: View {
     private var categories: [BacklogCategory]
 
     @AppStorage("didSeedBacklogCategories") private var didSeedCategories = false
-    /// 전파 카테고리는 기본값 시딩보다 나중에 생겼으므로 별도 플래그로 한 번 보강한다.
-    @AppStorage("didSeedBroadcastCategory") private var didSeedBroadcastCategory = false
 
     /// 툴바 '할 일 추가'가 보내는 신호. 마지막으로 받은 번호와 다르면 빈 칸을 연다.
     private let composeRequest = TodoComposeRequest.shared
@@ -59,9 +57,6 @@ struct BacklogSection: View {
     @State private var isAdding = false
     @State private var newTitle = ""
     @FocusState private var addFocused: Bool
-    /// 전파 필요 항목만 보기.
-    @State private var broadcastOnly = false
-    @State private var contractSheetItem: BacklogItem?
     /// 단계(뎁스)를 들여다보는 시트.
     @State private var stepsSheetItem: BacklogItem?
 
@@ -128,16 +123,35 @@ struct BacklogSection: View {
     private var filteredItems: [BacklogItem] {
         var items = split.open
         if let f = filterCategoryID { items = items.filter { $0.categoryID == f } }
-        if broadcastOnly { items = items.filter { $0.needsBroadcast } }
         return items
     }
 
     /// 요일에 올려 둔, 아직 안 끝낸 일. 목록에서는 내렸지만 **끝냈는지는 여기서 확인한다.**
     private var placedItems: [BacklogItem] { split.placed }
 
-    /// 전파 필요 항목 수 (필터 칩 배지).
-    private var broadcastCount: Int {
-        weekItems.filter { $0.needsBroadcast }.count
+    /// 보고 있는 주에서 **이미 지나간 요일들**.
+    /// 지난 주를 보고 있으면 전부, 앞으로의 주면 하나도 없다.
+    private var pastDays: Set<DayOfWeek> {
+        let today = Date()
+        let thisWeek = today.weekStart()
+        if weekStart < thisWeek { return Set(DayOfWeek.allCases) }
+        guard cal.isDate(weekStart, inSameDayAs: thisWeek) else { return [] }
+        // 오늘은 아직 안 지났다 — 어제까지만 지난 것으로 본다.
+        let index = (cal.dateComponents([.day], from: weekStart, to: today).day ?? 0)
+        return Set(DayOfWeek.allCases.filter { $0.rawValue < index })
+    }
+
+    /// 올려 둔 요일이 지났는데 아직 안 끝낸 일. **루틴은 여기 없다** —
+    /// 이 목록은 할 일(BacklogItem)만 담고, 루틴은 애초에 끝내고 말고 할 것이 아니다.
+    private func overdueItems(in placement: [String: [DayOfWeek]]) -> [BacklogItem] {
+        let past = pastDays
+        guard !past.isEmpty else { return [] }
+        return placedItems.filter { item in
+            // 여러 요일에 올렸으면 **마지막 날**까지 지나야 넘긴 것이다.
+            guard let last = placement[item.title]?.max(by: { $0.rawValue < $1.rawValue })
+            else { return false }
+            return past.contains(last)
+        }
     }
 
     /// 항목별 색상: 카테고리가 있으면 카테고리 색(같은 카테고리=같은 색),
@@ -167,6 +181,25 @@ struct BacklogSection: View {
             HStack {
                 Text("할 일")
                     .font(.headline)
+
+                // 적는 버튼은 제목 바로 옆이다. 아래에 따로 한 줄을 차지하고 있었는데,
+                // 그 줄에서 실제로 쓰는 건 이 버튼뿐이라 줄값을 못 했다.
+                //
+                // **어떤 경우에도 사라지지 않는다.** 고정 루틴이 없어 아직 계획할 수 없을 때
+                // 버튼까지 없애 봤더니 화면에 남은 '추가'가 루틴 쪽뿐이라 할 일을 어디서
+                // 적는지 길이 끊겼다. 못 누르는 것과 없는 것은 다르다 —
+                // 흐릿하게 남겨 두고, 왜 못 누르는지는 아래 안내가 말한다.
+                Button(action: beginAdding) {
+                    Label("새 할 일", systemImage: "plus")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(!canPlan)
+                .fixedSize()
+                .help(canPlan ? "목록 맨 위에 빈 칸을 만든다 (⌘N)"
+                              : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
+                .keyboardShortcut("n", modifiers: .command)
 
                 // '전체 보기'는 제목 바로 옆에 붙인다 — 지금 목록이 **전부가 아니라는 것**을
                 // 제목과 한 호흡에 말해야, 이월된 할 일을 못 보고 지나치지 않는다.
@@ -208,54 +241,22 @@ struct BacklogSection: View {
                 .fixedSize()
             }
 
-            // 분류 버튼 줄. 오른쪽 끝이 '새 할 일'을 여는 자리다 —
-            // 분류를 고르고 바로 그 분류로 적는 흐름이 한 줄 안에서 끝난다.
-            //
-            // 이 줄은 **어떤 경우에도 사라지지 않는다.** 고정 루틴이 없어 아직 계획할 수
-            // 없을 때 버튼까지 통째로 없애 봤더니, 화면에 남은 '추가'가 루틴 쪽뿐이라
-            // 할 일을 어디서 적는지 길이 끊겼다. 못 누르는 것과 없는 것은 다르다 —
-            // 흐릿하게 남겨 두고, 왜 못 누르는지는 아래 안내가 말한다.
-            HStack(spacing: 8) {
-                if canPlan, showsCategoryFilter {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) {
-                            FilterChip(label: "전체", color: .secondary,
-                                       selected: filterCategoryID == nil) { filterCategoryID = nil }
-                            ForEach(categories) { c in
-                                FilterChip(label: c.name, color: c.displayColor,
-                                           selected: filterCategoryID == c.uuid) {
-                                    filterCategoryID = (filterCategoryID == c.uuid) ? nil : c.uuid
-                                }
-                            }
-                            if broadcastCount > 0 {
-                                // 분류 버튼의 점은 분류 색(사용자가 고른 정체성)이지만
-                                // 이건 상태 필터라 색으로 의미를 만들지 않는다.
-                                FilterChip(label: "전파 \(broadcastCount)", color: .secondary,
-                                           selected: broadcastOnly) { broadcastOnly.toggle() }
+            // 분류 버튼 줄은 거를 자리가 있을 때만 선다 (할 일 창).
+            // 주간 화면에서는 아예 나타나지 않아 한 줄을 통째로 아낀다.
+            if canPlan, showsCategoryFilter {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        FilterChip(label: "전체", color: .secondary,
+                                   selected: filterCategoryID == nil) { filterCategoryID = nil }
+                        ForEach(categories) { c in
+                            FilterChip(label: c.name, color: c.displayColor,
+                                       selected: filterCategoryID == c.uuid) {
+                                filterCategoryID = (filterCategoryID == c.uuid) ? nil : c.uuid
                             }
                         }
-                        .padding(.vertical, 1)
                     }
+                    .padding(.vertical, 1)
                 }
-
-                // 창이 좁아도, 분류가 많아도 이 버튼은 밀려나지 않는다
-                // (가로 스크롤이 남는 폭을 다 가져가지 못하게 자리를 먼저 잡는다).
-                Button(action: beginAdding) {
-                    Label("새 할 일", systemImage: "plus")
-                        .font(.system(size: 13, weight: .medium))
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(!canPlan)
-                .fixedSize()
-                .layoutPriority(1)
-                .help(canPlan ? "목록 맨 위에 빈 칸을 만든다 (⌘N)"
-                              : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
-                .keyboardShortcut("n", modifiers: .command)
-
-                // 분류 줄이 없으면 버튼이 왼쪽에 선다. 혼자 오른쪽 끝에 떨어져 있으면
-                // 무엇에 딸린 버튼인지 눈이 못 잇는다.
-                Spacer(minLength: 0)
             }
 
             if !canPlan {
@@ -297,25 +298,6 @@ struct BacklogSection: View {
                             },
                             onSetCategory: { id in
                                 item.categoryID = id
-                                // 전파 카테고리로 옮기면 전파 필요를 켜고 계약을 받으러 간다.
-                                if let bc = categories.broadcastCategory, id == bc.uuid, !item.needsBroadcast {
-                                    item.needsBroadcast = true
-                                    try? context.save()
-                                    contractSheetItem = item
-                                    return
-                                }
-                                try? context.save()
-                            },
-                            onOpenBroadcastContract: {
-                                if !item.needsBroadcast {
-                                    item.needsBroadcast = true
-                                    try? context.save()
-                                }
-                                contractSheetItem = item
-                            },
-                            onClearBroadcast: {
-                                item.needsBroadcast = false
-                                item.broadcastContractVerified = false
                                 try? context.save()
                             },
                             onToggleNow: { toggleNow(item) }
@@ -342,10 +324,6 @@ struct BacklogSection: View {
         .sheet(isPresented: $showingAllBacklog) {
             AllBacklogView(currentWeek: weekStart)
                 .frame(minWidth: 560, minHeight: 600)
-        }
-        .sheet(item: $contractSheetItem) { item in
-            BroadcastContractView(item: item)
-                .frame(minWidth: 560, minHeight: 640)
         }
         .sheet(item: $stepsSheetItem) { item in
             TodoStepsView(root: item)
@@ -515,10 +493,6 @@ struct BacklogSection: View {
                                sortIndex: minIndex - 1,
                                categoryID: filterCategoryID,
                                weekStartDate: weekStart)
-        // 전파 분류로 적은 것은 곧바로 전파 필요가 된다 (계약은 미확정으로 남아 눈에 띈다).
-        if let broadcast = categories.broadcastCategory, filterCategoryID == broadcast.uuid {
-            item.needsBroadcast = true
-        }
         withAnimation(.easeOut(duration: 0.18)) {
             context.insert(item)
             try? context.save()
@@ -542,7 +516,10 @@ struct BacklogSection: View {
     /// 목록에서 내린 대신 여기서 끝냈는지를 확인한다. 체크하면 완료로 표시되고
     /// (아이폰 목록에서도 함께 내려간다) 이 줄에서도 사라진다.
     private var placedSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let placement = self.placement
+        let overdue = overdueItems(in: placement)
+        let overdueTokens = Set(overdue.map(\.dragToken))
+        return VStack(alignment: .leading, spacing: 6) {
             Button {
                 withAnimation(.easeOut(duration: 0.18)) { showsPlaced.toggle() }
             } label: {
@@ -553,9 +530,23 @@ struct BacklogSection: View {
                         .font(.system(size: 11))
                     Text("요일에 올린 일 \(placedItems.count)")
                         .font(.system(size: 13, weight: .medium))
-                    Text("— 끝냈으면 체크하세요")
+
+                    // 접어 둔 채로도 밀린 것이 있다는 사실은 보여야 한다.
+                    // 그래서 개수를 뱃지로 세운다 — 루틴은 세지 않는다(끝내고 말고 할 것이 아니다).
+                    if !overdue.isEmpty {
+                        Text("\(overdue.count)")
+                            .font(.system(size: 11, weight: .semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(Color.red, in: Capsule())
+                            .help("올린 날이 지났는데 아직 안 끝낸 일 \(overdue.count)개")
+                    }
+
+                    Text(overdue.isEmpty ? "— 끝냈으면 체크하세요" : "— 지난 날짜가 있습니다")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(overdue.isEmpty ? Color.secondary : Color.red)
                 }
                 .foregroundStyle(.secondary)
                 .contentShape(Rectangle())
@@ -564,7 +555,6 @@ struct BacklogSection: View {
 
             if showsPlaced {
                 let colors = itemColorMap
-                let placement = self.placement
                 VStack(spacing: 4) {
                     ForEach(placedItems) { item in
                         HStack(spacing: 8) {
@@ -585,9 +575,11 @@ struct BacklogSection: View {
                             Spacer(minLength: 8)
 
                             if let note = planNote(for: item, in: placement) {
+                                let isOverdue = overdueTokens.contains(item.dragToken)
                                 Text(note)
                                     .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(colors[item.dragToken] ?? .secondary)
+                                    .foregroundStyle(isOverdue ? Color.red
+                                                              : (colors[item.dragToken] ?? .secondary))
                             }
                         }
                         .padding(.horizontal, 8)
@@ -646,15 +638,11 @@ struct BacklogSection: View {
 
         // (A) 같은 이름의 중복 카테고리를 하나로 합친다.
         //     (과거 동기화 경쟁으로 생긴 "업무 업무 / 개인 개인" 정리)
-        dedupeCategoriesByName()
+        TodoStore.shared.dedupeCategoriesByName()
 
         // (B) 정말로 카테고리가 하나도 없을 때만, 그리고 한 번만 기본값을 넣는다.
         seedDefaultCategoriesIfNeeded()
 
-        // (C) 전파 카테고리 보강 — 기본값 시딩을 이미 끝낸 기존 설치에도 한 번은 들어가야 한다.
-        //     (B) 다음에 둬서 목록 맨 뒤에 붙는다. 이름이 아니라 플래그로 판별하므로
-        //     사용자가 이름을 바꿔도 다시 만들어지지 않는다.
-        seedBroadcastCategoryIfNeeded()
     }
 
     private func seedDefaultCategoriesIfNeeded() {
@@ -674,56 +662,8 @@ struct BacklogSection: View {
         try? context.save()
     }
 
-    /// 전파 카테고리를 기본으로 하나 만들어 둔다.
-    /// 이 카테고리로 지정하면 전파 필요가 자동으로 켜지므로, 안테나 토글을 몰라도 전파 흐름에 들어온다.
-    ///
-    /// `categories`(@Query)는 방금 insert한 기본값을 아직 반영하지 않으므로 직접 fetch한다.
-    /// 안 그러면 sortIndex가 업무와 겹쳐 목록 순서가 뒤섞인다.
-    private func seedBroadcastCategoryIfNeeded() {
-        guard !didSeedBroadcastCategory else { return }
-        let existing = (try? context.fetch(FetchDescriptor<BacklogCategory>())) ?? []
-        didSeedBroadcastCategory = true
-        // 이미 플래그가 붙은 게 있으면(동기화로 내려왔거나 직접 지정한 경우) 다시 만들지 않는다.
-        guard existing.broadcastCategory == nil else { return }
-        let sortIndex = (existing.map(\.sortIndex).max() ?? -1) + 1
-        context.insert(BacklogCategory(name: "전파",
-                                       colorName: "indigo",
-                                       iconName: "antenna.radiowaves.left.and.right",
-                                       sortIndex: sortIndex,
-                                       isBroadcast: true))
-        try? context.save()
-    }
-
     /// 이름이 같은 카테고리를 가장 먼저 만들어진 하나로 합치고,
     /// 나머지를 쓰던 항목은 살아남은 카테고리로 재연결한 뒤 중복을 삭제한다.
-    private func dedupeCategoriesByName() {
-        var survivors: [String: BacklogCategory] = [:]   // 이름(정규화) → 살아남을 카테고리
-        var duplicates: [BacklogCategory] = []
-        // createdAt 오름차순으로 훑으며 각 이름의 첫 번째를 살린다.
-        for c in categories.sorted(by: { $0.createdAt < $1.createdAt }) {
-            let key = c.name.trimmingCharacters(in: .whitespaces).lowercased()
-            guard !key.isEmpty else { continue }
-            if survivors[key] == nil {
-                survivors[key] = c
-            } else {
-                duplicates.append(c)
-            }
-        }
-        guard !duplicates.isEmpty else { return }
-
-        for dup in duplicates {
-            let key = dup.name.trimmingCharacters(in: .whitespaces).lowercased()
-            guard let keep = survivors[key] else { continue }
-            // 중복 카테고리를 참조하던 항목을 살아남은 카테고리로 옮긴다.
-            for item in allItems where item.categoryID == dup.uuid {
-                item.categoryID = keep.uuid
-            }
-            // 전파 플래그는 합칠 때 잃지 않는다 (사라지면 자동 전파 연결이 끊긴다).
-            if dup.isBroadcast { keep.isBroadcast = true }
-            context.delete(dup)
-        }
-        try? context.save()
-    }
 }
 
 /// '할 일'을 담는 **따로 선 창**.
@@ -837,35 +777,10 @@ struct BacklogBlock: View {
     var onEditSteps: () -> Void = { }
     let onDelete: () -> Void
     let onSetCategory: (String?) -> Void
-    /// 전파 계약 시트를 열어달라는 요청.
-    var onOpenBroadcastContract: () -> Void = { }
-    /// 전파 필요 체크 해제.
-    var onClearBroadcast: () -> Void = { }
     /// '바로 하면 되는 일' 표시를 켜고 끈다.
     var onToggleNow: () -> Void = { }
 
     @State private var hovering = false
-
-    /// 카드에는 전파 항목이라는 사실과 급한지 여부만. 어느 시점을 언제 보내는지는
-    /// '전파 필요' 섹션이 온전히 보여주므로 여기서 반복하지 않는다.
-    /// 색을 쓰지 않으므로 급한 정도는 문구 자체가 말한다.
-    private var broadcastMark: String? {
-        guard item.needsBroadcast else { return nil }
-        if !item.broadcastContractVerified { return "전파 · 계약 미확정" }
-        guard let next = item.nextBroadcastCheckpoint else { return "전파 완료" }
-        let d = BroadcastPlanner.dayCount(from: Date(), to: next.date)
-        if d < 0 { return "전파 지남" }
-        if d == 0 { return "전파 오늘" }
-        return "전파 D-\(d)"
-    }
-
-    private var broadcastHelp: String {
-        guard item.needsBroadcast, item.broadcastContractVerified, let next = item.nextBroadcastCheckpoint else {
-            return "드래그해서 요일에 배치"
-        }
-        let who = item.broadcastRecipient.isEmpty ? item.broadcastAudience.shortLabel : item.broadcastRecipient
-        return "\(BroadcastPlanner.dateLabel(next.date)) — \(who)에게 \(next.kind.label)"
-    }
 
     /// '바로 하면 되는 일'의 색. iOS와 같은 연두다.
     static let nowGreen = Color(hue: 0.26, saturation: 0.72, brightness: 0.66)
@@ -961,12 +876,6 @@ struct BacklogBlock: View {
                         .background(tint.opacity(0.16), in: Capsule())
                         .lineLimit(1)
                     }
-                    if let broadcastMark {
-                        Text(broadcastMark)
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
                     Spacer(minLength: 0)
                 }
             }
@@ -987,7 +896,6 @@ struct BacklogBlock: View {
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .draggable(item.dragToken)
         .onHover { hovering = $0 }
-        .help(broadcastHelp)
         .contextMenu {
             Button(steps == nil ? "단계로 쪼개기…" : "단계 보기·편집…", action: onEditSteps)
             Button(lane == .now ? "'바로' 표시 거두기" : "바로 하면 되는 일로 표시",
@@ -999,14 +907,6 @@ struct BacklogBlock: View {
                 if steps.canRewind {
                     Button("이전 단계로 되돌리기", action: onRewind)
                 }
-            }
-            Divider()
-            if item.needsBroadcast {
-                Button(item.broadcastContractVerified ? "전파 계약 열기" : "전파 계약 마치기",
-                       action: onOpenBroadcastContract)
-                Button("전파 필요 해제", action: onClearBroadcast)
-            } else {
-                Button("전파 필요로 체크", action: onOpenBroadcastContract)
             }
             Divider()
             Menu("카테고리 지정") {
@@ -1180,11 +1080,6 @@ struct BacklogComposerView: View {
         let item = BacklogItem(title: t, durationHours: TodoTree.defaultStepHours,
                                sortIndex: maxIndex + 1,
                                categoryID: defaultCategoryID, weekStartDate: weekStart)
-        // 전파 카테고리로 넣은 항목은 곧바로 전파 필요가 된다.
-        // 계약은 아직 미확정 상태로 남아 '전파 예정' 섹션에서 계속 눈에 띈다.
-        if let broadcast = categories.broadcastCategory, defaultCategoryID == broadcast.uuid {
-            item.needsBroadcast = true
-        }
         context.insert(item)
         try? context.save()
         newTitle = ""
@@ -1199,7 +1094,6 @@ struct ComposerItemRow: View {
     @Query private var allItems: [BacklogItem]
     let onDelete: () -> Void
 
-    @State private var showingContract = false
 
     private var category: BacklogCategory? { categories.first { $0.uuid == item.categoryID } }
 
@@ -1210,8 +1104,6 @@ struct ComposerItemRow: View {
             TextField("할 일", text: $item.title)
                 .textFieldStyle(.plain)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
-            broadcastToggle
 
 
             HStack(spacing: 2) {
@@ -1231,10 +1123,6 @@ struct ComposerItemRow: View {
         .padding(.vertical, 7)
         .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
         .onChange(of: item.title) { _, _ in try? context.save() }
-        .sheet(isPresented: $showingContract) {
-            BroadcastContractView(item: item)
-                .frame(minWidth: 560, minHeight: 640)
-        }
     }
 
     /// 이 할 일에 걸리는 시간. 단계가 있으면 그 합이라 여기서는 손대지 않는다.
@@ -1247,38 +1135,9 @@ struct ComposerItemRow: View {
                 })
     }
 
-    /// 카테고리 지정. 전파 카테고리면 전파 필요를 켜고 계약 시트로 바로 넘긴다.
-    /// 전파 카테고리에서 빼는 건 전파 필요 해제와 다른 동작이므로 계약을 지우지 않는다.
     private func assign(_ category: BacklogCategory) {
         item.categoryID = category.uuid
-        if category.isBroadcast && !item.needsBroadcast {
-            item.needsBroadcast = true
-            try? context.save()
-            showingContract = true
-            return
-        }
         try? context.save()
-    }
-
-    /// 전파 필요 체크. 켜는 순간 일반 항목과 다른 전처리(전파 계약)로 들어간다.
-    private var broadcastToggle: some View {
-        Button {
-            if !item.needsBroadcast {
-                item.needsBroadcast = true
-                try? context.save()
-            }
-            showingContract = true
-        } label: {
-            Text(item.needsBroadcast
-                 ? (item.broadcastContractVerified ? "전파" : "전파 · 미확정")
-                 : "전파 안 함")
-                .font(.system(size: 13))
-                .foregroundStyle(item.needsBroadcast ? .primary : .secondary)
-        }
-        .buttonStyle(.borderless)
-        .help(item.needsBroadcast
-              ? (item.broadcastContractVerified ? "전파 계약 확정됨 — 열어서 확인" : "전파 계약 미확정")
-              : "전파 필요로 체크")
     }
 
     private var categoryMenu: some View {
@@ -1484,8 +1343,7 @@ struct CategoryManagerView: View {
                         ForEach(categories) { c in
                             CategoryEditRow(
                                 category: c,
-                                onDelete: { deleteCategory(c) },
-                                onToggleBroadcast: { toggleBroadcast(c) }
+                                onDelete: { deleteCategory(c) }
                             )
                         }
                     }
@@ -1528,21 +1386,12 @@ struct CategoryManagerView: View {
         context.delete(c)
         try? context.save()
     }
-
-    /// 전파 연결은 한 카테고리만 가진다 (여러 개면 어느 쪽이 자동 전파인지 알 수 없다).
-    private func toggleBroadcast(_ c: BacklogCategory) {
-        let turningOn = !c.isBroadcast
-        for other in categories { other.isBroadcast = false }
-        c.isBroadcast = turningOn
-        try? context.save()
-    }
 }
 
 struct CategoryEditRow: View {
     @Bindable var category: BacklogCategory
     @Environment(\.modelContext) private var context
     let onDelete: () -> Void
-    var onToggleBroadcast: () -> Void = { }
 
     var body: some View {
         HStack(spacing: 10) {
@@ -1554,14 +1403,6 @@ struct CategoryEditRow: View {
             TextField("이름", text: $category.name)
                 .textFieldStyle(.roundedBorder)
                 .onChange(of: category.name) { _, _ in try? context.save() }
-
-            Button(category.isBroadcast ? "전파 카테고리" : "전파로 지정", action: onToggleBroadcast)
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .foregroundStyle(category.isBroadcast ? .primary : .secondary)
-            .help(category.isBroadcast
-                  ? "이 카테고리로 지정하면 전파 필요가 자동으로 켜집니다 — 눌러서 해제"
-                  : "이 카테고리를 전파 카테고리로 지정")
 
             Button("삭제", role: .destructive, action: onDelete)
                 .buttonStyle(.borderless)
