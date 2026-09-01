@@ -34,6 +34,8 @@ struct BacklogSection: View {
     // 이제 **목록 맨 앞에 빈 칸이 하나 생긴다** — 거기 적으면 그게 곧 할 일이다.
     /// 빈 칸이 열려 있는가.
     @State private var isAdding = false
+    /// '적기'가 잠겼을 때 내는 페이월 (→ PaywallView.swift).
+    @State private var showingPaywall = false
     @State private var newTitle = ""
     @FocusState private var addFocused: Bool
     /// 단계(뎁스)를 들여다보는 시트.
@@ -180,6 +182,18 @@ struct BacklogSection: View {
                               : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
                 .keyboardShortcut("n", modifiers: .command)
 
+                if !TodoAccess.canEdit {
+                    Button {
+                        showingPaywall = true
+                    } label: {
+                        Label("읽기 전용", systemImage: "lock")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.secondary)
+                    .help(TodoAccess.lockedNote)
+                }
+
                 // '전체 보기'는 제목 바로 옆에 붙인다 — 지금 목록이 **전부가 아니라는 것**을
                 // 제목과 한 호흡에 말해야, 이월된 할 일을 못 보고 지나치지 않는다.
                 //
@@ -292,6 +306,15 @@ struct BacklogSection: View {
             }
         }
         .task { await reconcileCategories() }
+        .sheet(isPresented: $showingPaywall) {
+            PaywallView()
+        }
+        // 값을 치르면 이 맥에서 적어 둔 것이 아이폰에도 보이게 열린다
+        // (→ TodoSharing.swift). 그때부터 올라가는 게 아니라 이미 올라가 있던 것이
+        // 그제서야 보이는 것이라 기다림이 없다.
+        .onChange(of: PurchaseManager.shared.isUnlocked) { _, unlocked in
+            if unlocked { TodoSharing.openMyItems(in: context) }
+        }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
                 .frame(minWidth: 540, minHeight: 560)
@@ -433,9 +456,13 @@ struct BacklogSection: View {
     /// 빈 칸을 연다. 분류는 지금 보고 있는 필터를 그대로 따른다 —
     /// '업무'만 보고 있었다면 지금 적는 것도 업무다.
     private func beginAdding() {
-        // 잠긴 기기에서는 적는 자리를 열지 않는다 (→ TodoAccess.swift).
-        // 버튼이 여러 곳에 있어서, 들머리 한 곳에서 막는 것이 새지 않는다.
-        guard TodoAccess.canEdit else { return }
+        // 잠긴 기기에서는 적는 자리 대신 **왜 못 적는지**를 연다 (→ TodoAccess.swift).
+        // 못 누르게만 두면 고장으로 읽힌다. 버튼이 여러 곳에 있어서, 들머리 한 곳에서
+        // 막는 것이 새지 않는다.
+        guard TodoAccess.canEdit else {
+            showingPaywall = true
+            return
+        }
         withAnimation(.easeOut(duration: 0.18)) { isAdding = true }
         addFocused = true
     }

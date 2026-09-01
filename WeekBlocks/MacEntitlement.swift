@@ -53,6 +53,9 @@ final class PurchaseManager {
     private(set) var isUnlocked: Bool = MacEntitlement.isUnlocked
     private(set) var product: Product?
     private(set) var isWorking = false
+    /// 사다가 막혔을 때 화면에 그대로 보여줄 말. 조용히 실패하면 사용자는
+    /// 버튼이 고장 난 줄 안다.
+    private(set) var failureMessage: String?
 
     private var updates: Task<Void, Never>?
 
@@ -78,10 +81,16 @@ final class PurchaseManager {
     }
 
     func purchase() async {
-        guard let product else { return }
+        guard let product else {
+            failureMessage = "상품을 아직 못 불러왔습니다. 잠시 뒤 다시 시도해 주세요."
+            return
+        }
         isWorking = true
+        failureMessage = nil
         defer { isWorking = false }
-        guard let result = try? await product.purchase() else { return }
+        let result: Product.PurchaseResult
+        do { result = try await product.purchase() }
+        catch { failureMessage = "구매하지 못했습니다: \(error.localizedDescription)"; return }
         if case .success(let verification) = result,
            case .verified(let transaction) = verification {
             await transaction.finish()

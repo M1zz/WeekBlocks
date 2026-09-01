@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
+		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
 		2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */; };
@@ -81,6 +82,7 @@
 		295B1036D16FB52A4E7D0C74 /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
 		3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOccurrence.swift; sourceTree = "<group>"; };
+		3DC93778BE68B512FD31ECFF /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogCategory.swift; sourceTree = "<group>"; };
 		45EF8BFE32D234EF9576302C /* ReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionView.swift; sourceTree = "<group>"; };
 		46C009263003E5FA4C9F764D /* WeekBlocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeekBlocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,6 +168,7 @@
 				C368657EE69104A4BA70BA52 /* Info.plist */,
 				7826FECD3C214B59C8E531EB /* MacEntitlement.swift */,
 				CC4A396C6929CB1C576DBA52 /* Models.swift */,
+				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
 				45EF8BFE32D234EF9576302C /* ReflectionView.swift */,
 				0DAA819E703DC5BE377B3688 /* Routine.swift */,
@@ -313,6 +316,7 @@
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
 				8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */,
 				12DCD47B097FBED701EECC11 /* Models.swift in Sources */,
+				076A03104420525A517BD699 /* PaywallView.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
 				33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */,
 				83DE0994DCC6B215222A482D /* Routine.swift in Sources */,
