@@ -12,7 +12,10 @@ packages:
 settings:
   base:
     MARKETING_VERSION: "1.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # ⚠️ 빌드 번호는 **한 번 올린 것보다 항상 커야 한다.** 스토어에 9까지 올라가 있어서
+    #    1로 되돌렸다가 업로드가 거절됐다("must contain a higher version than [9]").
+    #    마케팅 버전(1.1.0)과 달리 이 값은 되돌리거나 다시 쓰지 못한다. 올리기만 한다.
+    CURRENT_PROJECT_VERSION: "10"
     DEVELOPMENT_TEAM: QGAQ3AY3R3
     SWIFT_VERSION: "5.0"
     ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
