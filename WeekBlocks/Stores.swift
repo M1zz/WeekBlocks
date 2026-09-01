@@ -400,7 +400,6 @@ enum LegacyTodoArchive {
         var isCompleted: Bool
         var completedAt: Date?
         var parentToken: String?
-        var isManualWeight: Bool
         var labelRaw: String?
         // 전파 계약
         var needsBroadcast: Bool
@@ -428,7 +427,6 @@ enum LegacyTodoArchive {
             isCompleted = m.isCompleted
             completedAt = m.completedAt
             parentToken = m.parentToken
-            isManualWeight = m.isManualWeight
             labelRaw = m.labelRaw
             needsBroadcast = m.needsBroadcast
             deadline = m.deadline
@@ -458,7 +456,6 @@ enum LegacyTodoArchive {
             m.isCompleted = isCompleted
             m.completedAt = completedAt
             m.parentToken = parentToken
-            m.isManualWeight = isManualWeight
             m.labelRaw = labelRaw
             m.needsBroadcast = needsBroadcast
             m.deadline = deadline

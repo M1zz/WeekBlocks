@@ -36,19 +36,36 @@ final class PlanBlock {
     // 필드 구성과 의미는 BacklogItem과 같고, 접근자는 BroadcastContractHolder가 공용으로 제공한다.
     // CloudKit 라이트웨이트 마이그레이션을 위해 전부 기본값 또는 옵셔널이다.
 
-    var needsBroadcast: Bool = false
-    var deadline: Date? = nil
-    var broadcastAudienceRaw: String = "decisionMaker"
-    var broadcastRecipient: String = ""
-    var handoffForm: String = ""
-    var earliestDate: Date? = nil
-    var latestDate: Date? = nil
-    var broadcastConfidenceRaw: String = "medium"
-    var openVariable: String = ""
-    var variableResolveDate: Date? = nil
-    var noSignalRuleAgreed: Bool = false
-    var broadcastContractVerified: Bool = false
-    var sentCheckpointsRaw: String = ""
+    // ⚠️ **아래 필드들은 일부러 저장하지 않는다 (@Transient).**
+    //
+    //    전파 계약은 아직 출시 전이라 이 필드들이 **Production CloudKit 스키마에 없다.**
+    //    그런데 CloudKit은 모르는 필드를 만나면 그 레코드만 거절하는 게 아니라
+    //    미러링 델리게이트 초기화 자체를 실패시킨다 — 받기도 보내기도 통째로 멈춘다
+    //    ("Never successfully initialized"). 필드 하나가 맥과 아이폰의 동기화 전부를
+    //    죽이고 있었다.
+    //
+    //    스키마는 CloudKit 콘솔에서만 배포할 수 있어 코드로는 못 고친다. 그래서
+    //    동기화를 살리는 쪽을 택했다 — 화면과 계산은 그대로 두고(전부 컴파일된다)
+    //    **저장만 안 한다.** 앱을 껐다 켜면 계약 내용은 사라진다.
+    //
+    //    🔧 되살리는 법: 콘솔에서 Development → Production 스키마를 배포한 뒤
+    //       이 @Transient 들을 지우고, iOS 쪽 모델에도 같은 필드를 다시 넣는다
+    //       (→ 욕망의 무지개/ScheduleDensityApp/Shared/). 한쪽에만 칸이 있으면
+    //       저장할 때 남의 값을 지운다.
+
+    @Transient var needsBroadcast: Bool = false
+    @Transient var deadline: Date? = nil
+    @Transient var broadcastAudienceRaw: String = "decisionMaker"
+    @Transient var broadcastRecipient: String = ""
+    @Transient var handoffForm: String = ""
+    @Transient var earliestDate: Date? = nil
+    @Transient var latestDate: Date? = nil
+    @Transient var broadcastConfidenceRaw: String = "medium"
+    @Transient var openVariable: String = ""
+    @Transient var variableResolveDate: Date? = nil
+    @Transient var noSignalRuleAgreed: Bool = false
+    @Transient var broadcastContractVerified: Bool = false
+    @Transient var sentCheckpointsRaw: String = ""
 
     init(day: DayOfWeek,
          timeBand: TimeBand,

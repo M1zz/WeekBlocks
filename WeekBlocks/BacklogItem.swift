@@ -29,11 +29,6 @@ final class BacklogItem {
     /// 상위 할 일의 dragToken. nil이면 최상위 할 일(= 그 자체가 100%).
     var parentToken: String? = nil
 
-    /// ⚠️ 더 이상 쓰지 않는다. 비중(%)으로 단계를 나누던 시절의 필드로,
-    ///    이미 배포된 사용자·iOS 앱과 공유하는 CloudKit 스키마에 들어 있어 지우지 못한다.
-    ///    (지우면 라이트웨이트 마이그레이션이 깨진다.) 읽지도 쓰지도 말 것.
-    var isManualWeight: Bool = false
-
     /// '착수 조건'(바로/펼치고/몰입해서…)으로 단계를 나누던 시절의 필드.
     ///    이미 배포된 사용자·iOS 앱과 공유하는 CloudKit 스키마에 들어 있어 지우지 못한다.
     ///    (지우면 라이트웨이트 마이그레이션이 깨진다.)
@@ -49,32 +44,49 @@ final class BacklogItem {
     // 아래 필드가 그 전처리(전파 계약)의 내용이고, 전파 시점은 여기서 역산된다.
     // CloudKit 라이트웨이트 마이그레이션을 위해 전부 기본값 또는 옵셔널이다.
 
+    // ⚠️ **아래 필드들은 일부러 저장하지 않는다 (@Transient).**
+    //
+    //    전파 계약은 아직 출시 전이라 이 필드들이 **Production CloudKit 스키마에 없다.**
+    //    그런데 CloudKit은 모르는 필드를 만나면 그 레코드만 거절하는 게 아니라
+    //    미러링 델리게이트 초기화 자체를 실패시킨다 — 받기도 보내기도 통째로 멈춘다
+    //    ("Never successfully initialized"). 필드 하나가 맥과 아이폰의 동기화 전부를
+    //    죽이고 있었다.
+    //
+    //    스키마는 CloudKit 콘솔에서만 배포할 수 있어 코드로는 못 고친다. 그래서
+    //    동기화를 살리는 쪽을 택했다 — 화면과 계산은 그대로 두고(전부 컴파일된다)
+    //    **저장만 안 한다.** 앱을 껐다 켜면 계약 내용은 사라진다.
+    //
+    //    🔧 되살리는 법: 콘솔에서 Development → Production 스키마를 배포한 뒤
+    //       이 @Transient 들을 지우고, iOS 쪽 모델에도 같은 필드를 다시 넣는다
+    //       (→ 욕망의 무지개/ScheduleDensityApp/Shared/). 한쪽에만 칸이 있으면
+    //       저장할 때 남의 값을 지운다.
+
     /// 이 할 일을 누군가에게 알려야 하는가.
-    var needsBroadcast: Bool = false
+    @Transient var needsBroadcast: Bool = false
     /// 진짜 마감. 전파 시점 역산의 출발점.
-    var deadline: Date? = nil
+    @Transient var deadline: Date? = nil
     /// BroadcastAudience.rawValue
-    var broadcastAudienceRaw: String = "decisionMaker"
+    @Transient var broadcastAudienceRaw: String = "decisionMaker"
     /// 누구에게 알리는가 (이름·역할).
-    var broadcastRecipient: String = ""
+    @Transient var broadcastRecipient: String = ""
     /// 어떤 모양으로 넘어가는가. 상대가 이걸 전제로 자기 일을 짠다.
-    var handoffForm: String = ""
+    @Transient var handoffForm: String = ""
     /// 빠르면 이 날.
-    var earliestDate: Date? = nil
+    @Transient var earliestDate: Date? = nil
     /// 늦어도 이 날 보장. 상대가 계획을 세우는 기준이고, 역산의 실제 기준일.
-    var latestDate: Date? = nil
+    @Transient var latestDate: Date? = nil
     /// BroadcastConfidence.rawValue
-    var broadcastConfidenceRaw: String = "medium"
+    @Transient var broadcastConfidenceRaw: String = "medium"
     /// 지금 미확정인 것 하나. "없음"이면 없는 것으로 본다.
-    var openVariable: String = ""
+    @Transient var openVariable: String = ""
     /// 그 변수가 판명되는 날.
-    var variableResolveDate: Date? = nil
+    @Transient var variableResolveDate: Date? = nil
     /// "연락 없음 = 정상 진행" 규칙을 상대와 합의했는가.
-    var noSignalRuleAgreed: Bool = false
+    @Transient var noSignalRuleAgreed: Bool = false
     /// 전파 계약 전처리를 통과했는가. (일반 항목의 concreteVerified에 대응)
-    var broadcastContractVerified: Bool = false
+    @Transient var broadcastContractVerified: Bool = false
     /// 이미 보낸 전파 시점의 token 목록 (콤마 구분).
-    var sentCheckpointsRaw: String = ""
+    @Transient var sentCheckpointsRaw: String = ""
 
     init(title: String,
          durationHours: Double = 1,
