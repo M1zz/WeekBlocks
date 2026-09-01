@@ -8,15 +8,22 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<!-- CloudKit 환경 고정.
-	     기본값은 서명 방식을 따라가서 Xcode 디버그 빌드는 Development, App Store 빌드는
-	     Production을 쓰는데, 두 환경은 같은 컨테이너 ID라도 데이터가 완전히 분리된다.
-	     iOS '욕망의 무지개'가 Production으로 못박혀 있으므로, 맥 개발 빌드에서 만든 계획·
-	     백로그를 아이폰에서 보려면 이쪽도 Production이어야 한다. App Store 빌드는 어차피
-	     Production이라 이 값이 배포 동작을 바꾸지 않는다.
-	     ⚠️ 이 설정 때문에 디버그 빌드도 실제 사용자 데이터를 읽고 쓴다. -->
+	<!-- CloudKit 환경.
+	     ⚠️ **Development 다.** 예전에는 Production으로 못박아 두었는데, 그게 이번
+	        동기화 사고의 뿌리였다. Production에는 CloudKit이 레코드 타입·필드를
+	        **자동으로 만들지 않는다.** 모델에 필드를 하나 더하면 콘솔에서 배포하기
+	        전까지 서버가 그 필드를 모르고, 모르는 필드를 만나면 미러링 델리게이트
+	        초기화 자체가 실패해서 받기도 보내기도 통째로 멈춘다 — 에러도 안 보인다.
+	        (실제로 isManualWeight 하나가 맥과 아이폰의 동기화 전부를 죽이고 있었다.)
+
+	        Development에서는 자동으로 만들어지므로 모델을 고쳐도 바로 오간다.
+	        디버그 빌드가 실제 사용자 데이터를 만지지 않는 이점도 함께 온다.
+
+	     🚢 출시 전에 반드시: 콘솔에서 Development → Production 스키마를 배포한다.
+	        App Store 빌드는 이 값과 무관하게 언제나 Production을 쓴다. 배포를
+	        빠뜨리면 출시된 앱에서 똑같은 사고가 난다. -->
 	<key>com.apple.developer.icloud-container-environment</key>
-	<string>Production</string>
+	<string>Development</string>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
 		<string>CloudKit</string>
