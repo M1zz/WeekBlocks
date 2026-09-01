@@ -351,6 +351,14 @@ struct DayTimelineRow: View {
     /// 요일 칸과 달리 **몇 시인지까지** 함께 온다 — 자를 보면서 놓았기 때문이다.
     var onDropBacklog: (String, Double) -> Void = { _, _ in }
 
+    /// 세로로 끌려 온 계획 블록이 지금 이 줄 위에 있다 — 놓으면 이 요일로 간다.
+    var isDayDropTarget: Bool = false
+    /// 화면(글로벌) 좌표 한 점이 어느 요일 줄 위인지 묻는다.
+    /// 한 줄은 자기 자리만 알기에, 모든 줄의 자리를 아는 부모(주간 화면)가 답한다.
+    var dayAtGlobalPoint: (CGPoint) -> DayOfWeek? = { _ in nil }
+    /// 끌고 가는 동안 지나는 요일. 부모가 그 줄에 테두리를 세운다.
+    var onDayTargetChange: (DayOfWeek?) -> Void = { _ in }
+
     // 드래그 중인 세그먼트와 이동량(px). 같은 행 안에서만 유효.
     @State private var dragId: String? = nil
     @State private var dragPx: CGFloat = 0
@@ -464,8 +472,9 @@ struct DayTimelineRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .overlay {
                     // 받을 자리 표시. 카드가 올라와 있는 동안에만 테두리가 선다.
+                    // 다른 줄에서 계획 블록을 끌고 와도 같은 테두리로 "여기 놓으면 이 요일"이라고 말한다.
                     RoundedRectangle(cornerRadius: 4)
-                        .strokeBorder(Color.accentColor, lineWidth: dropTargeted ? 2 : 0)
+                        .strokeBorder(Color.accentColor, lineWidth: (dropTargeted || isDayDropTarget) ? 2 : 0)
                 }
                 // 자 위에 바로 떨어뜨린다 — 떨어뜨린 가로 위치가 곧 시작 시각이다.
                 .dropDestination(for: String.self) { items, location in
@@ -534,14 +543,17 @@ struct DayTimelineRow: View {
                     guard !seg.isGhost else { return }
                     dragId = seg.id
                     dragPx = v.translation.width
+                    // 위아래로도 끌 수 있다 — 지나는 요일 줄에 테두리가 선다.
+                    onDayTargetChange(targetDay(seg, at: v.location))
                 }
                 .onEnded { v in
                     guard !seg.isGhost else { return }
                     // 창이 좁아졌으면 같은 픽셀이 더 적은 시간을 의미한다.
                     let deltaHours = Double(v.translation.width / max(rowWidth, 1)) * window.span
-                    commitDrag(seg, deltaHours: deltaHours)
+                    commitDrag(seg, deltaHours: deltaHours, toDay: targetDay(seg, at: v.location))
                     dragId = nil
                     dragPx = 0
+                    onDayTargetChange(nil)
                 }
         )
         .contextMenu {
@@ -555,9 +567,16 @@ struct DayTimelineRow: View {
                 }
             }
         }
-        .help(ghost
-              ? "\(seg.title) — 삭제됨 · 우클릭으로 되살리기"
-              : "\(seg.title) — 드래그해서 시각 이동 (15분 단위) · 우클릭으로 삭제")
+        .help(dragHelp(seg))
+    }
+
+    /// 이 블록으로 무엇을 할 수 있는지. 계획 블록만 요일을 넘나들 수 있으므로 안내도 다르다.
+    private func dragHelp(_ seg: TimeSegment) -> String {
+        if seg.isGhost { return "\(seg.title) — 삭제됨 · 우클릭으로 되살리기" }
+        if case .planBlock = seg.source {
+            return "\(seg.title) — 좌우로 끌어 시각 이동 (15분 단위) · 위아래로 끌어 다른 요일로 · 우클릭으로 삭제"
+        }
+        return "\(seg.title) — 드래그해서 시각 이동 (15분 단위) · 우클릭으로 삭제"
     }
 
     private func deleteLabel(_ seg: TimeSegment) -> String {
@@ -621,9 +640,21 @@ struct DayTimelineRow: View {
         try? context.save()
     }
 
+    /// 이 드래그가 옮겨 갈 다른 요일. 옆 줄로 넘어가지 않았으면 nil.
+    ///
+    /// 요일을 넘나드는 건 **계획 블록뿐**이다. 고정 루틴과 끼니는 요일이 루틴 정의에 매여 있어,
+    /// 여기서 옮기면 정의와 이번 주 배치가 어긋난다 — 그건 루틴 편집기가 할 일이다.
+    private func targetDay(_ seg: TimeSegment, at globalPoint: CGPoint) -> DayOfWeek? {
+        guard case .planBlock = seg.source else { return nil }
+        guard let target = dayAtGlobalPoint(globalPoint), target != day else { return nil }
+        return target
+    }
+
     /// 드래그를 끝낸 세그먼트의 새 시작 시각을 계산해 원본 모델에 저장(15분 스냅).
-    private func commitDrag(_ seg: TimeSegment, deltaHours: Double) {
-        guard abs(deltaHours) > 0.001 else { return }   // 단순 클릭은 무시
+    /// - Parameter newDay: 세로로 끌어 다른 요일 줄에 놓았다면 그 요일. 계획 블록에만 적용된다.
+    private func commitDrag(_ seg: TimeSegment, deltaHours: Double, toDay newDay: DayOfWeek? = nil) {
+        // 단순 클릭은 무시. 다만 요일만 바꾼(가로로는 안 움직인) 드래그는 살려야 한다.
+        guard abs(deltaHours) > 0.001 || newDay != nil else { return }
         var newStart = ((seg.logicalStart + deltaHours) / 0.25).rounded() * 0.25
         // 고정 루틴(수면 등)은 자정을 넘겨도 되므로 시작만 하루 범위로, 나머지는 길이만큼 여유를 둬 자정 넘김 방지.
         let maxStart: Double
@@ -641,6 +672,8 @@ struct DayTimelineRow: View {
             }
         case .planBlock(let blk):
             blk.startHour = newStart
+            blk.timeBand = .containing(newStart)   // 요일 칸 칩의 '아침/오후/저녁'이 시각을 따라오게.
+            if let newDay { blk.day = newDay }
         case .quotaSession(let name, let index):
             if let p = quotaPlacements.first(where: { $0.routineName == name && $0.sessionIndex == index }) {
                 p.startHour = newStart
@@ -707,4 +740,15 @@ struct HourAxis: View {
 
 func fmtHours(_ v: Double) -> String {
     v == v.rounded() ? String(format: "%.0f", v) : String(format: "%.1f", v)
+}
+
+// MARK: - 요일 줄의 자리
+
+/// 요일 줄들이 각자 화면 어디에 서 있는지(요일 rawValue → 화면 좌표) 부모에게 올린다.
+/// 한 줄은 자기 자리만 알기에, 계획 블록을 세로로 끌 때 "어느 요일 위인가"는 부모가 답한다.
+struct DayRowFramesKey: PreferenceKey {
+    static var defaultValue: [Int: CGRect] { [:] }
+    static func reduce(value: inout [Int: CGRect], nextValue: () -> [Int: CGRect]) {
+        value.merge(nextValue()) { _, new in new }
+    }
 }

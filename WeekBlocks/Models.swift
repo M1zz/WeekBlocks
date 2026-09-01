@@ -38,6 +38,16 @@ enum TimeBand: String, Codable, CaseIterable, Identifiable {
         case .night: "심야"
         }
     }
+
+    /// 그 시각이 속한 시간대. 시각을 옮기면 시간대도 따라와야 칩의 부제가 거짓말을 하지 않는다.
+    static func containing(_ startHour: Double) -> TimeBand {
+        switch startHour {
+        case 6..<12: return .morning
+        case 12..<18: return .afternoon
+        case 18..<23: return .evening
+        default: return .night
+        }
+    }
 }
 
 enum RoutineKind: String, Codable, CaseIterable, Identifiable {

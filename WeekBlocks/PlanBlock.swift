@@ -84,3 +84,17 @@ final class PlanBlock {
     }
 }
 
+
+// MARK: - 끌어 옮기기
+
+extension PlanBlock {
+    /// 요일 칸·시간 자가 함께 쓰는 드래그 식별자.
+    /// 두 화면이 같은 규칙으로 만들고 읽어야 어디서 집어 어디에 놓든 같은 블록에 닿는다.
+    var dragToken: String { "block:" + String(describing: persistentModelID) }
+
+    /// 드래그 토큰이 가리키는 블록. 블록 토큰이 아니거나 찾지 못하면 nil.
+    static func matching(dragToken token: String, in blocks: [PlanBlock]) -> PlanBlock? {
+        guard token.hasPrefix("block:") else { return nil }
+        return blocks.first { $0.dragToken == token }
+    }
+}

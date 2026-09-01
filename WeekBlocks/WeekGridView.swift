@@ -13,7 +13,7 @@ enum DayPlanItem: Identifiable {
         switch self {
         case .fixedRoutine(_, let oid, _, _): "fixed:\(oid)"
         case .quotaSession(let r, let idx, _): "quota:\(r.name):\(idx)"
-        case .block(let b, _): "block:\(String(describing: b.persistentModelID))"
+        case .block(let b, _): b.dragToken
         }
     }
 
@@ -273,11 +273,15 @@ struct BlockChip: View {
         // 칩 전체는 탭 제스처로, 수정은 별도 버튼으로 분리한다.
         chipBody
             .contentShape(RoundedRectangle(cornerRadius: 7))
+            // 다른 요일로 끌어 옮기기 — 드롭 대상(DayColumn)에서 요일을 바꾼다.
+            //
+            // ⚠️ 순서가 중요하다. `.onTapGesture`를 먼저 붙이면 탭이 안쪽(우선순위 높은)
+            //    제스처가 되어 마우스를 눌러 끄는 동안 드래그가 시작되지 못한다.
+            //    드래그를 안쪽에 두면, 움직이지 않은 클릭만 바깥의 탭으로 떨어진다.
+            .draggable(block.dragToken)
             .onTapGesture(perform: onTap)
             .overlay(alignment: .topTrailing) { editButton }
             .onHover { hovering = $0 }
-            // 다른 요일로 끌어 옮기기 — 드롭 대상(DayColumn)에서 요일을 바꾼다.
-            .draggable("block:" + String(describing: block.persistentModelID))
             .help(block.successCriteria.isEmpty
                   ? "구체성 미검증 — 눌러서 다듬기 · 드래그해서 다른 요일로 옮기기"
                   : block.successCriteria + "\n드래그해서 다른 요일로 옮길 수 있습니다.")

@@ -26,6 +26,12 @@ struct ContentView: View {
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
     @State private var shareStore = ScheduleShareStore.shared
 
+    /// 시간 자에서 요일 줄들이 각각 화면 어디에 서 있는가(요일 rawValue → 화면 좌표).
+    /// 계획 블록을 세로로 끌 때 "지금 어느 요일 위인가"를 여기서 답한다.
+    @State private var timelineRowFrames: [Int: CGRect] = [:]
+    /// 지금 끌고 가는 계획 블록이 놓이려는 요일. 그 줄에 테두리가 선다.
+    @State private var timelineDayTarget: DayOfWeek?
+
     /// 한 주 요약(총량·고정 루틴·남은 자유 시간)을 펼쳐 두었는가. 기본은 접힘.
     @AppStorage("showsWeekSummary") private var showsWeekSummary = false
 
@@ -584,11 +590,35 @@ struct ContentView: View {
                         window: timelineWindow,
                         onDropBacklog: { token, hour in
                             dropBacklogItem(token: token, day: day, atHour: hour)
+                        },
+                        isDayDropTarget: timelineDayTarget == day,
+                        dayAtGlobalPoint: dayRow(atGlobalPoint:),
+                        onDayTargetChange: { target in
+                            guard timelineDayTarget != target else { return }
+                            withAnimation(.easeOut(duration: 0.12)) { timelineDayTarget = target }
                         }
                     )
+                    .background {
+                        GeometryReader { geo in
+                            Color.clear.preference(key: DayRowFramesKey.self,
+                                                   value: [day.rawValue: geo.frame(in: .global)])
+                        }
+                    }
                 }
             }
+            .onPreferenceChange(DayRowFramesKey.self) { timelineRowFrames = $0 }
         }
+    }
+
+    /// 화면 좌표 한 점이 어느 요일 줄 위인가.
+    /// 줄 사이 틈에서 답이 끊기지 않게 세로로 가장 가까운 줄을 고르고,
+    /// 자에서 한 줄 넘게 벗어나면 "요일을 바꾸려는 게 아니다"로 본다.
+    private func dayRow(atGlobalPoint point: CGPoint) -> DayOfWeek? {
+        guard let nearest = timelineRowFrames.min(by: {
+            abs(point.y - $0.value.midY) < abs(point.y - $1.value.midY)
+        }) else { return nil }
+        guard abs(point.y - nearest.value.midY) <= nearest.value.height else { return nil }
+        return DayOfWeek(rawValue: nearest.key)
     }
 
     private var weekGridSection: some View {
@@ -664,8 +694,7 @@ struct ContentView: View {
     private func dropBacklogItem(token: String, day: DayOfWeek, atHour: Double? = nil) {
         if token.hasPrefix("block:") {
             // 이미 계획에 올린 블록을 옮긴다 — 요일 칸에서는 요일만, 자 위에서는 시각까지.
-            let idStr = String(token.dropFirst("block:".count))
-            guard let blk = allBlocks.first(where: { String(describing: $0.persistentModelID) == idStr }) else { return }
+            guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
             var changed = false
             if blk.day != day { blk.day = day; changed = true }
             if let hour = atHour {
@@ -761,14 +790,7 @@ struct ContentView: View {
         try? context.save()
     }
 
-    private func timeBand(for startHour: Double) -> TimeBand {
-        switch startHour {
-        case 6..<12: return .morning
-        case 12..<18: return .afternoon
-        case 18..<23: return .evening
-        default: return .night
-        }
-    }
+    private func timeBand(for startHour: Double) -> TimeBand { .containing(startHour) }
 
     private func shiftWeek(by weeks: Int) {
         if let next = Calendar.current.date(byAdding: .day, value: weeks * 7, to: selectedWeek) {
