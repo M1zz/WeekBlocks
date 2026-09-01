@@ -38,6 +38,24 @@ final class BacklogItem {
     ///    → BacklogItem+Fragment.swift 의 `fragmentPick`으로만 드나든다.
     var labelRaw: String? = nil
 
+
+    // MARK: - 함께 쓰는 줄인가 (→ TodoSharing.swift)
+    //
+    // 잠긴 기기에서 적은 줄은 상대 기기에 보이면 안 된다. 그런데 동기화 엔진은
+    // 골라서 안 올리는 것을 못 한다 — 켜면 로컬에 있는 것을 전부 올린다.
+    // 그래서 **올라가게 두고, 받는 쪽에서 안 그린다.** 그러려면 판단에 필요한 것이
+    // 줄에 같이 실려 가야 한다. 결제 여부는 나중에 바뀌는데, 받는 쪽은 상대가
+    // 그때 샀는지를 알 방법이 없기 때문이다.
+
+    /// 상대 기기에도 보여도 되는 줄인가. **false → true 로만 간다** —
+    /// 결제하면 켜지고 다시 꺼지지 않는다. 양쪽에서 반대로 뒤집으면 풀 방법이 없다.
+    var isShared: Bool = true
+
+    /// 이 줄이 난 자리(앱 설치본). 잠긴 기기의 스토어에는 자기 것과 상대 것이
+    /// 섞여 있어서, 감출 것을 고르려면 누가 만들었는지를 알아야 한다.
+    /// 비어 있으면 이 기능이 생기기 전에 적은 줄이고, 그때는 내 것으로 본다.
+    var originInstallID: String = ""
+
     init(title: String,
          durationHours: Double = 1,
          sortIndex: Int = 0,

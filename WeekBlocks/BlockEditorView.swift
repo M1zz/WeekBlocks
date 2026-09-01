@@ -5,6 +5,10 @@ struct BlockEditorView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
+    /// 이 날에 이미 잡혀 있는 것들 — 만들기 전에 자리가 있는지 말해 주려고 본다.
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var allRoutines: [Routine]
+    @Query private var allBlocks: [PlanBlock]
+
     let existing: PlanBlock?
     let day: DayOfWeek
     let weekStart: Date
@@ -185,7 +189,16 @@ struct BlockEditorView: View {
     }
 
     private var footerBar: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
+            // 이 날에 자리가 남는지 먼저 말한다. 넘겨도 막지는 않는다 —
+            // 하루를 넘겨 잡아 두고 나중에 줄이는 것도 계획하는 방법이다.
+            if let crowding {
+                Label(crowding, systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+
+            HStack {
             if existing != nil {
                 Button(role: .destructive) {
                     if let existing { context.delete(existing); try? context.save() }
@@ -198,12 +211,53 @@ struct BlockEditorView: View {
             Button("취소") { dismiss() }
                 .keyboardShortcut(.cancelAction)
 
+            // 버튼이 흐린 이유를 버튼 옆에서 말한다.
+            if !missing.isEmpty {
+                Label("\(missing.joined(separator: " · "))", systemImage: "exclamationmark.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .padding(.trailing, 4)
+            }
+
             Button("저장") { save() }
                 .keyboardShortcut(.defaultAction)
                 .buttonStyle(.borderedProminent)
                 .disabled(!canSave)
+            }
         }
         .padding(20)
+    }
+
+    /// 저장하려면 아직 해야 하는 것. 비어 있으면 저장할 수 있다.
+    private var missing: [String] {
+        if title.trimmingCharacters(in: .whitespaces).isEmpty { return ["제목을 적어 주세요"] }
+        if withinRoutine { return [] }
+        if !hasCheckedOnce { return ["'구체성 검사'를 눌러 주세요"] }
+        if !issues.isEmpty { return ["위 검사에서 걸린 것을 고쳐 주세요"] }
+        return []
+    }
+
+    /// 이 날이 이미 얼마나 찼는지. 새로 넣을 길이가 남은 자리보다 크면 말해 준다.
+    private var crowding: String? {
+        guard !withinRoutine, durationHours > 0 else { return nil }
+        let cal = Calendar(identifier: .iso8601)
+        let dayBlocks = allBlocks.filter {
+            $0.day == day && !$0.withinRoutine
+                && cal.isDate($0.weekStartDate, inSameDayAs: weekStart)
+                && $0.persistentModelID != existing?.persistentModelID
+        }
+        let routineHours = allRoutines
+            .filter { $0.kind == .fixed && $0.selectedDays.contains(day) }
+            .reduce(0) { $0 + $1.durationHours }
+            + allRoutines.filter { $0.kind == .quota }.reduce(0) { $0 + $1.dailyQuotaHours }
+        let planned = dayBlocks.reduce(0) { $0 + $1.durationHours }
+        let free = 24 - routineHours - planned
+        guard durationHours > free else { return nil }
+        let f = { (h: Double) in h == h.rounded() ? String(format: "%.0f", h) : String(format: "%.1f", h) }
+        if free <= 0 {
+            return "\(day.longLabel)은 이미 꽉 찼습니다 — 루틴과 계획으로 24시간을 다 썼어요"
+        }
+        return "\(day.longLabel)에 남은 자리는 \(f(free))시간입니다 — \(f(durationHours))시간을 넣으면 넘칩니다"
     }
 
     // MARK: logic

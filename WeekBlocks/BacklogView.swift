@@ -2,20 +2,6 @@ import SwiftUI
 import SwiftData
 import TipKit
 
-/// 주간 화면 툴바의 '할 일 추가'가 다른 창(할 일 창)에 보내는 신호.
-/// 창을 여는 것과 빈 칸을 여는 것은 서로 다른 창에서 일어나므로 한 곳을 거쳐 간다.
-/// 숫자를 하나 올리는 것으로 신호를 삼는다 — 창이 이미 떠 있으면 바뀐 값이 바로 닿고,
-/// 이제 뜨는 중이면 나타나는 쪽이 "내가 본 적 없는 번호"를 보고 빈 칸을 연다.
-@Observable
-final class TodoComposeRequest {
-    static let shared = TodoComposeRequest()
-    private init() { }
-
-    private(set) var ticket = 0
-
-    func requestNew() { ticket += 1 }
-}
-
 struct BacklogSection: View {
     @Environment(\.modelContext) private var context
 
@@ -29,18 +15,11 @@ struct BacklogSection: View {
     /// 주간 화면에서는 끈다 — 거기서 할 일은 **요일 칸으로 끌어다 놓을 카드**일 뿐이라
     /// 거르는 도구가 앞에 서면 계획을 짜는 손을 방해한다. 거르는 일은 할 일 창에서 한다.
     var showsCategoryFilter: Bool = true
-    /// 툴바 '할 일 추가'의 신호를 받는 자리인가. 같은 목록이 두 창에 서 있으므로
-    /// 신호를 받는 쪽은 하나여야 한다 — 버튼이 있는 주간 화면 쪽만 true.
-    var listensForComposeRequest: Bool = false
 
     @Query(sort: [SortDescriptor(\BacklogCategory.sortIndex), SortDescriptor(\BacklogCategory.createdAt)])
     private var categories: [BacklogCategory]
 
     @AppStorage("didSeedBacklogCategories") private var didSeedCategories = false
-
-    /// 툴바 '할 일 추가'가 보내는 신호. 마지막으로 받은 번호와 다르면 빈 칸을 연다.
-    private let composeRequest = TodoComposeRequest.shared
-    @State private var seenComposeTicket = 0
 
     /// '요일에 올린 일'을 펼쳐 두었는가. 기본은 접힘 — 확인하러 갈 때만 연다.
     @State private var showsPlaced = false
@@ -313,10 +292,6 @@ struct BacklogSection: View {
             }
         }
         .task { await reconcileCategories() }
-        // 툴바의 '할 일 추가'가 부른 것이면 빈 칸까지 열어 준다.
-        // 창이 이제 뜨는 중이면 onChange가 오지 않으므로 나타날 때도 한 번 본다.
-        .onAppear { consumeComposeRequest() }
-        .onChange(of: composeRequest.ticket) { _, _ in consumeComposeRequest() }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
                 .frame(minWidth: 540, minHeight: 560)
@@ -460,15 +435,6 @@ struct BacklogSection: View {
     private func beginAdding() {
         withAnimation(.easeOut(duration: 0.18)) { isAdding = true }
         addFocused = true
-    }
-
-    /// 다른 창에서 온 '할 일 추가' 신호를 한 번만 받아 빈 칸을 연다.
-    private func consumeComposeRequest() {
-        guard listensForComposeRequest else { return }
-        guard composeRequest.ticket != seenComposeTicket else { return }
-        seenComposeTicket = composeRequest.ticket
-        guard canPlan, !isAdding else { return }
-        beginAdding()
     }
 
     private func endAdding() {

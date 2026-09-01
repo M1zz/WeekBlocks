@@ -149,6 +149,8 @@ struct RoutineBlock: View {
 struct RoutineEditorView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    /// 겹침을 미리 말해 주려면 이미 세워 둔 것들을 알아야 한다.
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var allRoutines: [Routine]
 
     let existing: Routine?
 
@@ -229,6 +231,22 @@ struct RoutineEditorView: View {
                             Stepper("", value: $durationHours, in: 0.25...24, step: 0.5)
                                 .labelsHidden()
                         }
+                        // 만들고 나서 타임라인에서 발견하는 것보다, 만들기 전에 말해 준다.
+                        // 막지는 않는다 — 정말 겹쳐야 하는 일도 있다.
+                        if !conflicts.isEmpty {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Label("이미 세워 둔 것과 겹칩니다", systemImage: "exclamationmark.triangle.fill")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(.orange)
+                                ForEach(conflicts, id: \.self) { line in
+                                    Text(line)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
                         HStack {
                             Text("주간 합계")
                                 .foregroundStyle(.secondary)
@@ -287,6 +305,16 @@ struct RoutineEditorView: View {
                         Text("삭제")
                     }
                 }
+                // 버튼이 흐린 이유를 버튼 옆에서 말한다. 예전에는 왜 못 누르는지
+                // 아무 데도 안 적혀 있어서, 무엇이 비었는지 찾아 헤매야 했다.
+                if !missing.isEmpty {
+                    Label("\(missing.joined(separator: " · "))을(를) 채워 주세요",
+                          systemImage: "exclamationmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .padding(.leading, 4)
+                }
+
                 Spacer()
                 Button("취소") { dismiss() }
                     .keyboardShortcut(.cancelAction)
@@ -355,6 +383,57 @@ struct RoutineEditorView: View {
             s += " · 회당 약 " + formatDuration(daily / Double(sessionsPerDay))
         }
         return s
+    }
+
+    /// 저장하려면 아직 채워야 하는 것들. 비어 있으면 저장할 수 있다.
+    private var missing: [String] {
+        var m: [String] = []
+        if name.trimmingCharacters(in: .whitespaces).isEmpty { m.append("이름") }
+        if kind == .fixed {
+            if selectedDays.isEmpty { m.append("요일") }
+            if durationHours <= 0 { m.append("길이") }
+        } else if weeklyHours <= 0 {
+            m.append("주당 시간")
+        }
+        return m
+    }
+
+    /// 지금 값으로 세우면 **이미 있는 고정 루틴과 겹치는 곳**들.
+    ///
+    /// 겹친다고 못 만들게 막지는 않는다 — 회의 중 이동처럼 정말 겹치는 일도 있다.
+    /// 다만 만들고 나서 타임라인에서 발견하는 것보다, 만들기 전에 말해 주는 편이 낫다.
+    private var conflicts: [String] {
+        guard kind == .fixed, !selectedDays.isEmpty, durationHours > 0 else { return [] }
+        let mine = (startHour, startHour + durationHours)
+        var found: [String] = []
+        for other in allRoutines where other.kind == .fixed {
+            if let existing, other.persistentModelID == existing.persistentModelID { continue }
+            let theirs = (other.startHour, other.startHour + other.durationHours)
+            let days = selectedDays.intersection(other.selectedDays)
+            guard !days.isEmpty, let overlap = Self.overlapHours(mine, theirs), overlap > 0.01
+            else { continue }
+            let dayLabels = days.sorted { $0.rawValue < $1.rawValue }.map(\.shortLabel).joined(separator: "·")
+            found.append("\(dayLabels) — \(other.name)와 \(fmtHours(overlap))시간")
+        }
+        return found
+    }
+
+    /// 자정을 넘는 구간까지 보고 겹치는 시간을 잰다 (잠처럼 23시에 시작하는 것들).
+    private static func overlapHours(_ a: (Double, Double), _ b: (Double, Double)) -> Double? {
+        func split(_ r: (Double, Double)) -> [(Double, Double)] {
+            r.1 <= 24 ? [r] : [(r.0, 24), (0, r.1 - 24)]
+        }
+        var total: Double = 0
+        for x in split(a) {
+            for y in split(b) {
+                total += max(0, min(x.1, y.1) - max(x.0, y.0))
+            }
+        }
+        return total > 0 ? total : nil
+    }
+
+    private func fmtHours(_ h: Double) -> String {
+        h == h.rounded() ? String(format: "%.0f", h) : String(format: "%.1f", h)
     }
 
     private var isValid: Bool {

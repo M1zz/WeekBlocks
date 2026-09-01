@@ -33,13 +33,6 @@ struct ContentView: View {
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
     private var weekLens: WeekLens { WeekLens(rawValue: weekLensRaw) ?? .plan }
 
-    /// 툴바 '할 일 추가' 신호 — 목록으로 데려가는 쪽은 여기서 듣는다.
-    /// (빈 칸을 여는 쪽은 BacklogSection이 같은 신호를 듣는다.)
-    private let composeRequest = TodoComposeRequest.shared
-
-    /// 할 일 목록 자리표. 툴바에서 눌렀을 때 여기로 스크롤한다.
-    private static let todosAnchor = "todos-section"
-
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
         return allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
@@ -66,70 +59,47 @@ struct ContentView: View {
 
     var body: some View {
         ScrollView {
-            ScrollViewReader { proxy in
-                VStack(alignment: .leading, spacing: 22) {
-                    weekHeader
-                    // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
-                    if showsWeekSummary {
-                        VStack(alignment: .leading, spacing: 10) {
-                            metricsRow
-                            WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
-                        }
-                        // 접히고 펴지는 결이 양쪽으로 같아야 한 덩어리가 여닫히는 것으로 읽힌다.
-                        // 예전에는 펼 때만 밀려 내려오고 접을 때는 그 자리에서 사라져서,
-                        // 접는 순간 아래 화면이 툭 끊기며 올라왔다.
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .top).combined(with: .opacity),
-                            removal: .move(edge: .top).combined(with: .opacity)
-                        ))
-                        .clipped()
+            VStack(alignment: .leading, spacing: 22) {
+                weekHeader
+                // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
+                if showsWeekSummary {
+                    VStack(alignment: .leading, spacing: 10) {
+                        metricsRow
+                        WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
                     }
-                    weekLensSection
-                    // 할 일 목록은 한 주를 보는 자리 **아래**에 둔다.
-                    // 먼저 이번 주가 어떻게 생겼는지 보고, 그다음 무엇을 끌어다 놓을지 고른다.
-                    // (따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
-                    //  넣을 카드가 아예 보이지 않았다. 창 ⇧⌘T 는 나란히 놓고 쓰고 싶을 때.)
-                    BacklogSection(allItems: backlogItems,
-                                   weekStart: selectedWeek,
-                                   weekBlocks: weekBlocks,
-                                   canPlan: hasFixedRoutines,
-                                   showsCategoryFilter: false,
-                                   listensForComposeRequest: true)
-                        .id(Self.todosAnchor)
-                    routinesSection
-                    // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
-                    if !shareStore.received.isEmpty {
-                        ReceivedSchedulesSection()
-                    }
+                    // 접히고 펴지는 결이 양쪽으로 같아야 한 덩어리가 여닫히는 것으로 읽힌다.
+                    // 예전에는 펼 때만 밀려 내려오고 접을 때는 그 자리에서 사라져서,
+                    // 접는 순간 아래 화면이 툭 끊기며 올라왔다.
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .move(edge: .top).combined(with: .opacity)
+                    ))
+                    .clipped()
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 18)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                // 툴바에서 '할 일 추가'를 누르면 아래로 내려가 있어도 목록으로 데려간다.
-                // 빈 칸이 열렸는데 화면 밖이면 누른 것이 아무 일도 안 한 것처럼 보인다.
-                .onChange(of: composeRequest.ticket) { _, _ in
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        proxy.scrollTo(Self.todosAnchor, anchor: .top)
-                    }
+                weekLensSection
+                // 할 일 목록은 한 주를 보는 자리 **아래**에 둔다.
+                // 먼저 이번 주가 어떻게 생겼는지 보고, 그다음 무엇을 끌어다 놓을지 고른다.
+                // (따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
+                //  넣을 카드가 아예 보이지 않았다. 창 ⇧⌘T 는 나란히 놓고 쓰고 싶을 때.)
+                BacklogSection(allItems: backlogItems,
+                               weekStart: selectedWeek,
+                               weekBlocks: weekBlocks,
+                               canPlan: hasFixedRoutines,
+                               showsCategoryFilter: false)
+                routinesSection
+                // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
+                if !shareStore.received.isEmpty {
+                    ReceivedSchedulesSection()
                 }
             }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 18)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(minWidth: 980, minHeight: 700)
         .navigationTitle("무지개 공방")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
-                // 아이콘만 있던 시절(목록 그림)에는 이게 **적는 자리**라는 걸 아무도
-                // 읽어내지 못했다. '＋'와 글자를 함께 세워, 누르기 전에 무엇이 일어나는지
-                // 버튼 자체가 말하게 한다. 누르면 아래 할 일 목록으로 데려가고
-                // 맨 앞에 빈 칸을 열어 준다 — 누른 뜻이 곧 '적겠다'이기 때문이다.
-                Button {
-                    TodoComposeRequest.shared.requestNew()
-                } label: {
-                    Label("할 일 추가", systemImage: "plus")
-                }
-                .labelStyle(.titleAndIcon)
-                .help("할 일 목록 맨 앞에 빈 칸을 연다 (⌘N)")
-
                 Button {
                     showingReflection = true
                 } label: {
