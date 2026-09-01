@@ -116,7 +116,10 @@ struct BroadcastPlanSection: View {
                                 onMarkSent: {
                                     guard let cp = e.checkpoint else { return }
                                     e.holder.markCheckpoint(cp.token, done: true)
+                                    // 이 줄의 주인은 할 일일 수도, 계획 블록일 수도 있다.
+                                    // 둘은 서로 다른 스토어에 살아서 한쪽만 저장하면 조용히 되돌아간다.
                                     try? context.save()
+                                    PlanStore.shared.save()
                                 }
                             )
                         }

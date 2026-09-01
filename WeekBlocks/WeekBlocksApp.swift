@@ -11,56 +11,60 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+/// 창 id는 여는 쪽(ContentView)과 세우는 쪽(WeekBlocksApp)이 함께 쓰므로 한 곳에 둔다.
+enum WeekBlocksWindow {
+    static let main = "main"
+    static let todos = "todos"
+}
+
 @main
 struct WeekBlocksApp: App {
     @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        // 저장소를 세우는 일이 가장 먼저다. 순서가 곧 안전이다 (→ Stores.swift).
+        StoreBootstrap.run()
         // LeeoKit 사용량 트래커 — 리뷰 요청·만족도 프롬프트 게이팅에 쓰인다.
         _ = LeeoEngagement.shared.registerLaunch()
         // 할 일 화면의 조언은 전부 TipKit으로 낸다 (→ TodoTips.swift).
         TodoTips.configure()
     }
 
-    let container: ModelContainer = {
-        let schema = Schema([Routine.self, PlanBlock.self, BacklogItem.self, RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self])
-        // ⚠️ groupContainer: .none 을 반드시 명시한다.
-        //    공유 익스텐션용 App Group entitlement가 붙으면 SwiftData의 기본 저장 위치가
-        //    앱 샌드박스 → App Group 컨테이너로 바뀐다. 그러면 이미 배포된 사용자의
-        //    기존 store를 못 찾고 빈 스토어를 새로 만들어, 루틴·계획·백로그가 전부
-        //    사라진 것처럼 보인다. (iOS '욕망의 무지개'도 같은 이유로 못박아 두었다.)
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            groupContainer: .none,
-            cloudKitDatabase: .private("iCloud.com.devkoan.ScheduleDensity")
-        )
-        do {
-            return try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            fatalError("ModelContainer failed: \(error)")
-        }
-    }()
+    /// 계획 스토어 — 루틴·계획 블록. 할 일은 여기 없다(→ Stores.swift).
+    private let planContainer = PlanStore.shared.container
+    /// 할 일 스토어 — 아이폰 '욕망의 무지개'와 같은 이름·같은 스키마.
+    private let todoContainer = TodoStore.shared.container
 
     var body: some Scene {
         // 단일 창 앱: Window 씬을 쓰면 창을 닫아도
         // "윈도우" 메뉴(및 Dock 아이콘 클릭)로 다시 열 수 있다. (App Store 심사 Guideline 4 대응)
-        Window("무지개 공방", id: "main") {
+        Window("무지개 공방", id: WeekBlocksWindow.main) {
             ContentView()
                 .leeoSatisfactionCheck(WeekBlocksSpec.self)
                 // 다른 앱에서 공유한 할 일 받기. 공유 익스텐션은 SwiftData에 직접 못 쓰고
                 // App Group에 쌓아만 두므로, 앱이 켜지고 앞으로 나올 때 그 상자를 비운다.
-                .task { TodoShareIntake.drain(into: container.mainContext) }
+                // 받은 할 일은 할 일 스토어로 들어간다.
+                .task { TodoShareIntake.drain(into: TodoStore.shared.context) }
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active { TodoShareIntake.drain(into: container.mainContext) }
+                    if phase == .active { TodoShareIntake.drain(into: TodoStore.shared.context) }
                 }
         }
-        .modelContainer(container)
+        .modelContainer(planContainer)
         .defaultSize(width: 1080, height: 760)
         .windowResizability(.contentMinSize)
         .commands {
             CommandGroup(replacing: .newItem) { }
         }
+
+        // 할 일은 따로 선 창이다 (→ TodoWindowView).
+        // 적는 일과 한 주를 짜는 일은 손이 오가는 방향이 달라서, 나란히 놓고 쓸 수 있어야 한다.
+        Window("할 일", id: WeekBlocksWindow.todos) {
+            TodoWindowView()
+        }
+        .modelContainer(todoContainer)
+        .defaultSize(width: 560, height: 620)
+        .windowResizability(.contentMinSize)
+        .keyboardShortcut("t", modifiers: [.command, .shift])
     }
 }

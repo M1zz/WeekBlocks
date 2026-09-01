@@ -35,6 +35,15 @@ struct HourWindow: Equatable {
         CGFloat((hour - start) / span) * width
     }
 
+    /// 가로 위치 → 시각. `x(_:width:)`의 역이다.
+    /// 떨어뜨린 자리를 30분 단위로 맞춘다 — 픽셀 하나까지 지키게 하면 손이 떨린다.
+    func hour(atX x: CGFloat, width: CGFloat) -> Double {
+        guard width > 0 else { return start }
+        let raw = start + Double(x / width) * span
+        let snapped = (raw * 2).rounded() / 2
+        return min(max(snapped, start), end)
+    }
+
     /// 창 밖으로 나간 부분을 잘라낸다. 완전히 벗어나면 nil.
     func clamp(_ s: Double, _ e: Double) -> (start: Double, end: Double)? {
         let cs = max(s, start), ce = min(e, end)
@@ -338,10 +347,15 @@ struct DayTimelineRow: View {
     var weekStart: Date = .currentWeekStart
     /// 그릴 시간 범위. 수면을 숨기면 양끝이 잘린 창이 들어온다.
     var window: HourWindow = .full
+    /// 할 일 카드를 이 줄에 떨어뜨렸다. (드래그 토큰, 떨어뜨린 시각)
+    /// 요일 칸과 달리 **몇 시인지까지** 함께 온다 — 자를 보면서 놓았기 때문이다.
+    var onDropBacklog: (String, Double) -> Void = { _, _ in }
 
     // 드래그 중인 세그먼트와 이동량(px). 같은 행 안에서만 유효.
     @State private var dragId: String? = nil
     @State private var dragPx: CGFloat = 0
+    /// 카드를 이 줄 위로 끌고 와 있는가. 받을 자리라는 것을 테두리로 말한다.
+    @State private var dropTargeted = false
 
     /// 그 시각을 0–24 소수 시간으로. (14:30 → 14.5)
     static func hourOfDay(_ date: Date) -> Double {
@@ -448,6 +462,19 @@ struct DayTimelineRow: View {
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay {
+                    // 받을 자리 표시. 카드가 올라와 있는 동안에만 테두리가 선다.
+                    RoundedRectangle(cornerRadius: 4)
+                        .strokeBorder(Color.accentColor, lineWidth: dropTargeted ? 2 : 0)
+                }
+                // 자 위에 바로 떨어뜨린다 — 떨어뜨린 가로 위치가 곧 시작 시각이다.
+                .dropDestination(for: String.self) { items, location in
+                    guard let token = items.first else { return false }
+                    onDropBacklog(token, window.hour(atX: location.x, width: w))
+                    return true
+                } isTargeted: { targeted in
+                    withAnimation(.easeOut(duration: 0.12)) { dropTargeted = targeted }
+                }
             }
             .frame(height: 28)
 

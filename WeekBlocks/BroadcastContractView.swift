@@ -10,6 +10,15 @@ import SwiftData
 /// 백로그 항목과 계획 블록 둘 다 계약을 가지므로 소유자 타입에 대해 제네릭이다.
 struct BroadcastContractView<Holder: BroadcastContractHolder>: View {
     @Environment(\.modelContext) private var context
+
+    /// 계약의 주인은 할 일(BacklogItem)일 수도, 계획 블록(PlanBlock)일 수도 있다.
+    /// 둘은 서로 다른 스토어에 살아서(→ Stores.swift), 이 화면을 어느 쪽에서 열었든
+    /// 양쪽을 다 저장해야 적어 둔 계약이 조용히 되돌아가지 않는다.
+    private func saveContract() {
+        try? context.save()
+        PlanStore.shared.save()
+        TodoStore.shared.save()
+    }
     @Environment(\.dismiss) private var dismiss
 
     @Bindable var item: Holder
@@ -83,7 +92,7 @@ struct BroadcastContractView<Holder: BroadcastContractHolder>: View {
             Button("전파 필요 해제") {
                 item.needsBroadcast = false
                 item.broadcastContractVerified = false
-                try? context.save()
+                saveContract()
                 dismiss()
             }
             .buttonStyle(.borderless)
@@ -312,7 +321,7 @@ struct BroadcastContractView<Holder: BroadcastContractHolder>: View {
                     checkpoint: cp,
                     onToggleDone: {
                         item.markCheckpoint(cp.token, done: !cp.isDone)
-                        try? context.save()
+                        saveContract()
                     },
                     onCopy: { copy(cp.script, key: cp.token) },
                     copied: copied == cp.token
@@ -455,7 +464,7 @@ struct BroadcastContractView<Holder: BroadcastContractHolder>: View {
     private func save(verified: Bool) {
         item.needsBroadcast = true
         item.broadcastContractVerified = verified && issues.isEmpty
-        try? context.save()
+        saveContract()
         dismiss()
     }
 

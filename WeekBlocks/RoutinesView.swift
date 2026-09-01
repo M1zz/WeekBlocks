@@ -44,14 +44,14 @@ struct RoutineRow: View {
                 .buttonStyle(.borderless)
 
                 if routine.kind == .fixed {
-                    // 협상 불가 고정 루틴은 실수 삭제 방지를 위해 목록에선 잠금.
+                    // 중요한 고정 루틴은 실수 삭제 방지를 위해 목록에선 잠금.
                     // 삭제는 편집(연필) → 삭제 버튼에서 확인 후 가능.
                     Button { onEdit() } label: {
                         Image(systemName: "lock.fill").font(.system(size: 14))
                     }
                     .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
-                    .help("협상 불가 고정 루틴 — 편집에서 삭제할 수 있습니다")
+                    .help("중요한 고정 루틴 — 편집에서 삭제할 수 있습니다")
                 } else {
                     Button(role: .destructive) { onDelete() } label: {
                         Image(systemName: "trash")
@@ -76,7 +76,7 @@ struct RoutineRow: View {
     }
 }
 
-/// "고정 루틴 · 협상 불가" 섹션용 블록 카드. 고정·쿼터 두 종류 모두 표시.
+/// "고정 루틴 · 중요한 일" 섹션용 블록 카드. 고정·쿼터 두 종류 모두 표시.
 struct RoutineBlock: View {
     let routine: Routine
     let onEdit: () -> Void
@@ -102,7 +102,7 @@ struct RoutineBlock: View {
                     }
                     .buttonStyle(.plain)
                     if routine.kind == .fixed {
-                        // 협상 불가 고정 루틴 — 실수 삭제 방지로 잠금(편집에서만 삭제).
+                        // 중요한 고정 루틴 — 실수 삭제 방지로 잠금(편집에서만 삭제).
                         Image(systemName: "lock.fill").font(.system(size: 12)).foregroundStyle(.secondary)
                     } else {
                         Button(role: .destructive) { onDelete() } label: {
@@ -305,7 +305,7 @@ struct RoutineEditorView: View {
             }
             Button("취소", role: .cancel) { }
         } message: {
-            Text("협상 불가 고정 루틴입니다. 이 루틴과 주간 배치가 모두 삭제됩니다. 계속할까요?")
+            Text("중요한 고정 루틴입니다. 이 루틴과 주간 배치가 모두 삭제됩니다. 계속할까요?")
         }
     }
 

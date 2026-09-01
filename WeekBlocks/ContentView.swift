@@ -3,10 +3,13 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.openWindow) private var openWindow
     @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routines: [Routine]
     @Query private var allBlocks: [PlanBlock]
-    @Query(sort: [SortDescriptor(\BacklogItem.sortIndex), SortDescriptor(\BacklogItem.createdAt)])
-    private var backlogItems: [BacklogItem]
+    // 할 일(BacklogItem·BacklogCategory)은 **다른 스토어**에 있다 (→ Stores.swift).
+    // 이 화면은 계획 스토어 위에 서 있어서 @Query로 못 읽는다 —
+    // 목록을 그리는 자리는 TodosPane이 할 일 스토어 위에 따로 세우고,
+    // 카드 하나를 집어 오는 일만 TodoStore에 물어본다.
     @Query private var allOccurrences: [RoutineOccurrence]
     @Query private var allQuotaPlacements: [QuotaPlacement]
 
@@ -30,6 +33,17 @@ struct ContentView: View {
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
     private var weekLens: WeekLens { WeekLens(rawValue: weekLensRaw) ?? .plan }
 
+    /// 자리를 옮길 때 어느 쪽으로 넘어가는가. 세그먼트의 오른쪽 칸으로 가면 true.
+    /// 넘어가는 방향이 화면에서도 같아야 "옆으로 옮겼다"가 몸으로 읽힌다.
+    @State private var lensForward = true
+
+    /// 툴바 '할 일 추가' 신호 — 목록으로 데려가는 쪽은 여기서 듣는다.
+    /// (빈 칸을 여는 쪽은 BacklogSection이 같은 신호를 듣는다.)
+    private let composeRequest = TodoComposeRequest.shared
+
+    /// 할 일 목록 자리표. 툴바에서 눌렀을 때 여기로 스크롤한다.
+    private static let todosAnchor = "todos-section"
+
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
         return allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
@@ -48,7 +62,7 @@ struct ContentView: View {
         max(0, 168 - routineHours)
     }
 
-    /// 협상 불가능한 고정 루틴이 하나라도 확보돼 있는지.
+    /// 빼놓을 수 없는 중요한 고정 루틴이 하나라도 확보돼 있는지.
     /// 이게 true가 되어야 백로그·계획 블록을 추가할 수 있다.
     private var hasFixedRoutines: Bool {
         routines.contains { $0.kind == .fixed }
@@ -56,36 +70,65 @@ struct ContentView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                weekHeader
-                // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
-                if showsWeekSummary {
-                    VStack(alignment: .leading, spacing: 10) {
-                        metricsRow
-                        WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
+            ScrollViewReader { proxy in
+                VStack(alignment: .leading, spacing: 28) {
+                    weekHeader
+                    // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
+                    if showsWeekSummary {
+                        VStack(alignment: .leading, spacing: 10) {
+                            metricsRow
+                            WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
+                        }
+                        .transition(.asymmetric(insertion: .push(from: .top).combined(with: .opacity),
+                                                removal: .opacity))
                     }
-                    .transition(.asymmetric(insertion: .push(from: .top).combined(with: .opacity),
-                                            removal: .opacity))
+                    // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
+                    // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
+                    // 할 일 목록은 **끌어다 놓을 자리 바로 위에** 있어야 한다.
+                    // 따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
+                    // 넣을 카드가 아예 보이지 않았다. 창(⇧⌘T)은 나란히 놓고 쓰고 싶을 때 쓰고,
+                    // 이 자리는 "지금 이 주에 넣을 것"을 손 닿는 곳에 둔다.
+                    //
+                    // 할 일은 다른 스토어에 살므로 이 안쪽만 그 스토어 위에 세운다.
+                    TodosPane(weekStart: selectedWeek,
+                              weekBlocks: weekBlocks,
+                              allBlocks: allBlocks,
+                              canPlan: hasFixedRoutines)
+                        .id(Self.todosAnchor)
+                    weekLensSection
+                    routinesSection
+                    // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
+                    if !shareStore.received.isEmpty {
+                        ReceivedSchedulesSection()
+                    }
                 }
-                // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
-                // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
-                BroadcastPlanSection(allItems: backlogItems, allBlocks: allBlocks)
-                weekLensSection
-                BacklogSection(allItems: backlogItems, weekStart: selectedWeek,
-                               weekBlocks: weekBlocks, canPlan: hasFixedRoutines)
-                routinesSection
-                // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
-                if !shareStore.received.isEmpty {
-                    ReceivedSchedulesSection()
+                .padding(28)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                // 툴바에서 '할 일 추가'를 누르면 아래로 내려가 있어도 목록으로 데려간다.
+                // 빈 칸이 열렸는데 화면 밖이면 누른 것이 아무 일도 안 한 것처럼 보인다.
+                .onChange(of: composeRequest.ticket) { _, _ in
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        proxy.scrollTo(Self.todosAnchor, anchor: .top)
+                    }
                 }
             }
-            .padding(28)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(minWidth: 980, minHeight: 700)
         .navigationTitle("무지개 공방")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                // 아이콘만 있던 시절(목록 그림)에는 이게 **적는 자리**라는 걸 아무도
+                // 읽어내지 못했다. '＋'와 글자를 함께 세워, 누르기 전에 무엇이 일어나는지
+                // 버튼 자체가 말하게 한다. 누르면 아래 할 일 목록으로 데려가고
+                // 맨 앞에 빈 칸을 열어 준다 — 누른 뜻이 곧 '적겠다'이기 때문이다.
+                Button {
+                    TodoComposeRequest.shared.requestNew()
+                } label: {
+                    Label("할 일 추가", systemImage: "plus")
+                }
+                .labelStyle(.titleAndIcon)
+                .help("할 일 목록 맨 앞에 빈 칸을 연다 (⌘N)")
+
                 Button {
                     showingReflection = true
                 } label: {
@@ -99,6 +142,14 @@ struct ContentView: View {
                 }
 
                 Menu {
+                    // 할 일 창은 두 창을 나란히 놓고 쓰고 싶을 때의 길이다.
+                    // 같은 목록이 이 창에도 있으므로 툴바 자리를 차지하지 않는다.
+                    Button {
+                        openWindow(id: WeekBlocksWindow.todos)
+                    } label: {
+                        Label("할 일 창 열기 (⇧⌘T)", systemImage: "macwindow.on.rectangle")
+                    }
+                    Divider()
                     Button {
                         routineSheet = RoutineSheetContext(routine: nil)
                     } label: {
@@ -166,7 +217,13 @@ struct ContentView: View {
         .task {
             if !didSeed {
                 didSeed = true
-                seedDefaultsIfNeeded()
+                await seedDefaultsIfNeeded()
+                dedupeRoutinesByName()
+                // 내려받기가 늦게 도착해 겹치는 일이 있어, 자리 잡은 뒤 한 번 더 본다.
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 30_000_000_000)
+                    dedupeRoutinesByName()
+                }
             }
             reconcileOccurrences(for: selectedWeek)
             await shareStore.refresh()
@@ -318,7 +375,7 @@ struct ContentView: View {
     private var routinesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Label("고정 루틴 · 협상 불가", systemImage: "lock")
+                Label("고정 루틴 · 중요한 일", systemImage: "lock")
                     .font(.headline)
                 Spacer()
                 Button {
@@ -333,7 +390,7 @@ struct ContentView: View {
                 ContentUnavailableView(
                     "루틴이 없습니다",
                     systemImage: "lock.open",
-                    description: Text("수면 · 식사 · 운동처럼 협상 불가능한 시간을 먼저 확보하세요.")
+                    description: Text("수면 · 식사 · 운동처럼 빼놓을 수 없는 중요한 시간을 먼저 확보하세요.")
                 )
                 .frame(minHeight: 120)
             } else {
@@ -456,7 +513,7 @@ struct ContentView: View {
     private var weekLensSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Picker("", selection: $weekLensRaw) {
+                Picker("", selection: lensBinding) {
                     ForEach(WeekLens.allCases) { lens in
                         Label(lens.rawValue, systemImage: lens.symbol).tag(lens.rawValue)
                     }
@@ -468,25 +525,64 @@ struct ContentView: View {
                 Text(weekLens.purpose)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .contentTransition(.opacity)
 
                 Spacer(minLength: 12)
 
                 // 오른쪽 끝에는 그 자리에서만 필요한 범례를 둔다.
-                switch weekLens {
-                case .plan:
-                    Legend()
-                case .day:
-                    Text(timelineLegend)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                // 겹쳐 세워야 바뀌는 동안 옆 글이 밀리지 않는다.
+                ZStack(alignment: .trailing) {
+                    switch weekLens {
+                    case .plan:
+                        Legend()
+                            .transition(.opacity)
+                    case .day:
+                        Text(timelineLegend)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .transition(.opacity)
+                    }
                 }
             }
 
-            switch weekLens {
-            case .plan: weekGridSection
-            case .day:  dayTimelineSection
+            // 두 자리는 **겹쳐 세우고 옆으로 밀어** 바꾼다.
+            // 위아래로 갈아 끼우면 새 자리가 어디서 왔는지 알 수 없어
+            // 매번 화면을 처음부터 다시 읽게 된다.
+            ZStack(alignment: .topLeading) {
+                switch weekLens {
+                case .plan:
+                    weekGridSection
+                        .transition(lensTransition)
+                case .day:
+                    dayTimelineSection
+                        .transition(lensTransition)
+                }
             }
         }
+    }
+
+    /// 세그먼트를 누르면 값만 바뀌는 게 아니라 **어느 쪽으로 넘어가는지**도 함께 정해진다.
+    /// (onChange로 뒤늦게 알아내면 방향이 한 박자 늦게 반영된다.)
+    private var lensBinding: Binding<String> {
+        Binding(
+            get: { weekLensRaw },
+            set: { newValue in
+                let from = weekLens
+                let to = WeekLens(rawValue: newValue) ?? .plan
+                guard from != to else { return }
+                lensForward = to.order > from.order
+                withAnimation(.snappy(duration: 0.3)) { weekLensRaw = newValue }
+            }
+        )
+    }
+
+    /// 나가는 쪽과 들어오는 쪽이 같은 방향으로 흐른다 — 한 장을 옆으로 넘기는 결.
+    /// 밀리는 거리는 짧게(28pt) 둔다. 화면이 통째로 날아다니면 산만하다.
+    private var lensTransition: AnyTransition {
+        .asymmetric(
+            insertion: .offset(x: lensForward ? 28 : -28).combined(with: .opacity),
+            removal: .offset(x: lensForward ? -28 : 28).combined(with: .opacity)
+        )
     }
 
     /// 타임라인 오른쪽 끝의 범례. 잘라 보는 중이면 그 사실도 여기서 말한다
@@ -518,7 +614,10 @@ struct ContentView: View {
                             $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: selectedWeek)
                         },
                         weekStart: selectedWeek,
-                        window: timelineWindow
+                        window: timelineWindow,
+                        onDropBacklog: { token, hour in
+                            dropBacklogItem(token: token, day: day, atHour: hour)
+                        }
                     )
                 }
             }
@@ -593,36 +692,53 @@ struct ContentView: View {
         if changed { try? context.save() }
     }
 
-    private func dropBacklogItem(token: String, day: DayOfWeek) {
+    /// 요일 칸(블록으로 보기)과 시간 자(시간축으로 보기)가 함께 쓰는 받는 자리.
+    /// - Parameter atHour: 자 위에 떨어뜨렸을 때의 시작 시각. 요일 칸에서는 nil(시간대만 정한다).
+    private func dropBacklogItem(token: String, day: DayOfWeek, atHour: Double? = nil) {
         if token.hasPrefix("block:") {
-            // 이미 계획에 올린 블록을 다른 요일로 이동 (같은 주 안에서 요일만 변경).
+            // 이미 계획에 올린 블록을 옮긴다 — 요일 칸에서는 요일만, 자 위에서는 시각까지.
             let idStr = String(token.dropFirst("block:".count))
             guard let blk = allBlocks.first(where: { String(describing: $0.persistentModelID) == idStr }) else { return }
-            if blk.day != day {
-                blk.day = day
-                try? context.save()
+            var changed = false
+            if blk.day != day { blk.day = day; changed = true }
+            if let hour = atHour {
+                let start = clampStart(hour, duration: blk.durationHours)
+                if blk.startHour != start {
+                    blk.startHour = start
+                    blk.timeBand = timeBand(for: start)
+                    changed = true
+                }
             }
+            if changed { try? context.save() }
             return
         }
         if token.hasPrefix("routine:") {
             let name = String(token.dropFirst("routine:".count))
             guard let routine = routines.first(where: { $0.name == name }) else { return }
+            let duration = routine.kind == .fixed ? routine.durationHours : 1
+            let start = atHour.map { clampStart($0, duration: duration) }
             let block = PlanBlock(
                 day: day,
-                timeBand: timeBand(for: routine.kind == .fixed ? routine.startHour : 12),
-                durationHours: routine.kind == .fixed ? routine.durationHours : 1,
+                timeBand: timeBand(for: start ?? (routine.kind == .fixed ? routine.startHour : 12)),
+                durationHours: duration,
                 title: routine.name,
                 successCriteria: "",
                 deliverable: "",
                 weekStartDate: selectedWeek,
-                concreteVerified: false
+                concreteVerified: false,
+                startHour: start ?? -1
             )
             context.insert(block)
         } else {
-            guard let item = backlogItems.first(where: { $0.dragToken == token }) else { return }
-            convertBacklogItem(item, to: day)
+            guard let item = TodoStore.shared.item(dragToken: token) else { return }
+            convertBacklogItem(item, to: day, atHour: atHour)
         }
         try? context.save()
+    }
+
+    /// 떨어뜨린 시각을 하루 안에 가둔다 — 끝자락에 놓아도 자정을 넘겨 사라지지 않게.
+    private func clampStart(_ hour: Double, duration: Double) -> Double {
+        min(max(0, hour), max(0, 24 - duration))
     }
 
     /// 백로그 항목 → 계획 블록. **할 일은 백로그에 그대로 남는다.**
@@ -637,27 +753,40 @@ struct ContentView: View {
     ///    같은 스토어를 쓰는 이상 어느 한쪽만 지우면 안 된다. **다시 지우지 말 것.**
     ///
     /// 단계로 쪼갠 할 일은 지금 할 단계 하나만 올린다. 남은 단계가 여전히 할 일이기 때문이다.
-    private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek) {
-        let tree = TodoTree(backlogItems)
+    private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek, atHour: Double? = nil) {
+        let tree = TodoTree(TodoStore.shared.allItems())
         let step = tree.hasChildren(item) ? tree.currentStep(of: item) : nil
         let title = step.map { "\(item.title) · \($0.title)" } ?? item.title
 
         // 항목이 백로그에 남으므로 같은 것을 두 번 떨어뜨릴 수 있다.
         // 같은 주·같은 요일에 이미 올라가 있으면 블록을 새로 만들지 않는다.
-        guard !weekBlocks.contains(where: { $0.day == day && $0.title == title }) else { return }
+        // 다만 자 위에서 시각까지 정해 다시 떨어뜨린 것이라면, 그건 "옮기겠다"는 뜻이다.
+        if let existing = weekBlocks.first(where: { $0.day == day && $0.title == title }) {
+            if let hour = atHour {
+                let start = clampStart(hour, duration: existing.durationHours)
+                existing.startHour = start
+                existing.timeBand = timeBand(for: start)
+                try? context.save()
+            }
+            return
+        }
 
+        let duration = step?.durationHours ?? item.durationHours
+        // 자 위에 놓았으면 그 시각이 곧 시작이다. 요일 칸에 놓았으면 빈 시간대를 골라 준다.
+        let start = atHour.map { clampStart($0, duration: duration) }
         let block = PlanBlock(
             day: day,
-            timeBand: TimelineLayout.suggestedBand(
+            timeBand: start.map { timeBand(for: $0) } ?? TimelineLayout.suggestedBand(
                 routines: fixedRoutines(on: day),
                 blocks: weekBlocks.filter { $0.day == day }
             ),
-            durationHours: step?.durationHours ?? item.durationHours,
+            durationHours: duration,
             title: title,
             successCriteria: "",
             deliverable: "",
             weekStartDate: selectedWeek,
-            concreteVerified: false
+            concreteVerified: false,
+            startHour: start ?? -1
         )
         // 전파 계약은 넘기지 않는다 — 항목이 백로그에 남아 계약의 주인으로 계속 서 있다.
         // 양쪽에 복사하면 '전파 필요' 섹션에 같은 전파가 두 줄로 선다.
@@ -680,9 +809,33 @@ struct ContentView: View {
         }
     }
 
-    private func seedDefaultsIfNeeded() {
-        guard routines.isEmpty else { return }
-        let defaults: [Routine] = [
+    /// 처음 켠 사람에게만 기본 루틴을 깔아 준다.
+    ///
+    /// ⚠️ "루틴이 비어 있다"를 곧바로 믿으면 안 된다. CloudKit이 아직 내려주기 전이면
+    ///    이미 쓰던 사람의 화면도 잠깐 비어 있고, 거기서 심으면 수면·식사·운동이
+    ///    **하나씩 더** 생겨 클라우드로 퍼진다. (실제로 그렇게 만들어 봤다.)
+    ///    그래서 ① 내려받을 시간을 주고 ② 한 번 심었으면 다시는 심지 않는다.
+    ///    (→ BacklogSection.reconcileCategories 와 같은 규칙)
+    @MainActor
+    private func seedDefaultsIfNeeded() async {
+        let seededKey = "didSeedDefaultRoutines"
+        guard !UserDefaults.standard.bool(forKey: seededKey) else { return }
+        guard routines.isEmpty else {
+            UserDefaults.standard.set(true, forKey: seededKey)   // 이미 쓰던 사람
+            return
+        }
+        try? await Task.sleep(nanoseconds: 3_000_000_000)
+        // 기다린 뒤에는 @Query가 아니라 스토어에 직접 묻는다 —
+        // 기다리는 동안 뷰가 새로 만들어져 손에 든 값이 옛것일 수 있다.
+        guard PlanStore.shared.fetch(Routine.self).isEmpty else { return }
+        UserDefaults.standard.set(true, forKey: seededKey)
+        for r in Self.defaultRoutines { context.insert(r) }
+        try? context.save()
+    }
+
+    /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.
+    private static var defaultRoutines: [Routine] {
+        [
             Routine(name: "수면", iconName: "moon.fill", kind: .fixed, colorName: "indigo",
                     dayMask: 0b1111111, startHour: 23, durationHours: 8, sortIndex: 0),
             Routine(name: "식사", iconName: "fork.knife", kind: .quota, colorName: "green",
@@ -690,22 +843,51 @@ struct ContentView: View {
             Routine(name: "운동", iconName: "figure.run", kind: .fixed, colorName: "orange",
                     dayMask: 0b0110101, startHour: 7.5, durationHours: 1, sortIndex: 2),
         ]
-        for r in defaults { context.insert(r) }
+    }
+
+    /// 같은 이름의 루틴이 둘 이상이면 **먼저 만들어진 것만** 남긴다.
+    ///
+    /// 동기화가 늦어 빈 화면에서 기본 루틴이 다시 심겼거나, 두 기기가 같은 이름을
+    /// 각자 만든 경우에 생긴다. 요일별 배치(RoutineOccurrence)는 이름으로 붙으므로
+    /// 이름만 하나로 모으면 배치도 제자리를 찾는다.
+    private func dedupeRoutinesByName() {
+        var keep: [String: Routine] = [:]
+        var victims: [Routine] = []
+        for r in PlanStore.shared.fetch(Routine.self) {
+            guard let kept = keep[r.name] else { keep[r.name] = r; continue }
+            if r.createdAt < kept.createdAt {
+                keep[r.name] = r
+                victims.append(kept)
+            } else {
+                victims.append(r)
+            }
+        }
+        guard !victims.isEmpty else { return }
+        for v in victims { context.delete(v) }
         try? context.save()
+        reconcileOccurrences(for: selectedWeek)
     }
 
     private func addSampleData() {
-        seedDefaultsIfNeeded()  // 루틴이 비어 있으면 기본 루틴 먼저
+        // 샘플을 부른 것은 사람의 뜻이므로 여기서는 기다리지 않고 바로 깐다.
+        if routines.isEmpty {
+            UserDefaults.standard.set(true, forKey: "didSeedDefaultRoutines")
+            for r in Self.defaultRoutines { context.insert(r) }
+        }
 
-        let base = backlogItems.map(\.sortIndex).max() ?? -1
+        // 할 일은 다른 스토어에 담긴다.
+        let todos = TodoStore.shared
+        let base = todos.allItems().map(\.sortIndex).max() ?? -1
         let samples: [(String, Double)] = [
             ("기획서 초안 작성", 2),
             ("논문 1편 정독", 1.5),
             ("주간 회고 정리", 0.5),
         ]
         for (i, s) in samples.enumerated() {
-            context.insert(BacklogItem(title: s.0, durationHours: s.1, sortIndex: base + 1 + i, weekStartDate: selectedWeek))
+            todos.context.insert(BacklogItem(title: s.0, durationHours: s.1,
+                                             sortIndex: base + 1 + i, weekStartDate: selectedWeek))
         }
+        todos.save()
 
         context.insert(PlanBlock(
             day: .mon,
@@ -723,20 +905,28 @@ struct ContentView: View {
     private func deleteAllData() {
         for b in allBlocks { context.delete(b) }
         for r in routines { context.delete(r) }
-        for i in backlogItems { context.delete(i) }
         for o in allOccurrences { context.delete(o) }
         try? context.save()
+        // 할 일은 다른 스토어에 있다. 여기서 같이 비우지 않으면 '모든 데이터 삭제'가 거짓말이 된다.
+        let todos = TodoStore.shared
+        for i in todos.allItems() { todos.context.delete(i) }
+        todos.save()
     }
 }
 
 /// 한 주를 보는 두 자리. 이름이 아니라 **목적**으로 가른다.
 enum WeekLens: String, CaseIterable, Identifiable {
     /// 무엇을 어느 요일에 할지 정하는 자리 (할 일을 끌어다 놓는 곳).
-    case plan = "이번 주 계획"
+    /// 요일 칸에 덩어리가 쌓인 모양이라 '블록'이다.
+    case plan = "블록으로 보기"
     /// 그 일이 하루의 어디에 들어가는지 보는 자리.
-    case day = "요일별 하루"
+    /// 24시간 자 위에 깔린 모양이라 '시간축'이다.
+    case day = "시간축으로 보기"
 
     var id: String { rawValue }
+
+    /// 세그먼트에서 몇 번째 칸인가. 넘어가는 방향(왼쪽/오른쪽)이 여기서 나온다.
+    var order: Int { Self.allCases.firstIndex(of: self) ?? 0 }
 
     var symbol: String {
         switch self {

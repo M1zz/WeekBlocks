@@ -12,6 +12,15 @@ struct SettingsView: View {
 
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
 
+    /// '지금 맞춰보기'를 눌렀는가 (한 번 누르면 더 누를 일이 없다).
+    @State private var matchDone = false
+    /// '다시 받아오기'가 예약됐는가. 실제 지우기는 다음 실행 때 일어난다.
+    @State private var refetchArmed = false
+    @State private var showingRefetchAlert = false
+
+    private var todoCount: Int { TodoStore.shared.allItems().count }
+    private var categoryCount: Int { TodoStore.shared.categories().count }
+
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
@@ -78,6 +87,40 @@ struct SettingsView: View {
                     Text("같은 iCloud 계정의 기기끼리 자동으로 동기화됩니다. (공유 컨테이너: ScheduleDensity)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    // 자동 동기화가 조용히 멈추는 일이 있다. 그때 손으로 당길 길을 둔다.
+                    HStack {
+                        Text("지금 할 일")
+                        Spacer()
+                        Text("\(todoCount)개 · 분류 \(categoryCount)개")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+
+                    Button {
+                        TodoStore.shared.reconcileWithArchive()
+                        matchDone = true
+                    } label: {
+                        Label(matchDone ? "맞춰봤습니다" : "지금 맞춰보기", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .disabled(matchDone)
+
+                    Text("떠 둔 벌과 iCloud가 준 벌 중 **더 최근에 손댄 쪽**을 세웁니다. 겹친 할 일도 함께 정리합니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Button(role: .destructive) {
+                        showingRefetchAlert = true
+                    } label: {
+                        Label("iCloud에서 다시 받아오기", systemImage: "icloud.and.arrow.down")
+                    }
+                    .disabled(refetchArmed)
+
+                    Text(refetchArmed
+                         ? "앱을 다시 켜면 iCloud에서 처음부터 받아옵니다."
+                         : "이 기기의 사본을 버리고 iCloud에 있는 것을 처음부터 다시 받습니다. 루틴·계획도 함께 다시 받습니다. 버리기 전에 지금 할 일을 파일로 떠 두므로, iCloud에 없는 할 일은 뒤이어 되살아납니다.")
+                        .font(.caption)
+                        .foregroundStyle(refetchArmed ? Color.orange : .secondary)
                 } header: {
                     Text("iCloud")
                 }
@@ -140,6 +183,15 @@ struct SettingsView: View {
             .padding(20)
         }
         .frame(minWidth: 460, minHeight: 540)
+        .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
+            Button("취소", role: .cancel) { }
+            Button("다시 받아오기", role: .destructive) {
+                TodoStore.shared.requestRefetchFromCloud()
+                refetchArmed = true
+            }
+        } message: {
+            Text("이 기기의 사본(루틴·계획·할 일)을 버리고 iCloud에 있는 것을 처음부터 받습니다.\n버리기 전에 지금 할 일을 파일로 떠 두므로, iCloud에 없는 할 일은 다음 실행에서 되살아납니다.\n\n앱을 다시 켜야 실제로 받아옵니다.")
+        }
     }
 
     private func ruleRow(_ field: String, _ rule: String) -> some View {

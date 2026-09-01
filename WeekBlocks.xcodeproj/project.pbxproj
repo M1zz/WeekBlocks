@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
 		2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */; };
@@ -86,6 +87,7 @@
 		45EF8BFE32D234EF9576302C /* ReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionView.swift; sourceTree = "<group>"; };
 		46C009263003E5FA4C9F764D /* WeekBlocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeekBlocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		482967041DBF8581050A3138 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
+		50CC675B4E440CD50573C3A4 /* Stores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores.swift; sourceTree = "<group>"; };
 		5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5CC172BAFFE573306711B4CE /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
 		5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BacklogItem+Fragment.swift"; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 				73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */,
 				5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */,
 				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
+				50CC675B4E440CD50573C3A4 /* Stores.swift */,
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
 				B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */,
 				1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */,
@@ -322,6 +325,7 @@
 				F8624EF27CC9E3AE1AEEFE83 /* ScheduleShareStore.swift in Sources */,
 				7EE825830848CC825A252ABD /* SettingsView.swift in Sources */,
 				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
+				032C842F55D754CDF99B7CEF /* Stores.swift in Sources */,
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
 				4EA685D4C9D593CD84458458 /* TodoShareInbox.swift in Sources */,
 				B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */,

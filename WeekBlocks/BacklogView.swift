@@ -2,6 +2,20 @@ import SwiftUI
 import SwiftData
 import TipKit
 
+/// 주간 화면 툴바의 '할 일 추가'가 다른 창(할 일 창)에 보내는 신호.
+/// 창을 여는 것과 빈 칸을 여는 것은 서로 다른 창에서 일어나므로 한 곳을 거쳐 간다.
+/// 숫자를 하나 올리는 것으로 신호를 삼는다 — 창이 이미 떠 있으면 바뀐 값이 바로 닿고,
+/// 이제 뜨는 중이면 나타나는 쪽이 "내가 본 적 없는 번호"를 보고 빈 칸을 연다.
+@Observable
+final class TodoComposeRequest {
+    static let shared = TodoComposeRequest()
+    private init() { }
+
+    private(set) var ticket = 0
+
+    func requestNew() { ticket += 1 }
+}
+
 struct BacklogSection: View {
     @Environment(\.modelContext) private var context
 
@@ -11,6 +25,9 @@ struct BacklogSection: View {
     var weekBlocks: [PlanBlock] = []
     /// 고정 루틴이 확보돼 있을 때만 할 일을 작성할 수 있다.
     var canPlan: Bool = true
+    /// 툴바 '할 일 추가'의 신호를 받는 자리인가. 같은 목록이 두 창에 서 있으므로
+    /// 신호를 받는 쪽은 하나여야 한다 — 버튼이 있는 주간 화면 쪽만 true.
+    var listensForComposeRequest: Bool = false
 
     @Query(sort: [SortDescriptor(\BacklogCategory.sortIndex), SortDescriptor(\BacklogCategory.createdAt)])
     private var categories: [BacklogCategory]
@@ -19,6 +36,10 @@ struct BacklogSection: View {
     /// 전파 카테고리는 기본값 시딩보다 나중에 생겼으므로 별도 플래그로 한 번 보강한다.
     @AppStorage("didSeedBroadcastCategory") private var didSeedBroadcastCategory = false
 
+    /// 툴바 '할 일 추가'가 보내는 신호. 마지막으로 받은 번호와 다르면 빈 칸을 연다.
+    private let composeRequest = TodoComposeRequest.shared
+    @State private var seenComposeTicket = 0
+
     @State private var filterCategoryID: String? = nil   // nil = 전체
     @State private var showingComposer = false
     @State private var showingAllBacklog = false
@@ -26,14 +47,10 @@ struct BacklogSection: View {
     // MARK: 적는 자리
     //
     // 적으려고 모달을 열고, 적고, 닫고, 다시 카드에서 찾는 왕복이 가장 큰 부담이었다.
-    // 이제 **목록 바로 위에 줄 하나가 열린다** — 적고 Enter를 치면 그 자리에 쌓이고
-    // 입력칸은 비워진 채 그대로 있어 다음 줄을 이어서 적을 수 있다. (iOS 할 일과 같은 규칙)
-    /// 적는 줄이 열려 있는가.
+    // 이제 **목록 맨 앞에 빈 칸이 하나 생긴다** — 거기 적으면 그게 곧 할 일이다.
+    /// 빈 칸이 열려 있는가.
     @State private var isAdding = false
     @State private var newTitle = ""
-    /// 새로 적는 줄의 분류. 열 때 켜 둔 필터를 그대로 물려받는다 —
-    /// '업무'만 보고 있었다면 지금 적는 것도 업무일 확률이 높다.
-    @State private var newCategoryID: String? = nil
     @FocusState private var addFocused: Bool
     /// 전파 필요 항목만 보기.
     @State private var broadcastOnly = false
@@ -57,12 +74,9 @@ struct BacklogSection: View {
             //   바로 하면 되는 일 → 그냥 하면 되는 것 → 시간을 잡은 일
             let (la, lb) = (tree.lane(of: a), tree.lane(of: b))
             if la != lb { return la < lb }
-            let (ba, bb) = (weekBucket(a), weekBucket(b))
-            if ba != bb { return ba < bb }
-            // 같은 묶음 안에서는 주차순 → 원래 정렬(sortIndex, createdAt) 유지.
-            if !cal.isDate(a.weekStartDate, inSameDayAs: b.weekStartDate) {
-                return a.weekStartDate < b.weekStartDate
-            }
+            // 주차로는 가르지 않는다. 요일에 올리기 전의 할 일에는 시간이 없고,
+            // 시간이 없는 것을 주 단위로 나누면 "지난 주 것"이라는 딱지만 늘어난다.
+            // (아이폰도 같은 규칙 — 밀린 줄은 이번 주로 끌어오고 목록은 하나다.)
             if a.sortIndex != b.sortIndex { return a.sortIndex < b.sortIndex }
             return a.createdAt < b.createdAt
         }
@@ -70,11 +84,6 @@ struct BacklogSection: View {
 
     /// 표시 순서 묶음: 보고 있는 주 → 지난 주(이월) → 앞으로.
     /// 이월을 두 번째에 두는 이유는 이미 밀린 일이라 눈에서 사라지면 안 되기 때문이다.
-    private func weekBucket(_ item: BacklogItem) -> Int {
-        if cal.isDate(item.weekStartDate, inSameDayAs: weekStart) { return 0 }
-        return item.weekStartDate < weekStart ? 1 : 2
-    }
-
     private var filteredItems: [BacklogItem] {
         var items = weekItems
         if let f = filterCategoryID { items = items.filter { $0.categoryID == f } }
@@ -85,12 +94,6 @@ struct BacklogSection: View {
     /// 전파 필요 항목 수 (필터 칩 배지).
     private var broadcastCount: Int {
         weekItems.filter { $0.needsBroadcast }.count
-    }
-
-
-    /// 이번 주보다 과거 주에 남아 있는(못 한) 백로그 수.
-    private var carryoverCount: Int {
-        allItems.filter { !$0.isCompleted && $0.weekStartDate < weekStart && !cal.isDate($0.weekStartDate, inSameDayAs: weekStart) }.count
     }
 
     /// 항목별 색상: 카테고리가 있으면 카테고리 색(같은 카테고리=같은 색),
@@ -120,71 +123,98 @@ struct BacklogSection: View {
             HStack {
                 Text("할 일")
                     .font(.headline)
+
+                // '전체 보기'는 제목 바로 옆에 붙인다 — 지금 목록이 **전부가 아니라는 것**을
+                // 제목과 한 호흡에 말해야, 이월된 할 일을 못 보고 지나치지 않는다.
+                //
+                // 테두리 없는 글씨로 두었더니 제목 옆에 붙은 설명처럼 읽혀서
+                // 누를 수 있는 줄 몰랐다. 테두리를 두르고 아이콘을 붙여 버튼으로 세운다.
+                // 이월 개수는 괄호가 아니라 알약 하나로 — 숫자가 글에 섞이지 않게.
+                Button {
+                    showingAllBacklog = true
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "tray.full")
+                            .font(.system(size: 11))
+                        Text("전체 보기")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help("끝낸 것까지 포함한 전체 할 일")
+
                 if !weekItems.isEmpty {
                     Text("\(filteredItems.count)개 · \(formatDuration(filteredItems.reduce(0) { $0 + $1.durationHours }))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+
                 Spacer()
 
-                Button {
-                    showingAllBacklog = true
+                // 시간·분류를 표처럼 한꺼번에 고치는 옛 화면. 적는 통로가 아니라
+                // 이따금 쓰는 정리 도구라 메뉴 안으로 넣는다.
+                Menu {
+                    Button("여러 개 한꺼번에 고치기") { showingComposer = true }
+                        .disabled(!canPlan)
                 } label: {
-                    Text(carryoverCount > 0 ? "전체 보기 (이월 \(carryoverCount))" : "전체 보기")
+                    Image(systemName: "ellipsis.circle")
                 }
-                .buttonStyle(.borderless)
-
-                // 한꺼번에 시간·분류를 손보는 자리. 적는 길은 아래 '+'가 맡으므로
-                // 이쪽은 부차적인 이름을 단다.
-                Button("목록으로 손보기") { showingComposer = true }
-                    .buttonStyle(.borderless)
-                    .disabled(!canPlan)
-
-                // 적는 자리는 이 버튼 하나로 연다. 누르면 목록 맨 위에 줄이 열린다.
-                Button {
-                    beginAdding()
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 13, weight: .semibold))
-                }
-                .buttonStyle(.borderless)
-                .disabled(!canPlan)
-                .help("할 일 적기 (⌘N)")
-                .keyboardShortcut("n", modifiers: .command)
+                .menuStyle(.borderlessButton)
+                .fixedSize()
             }
 
-            // 카테고리 필터 칩
-            if !categories.isEmpty && canPlan {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        FilterChip(label: "전체", color: .secondary,
-                                   selected: filterCategoryID == nil) { filterCategoryID = nil }
-                        ForEach(categories) { c in
-                            FilterChip(label: c.name, color: c.displayColor,
-                                       selected: filterCategoryID == c.uuid) {
-                                filterCategoryID = (filterCategoryID == c.uuid) ? nil : c.uuid
+            // 분류 버튼 줄. 오른쪽 끝이 '새 할 일'을 여는 자리다 —
+            // 분류를 고르고 바로 그 분류로 적는 흐름이 한 줄 안에서 끝난다.
+            //
+            // 이 줄은 **어떤 경우에도 사라지지 않는다.** 고정 루틴이 없어 아직 계획할 수
+            // 없을 때 버튼까지 통째로 없애 봤더니, 화면에 남은 '추가'가 루틴 쪽뿐이라
+            // 할 일을 어디서 적는지 길이 끊겼다. 못 누르는 것과 없는 것은 다르다 —
+            // 흐릿하게 남겨 두고, 왜 못 누르는지는 아래 안내가 말한다.
+            HStack(spacing: 8) {
+                if canPlan {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            FilterChip(label: "전체", color: .secondary,
+                                       selected: filterCategoryID == nil) { filterCategoryID = nil }
+                            ForEach(categories) { c in
+                                FilterChip(label: c.name, color: c.displayColor,
+                                           selected: filterCategoryID == c.uuid) {
+                                    filterCategoryID = (filterCategoryID == c.uuid) ? nil : c.uuid
+                                }
+                            }
+                            if broadcastCount > 0 {
+                                // 분류 버튼의 점은 분류 색(사용자가 고른 정체성)이지만
+                                // 이건 상태 필터라 색으로 의미를 만들지 않는다.
+                                FilterChip(label: "전파 \(broadcastCount)", color: .secondary,
+                                           selected: broadcastOnly) { broadcastOnly.toggle() }
                             }
                         }
-                        if broadcastCount > 0 {
-                            // 카테고리 칩의 점은 카테고리 색(사용자가 고른 정체성)이지만
-                            // 이건 상태 필터라 색으로 의미를 만들지 않는다.
-                            FilterChip(label: "전파 \(broadcastCount)", color: .secondary,
-                                       selected: broadcastOnly) { broadcastOnly.toggle() }
-                        }
+                        .padding(.vertical, 1)
                     }
-                    .padding(.vertical, 1)
+                } else {
+                    Spacer(minLength: 0)
                 }
-            }
 
-            // 적는 줄은 목록 **바로 위**에 열린다. 방금 적은 것이 그 아래에 쌓여
-            // "적었다"가 눈으로 확인되는 자리다.
-            if canPlan && isAdding {
-                newTodoRow
+                // 창이 좁아도, 분류가 많아도 이 버튼은 밀려나지 않는다
+                // (가로 스크롤이 남는 폭을 다 가져가지 못하게 자리를 먼저 잡는다).
+                Button(action: beginAdding) {
+                    Label("새 할 일", systemImage: "plus")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(!canPlan)
+                .fixedSize()
+                .layoutPriority(1)
+                .help(canPlan ? "목록 맨 위에 빈 칸을 만든다 (⌘N)"
+                              : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
+                .keyboardShortcut("n", modifiers: .command)
             }
 
             if !canPlan {
                 lockedNotice
-            } else if filteredItems.isEmpty {
+            } else if filteredItems.isEmpty && !isAdding {
                 emptyState
             } else {
                 LazyVGrid(
@@ -192,6 +222,11 @@ struct BacklogSection: View {
                     alignment: .leading,
                     spacing: 8
                 ) {
+                    // 새 할 일은 목록 **맨 앞 빈 칸**으로 열린다.
+                    // 적을 자리가 목록 안에 이미 생겨 있으니 따로 '추가' 절차가 없다 —
+                    // 그 칸에 적으면 그게 곧 할 일이 된다.
+                    if isAdding { newTodoCard }
+
                     ForEach(filteredItems) { item in
                         BacklogBlock(
                             item: item,
@@ -199,7 +234,6 @@ struct BacklogSection: View {
                             tint: itemColorMap[item.dragToken] ?? .secondary,
                             lane: tree.lane(of: item),
                             isFragment: isFragmentCard(item),
-                            weekNote: weekNote(for: item),
                             planNote: planNote(for: item),
                             steps: stepsInfo(for: item),
                             onAdvance: { advance(item) },
@@ -240,6 +274,13 @@ struct BacklogSection: View {
             }
         }
         .task { await reconcileCategories() }
+        // 안 끝난 일의 주차는 켤 때마다 이번 주로 끌어온다 (아이폰과 같은 규칙).
+        // 요일에 올리기 전의 할 일에는 시간이 없어서, 지난 주에 서 있을 이유가 없다.
+        .onAppear { pullForwardOverdueWeeks() }
+        // 툴바의 '할 일 추가'가 부른 것이면 빈 칸까지 열어 준다.
+        // 창이 이제 뜨는 중이면 onChange가 오지 않으므로 나타날 때도 한 번 본다.
+        .onAppear { consumeComposeRequest() }
+        .onChange(of: composeRequest.ticket) { _, _ in consumeComposeRequest() }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
                 .frame(minWidth: 540, minHeight: 560)
@@ -341,36 +382,27 @@ struct BacklogSection: View {
 
     /// 보고 있는 주가 아닌 항목에만 붙는 주차 표시 ("2주 전" 같은 상대 표기).
     /// 전부 보여주면서도 어느 주에 계획한 일인지는 잃지 않게 한다.
-    private func weekNote(for item: BacklogItem) -> String? {
-        guard !cal.isDate(item.weekStartDate, inSameDayAs: weekStart) else { return nil }
-        let days = cal.dateComponents([.day], from: weekStart, to: item.weekStartDate).day ?? 0
-        let offset = Int((Double(days) / 7).rounded())
-        switch offset {
-        case -1: return "지난 주"
-        case 1: return "다음 주"
-        case let n where n < -1: return "\(-n)주 전"
-        default: return "\(offset)주 후"
-        }
-    }
+    /// 목록 맨 앞의 빈 칸. **적으면 그게 곧 할 일이 된다.**
+    ///
+    /// 예전에는 목록 위에 입력 줄이 따로 열리고 Enter로 '추가'해야 했다.
+    /// 적는 것과 목록이 다른 물건처럼 보여서, 한 줄 적을 때마다 절차를 밟는 느낌이었다.
+    /// 지금은 목록 안에 빈 칸이 하나 생길 뿐이다 — 카드 모양도 크기도 옆의 할 일과 같다.
+    ///
+    /// 받는 것은 이름 하나뿐이다. 분류는 위에서 고른 버튼을 따라가고,
+    /// 시간·단계는 나중에 카드에서 고친다. 적는 순간에 정할 것을 늘리면 적기를 그만두게 된다.
+    private var newTodoCard: some View {
+        HStack(spacing: 7) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(draftTint)
+                .frame(width: 3)
 
-    /// 적는 줄. 이름 하나만 받는다 — 시간도 분류도 나중에 고칠 수 있고,
-    /// 적는 순간에 정할 것을 늘리면 적기를 그만두게 된다.
-    private var newTodoRow: some View {
-        HStack(spacing: 10) {
-            newCategoryMenu
-
-            TextField("할 일을 적고 Enter ↵", text: $newTitle)
+            TextField("할 일", text: $newTitle)
                 .textFieldStyle(.plain)
-                .font(.title3)
+                .font(.system(size: 14, weight: .medium))
                 .focused($addFocused)
-                // Enter는 '추가하고 계속 적기'. 빈 채로 치면 다 적었다는 뜻이라 닫는다.
-                .onSubmit { addTodo() }
-                // Esc로도 닫는다.
+                // Enter를 쳐도 되지만 안 쳐도 된다 — 다른 곳을 누르면 그대로 담긴다.
+                .onSubmit { commitDraft(keepOpen: true) }
                 .onExitCommand { endAdding() }
-
-            Button("추가", action: addTodo)
-                .buttonStyle(.borderless)
-                .disabled(newTitle.trimmingCharacters(in: .whitespaces).isEmpty)
 
             Button(action: endAdding) {
                 Image(systemName: "xmark").font(.system(size: 11))
@@ -379,45 +411,58 @@ struct BacklogSection: View {
             .foregroundStyle(.secondary)
             .help("닫기 (Esc)")
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
-        .background(Self.addingTint, in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Self.addingBorder, lineWidth: 1))
-        .transition(.asymmetric(insertion: .push(from: .top).combined(with: .opacity),
+        .padding(.horizontal, 8)
+        .padding(.vertical, 7)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(draftTint.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(draftTint.opacity(0.55),
+                              style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+        )
+        // 다른 데를 누르면 적던 것이 그대로 담긴다. 빈 칸이면 조용히 사라진다.
+        .onChange(of: addFocused) { _, focused in
+            if !focused { commitDraft(keepOpen: false) }
+        }
+        .transition(.asymmetric(insertion: .scale(scale: 0.96).combined(with: .opacity),
                                 removal: .opacity))
     }
 
-    /// 적는 줄의 분류 고르개. 안 고르면 미분류로 들어간다.
-    private var newCategoryMenu: some View {
-        let current = categories.first { $0.uuid == newCategoryID }
-        return Menu {
-            Button { newCategoryID = nil } label: {
-                Label("미분류", systemImage: newCategoryID == nil ? "checkmark" : "circle")
-            }
-            Divider()
-            ForEach(categories) { c in
-                Button { newCategoryID = c.uuid } label: {
-                    Label(c.name, systemImage: newCategoryID == c.uuid ? "checkmark" : "")
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Circle().fill(current?.displayColor ?? Color.secondary.opacity(0.4))
-                    .frame(width: 9, height: 9)
-                Text(current?.name ?? "미분류").font(.callout)
-                Image(systemName: "chevron.down").font(.system(size: 10)).foregroundStyle(.secondary)
-            }
-        }
-        .menuStyle(.borderlessButton)
-        .fixedSize()
-        .help("이 할 일의 분류")
-    }
-
-    /// 적는 줄을 연다. 켜 둔 필터가 있으면 그 분류를 물려받는다.
+    /// 빈 칸을 연다. 분류는 지금 보고 있는 필터를 그대로 따른다 —
+    /// '업무'만 보고 있었다면 지금 적는 것도 업무다.
     private func beginAdding() {
-        newCategoryID = filterCategoryID
         withAnimation(.easeOut(duration: 0.18)) { isAdding = true }
         addFocused = true
+    }
+
+    /// 안 끝난 일의 주차(`weekStartDate`)를 이번 주로 끌어온다.
+    ///
+    /// 예전에는 '이번 주로' 버튼을 사람이 줄마다 눌렀다. 그런데 안 끝난 일이 지난 주에
+    /// 남아 있다는 사실은 딱지로 말할 것이 아니라 그냥 목록에 서 있으면 되는 것이었다.
+    /// 주차는 이제 결산이 "이번 주에 무엇을 했나"를 세는 자리로만 쓴다.
+    /// **완료한 일은 건드리지 않는다** — 지난 주에 끝낸 것은 지난 주의 셈이다.
+    /// (→ iOS TodoView.pullForwardOverdueWeeks 와 같은 규칙)
+    private func pullForwardOverdueWeeks() {
+        let tree = self.tree
+        let stale = tree.roots.filter {
+            !$0.isCompleted && $0.weekStartDate < weekStart
+                && !cal.isDate($0.weekStartDate, inSameDayAs: weekStart)
+        }
+        guard !stale.isEmpty else { return }
+        for root in stale {
+            // 단계도 부모와 한 덩어리로 같이 옮긴다.
+            for node in tree.subtree(of: root) { node.weekStartDate = weekStart }
+        }
+        try? context.save()
+    }
+
+    /// 다른 창에서 온 '할 일 추가' 신호를 한 번만 받아 빈 칸을 연다.
+    private func consumeComposeRequest() {
+        guard listensForComposeRequest else { return }
+        guard composeRequest.ticket != seenComposeTicket else { return }
+        seenComposeTicket = composeRequest.ticket
+        guard canPlan, !isAdding else { return }
+        beginAdding()
     }
 
     private func endAdding() {
@@ -426,20 +471,24 @@ struct BacklogSection: View {
         withAnimation(.easeOut(duration: 0.18)) { isAdding = false }
     }
 
-    /// 적은 것을 그대로 목록에 얹고, 다음 줄을 이어서 적을 수 있게 둔다.
-    private func addTodo() {
+    /// 적은 것을 할 일로 담는다.
+    /// - Parameter keepOpen: 담고 나서 빈 칸을 하나 더 열어 둘지. Enter로 이어 적을 때만 true.
+    private func commitDraft(keepOpen: Bool) {
         let title = newTitle.trimmingCharacters(in: .whitespaces)
-        // 빈 채로 Enter = 다 적었다.
-        guard !title.isEmpty else { endAdding(); return }
+        guard !title.isEmpty else {
+            if !keepOpen { endAdding() }
+            return
+        }
 
-        let maxIndex = allItems.map(\.sortIndex).max() ?? -1
+        // 새로 적은 것이 맨 앞에 서도록 지금 가장 작은 순서보다 하나 앞에 둔다.
+        let minIndex = allItems.map(\.sortIndex).min() ?? 0
         let item = BacklogItem(title: title,
                                durationHours: TodoTree.defaultStepHours,
-                               sortIndex: maxIndex + 1,
-                               categoryID: newCategoryID,
+                               sortIndex: minIndex - 1,
+                               categoryID: filterCategoryID,
                                weekStartDate: weekStart)
         // 전파 분류로 적은 것은 곧바로 전파 필요가 된다 (계약은 미확정으로 남아 눈에 띈다).
-        if let broadcast = categories.broadcastCategory, newCategoryID == broadcast.uuid {
+        if let broadcast = categories.broadcastCategory, filterCategoryID == broadcast.uuid {
             item.needsBroadcast = true
         }
         withAnimation(.easeOut(duration: 0.18)) {
@@ -447,11 +496,18 @@ struct BacklogSection: View {
             try? context.save()
         }
         newTitle = ""
-        addFocused = true   // 손이 키보드를 떠나지 않게 한다
+        if keepOpen {
+            addFocused = true          // 손이 키보드를 떠나지 않게 둔다
+        } else {
+            withAnimation(.easeOut(duration: 0.18)) { isAdding = false }
+        }
     }
 
-    private static let addingTint = Color(red: 0.55, green: 0.80, blue: 0.45).opacity(0.14)
-    private static let addingBorder = Color(red: 0.55, green: 0.80, blue: 0.45).opacity(0.40)
+    /// 빈 칸의 색. 어느 분류로 적는 중인지 테두리 색이 말한다.
+    private var draftTint: Color {
+        categories.first { $0.uuid == filterCategoryID }?.displayColor
+            ?? Color(red: 0.55, green: 0.80, blue: 0.45)
+    }
 
     private var emptyState: some View {
         HStack(spacing: 8) {
@@ -461,7 +517,7 @@ struct BacklogSection: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
             if weekItems.isEmpty && !isAdding {
-                Button("할 일 적기") { beginAdding() }
+                Button("새 할 일") { beginAdding() }
                     .buttonStyle(.borderless)
             }
             Spacer()
@@ -568,34 +624,77 @@ struct BacklogSection: View {
     }
 }
 
+/// '할 일'을 담는 **따로 선 창**.
+///
+/// 예전에는 주간 화면 맨 아래에 얹힌 한 조각이었다. 그런데 할 일을 적는 일과
+/// 한 주를 짜는 일은 손이 오가는 방향이 다르다 — 적을 때는 목록만 보면 되고,
+/// 배치할 때는 목록과 요일 칸을 **동시에** 봐야 한다. 한 창에 세로로 쌓아 두면
+/// 둘 중 하나는 늘 스크롤 밖에 있다. 창을 따로 세우면 나란히 놓고 끌어다 놓을 수 있다.
+///
+/// 주는 언제나 '이번 주'다. 지난 주를 들추는 일은 '전체 보기'가 맡는다.
+struct TodoWindowView: View {
+    @Query(sort: [SortDescriptor(\BacklogItem.sortIndex), SortDescriptor(\BacklogItem.createdAt)])
+    private var allItems: [BacklogItem]
+
+    private let weekStart: Date = .currentWeekStart
+
+    // 이 창은 **할 일 스토어** 위에 서 있다. 루틴·계획 블록은 다른 스토어에 살아서
+    // @Query로 못 읽는다 — 카드에 붙일 표시에만 쓰는 값이라 그때그때 물어본다.
+    // (→ Stores.swift)
+
+    /// 이번 주의 계획 블록 — 카드에 '어느 요일에 올렸는지'를 붙이는 데 쓴다.
+    private var weekBlocks: [PlanBlock] { PlanStore.shared.blocks(inWeek: weekStart) }
+
+    /// 고정 루틴이 하나라도 있어야 할 일을 계획할 수 있다 (주간 화면과 같은 규칙).
+    private var canPlan: Bool { PlanStore.shared.hasFixedRoutines }
+
+    var body: some View {
+        ScrollView {
+            BacklogSection(allItems: allItems, weekStart: weekStart,
+                           weekBlocks: weekBlocks, canPlan: canPlan)
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(minWidth: 460, minHeight: 420)
+    }
+}
+
 struct FilterChip: View {
     let label: String
     let color: Color
     let selected: Bool
     let onTap: () -> Void
 
+    @State private var hovering = false
+
+    // 안 고른 것도 **눌리는 것처럼** 보여야 한다. 예전에는 배경이 아예 없어서
+    // 고르기 전에는 그냥 적어 둔 글씨로 읽혔다 — 누를 수 있는 줄 모르고 지나쳤다.
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 5) {
                 Circle()
                     .fill(color)
-                    .frame(width: 6, height: 6)
+                    .frame(width: 7, height: 7)
                 Text(label)
-                    .font(.system(size: 14, weight: selected ? .semibold : .regular))
+                    .font(.system(size: 13, weight: selected ? .semibold : .medium))
                     .lineLimit(1)
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 11)
             .padding(.vertical, 5)
             .background(
-                color.opacity(selected ? 0.22 : 0.0),
+                selected ? color.opacity(0.20)
+                         : Color.primary.opacity(hovering ? 0.10 : 0.06),
                 in: Capsule()
             )
             .overlay(
-                Capsule().stroke(color.opacity(selected ? 0.55 : 0.25), lineWidth: selected ? 1 : 0.5)
+                Capsule().stroke(selected ? color.opacity(0.65) : Color.primary.opacity(0.12),
+                                 lineWidth: selected ? 1.2 : 1)
             )
-            .foregroundStyle(selected ? color : .secondary)
+            .foregroundStyle(selected ? color : .primary)
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .onHover { hovering = $0 }
     }
 }
 
@@ -623,8 +722,6 @@ struct BacklogBlock: View {
     var lane: TodoTree.Lane = .planned
     /// 지금 세우고 있는 것이 조각인가. 표시해 둔 것과 같은 연두로 칠한다.
     var isFragment: Bool = false
-    /// 보고 있는 주가 아닐 때 붙는 표시 ("지난 주", "2주 전"). 같은 주면 nil.
-    var weekNote: String? = nil
     /// 이 주에 이미 요일로 올려 둔 경우의 표시 ("화요일"). 안 올렸으면 nil.
     var planNote: String? = nil
     var steps: StepsInfo? = nil
@@ -644,8 +741,6 @@ struct BacklogBlock: View {
     var onToggleNow: () -> Void = { }
 
     @State private var hovering = false
-
-    private var category: BacklogCategory? { categories.first { $0.uuid == item.categoryID } }
 
     /// 카드에는 전파 항목이라는 사실과 급한지 여부만. 어느 시점을 언제 보내는지는
     /// '전파 필요' 섹션이 온전히 보여주므로 여기서 반복하지 않는다.
@@ -732,6 +827,10 @@ struct BacklogBlock: View {
 
                 // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
                 // 단계가 있으면 이 카드를 끌어다 놓을 때 잡히는 건 전체 시간이라 그걸 쓴다.
+                //
+                // 분류 이름은 여기 적지 않는다. 카드 색이 이미 분류를 말하고 있고,
+                // 한 줄에 글씨가 넷씩 붙으면 정작 읽어야 할 시간·요일이 묻힌다.
+                // 무슨 분류인지 확인하고 바꾸는 자리는 카드 오른쪽 클릭 메뉴다.
                 HStack(spacing: 6) {
                     if (lane == .now || isFragment), steps == nil {
                         Image(systemName: "bolt.circle")
@@ -743,18 +842,6 @@ struct BacklogBlock: View {
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
 
-                    if let category {
-                        Text(category.name)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(tint)
-                            .lineLimit(1)
-                    }
-                    if let weekNote {
-                        Text(weekNote)
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
                     // 요일에 올려 둔 할 일. 카드가 백로그에 그대로 남으므로,
                     // "이건 이미 언제 할지 정했다"를 이 칩 하나로 말한다.
                     if let planNote {
@@ -1149,7 +1236,7 @@ struct AllBacklogView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("전체 할 일").font(.title2.weight(.semibold))
-                    Text("지난 주에 못 한 항목을 이번 주로 가져올 수 있습니다")
+                    Text("끝낸 것까지, 주별로 모아 봅니다")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -1182,11 +1269,6 @@ struct AllBacklogView: View {
                                     AllBacklogRow(
                                         item: item,
                                         categories: categories,
-                                        isCurrentWeek: isCurrent(week),
-                                        onCarry: {
-                                            for node in tree.subtree(of: item) { node.weekStartDate = currentWeek }
-                                            try? context.save()
-                                        },
                                         onDelete: {
                                             for node in tree.subtree(of: item) { context.delete(node) }
                                             try? context.save()
@@ -1225,8 +1307,6 @@ struct AllBacklogView: View {
 struct AllBacklogRow: View {
     let item: BacklogItem
     let categories: [BacklogCategory]
-    let isCurrentWeek: Bool
-    let onCarry: () -> Void
     let onDelete: () -> Void
 
     @State private var hovering = false
@@ -1245,13 +1325,6 @@ struct AllBacklogRow: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(String(format: "%.1fh", item.durationHours))
                 .font(.system(size: 13)).foregroundStyle(.secondary).monospacedDigit()
-
-            if !isCurrentWeek && !item.isCompleted {
-                Button("이번 주로", action: onCarry)
-                    .buttonStyle(.borderless)
-                .font(.caption)
-                .help("이 할 일을 이번 주로 가져옵니다")
-            }
 
             Button(role: .destructive, action: onDelete) {
                 Image(systemName: "xmark").font(.system(size: 12))
