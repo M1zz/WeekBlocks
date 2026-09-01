@@ -22,8 +22,13 @@ struct ContentView: View {
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
     @State private var shareStore = ScheduleShareStore.shared
-    /// 전파 계약이 붙은 백로그 항목을 요일에 떨어뜨렸을 때 확인을 받기 위한 보류 상태.
-    @State private var pendingBroadcastDrop: BroadcastDropContext?
+
+    /// 한 주 요약(총량·고정 루틴·남은 자유 시간)을 펼쳐 두었는가. 기본은 접힘.
+    @AppStorage("showsWeekSummary") private var showsWeekSummary = false
+
+    /// 마지막으로 보던 자리. 앱을 다시 켜도 하던 일을 이어서 한다.
+    @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
+    private var weekLens: WeekLens { WeekLens(rawValue: weekLensRaw) ?? .plan }
 
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
@@ -53,16 +58,21 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 weekHeader
-                VStack(alignment: .leading, spacing: 10) {
-                    metricsRow
-                    WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
+                // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
+                if showsWeekSummary {
+                    VStack(alignment: .leading, spacing: 10) {
+                        metricsRow
+                        WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
+                    }
+                    .transition(.asymmetric(insertion: .push(from: .top).combined(with: .opacity),
+                                            removal: .opacity))
                 }
                 // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
                 // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
                 BroadcastPlanSection(allItems: backlogItems, allBlocks: allBlocks)
-                dayTimelineSection
-                weekGridSection
-                BacklogSection(allItems: backlogItems, weekStart: selectedWeek, canPlan: hasFixedRoutines)
+                weekLensSection
+                BacklogSection(allItems: backlogItems, weekStart: selectedWeek,
+                               weekBlocks: weekBlocks, canPlan: hasFixedRoutines)
                 routinesSection
                 // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
                 if !shareStore.received.isEmpty {
@@ -143,35 +153,16 @@ struct ContentView: View {
             Button("추가") { addSampleData() }
             Button("취소", role: .cancel) { }
         } message: {
-            Text("기본 루틴과 샘플 백로그·블록을 추가하시겠습니까?")
+            Text("기본 루틴과 샘플 할 일·블록을 추가하시겠습니까?")
         }
         .alert("모든 데이터 삭제", isPresented: $showingDeleteAllAlert) {
             Button("삭제", role: .destructive) { deleteAllData() }
             Button("취소", role: .cancel) { }
         } message: {
-            Text("루틴·계획 블록·백로그를 모두 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")
+            Text("루틴·계획 블록·할 일을 모두 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")
         }
-        .alert("전파 계약이 있는 할 일입니다",
-               isPresented: Binding(get: { pendingBroadcastDrop != nil },
-                                    set: { if !$0 { pendingBroadcastDrop = nil } })) {
-            Button("배치하고 계약 유지") {
-                if let ctx = pendingBroadcastDrop {
-                    convertBacklogItem(ctx.item, to: ctx.day)
-                }
-                pendingBroadcastDrop = nil
-            }
-            Button("취소", role: .cancel) { pendingBroadcastDrop = nil }
-        } message: {
-            if let ctx = pendingBroadcastDrop {
-                Text("""
-                \(ctx.item.title)
-                \(ctx.item.broadcastCarryOverSummary)
-
-                \(ctx.day.longLabel)에 배치하면 이 할 일은 백로그에서 사라지고 계획 블록이 됩니다. \
-                전파 계약은 블록으로 그대로 넘어가고, '전파 필요' 섹션에도 계속 남습니다.
-                """)
-            }
-        }
+        // 전파 계약이 붙은 할 일을 요일에 떨어뜨릴 때 받던 확인은 걷어냈다 —
+        // 배치해도 할 일이 백로그에 그대로 남으므로 알릴 일이 없어졌다.
         .task {
             if !didSeed {
                 didSeed = true
@@ -254,6 +245,19 @@ struct ContentView: View {
             }
 
             Spacer()
+
+            // 한 주 총량·고정 루틴·남은 자유 시간 요약.
+            // 좋은 숫자지만 **매번 볼 숫자는 아니다** — 한 주에 한 번 확인하면 되는 값이
+            // 화면 맨 위 제일 좋은 자리를 늘 차지하고 있었다. 버튼 뒤로 접고, 접힘 상태를 기억한다.
+            Button {
+                withAnimation(.easeOut(duration: 0.2)) { showsWeekSummary.toggle() }
+            } label: {
+                Label(showsWeekSummary ? "요약 접기" : "요약",
+                      systemImage: "chart.bar.xaxis")
+                    .labelStyle(.titleAndIcon)
+            }
+            .buttonStyle(.borderless)
+            .help("한 주 총량 · 고정 루틴 · 남은 자유 시간")
         }
     }
 
@@ -433,7 +437,8 @@ struct ContentView: View {
         }
         for b in dayBlocks {
             let id = String(describing: b.persistentModelID)
-            entries.append((blockStart[id] ?? b.sortHour, 1, .block(b)))
+            let at = blockStart[id] ?? b.sortHour
+            entries.append((at, 1, .block(b, atHour: at)))
         }
 
         // 시각 같으면 고정 → 블록 → 쿼터 순으로 안정 정렬.
@@ -442,24 +447,59 @@ struct ContentView: View {
             .map(\.item)
     }
 
-    private var dayTimelineSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(timelineWindow.isFullDay
-                     ? "요일별 하루 24시간"
-                     : "요일별 하루 \(Int(timelineWindow.start))–\(Int(timelineWindow.end))시")
-                    .font(.headline)
-                if !timelineWindow.isFullDay {
-                    Text("수면 시간 숨김")
+    /// 한 주를 보는 두 자리. 목적이 다르므로 **한 번에 하나만** 세운다.
+    ///
+    /// 예전에는 '요일별 하루 24시간'과 '이번 주 계획'을 위아래로 함께 깔았다.
+    /// 둘 다 같은 주의 같은 일을 그리지만 묻는 것이 달라서(무엇을 언제 / 하루 어디에),
+    /// 스크롤로 왔다 갔다 하면 지금 무엇을 정하고 있었는지를 놓친다.
+    /// 세그먼트로 가르고, 그 옆에 이 자리가 무엇을 하는 자리인지 한 줄로 적는다.
+    private var weekLensSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Picker("", selection: $weekLensRaw) {
+                    ForEach(WeekLens.allCases) { lens in
+                        Label(lens.rawValue, systemImage: lens.symbol).tag(lens.rawValue)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(maxWidth: 300)
+
+                Text(weekLens.purpose)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer(minLength: 12)
+
+                // 오른쪽 끝에는 그 자리에서만 필요한 범례를 둔다.
+                switch weekLens {
+                case .plan:
+                    Legend()
+                case .day:
+                    Text(timelineLegend)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                Spacer()
-                Text("실선=고정 · 점선=유연 쿼터 · 계획은 빈 구간에")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
 
+            switch weekLens {
+            case .plan: weekGridSection
+            case .day:  dayTimelineSection
+            }
+        }
+    }
+
+    /// 타임라인 오른쪽 끝의 범례. 잘라 보는 중이면 그 사실도 여기서 말한다
+    /// (제목을 세그먼트에 내주었으므로 "6–24시"가 갈 자리가 여기밖에 없다).
+    private var timelineLegend: String {
+        let window = timelineWindow.isFullDay
+            ? "하루 24시간"
+            : "\(Int(timelineWindow.start))–\(Int(timelineWindow.end))시 · 수면 숨김"
+        return "\(window) · 실선=고정 · 점선=유연 쿼터 · 계획은 빈 구간에"
+    }
+
+    private var dayTimelineSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
             HourAxis(window: timelineWindow)
 
             VStack(spacing: 4) {
@@ -487,13 +527,6 @@ struct ContentView: View {
 
     private var weekGridSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Label("이번 주 계획", systemImage: "calendar")
-                    .font(.headline)
-                Spacer()
-                Legend()
-            }
-
             HStack(alignment: .top, spacing: 8) {
                 ForEach(DayOfWeek.allCases) { day in
                     DayColumn(
@@ -587,25 +620,31 @@ struct ContentView: View {
             context.insert(block)
         } else {
             guard let item = backlogItems.first(where: { $0.dragToken == token }) else { return }
-            // 전파 계약이 붙은 항목은 배치하면 백로그에서 사라지므로 먼저 확인을 받는다.
-            // (계약은 블록으로 승계되지만, 백로그에서 찾을 수 없게 되는 건 알려야 한다)
-            if item.needsBroadcast {
-                pendingBroadcastDrop = BroadcastDropContext(item: item, day: day)
-                return
-            }
             convertBacklogItem(item, to: day)
         }
         try? context.save()
     }
 
-    /// 백로그 항목 → 계획 블록. 전파 계약을 그대로 승계한다.
+    /// 백로그 항목 → 계획 블록. **할 일은 백로그에 그대로 남는다.**
     ///
-    /// 단계로 쪼갠 할 일은 **지금 할 단계 하나만** 요일에 올리고 항목은 백로그에 남긴다.
-    /// 남은 단계가 여전히 할 일이기 때문이다. 단계가 없는 할 일은 종전대로
-    /// 통째로 옮겨지고(백로그에서 사라지고) 블록이 그 자리를 대신한다.
+    /// 요일에 올리는 것은 "언제 할지 정했다"는 뜻이지 "할 일이 아니게 됐다"는 뜻이 아니다.
+    /// 블록은 그 할 일이 드리운 그림자고, 원본은 계속 백로그에 있다.
+    ///
+    /// ⚠️ 예전에는 단계가 없는 할 일을 배치하면서 `context.delete(item)`으로 지웠다.
+    ///    그 삭제가 CloudKit을 타고 iOS '욕망의 무지개'까지 건너가, 맥에서 요일에
+    ///    올린 할 일이 아이폰 할 일 목록에서 통째로 사라졌다. iOS는 반대로 배정해도
+    ///    항목을 남긴다(→ ScheduleDensityApp/Services/WeekBlocksStore.swift). 두 앱이
+    ///    같은 스토어를 쓰는 이상 어느 한쪽만 지우면 안 된다. **다시 지우지 말 것.**
+    ///
+    /// 단계로 쪼갠 할 일은 지금 할 단계 하나만 올린다. 남은 단계가 여전히 할 일이기 때문이다.
     private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek) {
         let tree = TodoTree(backlogItems)
         let step = tree.hasChildren(item) ? tree.currentStep(of: item) : nil
+        let title = step.map { "\(item.title) · \($0.title)" } ?? item.title
+
+        // 항목이 백로그에 남으므로 같은 것을 두 번 떨어뜨릴 수 있다.
+        // 같은 주·같은 요일에 이미 올라가 있으면 블록을 새로 만들지 않는다.
+        guard !weekBlocks.contains(where: { $0.day == day && $0.title == title }) else { return }
 
         let block = PlanBlock(
             day: day,
@@ -614,17 +653,15 @@ struct ContentView: View {
                 blocks: weekBlocks.filter { $0.day == day }
             ),
             durationHours: step?.durationHours ?? item.durationHours,
-            title: step.map { "\(item.title) · \($0.title)" } ?? item.title,
+            title: title,
             successCriteria: "",
             deliverable: "",
             weekStartDate: selectedWeek,
             concreteVerified: false
         )
-        // 대상·두 날짜·넘길 형태·이미 보낸 시점까지 통째로 넘긴다.
-        // 보낸 기록을 빼먹으면 이미 보낸 전파를 다시 보내라고 뜬다.
-        item.copyBroadcastContract(to: block)
+        // 전파 계약은 넘기지 않는다 — 항목이 백로그에 남아 계약의 주인으로 계속 서 있다.
+        // 양쪽에 복사하면 '전파 필요' 섹션에 같은 전파가 두 줄로 선다.
         context.insert(block)
-        if step == nil { context.delete(item) }
         try? context.save()
     }
 
@@ -692,6 +729,31 @@ struct ContentView: View {
     }
 }
 
+/// 한 주를 보는 두 자리. 이름이 아니라 **목적**으로 가른다.
+enum WeekLens: String, CaseIterable, Identifiable {
+    /// 무엇을 어느 요일에 할지 정하는 자리 (할 일을 끌어다 놓는 곳).
+    case plan = "이번 주 계획"
+    /// 그 일이 하루의 어디에 들어가는지 보는 자리.
+    case day = "요일별 하루"
+
+    var id: String { rawValue }
+
+    var symbol: String {
+        switch self {
+        case .plan: "calendar"
+        case .day:  "clock"
+        }
+    }
+
+    /// 세그먼트 옆 한 줄. 지금 무엇을 하는 중인지를 잊지 않게 한다.
+    var purpose: String {
+        switch self {
+        case .plan: "무엇을 어느 요일에 할지 정한다 — 할 일을 끌어다 놓는 자리"
+        case .day:  "그 일이 하루 어디에 들어가는지 본다 — 시간이 실제로 있는지"
+        }
+    }
+}
+
 // MARK: Sheet contexts
 
 struct BlockSheetContext: Identifiable {
@@ -703,13 +765,6 @@ struct BlockSheetContext: Identifiable {
 struct RoutineSheetContext: Identifiable {
     let id = UUID()
     let routine: Routine?
-}
-
-/// 전파 계약이 붙은 백로그 항목을 요일에 떨어뜨렸을 때, 확인을 받는 동안 붙잡아 두는 값.
-struct BroadcastDropContext: Identifiable {
-    let id = UUID()
-    let item: BacklogItem
-    let day: DayOfWeek
 }
 
 // MARK: Components

@@ -157,7 +157,10 @@ struct TodoStepsView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(root.title)
                         .font(.title3.weight(.semibold))
-                    if let step = tree.currentStep(of: root) {
+                    // ⚠️ `currentStep`은 자식이 없으면 **자기 자신**을 돌려준다. 안 쪼갠 일에서
+                    //    그것만 보고 세우면 헤더가 제 이름을 두 번 적는다 —
+                    //    "제목 / 지금 단계 / 같은 제목". 쪼갠 일에만 이 줄이 있다.
+                    if tree.hasChildren(root), let step = tree.currentStep(of: root) {
                         HStack(spacing: 6) {
                             // 기호 하나로는 이게 '지금 할 것'이라는 뜻이 안 읽힌다. 말로 적는다.
                             Text("지금 단계")
@@ -170,7 +173,7 @@ struct TodoStepsView: View {
                                 .font(.system(size: 14, weight: .medium))
                                 .lineLimit(1)
                         }
-                    } else if stepCount > 0 {
+                    } else if tree.hasChildren(root) {
                         Label("모든 단계를 마쳤습니다", systemImage: "checkmark.circle.fill")
                             .font(.callout)
                             .foregroundStyle(.green)

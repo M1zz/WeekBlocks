@@ -343,6 +343,12 @@ struct DayTimelineRow: View {
     @State private var dragId: String? = nil
     @State private var dragPx: CGFloat = 0
 
+    /// 그 시각을 0–24 소수 시간으로. (14:30 → 14.5)
+    static func hourOfDay(_ date: Date) -> Double {
+        let c = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60
+    }
+
     private var routineStartOverride: [String: Double] {
         var d: [String: Double] = [:]
         for o in occurrences where o.startHourOverride >= 0 { d[o.routineName] = o.startHourOverride }
@@ -420,6 +426,25 @@ struct DayTimelineRow: View {
                                 .offset(x: x + dragOffset)
                                 .zIndex(seg.id == dragId ? 1 : 0)
                         }
+                    }
+
+                    // 지금 — 오늘 줄에만, 모든 구간 위에 붉은 선 하나.
+                    // 하루 어디까지 왔는지가 이 한 줄로 읽힌다.
+                    if isToday {
+                        TimelineView(.everyMinute) { ctx in
+                            let h = Self.hourOfDay(ctx.date)
+                            ZStack(alignment: .leading) {
+                                if h >= window.start, h <= window.end {
+                                    Rectangle()
+                                        .fill(Color.red)
+                                        .frame(width: 1.5)
+                                        .offset(x: window.x(h, width: w) - 0.75)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        }
+                        .allowsHitTesting(false)
+                        .zIndex(2)
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -625,6 +650,25 @@ struct HourAxis: View {
                             .foregroundStyle(.tertiary)
                             .monospacedDigit()
                             .offset(x: min(w - 14, max(0, window.x(Double(h), width: w))))
+                    }
+
+                    // 축에도 지금을 찍는다 — 줄마다 그은 선이 몇 시인지 여기서 읽는다.
+                    TimelineView(.everyMinute) { ctx in
+                        let h = DayTimelineRow.hourOfDay(ctx.date)
+                        ZStack(alignment: .leading) {
+                            if h >= window.start, h <= window.end {
+                                Text(formatHour(h))
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 1)
+                                    .background(Color.red, in: Capsule())
+                                    // 라벨 가운데가 지금에 오도록 당기고, 양끝에서는 잘리지 않게 잡아둔다.
+                                    .offset(x: min(w - 34, max(0, window.x(h, width: w) - 17)))
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                     }
                 }
             }

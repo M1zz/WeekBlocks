@@ -7,13 +7,23 @@ import SwiftUI
 enum DayPlanItem: Identifiable {
     case fixedRoutine(Routine, occurrenceID: String, atHour: Double, hours: Double)
     case quotaSession(Routine, sessionIndex: Int, atHour: Double)
-    case block(PlanBlock)
+    case block(PlanBlock, atHour: Double)
 
     var id: String {
         switch self {
         case .fixedRoutine(_, let oid, _, _): "fixed:\(oid)"
         case .quotaSession(let r, let idx, _): "quota:\(r.name):\(idx)"
-        case .block(let b): "block:\(String(describing: b.persistentModelID))"
+        case .block(let b, _): "block:\(String(describing: b.persistentModelID))"
+        }
+    }
+
+    /// 이 항목이 하루의 몇 시에 서 있는가. '지금' 선을 어디에 끼울지 여기서 나온다.
+    /// 타임라인이 실제로 그린 시작 시각과 같은 값이라, 두 화면의 순서가 어긋나지 않는다.
+    var atHour: Double {
+        switch self {
+        case .fixedRoutine(_, _, let h, _): h
+        case .quotaSession(_, _, let h): h
+        case .block(_, let h): h
         }
     }
 }
@@ -35,6 +45,46 @@ struct DayColumn: View {
     @State private var isDropTargeted = false
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
+
+    /// 그 시각을 0–24 소수 시간으로. (14:30 → 14.5)
+    static func hourOfDay(_ date: Date) -> Double {
+        let c = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60
+    }
+
+    /// 한 항목의 칩. '지금' 선을 끼우느라 두 곳에서 쓰므로 따로 뺐다.
+    @ViewBuilder
+    private func chip(for item: DayPlanItem) -> some View {
+        switch item {
+        case .fixedRoutine(let routine, _, let atHour, let hours):
+            // 자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 되도록.
+            RoutineChip(routine: routine,
+                        subtitleOverride: "\(formatHour(atHour))  \(String(format: "%.1fh", hours))",
+                        onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
+                onEditRoutine(routine)
+            }
+        case .quotaSession(let routine, _, let atHour):
+            RoutineChip(routine: routine, subtitleOverride: formatHour(atHour),
+                        onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) { onEditRoutine(routine) }
+        case .block(let block, _):
+            BlockChip(block: block) { onEdit(block) }
+        }
+    }
+
+    /// 지금 이 순간의 자리. 시각을 함께 적어 '요일별 하루'의 붉은 선과 같은 값임을 알린다.
+    private func nowMarker(_ hour: Double) -> some View {
+        HStack(spacing: 4) {
+            Circle().fill(Color.red).frame(width: 5, height: 5)
+            Rectangle().fill(Color.red.opacity(0.7)).frame(height: 1)
+            Text(formatHour(hour))
+                .font(.system(size: 10, weight: .semibold))
+                .monospacedDigit()
+                .foregroundStyle(Color.red)
+        }
+        .padding(.vertical, 1)
+        .accessibilityLabel("지금 \(formatHour(hour))")
+    }
+
     private var dayNumber: String {
         let f = DateFormatter()
         f.dateFormat = "d"
@@ -62,20 +112,26 @@ struct DayColumn: View {
             .padding(.bottom, 2)
 
             // 고정 루틴·유연 쿼터·계획 블록을 시각 순으로 섞어, '요일별 하루' 타임라인과 같은 흐름으로 표시.
-            ForEach(items) { item in
-                switch item {
-                case .fixedRoutine(let routine, _, let atHour, let hours):
-                    // 자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 되도록.
-                    RoutineChip(routine: routine,
-                                subtitleOverride: "\(formatHour(atHour))  \(String(format: "%.1fh", hours))",
-                                onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
-                        onEditRoutine(routine)
+            //
+            // 오늘 칸에는 지나간 것과 남은 것 사이에 붉은 '지금' 선이 끼어든다.
+            // 컬럼이 시각 순으로 서 있으므로, 선 위는 이미 지난 계획이고 아래가 남은 계획이다.
+            if isToday {
+                // 분이 바뀌면 선도 한 칸씩 내려간다. 다시 그리는 건 오늘 칸 하나뿐이다.
+                TimelineView(.everyMinute) { ctx in
+                    let now = Self.hourOfDay(ctx.date)
+                    // 지금보다 늦은 첫 항목 **앞**에 선을 끼운다. 그런 항목이 없으면 맨 아래 = 오늘 계획을 다 지났다.
+                    let cut = items.firstIndex { $0.atHour > now } ?? items.count
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                            if index == cut { nowMarker(now) }
+                            chip(for: item)
+                        }
+                        if cut == items.count { nowMarker(now) }
                     }
-                case .quotaSession(let routine, _, let atHour):
-                    RoutineChip(routine: routine, subtitleOverride: formatHour(atHour),
-                                onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) { onEditRoutine(routine) }
-                case .block(let block):
-                    BlockChip(block: block) { onEdit(block) }
+                }
+            } else {
+                ForEach(items) { item in
+                    chip(for: item)
                 }
             }
 

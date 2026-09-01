@@ -7,6 +7,8 @@ struct BacklogSection: View {
 
     let allItems: [BacklogItem]
     let weekStart: Date
+    /// 보고 있는 주의 계획 블록. 요일에 올려 둔 할 일에 표시를 붙이는 데만 쓴다.
+    var weekBlocks: [PlanBlock] = []
     /// 고정 루틴이 확보돼 있을 때만 할 일을 작성할 수 있다.
     var canPlan: Bool = true
 
@@ -20,6 +22,19 @@ struct BacklogSection: View {
     @State private var filterCategoryID: String? = nil   // nil = 전체
     @State private var showingComposer = false
     @State private var showingAllBacklog = false
+
+    // MARK: 적는 자리
+    //
+    // 적으려고 모달을 열고, 적고, 닫고, 다시 카드에서 찾는 왕복이 가장 큰 부담이었다.
+    // 이제 **목록 바로 위에 줄 하나가 열린다** — 적고 Enter를 치면 그 자리에 쌓이고
+    // 입력칸은 비워진 채 그대로 있어 다음 줄을 이어서 적을 수 있다. (iOS 할 일과 같은 규칙)
+    /// 적는 줄이 열려 있는가.
+    @State private var isAdding = false
+    @State private var newTitle = ""
+    /// 새로 적는 줄의 분류. 열 때 켜 둔 필터를 그대로 물려받는다 —
+    /// '업무'만 보고 있었다면 지금 적는 것도 업무일 확률이 높다.
+    @State private var newCategoryID: String? = nil
+    @FocusState private var addFocused: Bool
     /// 전파 필요 항목만 보기.
     @State private var broadcastOnly = false
     @State private var contractSheetItem: BacklogItem?
@@ -103,7 +118,7 @@ struct BacklogSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("백로그")
+                Text("할 일")
                     .font(.headline)
                 if !weekItems.isEmpty {
                     Text("\(filteredItems.count)개 · \(formatDuration(filteredItems.reduce(0) { $0 + $1.durationHours }))")
@@ -115,13 +130,27 @@ struct BacklogSection: View {
                 Button {
                     showingAllBacklog = true
                 } label: {
-                    Text(carryoverCount > 0 ? "전체 백로그 (이월 \(carryoverCount))" : "전체 백로그")
+                    Text(carryoverCount > 0 ? "전체 보기 (이월 \(carryoverCount))" : "전체 보기")
                 }
                 .buttonStyle(.borderless)
 
-                Button("할 일 작성") { showingComposer = true }
+                // 한꺼번에 시간·분류를 손보는 자리. 적는 길은 아래 '+'가 맡으므로
+                // 이쪽은 부차적인 이름을 단다.
+                Button("목록으로 손보기") { showingComposer = true }
                     .buttonStyle(.borderless)
                     .disabled(!canPlan)
+
+                // 적는 자리는 이 버튼 하나로 연다. 누르면 목록 맨 위에 줄이 열린다.
+                Button {
+                    beginAdding()
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .buttonStyle(.borderless)
+                .disabled(!canPlan)
+                .help("할 일 적기 (⌘N)")
+                .keyboardShortcut("n", modifiers: .command)
             }
 
             // 카테고리 필터 칩
@@ -147,6 +176,12 @@ struct BacklogSection: View {
                 }
             }
 
+            // 적는 줄은 목록 **바로 위**에 열린다. 방금 적은 것이 그 아래에 쌓여
+            // "적었다"가 눈으로 확인되는 자리다.
+            if canPlan && isAdding {
+                newTodoRow
+            }
+
             if !canPlan {
                 lockedNotice
             } else if filteredItems.isEmpty {
@@ -163,7 +198,9 @@ struct BacklogSection: View {
                             categories: categories,
                             tint: itemColorMap[item.dragToken] ?? .secondary,
                             lane: tree.lane(of: item),
+                            isFragment: isFragmentCard(item),
                             weekNote: weekNote(for: item),
+                            planNote: planNote(for: item),
                             steps: stepsInfo(for: item),
                             onAdvance: { advance(item) },
                             onRewind: { rewind(item) },
@@ -218,6 +255,17 @@ struct BacklogSection: View {
         .sheet(item: $stepsSheetItem) { item in
             TodoStepsView(root: item)
         }
+    }
+
+    /// 이 카드가 지금 세우고 있는 것이 조각인가 — 앱 판정까지 포함해서 본다.
+    /// 표시해 둔 것(lane == .now)과 같은 연두로 칠한다. 둘 다 "그냥 집으면 된다"는 뜻이다.
+    private func isFragmentCard(_ item: BacklogItem) -> Bool {
+        let tree = self.tree
+        guard let step = tree.markedStep(of: item) ?? tree.currentStep(of: item) ?? Optional(item)
+        else { return false }
+        return TodoSplitAdvisor.advice(title: step.title,
+                                       durationHours: step.durationHours,
+                                       pick: step.fragmentPick).isFragment
     }
 
     /// 카드에 그릴 단계 요약. 단계가 없으면 nil.
@@ -275,6 +323,22 @@ struct BacklogSection: View {
         }
     }
 
+    /// 이 할 일을 이 주의 어느 요일에 올려 뒀는지. 안 올렸으면 nil.
+    ///
+    /// 요일에 올려도 할 일은 백로그에 남는다(→ ContentView의 `convertBacklogItem`).
+    /// 그래서 카드만 보면 올렸는지 아닌지를 알 수 없다 — 이 표시가 그 자리를 메운다.
+    /// 블록과 항목을 잇는 식별자가 스키마에 없어 **제목으로 맞춘다**(iOS도 같은 방식).
+    /// 단계를 올린 블록은 "할 일 · 단계" 꼴이라 접두어까지 함께 본다.
+    private func planNote(for item: BacklogItem) -> String? {
+        let prefix = item.title + " · "
+        let days = weekBlocks
+            .filter { $0.title == item.title || $0.title.hasPrefix(prefix) }
+            .map(\.day)
+        guard let first = days.min(by: { $0.rawValue < $1.rawValue }) else { return nil }
+        let others = Set(days).count - 1
+        return others > 0 ? "\(first.shortLabel) +\(others)" : first.longLabel
+    }
+
     /// 보고 있는 주가 아닌 항목에만 붙는 주차 표시 ("2주 전" 같은 상대 표기).
     /// 전부 보여주면서도 어느 주에 계획한 일인지는 잃지 않게 한다.
     private func weekNote(for item: BacklogItem) -> String? {
@@ -289,15 +353,115 @@ struct BacklogSection: View {
         }
     }
 
+    /// 적는 줄. 이름 하나만 받는다 — 시간도 분류도 나중에 고칠 수 있고,
+    /// 적는 순간에 정할 것을 늘리면 적기를 그만두게 된다.
+    private var newTodoRow: some View {
+        HStack(spacing: 10) {
+            newCategoryMenu
+
+            TextField("할 일을 적고 Enter ↵", text: $newTitle)
+                .textFieldStyle(.plain)
+                .font(.title3)
+                .focused($addFocused)
+                // Enter는 '추가하고 계속 적기'. 빈 채로 치면 다 적었다는 뜻이라 닫는다.
+                .onSubmit { addTodo() }
+                // Esc로도 닫는다.
+                .onExitCommand { endAdding() }
+
+            Button("추가", action: addTodo)
+                .buttonStyle(.borderless)
+                .disabled(newTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+
+            Button(action: endAdding) {
+                Image(systemName: "xmark").font(.system(size: 11))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .help("닫기 (Esc)")
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Self.addingTint, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Self.addingBorder, lineWidth: 1))
+        .transition(.asymmetric(insertion: .push(from: .top).combined(with: .opacity),
+                                removal: .opacity))
+    }
+
+    /// 적는 줄의 분류 고르개. 안 고르면 미분류로 들어간다.
+    private var newCategoryMenu: some View {
+        let current = categories.first { $0.uuid == newCategoryID }
+        return Menu {
+            Button { newCategoryID = nil } label: {
+                Label("미분류", systemImage: newCategoryID == nil ? "checkmark" : "circle")
+            }
+            Divider()
+            ForEach(categories) { c in
+                Button { newCategoryID = c.uuid } label: {
+                    Label(c.name, systemImage: newCategoryID == c.uuid ? "checkmark" : "")
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Circle().fill(current?.displayColor ?? Color.secondary.opacity(0.4))
+                    .frame(width: 9, height: 9)
+                Text(current?.name ?? "미분류").font(.callout)
+                Image(systemName: "chevron.down").font(.system(size: 10)).foregroundStyle(.secondary)
+            }
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help("이 할 일의 분류")
+    }
+
+    /// 적는 줄을 연다. 켜 둔 필터가 있으면 그 분류를 물려받는다.
+    private func beginAdding() {
+        newCategoryID = filterCategoryID
+        withAnimation(.easeOut(duration: 0.18)) { isAdding = true }
+        addFocused = true
+    }
+
+    private func endAdding() {
+        newTitle = ""
+        addFocused = false
+        withAnimation(.easeOut(duration: 0.18)) { isAdding = false }
+    }
+
+    /// 적은 것을 그대로 목록에 얹고, 다음 줄을 이어서 적을 수 있게 둔다.
+    private func addTodo() {
+        let title = newTitle.trimmingCharacters(in: .whitespaces)
+        // 빈 채로 Enter = 다 적었다.
+        guard !title.isEmpty else { endAdding(); return }
+
+        let maxIndex = allItems.map(\.sortIndex).max() ?? -1
+        let item = BacklogItem(title: title,
+                               durationHours: TodoTree.defaultStepHours,
+                               sortIndex: maxIndex + 1,
+                               categoryID: newCategoryID,
+                               weekStartDate: weekStart)
+        // 전파 분류로 적은 것은 곧바로 전파 필요가 된다 (계약은 미확정으로 남아 눈에 띈다).
+        if let broadcast = categories.broadcastCategory, newCategoryID == broadcast.uuid {
+            item.needsBroadcast = true
+        }
+        withAnimation(.easeOut(duration: 0.18)) {
+            context.insert(item)
+            try? context.save()
+        }
+        newTitle = ""
+        addFocused = true   // 손이 키보드를 떠나지 않게 한다
+    }
+
+    private static let addingTint = Color(red: 0.55, green: 0.80, blue: 0.45).opacity(0.14)
+    private static let addingBorder = Color(red: 0.55, green: 0.80, blue: 0.45).opacity(0.40)
+
     private var emptyState: some View {
         HStack(spacing: 8) {
             Text(weekItems.isEmpty
                  ? "할 일이 아직 없습니다."
-                 : "이 카테고리엔 할 일이 없습니다.")
+                 : "이 분류엔 할 일이 없습니다.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
-            if weekItems.isEmpty {
-                Button("할 일 작성") { showingComposer = true }
+            if weekItems.isEmpty && !isAdding {
+                Button("할 일 적기") { beginAdding() }
                     .buttonStyle(.borderless)
             }
             Spacer()
@@ -455,10 +619,14 @@ struct BacklogBlock: View {
     let item: BacklogItem
     let categories: [BacklogCategory]
     let tint: Color
-    /// 이 카드가 어느 자리에 서는가. 배경색이 여기서 나온다 (iOS 목록의 띠와 같은 규칙).
+    /// 이 카드가 어느 자리에 서는가. 순서가 여기서 나온다 (iOS 목록의 띠와 같은 규칙).
     var lane: TodoTree.Lane = .planned
+    /// 지금 세우고 있는 것이 조각인가. 표시해 둔 것과 같은 연두로 칠한다.
+    var isFragment: Bool = false
     /// 보고 있는 주가 아닐 때 붙는 표시 ("지난 주", "2주 전"). 같은 주면 nil.
     var weekNote: String? = nil
+    /// 이 주에 이미 요일로 올려 둔 경우의 표시 ("화요일"). 안 올렸으면 nil.
+    var planNote: String? = nil
     var steps: StepsInfo? = nil
     /// 지금 할 단계를 끝내고 다음으로 넘기기.
     var onAdvance: () -> Void = { }
@@ -506,6 +674,7 @@ struct BacklogBlock: View {
     /// 카드 배경. 성질이 곧 색이다.
     ///   바로 하면 되는 일 → 연두, 그냥 하면 되는 것 → 회색, 나머지 → 카테고리 색.
     private var laneBackground: Color {
+        if isFragment { return Self.nowGreen.opacity(0.18) }
         switch lane {
         case .now:     return Self.nowGreen.opacity(0.18)
         case .errand:  return Color.secondary.opacity(0.09)
@@ -514,6 +683,7 @@ struct BacklogBlock: View {
     }
 
     private var laneBorder: Color {
+        if isFragment { return Self.nowGreen.opacity(0.45) }
         switch lane {
         case .now:     return Self.nowGreen.opacity(0.45)
         case .errand:  return Color.secondary.opacity(0.25)
@@ -541,11 +711,11 @@ struct BacklogBlock: View {
                             // 표시해 둔 단계는 원 안의 번개로 — 색만으로는 흑백에서 사라진다.
                             Image(systemName: steps.currentTitle == nil
                                   ? "checkmark.circle.fill"
-                                  : (steps.isMarked ? "bolt.circle" : "arrowtriangle.right.circle.fill"))
+                                  : ((steps.isMarked || isFragment) ? "bolt.circle" : "arrowtriangle.right.circle.fill"))
                                 .font(.system(size: 13))
                                 .foregroundStyle(steps.currentTitle == nil
                                                  ? Color.green
-                                                 : (steps.isMarked ? Self.nowGreen : Color.orange))
+                                                 : ((steps.isMarked || isFragment) ? Self.nowGreen : Color.orange))
                             Text(steps.currentTitle ?? "모든 단계 완료")
                                 .font(.system(size: 13, weight: .medium))
                                 .lineLimit(1)
@@ -563,7 +733,7 @@ struct BacklogBlock: View {
                 // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
                 // 단계가 있으면 이 카드를 끌어다 놓을 때 잡히는 건 전체 시간이라 그걸 쓴다.
                 HStack(spacing: 6) {
-                    if lane == .now, steps == nil {
+                    if (lane == .now || isFragment), steps == nil {
                         Image(systemName: "bolt.circle")
                             .font(.system(size: 13))
                             .foregroundStyle(Self.nowGreen)
@@ -584,6 +754,21 @@ struct BacklogBlock: View {
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
+                    }
+                    // 요일에 올려 둔 할 일. 카드가 백로그에 그대로 남으므로,
+                    // "이건 이미 언제 할지 정했다"를 이 칩 하나로 말한다.
+                    if let planNote {
+                        HStack(spacing: 3) {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 11))
+                            Text(planNote)
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        .foregroundStyle(tint)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .background(tint.opacity(0.16), in: Capsule())
+                        .lineLimit(1)
                     }
                     if let broadcastMark {
                         Text(broadcastMark)
@@ -963,7 +1148,7 @@ struct AllBacklogView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("전체 백로그").font(.title2.weight(.semibold))
+                    Text("전체 할 일").font(.title2.weight(.semibold))
                     Text("지난 주에 못 한 항목을 이번 주로 가져올 수 있습니다")
                         .font(.caption).foregroundStyle(.secondary)
                 }
@@ -976,7 +1161,7 @@ struct AllBacklogView: View {
 
             if rootItems.isEmpty {
                 Spacer()
-                Text("백로그가 비어 있습니다.").foregroundStyle(.secondary)
+                Text("할 일이 비어 있습니다.").foregroundStyle(.secondary)
                 Spacer()
             } else {
                 ScrollView {
@@ -1065,7 +1250,7 @@ struct AllBacklogRow: View {
                 Button("이번 주로", action: onCarry)
                     .buttonStyle(.borderless)
                 .font(.caption)
-                .help("이 항목을 이번 주 백로그로 가져옵니다")
+                .help("이 할 일을 이번 주로 가져옵니다")
             }
 
             Button(role: .destructive, action: onDelete) {

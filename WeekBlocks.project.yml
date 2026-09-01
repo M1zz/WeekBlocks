@@ -46,7 +46,16 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp
-        PRODUCT_NAME: "$(TARGET_NAME)"
+        # ⚠️ 번들 이름이 곧 사람이 찾는 이름이다.
+        #    스포트라이트의 앱 검색은 파일명(`무지개 공방.app`)과 CFBundleName으로 잡는다.
+        #    CFBundleDisplayName만 한글로 두면 독과 파인더에만 '무지개 공방'으로 보이고,
+        #    정작 스포트라이트에서는 'WeekBlocks'로만 찾아진다. 그래서 PRODUCT_NAME을 바꾼다.
+        PRODUCT_NAME: "무지개 공방"
+        # 번들 이름과 달리 **실행 파일·모듈 이름은 ASCII로 못박는다.**
+        # PRODUCT_NAME을 따라가게 두면 바이너리가 '무지개 공방', 스위프트 모듈이
+        # '무지개_공방'이 되어 크래시 리포트·ps·로그 필터가 전부 읽기 어려워진다.
+        EXECUTABLE_NAME: WeekBlocks
+        PRODUCT_MODULE_NAME: WeekBlocks
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: WeekBlocks/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: "무지개 공방"

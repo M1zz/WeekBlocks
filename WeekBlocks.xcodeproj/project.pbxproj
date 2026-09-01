@@ -412,6 +412,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				EXECUTABLE_NAME = WeekBlocks;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeekBlocks/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "무지개 공방";
@@ -422,7 +423,8 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = WeekBlocks;
+				PRODUCT_NAME = "무지개 공방";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -499,6 +501,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				EXECUTABLE_NAME = WeekBlocks;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeekBlocks/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "무지개 공방";
@@ -509,7 +512,8 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = WeekBlocks;
+				PRODUCT_NAME = "무지개 공방";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
