@@ -30,7 +30,12 @@ struct TodoTree {
     /// 사람이 손으로 만드는 단계 구조가 이보다 깊을 일은 없다.
     static let maxDepth = 12
 
-    init(_ items: [BacklogItem]) {
+    /// ⚠️ **감추는 자리는 여기 하나뿐이다** (→ TodoSharing.swift).
+    ///    잠긴 아이폰이 적어 둔 줄은 이 기기에서 그리지 않는다. 목록·주간 화면·결산이
+    ///    전부 이 트리에서 나오므로 여기서 한 번 거르면 어디에도 안 샌다.
+    ///    화면마다 조건을 따로 쓰면 반드시 어딘가는 새어 보인다.
+    init(_ unfiltered: [BacklogItem]) {
+        let items = unfiltered.filter(TodoSharing.isVisible)
         // 토큰 → 항목 사전을 먼저 만든다. 예전에는 부모를 찾을 때마다 목록을 처음부터
         // 훑어서(items.first) 단계가 많아질수록 제곱으로 느려졌다. 이 사전은 한 번만 돈다.
         var itemsByToken: [String: BacklogItem] = [:]
@@ -246,6 +251,7 @@ extension TodoTree {
                                sortIndex: sortIndex,
                                categoryID: parent.categoryID,
                                weekStartDate: parent.weekStartDate)
+        TodoSharing.stamp(step)
         step.parentToken = parent.dragToken
         return step
     }

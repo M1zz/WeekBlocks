@@ -433,6 +433,9 @@ struct BacklogSection: View {
     /// 빈 칸을 연다. 분류는 지금 보고 있는 필터를 그대로 따른다 —
     /// '업무'만 보고 있었다면 지금 적는 것도 업무다.
     private func beginAdding() {
+        // 잠긴 기기에서는 적는 자리를 열지 않는다 (→ TodoAccess.swift).
+        // 버튼이 여러 곳에 있어서, 들머리 한 곳에서 막는 것이 새지 않는다.
+        guard TodoAccess.canEdit else { return }
         withAnimation(.easeOut(duration: 0.18)) { isAdding = true }
         addFocused = true
     }
@@ -459,6 +462,7 @@ struct BacklogSection: View {
                                sortIndex: minIndex - 1,
                                categoryID: filterCategoryID,
                                weekStartDate: weekStart)
+        TodoSharing.stamp(item)
         withAnimation(.easeOut(duration: 0.18)) {
             context.insert(item)
             try? context.save()
@@ -578,6 +582,7 @@ struct BacklogSection: View {
                 .foregroundStyle(.secondary)
             if weekItems.isEmpty && !isAdding {
                 Button("새 할 일") { beginAdding() }
+                    .disabled(!TodoAccess.canEdit)
                     .buttonStyle(.borderless)
             }
             Spacer()
@@ -1046,6 +1051,7 @@ struct BacklogComposerView: View {
         let item = BacklogItem(title: t, durationHours: TodoTree.defaultStepHours,
                                sortIndex: maxIndex + 1,
                                categoryID: defaultCategoryID, weekStartDate: weekStart)
+        TodoSharing.stamp(item)
         context.insert(item)
         try? context.save()
         newTitle = ""

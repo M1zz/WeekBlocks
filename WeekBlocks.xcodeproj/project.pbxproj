@@ -34,8 +34,11 @@
 		82F6C212A68907007B4A9F96 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8A00620F11E5E0DA035BC8 /* ShareViewController.swift */; };
 		837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EB398D348B2377FA8540BF /* WeekGridView.swift */; };
 		83DE0994DCC6B215222A482D /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DAA819E703DC5BE377B3688 /* Routine.swift */; };
+		8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7826FECD3C214B59C8E531EB /* MacEntitlement.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
+		AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526E2EF2A25551766D802F91 /* TodoSharing.swift */; };
 		ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */; };
+		B121540A19F0977281258CD9 /* TodoAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB645C90135FC303A3A31FA0 /* TodoAccess.swift */; };
 		B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */; };
 		B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD35C8D5A757450762EFDC34 /* TodoTips.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
@@ -83,12 +86,14 @@
 		46C009263003E5FA4C9F764D /* WeekBlocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeekBlocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		482967041DBF8581050A3138 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
 		50CC675B4E440CD50573C3A4 /* Stores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores.swift; sourceTree = "<group>"; };
+		526E2EF2A25551766D802F91 /* TodoSharing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSharing.swift; sourceTree = "<group>"; };
 		5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5CC172BAFFE573306711B4CE /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
 		5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BacklogItem+Fragment.swift"; sourceTree = "<group>"; };
 		622A5D436D0F426C007C5246 /* ShareTodoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTodoView.swift; sourceTree = "<group>"; };
 		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
+		7826FECD3C214B59C8E531EB /* MacEntitlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacEntitlement.swift; sourceTree = "<group>"; };
 		7970A4DA39D1705294090BDC /* TodoShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodoShare.entitlements; sourceTree = "<group>"; };
 		8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSplitAdvisor.swift; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
@@ -98,6 +103,7 @@
 		9FCA2B090B06BBF2FEE2C830 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A47970A792B8AE57E021D9CB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		AA8A00620F11E5E0DA035BC8 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		AB645C90135FC303A3A31FA0 /* TodoAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoAccess.swift; sourceTree = "<group>"; };
 		B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoShareInbox.swift; sourceTree = "<group>"; };
 		B30E4F0DBDE964141EDE57D1 /* TodoShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TodoShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStepsView.swift; sourceTree = "<group>"; };
@@ -158,6 +164,7 @@
 				E29F659737698D0D348D6468 /* ContentView.swift */,
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
 				C368657EE69104A4BA70BA52 /* Info.plist */,
+				7826FECD3C214B59C8E531EB /* MacEntitlement.swift */,
 				CC4A396C6929CB1C576DBA52 /* Models.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
 				45EF8BFE32D234EF9576302C /* ReflectionView.swift */,
@@ -171,8 +178,10 @@
 				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
 				50CC675B4E440CD50573C3A4 /* Stores.swift */,
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
+				AB645C90135FC303A3A31FA0 /* TodoAccess.swift */,
 				B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */,
 				1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */,
+				526E2EF2A25551766D802F91 /* TodoSharing.swift */,
 				8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */,
 				C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */,
 				CD35C8D5A757450762EFDC34 /* TodoTips.swift */,
@@ -302,6 +311,7 @@
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,
 				55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */,
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
+				8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */,
 				12DCD47B097FBED701EECC11 /* Models.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
 				33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */,
@@ -315,8 +325,10 @@
 				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
 				032C842F55D754CDF99B7CEF /* Stores.swift in Sources */,
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
+				B121540A19F0977281258CD9 /* TodoAccess.swift in Sources */,
 				4EA685D4C9D593CD84458458 /* TodoShareInbox.swift in Sources */,
 				B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */,
+				AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */,
 				67A12313C3A920C6F3B8C092 /* TodoSplitAdvisor.swift in Sources */,
 				ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */,
 				B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */,
@@ -472,7 +484,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -567,7 +579,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

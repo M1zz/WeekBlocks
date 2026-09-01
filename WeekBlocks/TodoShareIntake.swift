@@ -26,10 +26,13 @@ enum TodoShareIntake {
             .map(\.sortIndex).max().map { $0 + 1 } ?? 0
 
         for draft in drafts {
-            context.insert(BacklogItem(title: draft.title,
-                                       durationHours: TodoTree.defaultStepHours,
-                                       sortIndex: nextIndex,
-                                       weekStartDate: .currentWeekStart))
+            // 공유로 받은 것도 이 기기에서 난 줄이다 (→ TodoSharing.swift).
+            let made = BacklogItem(title: draft.title,
+                                   durationHours: TodoTree.defaultStepHours,
+                                   sortIndex: nextIndex,
+                                   weekStartDate: .currentWeekStart)
+            TodoSharing.stamp(made)
+            context.insert(made)
             nextIndex += 1
         }
 
