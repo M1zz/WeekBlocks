@@ -6,10 +6,8 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routines: [Routine]
     @Query private var allBlocks: [PlanBlock]
-    // 할 일(BacklogItem·BacklogCategory)은 **다른 스토어**에 있다 (→ Stores.swift).
-    // 이 화면은 계획 스토어 위에 서 있어서 @Query로 못 읽는다 —
-    // 목록을 그리는 자리는 TodosPane이 할 일 스토어 위에 따로 세우고,
-    // 카드 하나를 집어 오는 일만 TodoStore에 물어본다.
+    @Query(sort: [SortDescriptor(\BacklogItem.sortIndex), SortDescriptor(\BacklogItem.createdAt)])
+    private var backlogItems: [BacklogItem]
     @Query private var allOccurrences: [RoutineOccurrence]
     @Query private var allQuotaPlacements: [QuotaPlacement]
 
@@ -32,10 +30,6 @@ struct ContentView: View {
     /// 마지막으로 보던 자리. 앱을 다시 켜도 하던 일을 이어서 한다.
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
     private var weekLens: WeekLens { WeekLens(rawValue: weekLensRaw) ?? .plan }
-
-    /// 자리를 옮길 때 어느 쪽으로 넘어가는가. 세그먼트의 오른쪽 칸으로 가면 true.
-    /// 넘어가는 방향이 화면에서도 같아야 "옆으로 옮겼다"가 몸으로 읽힌다.
-    @State private var lensForward = true
 
     /// 툴바 '할 일 추가' 신호 — 목록으로 데려가는 쪽은 여기서 듣는다.
     /// (빈 칸을 여는 쪽은 BacklogSection이 같은 신호를 듣는다.)
@@ -84,18 +78,19 @@ struct ContentView: View {
                     }
                     // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
                     // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
-                    // 할 일 목록은 **끌어다 놓을 자리 바로 위에** 있어야 한다.
-                    // 따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
-                    // 넣을 카드가 아예 보이지 않았다. 창(⇧⌘T)은 나란히 놓고 쓰고 싶을 때 쓰고,
-                    // 이 자리는 "지금 이 주에 넣을 것"을 손 닿는 곳에 둔다.
-                    //
-                    // 할 일은 다른 스토어에 살므로 이 안쪽만 그 스토어 위에 세운다.
-                    TodosPane(weekStart: selectedWeek,
-                              weekBlocks: weekBlocks,
-                              allBlocks: allBlocks,
-                              canPlan: hasFixedRoutines)
-                        .id(Self.todosAnchor)
+                    BroadcastPlanSection(allItems: backlogItems, allBlocks: allBlocks)
                     weekLensSection
+                    // 할 일 목록은 한 주를 보는 자리 **아래**에 둔다.
+                    // 먼저 이번 주가 어떻게 생겼는지 보고, 그다음 무엇을 끌어다 놓을지 고른다.
+                    // (따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
+                    //  넣을 카드가 아예 보이지 않았다. 창 ⇧⌘T 는 나란히 놓고 쓰고 싶을 때.)
+                    BacklogSection(allItems: backlogItems,
+                                   weekStart: selectedWeek,
+                                   weekBlocks: weekBlocks,
+                                   canPlan: hasFixedRoutines,
+                                   showsCategoryFilter: false,
+                                   listensForComposeRequest: true)
+                        .id(Self.todosAnchor)
                     routinesSection
                     // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
                     if !shareStore.received.isEmpty {
@@ -561,27 +556,26 @@ struct ContentView: View {
         }
     }
 
-    /// 세그먼트를 누르면 값만 바뀌는 게 아니라 **어느 쪽으로 넘어가는지**도 함께 정해진다.
-    /// (onChange로 뒤늦게 알아내면 방향이 한 박자 늦게 반영된다.)
+    /// 세그먼트를 누르면 값이 애니메이션과 함께 바뀐다.
     private var lensBinding: Binding<String> {
         Binding(
             get: { weekLensRaw },
             set: { newValue in
-                let from = weekLens
-                let to = WeekLens(rawValue: newValue) ?? .plan
-                guard from != to else { return }
-                lensForward = to.order > from.order
+                guard newValue != weekLensRaw else { return }
                 withAnimation(.snappy(duration: 0.3)) { weekLensRaw = newValue }
             }
         )
     }
 
     /// 나가는 쪽과 들어오는 쪽이 같은 방향으로 흐른다 — 한 장을 옆으로 넘기는 결.
+    /// 방향은 따로 기억하지 않는다. 두 칸짜리 세그먼트에서는 **지금 선 자리**가 곧 방향이다
+    /// (오른쪽 칸으로 갔으면 오른쪽에서 들어온다).
     /// 밀리는 거리는 짧게(28pt) 둔다. 화면이 통째로 날아다니면 산만하다.
     private var lensTransition: AnyTransition {
-        .asymmetric(
-            insertion: .offset(x: lensForward ? 28 : -28).combined(with: .opacity),
-            removal: .offset(x: lensForward ? -28 : 28).combined(with: .opacity)
+        let forward = (weekLens == .day)
+        return .asymmetric(
+            insertion: .offset(x: forward ? 28 : -28).combined(with: .opacity),
+            removal: .offset(x: forward ? -28 : 28).combined(with: .opacity)
         )
     }
 
@@ -730,7 +724,7 @@ struct ContentView: View {
             )
             context.insert(block)
         } else {
-            guard let item = TodoStore.shared.item(dragToken: token) else { return }
+            guard let item = backlogItems.first(where: { $0.dragToken == token }) else { return }
             convertBacklogItem(item, to: day, atHour: atHour)
         }
         try? context.save()
@@ -741,10 +735,12 @@ struct ContentView: View {
         min(max(0, hour), max(0, 24 - duration))
     }
 
-    /// 백로그 항목 → 계획 블록. **할 일은 백로그에 그대로 남는다.**
+    /// 백로그 항목 → 계획 블록. **항목은 지우지 않는다. 목록에서 내릴 뿐이다.**
     ///
-    /// 요일에 올리는 것은 "언제 할지 정했다"는 뜻이지 "할 일이 아니게 됐다"는 뜻이 아니다.
-    /// 블록은 그 할 일이 드리운 그림자고, 원본은 계속 백로그에 있다.
+    /// 요일에 올린 일은 할 일 목록에서 빠진다 — 언제 할지 정한 것과 아직 안 정한 것이
+    /// 섞이면 "무엇을 정해야 하는가"가 흐려지기 때문이다(→ BacklogSection.filteredItems).
+    /// 하지만 **레코드는 그대로 남는다.** 블록을 지우면 다시 목록에 서고,
+    /// 끝냈는지는 '요일에 올린 일'에서 체크한다.
     ///
     /// ⚠️ 예전에는 단계가 없는 할 일을 배치하면서 `context.delete(item)`으로 지웠다.
     ///    그 삭제가 CloudKit을 타고 iOS '욕망의 무지개'까지 건너가, 맥에서 요일에
@@ -754,7 +750,7 @@ struct ContentView: View {
     ///
     /// 단계로 쪼갠 할 일은 지금 할 단계 하나만 올린다. 남은 단계가 여전히 할 일이기 때문이다.
     private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek, atHour: Double? = nil) {
-        let tree = TodoTree(TodoStore.shared.allItems())
+        let tree = TodoTree(backlogItems)
         let step = tree.hasChildren(item) ? tree.currentStep(of: item) : nil
         let title = step.map { "\(item.title) · \($0.title)" } ?? item.title
 
@@ -818,20 +814,27 @@ struct ContentView: View {
     ///    (→ BacklogSection.reconcileCategories 와 같은 규칙)
     @MainActor
     private func seedDefaultsIfNeeded() async {
-        let seededKey = "didSeedDefaultRoutines"
-        guard !UserDefaults.standard.bool(forKey: seededKey) else { return }
+        guard !UserDefaults.standard.bool(forKey: Self.seededKey) else { return }
         guard routines.isEmpty else {
-            UserDefaults.standard.set(true, forKey: seededKey)   // 이미 쓰던 사람
+            UserDefaults.standard.set(true, forKey: Self.seededKey)   // 이미 쓰던 사람
             return
         }
         try? await Task.sleep(nanoseconds: 3_000_000_000)
         // 기다린 뒤에는 @Query가 아니라 스토어에 직접 묻는다 —
         // 기다리는 동안 뷰가 새로 만들어져 손에 든 값이 옛것일 수 있다.
         guard PlanStore.shared.fetch(Routine.self).isEmpty else { return }
-        UserDefaults.standard.set(true, forKey: seededKey)
+        seedDefaults()
+    }
+
+    /// 기본 루틴을 실제로 깐다. 기다림 없이 부르는 자리(샘플 데이터)도 이것을 쓴다 —
+    /// "심었다"는 표시와 심는 내용이 두 곳에 흩어지면 한쪽만 고치게 된다.
+    private func seedDefaults() {
+        UserDefaults.standard.set(true, forKey: Self.seededKey)
         for r in Self.defaultRoutines { context.insert(r) }
         try? context.save()
     }
+
+    private static let seededKey = "didSeedDefaultRoutines"
 
     /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.
     private static var defaultRoutines: [Routine] {
@@ -870,24 +873,18 @@ struct ContentView: View {
 
     private func addSampleData() {
         // 샘플을 부른 것은 사람의 뜻이므로 여기서는 기다리지 않고 바로 깐다.
-        if routines.isEmpty {
-            UserDefaults.standard.set(true, forKey: "didSeedDefaultRoutines")
-            for r in Self.defaultRoutines { context.insert(r) }
-        }
+        if routines.isEmpty { seedDefaults() }
 
-        // 할 일은 다른 스토어에 담긴다.
-        let todos = TodoStore.shared
-        let base = todos.allItems().map(\.sortIndex).max() ?? -1
+        let base = backlogItems.map(\.sortIndex).max() ?? -1
         let samples: [(String, Double)] = [
             ("기획서 초안 작성", 2),
             ("논문 1편 정독", 1.5),
             ("주간 회고 정리", 0.5),
         ]
         for (i, s) in samples.enumerated() {
-            todos.context.insert(BacklogItem(title: s.0, durationHours: s.1,
-                                             sortIndex: base + 1 + i, weekStartDate: selectedWeek))
+            context.insert(BacklogItem(title: s.0, durationHours: s.1,
+                                       sortIndex: base + 1 + i, weekStartDate: selectedWeek))
         }
-        todos.save()
 
         context.insert(PlanBlock(
             day: .mon,
@@ -906,11 +903,8 @@ struct ContentView: View {
         for b in allBlocks { context.delete(b) }
         for r in routines { context.delete(r) }
         for o in allOccurrences { context.delete(o) }
+        for i in backlogItems { context.delete(i) }
         try? context.save()
-        // 할 일은 다른 스토어에 있다. 여기서 같이 비우지 않으면 '모든 데이터 삭제'가 거짓말이 된다.
-        let todos = TodoStore.shared
-        for i in todos.allItems() { todos.context.delete(i) }
-        todos.save()
     }
 }
 
@@ -924,9 +918,6 @@ enum WeekLens: String, CaseIterable, Identifiable {
     case day = "시간축으로 보기"
 
     var id: String { rawValue }
-
-    /// 세그먼트에서 몇 번째 칸인가. 넘어가는 방향(왼쪽/오른쪽)이 여기서 나온다.
-    var order: Int { Self.allCases.firstIndex(of: self) ?? 0 }
 
     var symbol: String {
         switch self {

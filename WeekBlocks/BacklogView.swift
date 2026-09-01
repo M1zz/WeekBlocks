@@ -25,6 +25,10 @@ struct BacklogSection: View {
     var weekBlocks: [PlanBlock] = []
     /// 고정 루틴이 확보돼 있을 때만 할 일을 작성할 수 있다.
     var canPlan: Bool = true
+    /// 분류 버튼 줄(전체·업무·개인…)을 보여줄 것인가.
+    /// 주간 화면에서는 끈다 — 거기서 할 일은 **요일 칸으로 끌어다 놓을 카드**일 뿐이라
+    /// 거르는 도구가 앞에 서면 계획을 짜는 손을 방해한다. 거르는 일은 할 일 창에서 한다.
+    var showsCategoryFilter: Bool = true
     /// 툴바 '할 일 추가'의 신호를 받는 자리인가. 같은 목록이 두 창에 서 있으므로
     /// 신호를 받는 쪽은 하나여야 한다 — 버튼이 있는 주간 화면 쪽만 true.
     var listensForComposeRequest: Bool = false
@@ -39,6 +43,9 @@ struct BacklogSection: View {
     /// 툴바 '할 일 추가'가 보내는 신호. 마지막으로 받은 번호와 다르면 빈 칸을 연다.
     private let composeRequest = TodoComposeRequest.shared
     @State private var seenComposeTicket = 0
+
+    /// '요일에 올린 일'을 펼쳐 두었는가. 기본은 접힘 — 확인하러 갈 때만 연다.
+    @State private var showsPlaced = false
 
     @State private var filterCategoryID: String? = nil   // nil = 전체
     @State private var showingComposer = false
@@ -84,12 +91,49 @@ struct BacklogSection: View {
 
     /// 표시 순서 묶음: 보고 있는 주 → 지난 주(이월) → 앞으로.
     /// 이월을 두 번째에 두는 이유는 이미 밀린 일이라 눈에서 사라지면 안 되기 때문이다.
+    /// 이 주에 요일로 올려 둔 것들: 할 일 제목 → 올린 요일들.
+    ///
+    /// 블록 목록을 **한 번만** 훑어 만든다. 예전에는 카드마다 blocks 전체를 다시 훑어서
+    /// (항목 수 × 블록 수)만큼 문자열을 비교했고, 그 일이 한 번 그릴 때마다 여러 번 돌았다.
+    private var placement: [String: [DayOfWeek]] {
+        var map: [String: [DayOfWeek]] = [:]
+        for block in weekBlocks {
+            // 단계를 올린 블록은 "할 일 · 단계" 꼴이다. 앞머리를 잘라 부모 이름으로 모은다.
+            let root = block.title.components(separatedBy: " · ").first ?? block.title
+            map[root, default: []].append(block.day)
+        }
+        return map
+    }
+
+    /// 아직 요일을 안 정한 것과 이미 올린 것. **한 번의 분할**로 둘 다 얻는다.
+    private var split: (open: [BacklogItem], placed: [BacklogItem]) {
+        let placement = self.placement
+        var open: [BacklogItem] = []
+        var placed: [BacklogItem] = []
+        for item in weekItems {
+            if placement[item.title] == nil { open.append(item) } else { placed.append(item) }
+        }
+        return (open, placed)
+    }
+
+    /// 목록에 세울 것 — **요일에 올린 일은 빠진다.**
+    ///
+    /// 언제 할지 정한 일이 목록에 그대로 남아 있으면, 아직 안 정한 일과 섞여
+    /// "무엇을 정해야 하는가"가 흐려진다. 올린 순간 이 목록에서는 내린다.
+    ///
+    /// ⚠️ **내리는 것이지 지우는 것이 아니다.** 항목은 그대로 남는다 —
+    ///    지우면 그 삭제가 CloudKit을 타고 아이폰까지 건너가 할 일이 통째로 사라진다
+    ///    (→ ContentView.convertBacklogItem의 경고). 블록을 지우면 다시 목록에 선다.
+    ///    끝냈는지는 아래 '요일에 올린 일'에서 확인하고 체크한다.
     private var filteredItems: [BacklogItem] {
-        var items = weekItems
+        var items = split.open
         if let f = filterCategoryID { items = items.filter { $0.categoryID == f } }
         if broadcastOnly { items = items.filter { $0.needsBroadcast } }
         return items
     }
+
+    /// 요일에 올려 둔, 아직 안 끝낸 일. 목록에서는 내렸지만 **끝냈는지는 여기서 확인한다.**
+    private var placedItems: [BacklogItem] { split.placed }
 
     /// 전파 필요 항목 수 (필터 칩 배지).
     private var broadcastCount: Int {
@@ -172,7 +216,7 @@ struct BacklogSection: View {
             // 할 일을 어디서 적는지 길이 끊겼다. 못 누르는 것과 없는 것은 다르다 —
             // 흐릿하게 남겨 두고, 왜 못 누르는지는 아래 안내가 말한다.
             HStack(spacing: 8) {
-                if canPlan {
+                if canPlan, showsCategoryFilter {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
                             FilterChip(label: "전체", color: .secondary,
@@ -192,8 +236,6 @@ struct BacklogSection: View {
                         }
                         .padding(.vertical, 1)
                     }
-                } else {
-                    Spacer(minLength: 0)
                 }
 
                 // 창이 좁아도, 분류가 많아도 이 버튼은 밀려나지 않는다
@@ -210,6 +252,10 @@ struct BacklogSection: View {
                 .help(canPlan ? "목록 맨 위에 빈 칸을 만든다 (⌘N)"
                               : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
                 .keyboardShortcut("n", modifiers: .command)
+
+                // 분류 줄이 없으면 버튼이 왼쪽에 선다. 혼자 오른쪽 끝에 떨어져 있으면
+                // 무엇에 딸린 버튼인지 눈이 못 잇는다.
+                Spacer(minLength: 0)
             }
 
             if !canPlan {
@@ -217,6 +263,11 @@ struct BacklogSection: View {
             } else if filteredItems.isEmpty && !isAdding {
                 emptyState
             } else {
+                // 카드마다 다시 만들지 않는다. 트리·색·배치는 한 번 만들어 나눠 쓴다
+                // (예전에는 카드 수만큼 TodoTree와 색 지도를 새로 지었다).
+                let tree = self.tree
+                let colors = itemColorMap
+                let placement = self.placement
                 LazyVGrid(
                     columns: [GridItem(.adaptive(minimum: 150, maximum: 240), spacing: 8)],
                     alignment: .leading,
@@ -231,11 +282,11 @@ struct BacklogSection: View {
                         BacklogBlock(
                             item: item,
                             categories: categories,
-                            tint: itemColorMap[item.dragToken] ?? .secondary,
+                            tint: colors[item.dragToken] ?? .secondary,
                             lane: tree.lane(of: item),
-                            isFragment: isFragmentCard(item),
-                            planNote: planNote(for: item),
-                            steps: stepsInfo(for: item),
+                            isFragment: isFragmentCard(item, tree: tree),
+                            planNote: planNote(for: item, in: placement),
+                            steps: stepsInfo(for: item, tree: tree),
                             onAdvance: { advance(item) },
                             onRewind: { rewind(item) },
                             onEditSteps: { stepsSheetItem = item },
@@ -272,11 +323,14 @@ struct BacklogSection: View {
                     }
                 }
             }
+
+            // 요일에 올린 일은 위 목록에서 내렸다. 그렇다고 사라진 것은 아니므로
+            // **끝냈는지 확인하고 체크하는 자리**를 여기 남긴다. 기본은 접힘.
+            if canPlan, !placedItems.isEmpty {
+                placedSection
+            }
         }
         .task { await reconcileCategories() }
-        // 안 끝난 일의 주차는 켤 때마다 이번 주로 끌어온다 (아이폰과 같은 규칙).
-        // 요일에 올리기 전의 할 일에는 시간이 없어서, 지난 주에 서 있을 이유가 없다.
-        .onAppear { pullForwardOverdueWeeks() }
         // 툴바의 '할 일 추가'가 부른 것이면 빈 칸까지 열어 준다.
         // 창이 이제 뜨는 중이면 onChange가 오지 않으므로 나타날 때도 한 번 본다.
         .onAppear { consumeComposeRequest() }
@@ -300,8 +354,7 @@ struct BacklogSection: View {
 
     /// 이 카드가 지금 세우고 있는 것이 조각인가 — 앱 판정까지 포함해서 본다.
     /// 표시해 둔 것(lane == .now)과 같은 연두로 칠한다. 둘 다 "그냥 집으면 된다"는 뜻이다.
-    private func isFragmentCard(_ item: BacklogItem) -> Bool {
-        let tree = self.tree
+    private func isFragmentCard(_ item: BacklogItem, tree: TodoTree) -> Bool {
         guard let step = tree.markedStep(of: item) ?? tree.currentStep(of: item) ?? Optional(item)
         else { return false }
         return TodoSplitAdvisor.advice(title: step.title,
@@ -310,8 +363,7 @@ struct BacklogSection: View {
     }
 
     /// 카드에 그릴 단계 요약. 단계가 없으면 nil.
-    private func stepsInfo(for item: BacklogItem) -> BacklogBlock.StepsInfo? {
-        let tree = self.tree
+    private func stepsInfo(for item: BacklogItem, tree: TodoTree) -> BacklogBlock.StepsInfo? {
         guard tree.hasChildren(item) else { return nil }
         // 표시해 둔 단계가 있으면 그것을 세운다. 차례를 기다리지 않는 것이
         // '바로 하면 되는 일'로 표시해 둔 뜻이다 (iOS 목록·위젯과 같은 규칙).
@@ -370,12 +422,9 @@ struct BacklogSection: View {
     /// 그래서 카드만 보면 올렸는지 아닌지를 알 수 없다 — 이 표시가 그 자리를 메운다.
     /// 블록과 항목을 잇는 식별자가 스키마에 없어 **제목으로 맞춘다**(iOS도 같은 방식).
     /// 단계를 올린 블록은 "할 일 · 단계" 꼴이라 접두어까지 함께 본다.
-    private func planNote(for item: BacklogItem) -> String? {
-        let prefix = item.title + " · "
-        let days = weekBlocks
-            .filter { $0.title == item.title || $0.title.hasPrefix(prefix) }
-            .map(\.day)
-        guard let first = days.min(by: { $0.rawValue < $1.rawValue }) else { return nil }
+    private func planNote(for item: BacklogItem, in placement: [String: [DayOfWeek]]) -> String? {
+        guard let days = placement[item.title],
+              let first = days.min(by: { $0.rawValue < $1.rawValue }) else { return nil }
         let others = Set(days).count - 1
         return others > 0 ? "\(first.shortLabel) +\(others)" : first.longLabel
     }
@@ -435,27 +484,6 @@ struct BacklogSection: View {
         addFocused = true
     }
 
-    /// 안 끝난 일의 주차(`weekStartDate`)를 이번 주로 끌어온다.
-    ///
-    /// 예전에는 '이번 주로' 버튼을 사람이 줄마다 눌렀다. 그런데 안 끝난 일이 지난 주에
-    /// 남아 있다는 사실은 딱지로 말할 것이 아니라 그냥 목록에 서 있으면 되는 것이었다.
-    /// 주차는 이제 결산이 "이번 주에 무엇을 했나"를 세는 자리로만 쓴다.
-    /// **완료한 일은 건드리지 않는다** — 지난 주에 끝낸 것은 지난 주의 셈이다.
-    /// (→ iOS TodoView.pullForwardOverdueWeeks 와 같은 규칙)
-    private func pullForwardOverdueWeeks() {
-        let tree = self.tree
-        let stale = tree.roots.filter {
-            !$0.isCompleted && $0.weekStartDate < weekStart
-                && !cal.isDate($0.weekStartDate, inSameDayAs: weekStart)
-        }
-        guard !stale.isEmpty else { return }
-        for root in stale {
-            // 단계도 부모와 한 덩어리로 같이 옮긴다.
-            for node in tree.subtree(of: root) { node.weekStartDate = weekStart }
-        }
-        try? context.save()
-    }
-
     /// 다른 창에서 온 '할 일 추가' 신호를 한 번만 받아 빈 칸을 연다.
     private func consumeComposeRequest() {
         guard listensForComposeRequest else { return }
@@ -506,14 +534,88 @@ struct BacklogSection: View {
     /// 빈 칸의 색. 어느 분류로 적는 중인지 테두리 색이 말한다.
     private var draftTint: Color {
         categories.first { $0.uuid == filterCategoryID }?.displayColor
-            ?? Color(red: 0.55, green: 0.80, blue: 0.45)
+            ?? BacklogBlock.nowGreen
+    }
+
+    /// 요일에 올려 둔, 아직 안 끝낸 일. 접었다 펼치는 한 줄.
+    ///
+    /// 목록에서 내린 대신 여기서 끝냈는지를 확인한다. 체크하면 완료로 표시되고
+    /// (아이폰 목록에서도 함께 내려간다) 이 줄에서도 사라진다.
+    private var placedSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                withAnimation(.easeOut(duration: 0.18)) { showsPlaced.toggle() }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: showsPlaced ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 10, weight: .semibold))
+                    Image(systemName: "calendar")
+                        .font(.system(size: 11))
+                    Text("요일에 올린 일 \(placedItems.count)")
+                        .font(.system(size: 13, weight: .medium))
+                    Text("— 끝냈으면 체크하세요")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .foregroundStyle(.secondary)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if showsPlaced {
+                let colors = itemColorMap
+                let placement = self.placement
+                VStack(spacing: 4) {
+                    ForEach(placedItems) { item in
+                        HStack(spacing: 8) {
+                            Button {
+                                complete(item)
+                            } label: {
+                                Image(systemName: "circle")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .help("끝냈다고 표시한다")
+
+                            Text(item.title)
+                                .font(.system(size: 13))
+                                .lineLimit(1)
+
+                            Spacer(minLength: 8)
+
+                            if let note = planNote(for: item, in: placement) {
+                                Text(note)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(colors[item.dragToken] ?? .secondary)
+                            }
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
+                    }
+                }
+                .transition(.opacity)
+            }
+        }
+        .padding(.top, 2)
+    }
+
+    /// 끝냈다고 표시한다. 단계로 쪼갠 일이면 남은 단계까지 함께 닫는 것은
+    /// TodoTree가 아는 규칙이라 그쪽에 맡긴다 (여기서 다시 쓰면 규칙이 둘이 된다).
+    private func complete(_ item: BacklogItem) {
+        withAnimation {
+            tree.setCompleted(item, true)
+            try? context.save()
+        }
     }
 
     private var emptyState: some View {
         HStack(spacing: 8) {
             Text(weekItems.isEmpty
                  ? "할 일이 아직 없습니다."
-                 : "이 분류엔 할 일이 없습니다.")
+                 : (placedItems.isEmpty ? "이 분류엔 할 일이 없습니다."
+                                        : "언제 할지 다 정했습니다."))
                 .font(.callout)
                 .foregroundStyle(.secondary)
             if weekItems.isEmpty && !isAdding {
@@ -638,15 +740,17 @@ struct TodoWindowView: View {
 
     private let weekStart: Date = .currentWeekStart
 
-    // 이 창은 **할 일 스토어** 위에 서 있다. 루틴·계획 블록은 다른 스토어에 살아서
-    // @Query로 못 읽는다 — 카드에 붙일 표시에만 쓰는 값이라 그때그때 물어본다.
-    // (→ Stores.swift)
+    @Query private var allBlocks: [PlanBlock]
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routines: [Routine]
 
     /// 이번 주의 계획 블록 — 카드에 '어느 요일에 올렸는지'를 붙이는 데 쓴다.
-    private var weekBlocks: [PlanBlock] { PlanStore.shared.blocks(inWeek: weekStart) }
+    private var weekBlocks: [PlanBlock] {
+        let cal = Calendar(identifier: .iso8601)
+        return allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) }
+    }
 
     /// 고정 루틴이 하나라도 있어야 할 일을 계획할 수 있다 (주간 화면과 같은 규칙).
-    private var canPlan: Bool { PlanStore.shared.hasFixedRoutines }
+    private var canPlan: Bool { routines.contains { $0.kind == .fixed } }
 
     var body: some View {
         ScrollView {

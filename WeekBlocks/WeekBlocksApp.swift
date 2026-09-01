@@ -22,19 +22,22 @@ struct WeekBlocksApp: App {
     @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
 
+    /// 이 앱이 쓰는 단 하나의 컨테이너 (→ Stores.swift).
+    ///
+    /// ⚠️ **저장 프로퍼티로 두지 말 것.** 기본값 초기화는 `init()` 본문보다 먼저 돌기 때문에,
+    ///    저장 프로퍼티로 두면 "스토어를 열기 전에" 해야 하는 일(다시 받기 요청 처리 등)이
+    ///    정작 열린 **뒤에** 돌아 아무 효과가 없다.
+    private let container: ModelContainer
+
     init() {
         // 저장소를 세우는 일이 가장 먼저다. 순서가 곧 안전이다 (→ Stores.swift).
         StoreBootstrap.run()
+        container = PlanStore.shared.container
         // LeeoKit 사용량 트래커 — 리뷰 요청·만족도 프롬프트 게이팅에 쓰인다.
         _ = LeeoEngagement.shared.registerLaunch()
         // 할 일 화면의 조언은 전부 TipKit으로 낸다 (→ TodoTips.swift).
         TodoTips.configure()
     }
-
-    /// 계획 스토어 — 루틴·계획 블록. 할 일은 여기 없다(→ Stores.swift).
-    private let planContainer = PlanStore.shared.container
-    /// 할 일 스토어 — 아이폰 '욕망의 무지개'와 같은 이름·같은 스키마.
-    private let todoContainer = TodoStore.shared.container
 
     var body: some Scene {
         // 단일 창 앱: Window 씬을 쓰면 창을 닫아도
@@ -50,7 +53,7 @@ struct WeekBlocksApp: App {
                     if phase == .active { TodoShareIntake.drain(into: TodoStore.shared.context) }
                 }
         }
-        .modelContainer(planContainer)
+        .modelContainer(container)
         .defaultSize(width: 1080, height: 760)
         .windowResizability(.contentMinSize)
         .commands {
@@ -62,7 +65,7 @@ struct WeekBlocksApp: App {
         Window("할 일", id: WeekBlocksWindow.todos) {
             TodoWindowView()
         }
-        .modelContainer(todoContainer)
+        .modelContainer(container)
         .defaultSize(width: 560, height: 620)
         .windowResizability(.contentMinSize)
         .keyboardShortcut("t", modifiers: [.command, .shift])

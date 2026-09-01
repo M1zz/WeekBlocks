@@ -18,6 +18,12 @@ import SwiftUI
 //  PlanStore와 TodoStore는 이제 **같은 컨테이너를 보는 두 창구**다.
 //  이름을 남겨 둔 것은 부르는 쪽이 무엇을 물어보는지 드러내기 위해서다.
 
+/// 이 할 일을 마지막으로 손댄 시각. 모델에 수정 시각이 없어 만든 때·끝낸 때로 본다.
+/// **떠 둔 벌과 클라우드가 준 벌을 견주는 기준**이라, 양쪽이 반드시 같은 규칙을 써야 한다.
+func touchedAt(createdAt: Date, completedAt: Date?) -> Date {
+    max(createdAt, completedAt ?? .distantPast)
+}
+
 // MARK: - 켤 때 한 번
 
 @MainActor
@@ -34,6 +40,7 @@ enum StoreBootstrap {
         LegacyTodoArchive.captureFromSplitStoreIfNeeded()
 
         _ = PlanStore.shared
+        TodoStore.shared.pullForwardOverdueWeeks()
         TodoStore.shared.scheduleArchiveReconcile()
     }
 }
@@ -54,6 +61,13 @@ final class PlanStore {
 
     private init() {
         container = PlanStore.makeContainer()
+    }
+
+    /// 이 앱의 스토어 파일들. 이름을 한 곳에서만 말한다 —
+    /// 설정을 바꿔 파일 이름이 달라지면 '다시 받아오기'가 조용한 무동작이 된다.
+    static var storeFileURLs: [URL] {
+        let base = URL.applicationSupportDirectory.appending(path: "default.store")
+        return ["", "-wal", "-shm"].map { URL(fileURLWithPath: base.path + $0) }
     }
 
     private static func makeContainer() -> ModelContainer {
@@ -79,16 +93,6 @@ final class PlanStore {
 
     func fetch<T: PersistentModel>(_ type: T.Type) -> [T] {
         (try? context.fetch(FetchDescriptor<T>())) ?? []
-    }
-
-    /// 고정 루틴이 하나라도 있는가 — 할 일을 계획할 수 있는지의 조건.
-    var hasFixedRoutines: Bool {
-        fetch(Routine.self).contains { $0.kind == .fixed }
-    }
-
-    func blocks(inWeek weekStart: Date) -> [PlanBlock] {
-        let cal = Calendar(identifier: .iso8601)
-        return fetch(PlanBlock.self).filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) }
     }
 
     func save() { try? context.save() }
@@ -129,10 +133,8 @@ final class TodoStore {
         guard defaults.bool(forKey: refetchKey) else { return }
         defaults.set(false, forKey: refetchKey)
 
-        let fm = FileManager.default
-        let base = URL.applicationSupportDirectory.appending(path: "default.store")
-        for suffix in ["", "-wal", "-shm"] {
-            try? fm.removeItem(at: URL(fileURLWithPath: base.path + suffix))
+        for url in PlanStore.storeFileURLs {
+            try? FileManager.default.removeItem(at: url)
         }
         print("🔄 [Store] 로컬 사본을 버렸다 — iCloud에서 처음부터 받는다")
     }
@@ -160,6 +162,32 @@ final class TodoStore {
 
     func save() { try? context.save() }
 
+    /// 안 끝난 일의 주차(`weekStartDate`)를 이번 주로 끌어온다. **켤 때 한 번.**
+    ///
+    /// 예전에는 '이번 주로' 버튼을 사람이 줄마다 눌렀다. 그런데 안 끝난 일이 지난 주에
+    /// 남아 있다는 사실은 딱지로 말할 것이 아니라 그냥 목록에 서 있으면 되는 것이었다.
+    /// 주차는 이제 결산이 "이번 주에 무엇을 했나"를 세는 자리로만 쓴다.
+    /// **완료한 일은 건드리지 않는다** — 지난 주에 끝낸 것은 지난 주의 셈이다.
+    /// (→ iOS TodoView.pullForwardOverdueWeeks 와 같은 규칙)
+    ///
+    /// ⚠️ 화면의 onAppear에 두지 않는다. 목록을 세우는 뷰가 두 창에 동시에 떠 있어서
+    ///    같은 데이터 정리가 두 번 돌고, 스크롤로 다시 나타날 때마다 또 돈다.
+    func pullForwardOverdueWeeks() {
+        let weekStart = Date.currentWeekStart
+        let cal = Calendar(identifier: .iso8601)
+        let tree = TodoTree(allItems())
+        let stale = tree.roots.filter {
+            !$0.isCompleted && $0.weekStartDate < weekStart
+                && !cal.isDate($0.weekStartDate, inSameDayAs: weekStart)
+        }
+        guard !stale.isEmpty else { return }
+        for root in stale {
+            // 단계도 부모와 한 덩어리로 같이 옮긴다.
+            for node in tree.subtree(of: root) { node.weekStartDate = weekStart }
+        }
+        save()
+    }
+
     // MARK: 비상구 — 더 최신인 쪽을 세운다
 
     /// 스토어를 나눈 뒤, **두 벌 중 어느 쪽이 더 최신인지 보고 최신 쪽을 세운다.**
@@ -185,6 +213,11 @@ final class TodoStore {
     /// 위 판단을 실제로 한 번 수행한다.
     func reconcileWithArchive() {
         guard let archive = LegacyTodoArchive.load() else { return }
+        // 어느 갈래로 빠지든 겹친 것을 정리하고 안전망을 최신으로 둔다.
+        defer {
+            dedupeByDragToken()
+            refreshArchive()
+        }
 
         let items = allItems()
         let cloudStamp = TodoStore.lastTouched(items)
@@ -196,14 +229,10 @@ final class TodoStore {
 
         guard !archive.items.isEmpty else {
             print("ℹ️ [Split] 떠 둔 것이 비어 있다 — 지금 있는 것으로 안전망을 세운다")
-            dedupeByDragToken()
-            refreshArchive()
             return
         }
         guard archiveStamp > cloudStamp else {
             print("ℹ️ [Split] 클라우드 쪽이 더 최신이라 그대로 둔다")
-            dedupeByDragToken()
-            refreshArchive()
             return
         }
 
@@ -219,14 +248,21 @@ final class TodoStore {
         }
         save()
         print("💾 [Split] 떠 둔 쪽이 더 최신 — 모자란 할 일 \(added)개를 세웠다")
-        dedupeByDragToken()
-        refreshArchive()
     }
 
     /// 판정이 끝난 **지금의 한 벌**을 안전망으로 다시 떠 둔다.
     /// 스냅샷이 스토어를 나누던 시점에 얼어붙어 있으면, 다음 비교가 늘 옛 벌을 보고 판단한다.
     func refreshArchive() {
-        LegacyTodoArchive.write(items: allItems(), categories: categories())
+        let items = allItems()
+        let categories = self.categories()
+        // 켤 때마다 같은 내용을 다시 직렬화해 디스크에 쓸 이유가 없다.
+        if let current = LegacyTodoArchive.load(),
+           current.items.count == items.count,
+           current.categories.count == categories.count,
+           current.lastTouched == TodoStore.lastTouched(items) {
+            return
+        }
+        LegacyTodoArchive.write(items: items, categories: categories)
     }
 
     /// 같은 dragToken이 둘 이상이면 **가장 최근에 손댄 것 하나만** 남긴다.
@@ -249,9 +285,8 @@ final class TodoStore {
         print("🧹 [Split] 같은 할 일이 겹쳐 있던 \(victims.count)개를 정리했다")
     }
 
-    /// 이 할 일을 마지막으로 손댄 시각. 모델에 수정 시각이 없어 만든 때·끝낸 때로 본다.
     static func touched(_ item: BacklogItem) -> Date {
-        max(item.createdAt, item.completedAt ?? .distantPast)
+        touchedAt(createdAt: item.createdAt, completedAt: item.completedAt)
     }
 
     static func lastTouched(_ items: [BacklogItem]) -> Date {
@@ -261,14 +296,11 @@ final class TodoStore {
 
 // MARK: - 옛 스토어에 남은 할 일을 떠 두는 곳
 //
-// 스토어를 나누는 일은 사용자의 실제 데이터를 옮기는 일이다. 되돌릴 길을 먼저 만든다.
-//  · default.store 파일을 통째로 한 벌 복사해 둔다.
-//  · 할 일·분류는 JSON으로도 떠 둔다 (스키마와 무관하게 사람이 읽고 되살릴 수 있게).
-// 둘 다 **지우지 않는다.** 몇백 KB가 아까울 자리가 아니다.
+// 할 일을 JSON 한 벌로 떠 둔다. 스키마와 무관하게 사람이 열어 읽고 되살릴 수 있는 형태다.
+// 클라우드가 내려준 벌과 견줄 기준이 되고, 클라우드가 못 준 것을 되살리는 마지막 그물이다.
+// **지우지 않는다.** 몇백 KB가 아까울 자리가 아니다.
 
 enum LegacyTodoArchive {
-    private static let capturedKey = "didArchiveLegacyTodos.v1"
-
     private static var supportDirectory: URL {
         URL.applicationSupportDirectory
     }
@@ -311,47 +343,6 @@ enum LegacyTodoArchive {
         }
     }
 
-    /// 아직 한 번도 안 떴으면, 옛 스토어(여섯 타입)를 **오프라인으로** 열어 할 일을 떠 둔다.
-    static func captureIfNeeded() {
-        let defaults = UserDefaults.standard
-        guard !defaults.bool(forKey: capturedKey) else { return }
-
-        let legacyURL = supportDirectory.appending(path: "default.store")
-        guard FileManager.default.fileExists(atPath: legacyURL.path) else {
-            defaults.set(true, forKey: capturedKey)   // 새 설치 — 떠 올 것이 없다
-            return
-        }
-
-        backupStoreFiles(at: legacyURL)
-
-        let legacySchema = Schema([Routine.self, PlanBlock.self, BacklogItem.self,
-                                   RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self])
-        do {
-            let config = ModelConfiguration(schema: legacySchema,
-                                            isStoredInMemoryOnly: false,
-                                            groupContainer: .none,
-                                            cloudKitDatabase: .none)
-            let container = try ModelContainer(for: legacySchema, configurations: [config])
-            let context = ModelContext(container)
-            let items = try context.fetch(FetchDescriptor<BacklogItem>())
-            let categories = try context.fetch(FetchDescriptor<BacklogCategory>())
-
-            let snapshot = Snapshot(capturedAt: Date(),
-                                    items: items.map(ItemRow.init),
-                                    categories: categories.map(CategoryRow.init))
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            encoder.dateEncodingStrategy = .iso8601
-            try encoder.encode(snapshot).write(to: archiveURL, options: .atomic)
-
-            defaults.set(true, forKey: capturedKey)
-            print("✅ [Split] 옛 스토어에서 할 일 \(items.count)개 · 분류 \(categories.count)개를 떠 두었다")
-        } catch {
-            // 못 떴으면 플래그를 세우지 않는다 — 다음 실행에서 다시 시도한다.
-            print("⚠️ [Split] 할 일 스냅샷 실패: \(error)")
-        }
-    }
-
     /// 지금 스토어에 있는 것을 그대로 떠서 덮어쓴다.
     /// '다시 받아오기' 직전에 부른다 — 클라우드가 못 돌려주는 것이 있어도 이 파일이 남는다.
     static func write(items: [BacklogItem], categories: [BacklogCategory]) {
@@ -381,20 +372,6 @@ enum LegacyTodoArchive {
         return snapshot
     }
 
-    /// store · -wal · -shm 세 벌을 한 번에 복사한다. 하나만 복사하면 열리지 않는다.
-    private static func backupStoreFiles(at storeURL: URL) {
-        let fm = FileManager.default
-        let stamp = ISO8601DateFormatter().string(from: Date())
-            .replacingOccurrences(of: ":", with: "")
-        for suffix in ["", "-wal", "-shm"] {
-            let src = URL(fileURLWithPath: storeURL.path + suffix)
-            guard fm.fileExists(atPath: src.path) else { continue }
-            let dst = supportDirectory.appending(path: "default.store.before-split-\(stamp)\(suffix)")
-            try? fm.copyItem(at: src, to: dst)
-        }
-        print("🗄 [Split] 계획 스토어를 복사해 두었다 (default.store.before-split-\(stamp))")
-    }
-
     // MARK: 값으로 떠 두는 모양
     //
     // @Model 객체는 스토어가 닫히면 못 읽는다. 필드를 전부 값으로 옮겨 적는다.
@@ -407,7 +384,8 @@ enum LegacyTodoArchive {
 
         /// 이 벌을 마지막으로 손댄 시각. 항목이 없으면 뜬 시각으로 본다.
         var lastTouched: Date {
-            items.map { max($0.createdAt, $0.completedAt ?? .distantPast) }.max() ?? capturedAt
+            items.map { touchedAt(createdAt: $0.createdAt, completedAt: $0.completedAt) }
+                .max() ?? capturedAt
         }
     }
 
@@ -531,48 +509,3 @@ enum LegacyTodoArchive {
 }
 
 // MARK: - 두 스토어가 만나는 자리
-
-/// 주간 화면 안에서 할 일 목록이 서는 한 칸.
-///
-/// 스토어를 도로 합쳤으므로 여기 꽂히는 컨테이너는 바깥과 **같은 것**이다.
-/// 그래도 이 자리를 남겨 둔 것은, 할 일을 @Query 하는 뷰가 어디서부터인지
-/// 코드에서 드러나는 편이 낫기 때문이다.
-struct TodosPane: View {
-    let weekStart: Date
-    /// 이 주의 계획 블록 — 카드에 '어느 요일에 올렸는지'를 붙이는 데 쓴다.
-    let weekBlocks: [PlanBlock]
-    /// 전파 계약을 승계한 블록까지 훑어야 해서 전체가 필요하다.
-    let allBlocks: [PlanBlock]
-    let canPlan: Bool
-
-    var body: some View {
-        TodosPaneBody(weekStart: weekStart, weekBlocks: weekBlocks,
-                      allBlocks: allBlocks, canPlan: canPlan)
-            .modelContainer(TodoStore.shared.container)
-    }
-}
-
-/// 컨테이너가 환경에 꽂힌 **뒤에** @Query가 도는 자리.
-/// (같은 뷰에서 .modelContainer를 걸고 @Query를 쓰면 걸기 전 환경으로 읽는다.)
-private struct TodosPaneBody: View {
-    let weekStart: Date
-    let weekBlocks: [PlanBlock]
-    let allBlocks: [PlanBlock]
-    let canPlan: Bool
-
-    @Query(sort: [SortDescriptor(\BacklogItem.sortIndex), SortDescriptor(\BacklogItem.createdAt)])
-    private var allItems: [BacklogItem]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 28) {
-            // 오늘 손을 움직여야 하는 것만 온다 (앞으로 올 시점·계약 미확정은 백로그에 있다).
-            // 늦은 나쁜 소식이 신뢰를 깎는 유일한 요인이라 타임라인 아래에 묻지 않고 위에 둔다.
-            BroadcastPlanSection(allItems: allItems, allBlocks: allBlocks)
-            BacklogSection(allItems: allItems,
-                           weekStart: weekStart,
-                           weekBlocks: weekBlocks,
-                           canPlan: canPlan,
-                           listensForComposeRequest: true)
-        }
-    }
-}

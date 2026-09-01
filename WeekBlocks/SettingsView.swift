@@ -18,8 +18,14 @@ struct SettingsView: View {
     @State private var refetchArmed = false
     @State private var showingRefetchAlert = false
 
-    private var todoCount: Int { TodoStore.shared.allItems().count }
-    private var categoryCount: Int { TodoStore.shared.categories().count }
+    /// 스토어를 세는 일은 화면을 그릴 때마다 할 일이 아니다 — 열 때 한 번, 누른 뒤 한 번.
+    @State private var todoCount = 0
+    @State private var categoryCount = 0
+
+    private func refreshCounts() {
+        todoCount = TodoStore.shared.allItems().count
+        categoryCount = TodoStore.shared.categories().count
+    }
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -99,6 +105,7 @@ struct SettingsView: View {
 
                     Button {
                         TodoStore.shared.reconcileWithArchive()
+                        refreshCounts()
                         matchDone = true
                     } label: {
                         Label(matchDone ? "맞춰봤습니다" : "지금 맞춰보기", systemImage: "arrow.triangle.2.circlepath")
@@ -183,6 +190,7 @@ struct SettingsView: View {
             .padding(20)
         }
         .frame(minWidth: 460, minHeight: 540)
+        .task { refreshCounts() }
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
             Button("취소", role: .cancel) { }
             Button("다시 받아오기", role: .destructive) {

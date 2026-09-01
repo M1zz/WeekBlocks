@@ -31,7 +31,12 @@ struct TodoTree {
     static let maxDepth = 12
 
     init(_ items: [BacklogItem]) {
-        let tokens = Set(items.map(\.dragToken))
+        // 토큰 → 항목 사전을 먼저 만든다. 예전에는 부모를 찾을 때마다 목록을 처음부터
+        // 훑어서(items.first) 단계가 많아질수록 제곱으로 느려졌다. 이 사전은 한 번만 돈다.
+        var itemsByToken: [String: BacklogItem] = [:]
+        itemsByToken.reserveCapacity(items.count)
+        for item in items { itemsByToken[item.dragToken] = item }
+        let tokens = Set(itemsByToken.keys)
         var byParent: [String: [BacklogItem]] = [:]
         var byToken: [String: BacklogItem] = [:]
         var tops: [BacklogItem] = []
@@ -55,7 +60,7 @@ struct TodoTree {
         self.roots = tops.sorted(by: inOrder)
 
         for (parentToken, kids) in byParent {
-            guard let parent = items.first(where: { $0.dragToken == parentToken }) else { continue }
+            guard let parent = itemsByToken[parentToken] else { continue }
             for kid in kids { byToken[kid.dragToken] = parent }
         }
         self.parentByToken = byToken
