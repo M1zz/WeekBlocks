@@ -20,11 +20,28 @@ import Foundation
 
 enum TodoAccess {
 
-    /// 이 기기에서 할 일을 적고 고칠 수 있는가.
+    /// **적기는 언제나 무료다. 이 값은 항상 참이다.**
     ///
-    /// 화면들은 **이 값 하나만** 본다. 상품 구성이 바뀌어도 여기 한 줄만 고치면 된다.
-    static var canEdit: Bool { MacEntitlement.isUnlocked }
+    /// 한때 '적기'를 팔려고 이 값에 결제를 걸었는데, 그러면 새로 깐 사람이 첫 화면부터
+    /// 한 줄도 못 적는다. 앱이 무엇인지 알기도 전에 값부터 치르라는 말이 되고,
+    /// 이 앱의 본체는 적는 것이라 그건 곁다리를 파는 게 아니라 앱을 잠그는 것이다.
+    ///
+    /// 파는 것은 **적기가 아니라 건너가기**다 (→ `canSync`).
+    ///
+    /// ⚠️ 화면에 `if TodoAccess.canEdit` 이 남아 있다. 전부 '열린 쪽'으로만 흐르므로
+    ///    동작에는 영향이 없다. **이 값을 다시 false로 만들지 말 것.**
+    static var canEdit: Bool { true }
 
-    static let lockedTitle = "이 기기에서는 읽기만 됩니다"
-    static let lockedNote = "적는 것은 열어야 합니다. 이미 적어 둔 것은 그대로 보이고, 아이폰에서 적은 것도 계속 내려옵니다."
+    /// 이 맥에서 적은 것이 아이폰으로 건너가는가.
+    ///
+    /// 잠겨 있어도 **적는 데는 아무 지장이 없다.** 적은 것은 이 맥에서 그대로 보이고,
+    /// 아이폰에서 온 것도 계속 내려온다. 다만 여기서 적은 것이 저쪽에 안 보일 뿐이다
+    /// (→ TodoSharing.swift). 값을 치르면 그때까지 적어 둔 것도 함께 열린다.
+    static var canSync: Bool {
+        guard MacEntitlement.sellsAccess else { return true }
+        return MacEntitlement.isUnlocked
+    }
+
+    static let lockedTitle = "여기서 적은 것은 아직 아이폰에 안 갑니다"
+    static let lockedNote = "적는 데는 아무 지장이 없습니다. 아이폰에서 적은 것도 계속 내려옵니다. 열면 지금까지 적어 둔 것까지 함께 보입니다."
 }

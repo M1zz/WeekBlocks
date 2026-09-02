@@ -182,11 +182,11 @@ struct BacklogSection: View {
                               : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
                 .keyboardShortcut("n", modifiers: .command)
 
-                if !TodoAccess.canEdit {
+                if !TodoAccess.canSync, TodoSharing.hiddenFromOthersCount(allItems) > 0 {
                     Button {
                         showingPaywall = true
                     } label: {
-                        Label("읽기 전용", systemImage: "lock")
+                        Label("아이폰에 안 감", systemImage: "arrow.left.arrow.right")
                             .font(.system(size: 11, weight: .medium))
                     }
                     .buttonStyle(.borderless)
@@ -609,7 +609,7 @@ struct BacklogSection: View {
                 .foregroundStyle(.secondary)
             if weekItems.isEmpty && !isAdding {
                 Button("새 할 일") { beginAdding() }
-                    .disabled(!TodoAccess.canEdit)
+
                     .buttonStyle(.borderless)
             }
             Spacer()

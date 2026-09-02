@@ -19,7 +19,6 @@
 		4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482967041DBF8581050A3138 /* DayTimelineView.swift */; };
 		4AD3E0852C409C709566599A /* TodoTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */; };
 		4EA685D4C9D593CD84458458 /* TodoShareInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */; };
-		4F244DC3FBAD972B617CA295 /* RoutineOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B5017D2F7AFF0E3827709F /* RoutineOnboardingView.swift */; };
 		55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29F659737698D0D348D6468 /* ContentView.swift */; };
 		58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */; };
 		5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */; };
@@ -38,6 +37,7 @@
 		83DE0994DCC6B215222A482D /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DAA819E703DC5BE377B3688 /* Routine.swift */; };
 		8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7826FECD3C214B59C8E531EB /* MacEntitlement.swift */; };
 		885ED0917CD0F523548B558B /* TaskTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */; };
+		918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
 		9D5EEDBB4DA71FED5DFA3AE7 /* ScheduleClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AB47D0D95CB6D901FC0D81 /* ScheduleClock.swift */; };
 		AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526E2EF2A25551766D802F91 /* TodoSharing.swift */; };
@@ -117,10 +117,10 @@
 		CC4A396C6929CB1C576DBA52 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		CD35C8D5A757450762EFDC34 /* TodoTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTips.swift; sourceTree = "<group>"; };
 		D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
+		D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		D500334C7133BD6E4CFCC361 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTimer.swift; sourceTree = "<group>"; };
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E7B5017D2F7AFF0E3827709F /* RoutineOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOnboardingView.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTree.swift; sourceTree = "<group>"; };
 		FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogItem.swift; sourceTree = "<group>"; };
@@ -174,13 +174,13 @@
 				C368657EE69104A4BA70BA52 /* Info.plist */,
 				7826FECD3C214B59C8E531EB /* MacEntitlement.swift */,
 				CC4A396C6929CB1C576DBA52 /* Models.swift */,
+				D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */,
 				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
 				45EF8BFE32D234EF9576302C /* ReflectionView.swift */,
 				0DAA819E703DC5BE377B3688 /* Routine.swift */,
 				9F541E3039606B54D810E610 /* RoutineDetailView.swift */,
 				3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */,
-				E7B5017D2F7AFF0E3827709F /* RoutineOnboardingView.swift */,
 				D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */,
 				56AB47D0D95CB6D901FC0D81 /* ScheduleClock.swift */,
 				73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */,
@@ -325,13 +325,13 @@
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
 				8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */,
 				12DCD47B097FBED701EECC11 /* Models.swift in Sources */,
+				918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */,
 				076A03104420525A517BD699 /* PaywallView.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
 				33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */,
 				83DE0994DCC6B215222A482D /* Routine.swift in Sources */,
 				E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */,
 				BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */,
-				4F244DC3FBAD972B617CA295 /* RoutineOnboardingView.swift in Sources */,
 				651A1BCE01591AEDA87AEFAA /* RoutinesView.swift in Sources */,
 				9D5EEDBB4DA71FED5DFA3AE7 /* ScheduleClock.swift in Sources */,
 				F8624EF27CC9E3AE1AEEFE83 /* ScheduleShareStore.swift in Sources */,
