@@ -10,6 +10,9 @@ struct SettingsView: View {
     /// 일정 공유 시작·업데이트 시점의 최신 스냅숏을 만들어주는 클로저.
     var scheduleSnapshots: () -> [SharedScheduleSnapshot] = { [] }
 
+    /// '처음 안내 다시 보기' — 부르는 쪽이 설정을 닫고 온보딩을 연다.
+    var onReplayOnboarding: () -> Void = { }
+
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
 
     /// '지금 맞춰보기'를 눌렀는가 (한 번 누르면 더 누를 일이 없다).
@@ -152,6 +155,16 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Button {
+                        onReplayOnboarding()
+                    } label: {
+                        Label("처음 안내 다시 보기", systemImage: "sparkles")
+                    }
+
+                    Text("한 주를 짜는 순서(고정 루틴 → 할 일 → 요일에 올리기)를 처음부터 다시 봅니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
                     Button {
                         TodoTips.resetAll()
                         tipsResetDone = true

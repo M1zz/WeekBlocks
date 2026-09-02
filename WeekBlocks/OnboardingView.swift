@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 /// 처음 켠 사람에게 **세 걸음으로 앱을 건네는 자리.**
 ///
@@ -351,6 +352,23 @@ struct OnboardingView: View {
     }
 }
 
+/// 안내를 **여는 쪽**과 **그리는 쪽**이 다르다 — 메뉴 막대(도움말)·설정·빈 자리 버튼에서
+/// 모두 같은 시트를 연다. 그 사이를 잇는 가운데 자리.
+@Observable
+final class OnboardingPresenter {
+    static let shared = OnboardingPresenter()
+    private init() { }
+
+    var isPresented = false
+    /// 어느 걸음에서 열 것인가. 루틴이 비어 부를 때는 곧장 루틴 걸음으로.
+    var startPage = 0
+
+    func present(from page: Int = 0) {
+        startPage = page
+        isPresented = true
+    }
+}
+
 enum RoutineOnboarding {
     static let shownKey = "didShowRoutineOnboarding"
 
@@ -359,5 +377,103 @@ enum RoutineOnboarding {
     /// 설정에서 '처음 안내 다시 보기'를 눌렀을 때. 다음에 열 때 처음부터 다시 흐른다.
     static func reset() {
         UserDefaults.standard.set(false, forKey: shownKey)
+    }
+}
+
+// MARK: - 다음 한 걸음
+
+/// 지금 화면에서 **다음에 할 일 하나**. 흐름을 다 지나면 사라진다.
+///
+/// 온보딩 시트는 한 번 보고 닫으면 끝이라, 정작 화면 앞에 앉았을 때는 남는 게 없다.
+/// 이 줄은 상태를 보고 말한다 — 루틴이 없으면 루틴을, 할 일이 없으면 할 일을,
+/// 요일에 아무것도 안 올렸으면 끌어다 놓는 법을. 다 하고 나면 저절로 없어진다.
+enum NextStep {
+    case setRoutines
+    case writeTodos
+    case placeTodos
+
+    var title: String {
+        switch self {
+        case .setRoutines: "먼저, 빼놓을 수 없는 시간을 세웁니다"
+        case .writeTodos:  "이번 주에 할 일을 적어 보세요"
+        case .placeTodos:  "할 일을 요일 칸으로 끌어다 놓으세요"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .setRoutines:
+            "잠·끼니·일처럼 뺄 수 없는 시간을 먼저 깔면, 남는 자리가 이번 주에 실제로 쓸 수 있는 시간이 됩니다."
+        case .writeTodos:
+            "화면 아래 '할 일'에 한 줄씩 적습니다. 언제 할지는 아직 정하지 않아도 됩니다."
+        case .placeTodos:
+            "할 일 카드를 잡아 요일 칸에 떨어뜨리면 그 요일의 계획이 됩니다. 올려 둔 뒤에도 다른 요일로 다시 끌 수 있습니다."
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .setRoutines: "lock"
+        case .writeTodos:  "square.and.pencil"
+        case .placeTodos:  "hand.draw"
+        }
+    }
+
+    /// 눌러서 바로 갈 수 있는 자리가 있으면 그 이름. 없으면 말로만 안내한다.
+    var actionTitle: String? {
+        switch self {
+        case .setRoutines: "안내 받기"
+        case .writeTodos:  "할 일 창 열기"
+        case .placeTodos:  nil
+        }
+    }
+}
+
+struct NextStepBanner: View {
+    let step: NextStep
+    /// 누를 자리가 있을 때의 동작.
+    var onAction: () -> Void = { }
+    /// 이 줄을 아주 닫는다 — 다 아는 사람에게 계속 말을 걸지 않는다.
+    var onDismiss: () -> Void = { }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: step.icon)
+                .font(.system(size: 16))
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 22)
+                .padding(.top, 1)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(step.title)
+                    .font(.system(size: 14, weight: .semibold))
+                Text(step.detail)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 8)
+
+            if let action = step.actionTitle {
+                Button(action, action: onAction)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+            }
+
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
+            .help("이 안내를 더 보지 않기")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.accentColor.opacity(0.07), in: RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10)
+            .stroke(Color.accentColor.opacity(0.25), lineWidth: 1))
     }
 }

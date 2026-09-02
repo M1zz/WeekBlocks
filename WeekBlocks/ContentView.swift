@@ -18,8 +18,11 @@ struct ContentView: View {
     @State private var showingReflection = false
     @State private var showingSettings = false
     @State private var showingSampleAlert = false
-    /// 처음 켠 사람에게 고정 루틴을 함께 세우자고 묻는 자리.
-    @State private var showingRoutineOnboarding = false
+    /// 처음 켠 사람에게 앱을 건네는 자리 (→ OnboardingView.swift).
+    /// 메뉴 막대(도움말)에서도 같은 자리를 열기에 스토어를 가운데에 둔다.
+    @State private var onboarding = OnboardingPresenter.shared
+    /// '다음 한 걸음' 줄을 아주 닫았는가. 다 아는 사람에게 계속 말을 걸지 않는다.
+    @AppStorage("didDismissNextStep") private var didDismissNextStep = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
@@ -69,6 +72,17 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 weekHeader
+                // 지금 화면에서 다음에 할 일 하나. 흐름을 다 지나면 사라진다.
+                if let step = nextStep {
+                    NextStepBanner(step: step,
+                                   onAction: { perform(step) },
+                                   onDismiss: {
+                                       withAnimation(.snappy(duration: 0.2)) {
+                                           didDismissNextStep = true
+                                       }
+                                   })
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
                 if showsWeekSummary {
                     VStack(alignment: .leading, spacing: 10) {
@@ -169,10 +183,10 @@ struct ContentView: View {
             )
             .frame(minWidth: 520, minHeight: 540)
         }
-        .sheet(isPresented: $showingRoutineOnboarding) {
-            RoutineOnboardingView(onWriteMyOwn: {
+        .sheet(isPresented: $onboarding.isPresented) {
+            OnboardingView(onWriteMyOwn: {
                 routineSheet = RoutineSheetContext(routine: nil)
-            })
+            }, startPage: onboarding.startPage)
         }
         .sheet(item: $routineSheet) { ctx in
             RoutineEditorView(existing: ctx.routine)
@@ -189,6 +203,11 @@ struct ContentView: View {
         .sheet(isPresented: $showingSettings) {
             SettingsView(scheduleSnapshots: {
                 ScheduleSnapshotBuilder.snapshots(routines: routines, allBlocks: allBlocks, currentWeek: selectedWeek)
+            }, onReplayOnboarding: {
+                RoutineOnboarding.reset()
+                didDismissNextStep = false
+                showingSettings = false
+                onboarding.present()
             })
         }
         .alert("샘플 데이터 추가", isPresented: $showingSampleAlert) {
@@ -230,6 +249,29 @@ struct ContentView: View {
         .onChange(of: shareSignature) { _, _ in
             // 루틴·블록이 바뀌면 공유 중인 일정을 자동 갱신.
             Task { await autoPublishSharedSchedule() }
+        }
+    }
+
+    /// 지금 화면에서 **다음에 할 일 하나** (→ OnboardingView.swift).
+    ///
+    /// 순서는 앱이 실제로 흐르는 순서다: 고정 루틴 → 할 일 → 요일에 올리기.
+    /// 세 개를 다 지나면 nil이 되어 줄이 사라진다. 처음 온 사람만 보게 된다.
+    private var nextStep: NextStep? {
+        guard !didDismissNextStep else { return nil }
+        if routines.isEmpty { return .setRoutines }
+        guard weekBlocks.isEmpty else { return nil }
+        let hasOpenTodo = backlogItems.contains { $0.parentToken == nil && !$0.isCompleted }
+        return hasOpenTodo ? .placeTodos : .writeTodos
+    }
+
+    private func perform(_ step: NextStep) {
+        switch step {
+        case .setRoutines:
+            onboarding.present(from: 1)
+        case .writeTodos:
+            openWindow(id: WeekBlocksWindow.todos)
+        case .placeTodos:
+            break
         }
     }
 
@@ -414,7 +456,7 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 8) {
-                        Button("만드는 걸 도와드릴게요") { showingRoutineOnboarding = true }
+                        Button("만드는 걸 도와드릴게요") { onboarding.present(from: 1) }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)
                         Button("직접 적기") { routineSheet = RoutineSheetContext(routine: nil) }
@@ -849,7 +891,7 @@ struct ContentView: View {
         // 기다린 뒤에는 @Query가 아니라 스토어에 직접 묻는다 —
         // 기다리는 동안 뷰가 새로 만들어져 손에 든 값이 옛것일 수 있다.
         guard PlanStore.shared.fetch(Routine.self).isEmpty else { return }
-        showingRoutineOnboarding = true
+        onboarding.present()
     }
 
     /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.
