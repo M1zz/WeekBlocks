@@ -12,6 +12,17 @@ enum DayOfWeek: Int, Codable, CaseIterable, Identifiable {
         }
     }
     var longLabel: String { shortLabel + "요일" }
+
+    /// 그 날이 무슨 요일인가. 이 앱의 한 주는 월요일에서 시작한다.
+    static func of(_ date: Date) -> DayOfWeek {
+        var cal = Calendar(identifier: .iso8601)
+        cal.firstWeekday = 2
+        let weekday = cal.component(.weekday, from: date)   // 1=일 … 7=토
+        return DayOfWeek(rawValue: (weekday + 5) % 7) ?? .mon
+    }
+
+    /// 오늘이 무슨 요일인가.
+    static var today: DayOfWeek { of(Date()) }
 }
 
 enum TimeBand: String, Codable, CaseIterable, Identifiable {

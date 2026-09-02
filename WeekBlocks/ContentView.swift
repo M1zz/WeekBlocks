@@ -25,6 +25,8 @@ struct ContentView: View {
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
     @State private var shareStore = ScheduleShareStore.shared
+    /// 지금 하고 있는 하나와 남은 시간 (→ TaskTimer.swift). 기기에만 남는다.
+    @State private var taskTimer = TaskTimer.shared
 
     /// 시간 자에서 요일 줄들이 각각 화면 어디에 서 있는가(요일 rawValue → 화면 좌표).
     /// 계획 블록을 세로로 끌 때 "지금 어느 요일 위인가"를 여기서 답한다.
@@ -106,6 +108,13 @@ struct ContentView: View {
         .navigationTitle("무지개 공방")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    openWindow(id: WeekBlocksWindow.timer)
+                } label: {
+                    Label("타이머", systemImage: "timer")
+                }
+                .help("지금 하는 일에 남은 시간 (⇧⌘R)")
+
                 Button {
                     showingReflection = true
                 } label: {
@@ -287,6 +296,14 @@ struct ContentView: View {
             // 한 줄의 무게를 양 끝으로 나눈다. 왼쪽은 '언제'(날짜), 오른쪽은 '어떻게 볼까'.
             // 가운데에 몰아 두면 오른쪽이 통째로 비어 한쪽으로 쏠려 보인다.
             Spacer()
+
+            // 지금 세고 있는 일이 있으면 남은 시간이 여기 늘 서 있다.
+            // 타이머 창을 닫아 두어도 "무엇을 하는 중이고 얼마 남았는지"는 사라지지 않는다.
+            TimelineView(.everyMinute) { ctx in
+                TimerPill(slot: currentSlot(at: ctx.date)) {
+                    openWindow(id: WeekBlocksWindow.timer)
+                }
+            }
 
             // 한 주를 보는 두 자리. 날짜 줄에 함께 세운다 —
             // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
@@ -622,13 +639,16 @@ struct ContentView: View {
     }
 
     private var weekGridSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 8) {
-                ForEach(DayOfWeek.allCases) { day in
-                    DayColumn(
-                        day: day,
-                        date: dayDate(day),
-                        canPlan: hasFixedRoutines,
+        // 분이 바뀌면 '지금 하고 있는 것'이 달라질 수 있다. 그때 칩의 남은 시간도 자리를 옮긴다.
+        TimelineView(.everyMinute) { ctx in
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top, spacing: 8) {
+                    ForEach(DayOfWeek.allCases) { day in
+                        DayColumn(
+                            day: day,
+                            date: dayDate(day),
+                            canPlan: hasFixedRoutines,
+                            currentSlot: currentSlot(at: ctx.date),
                         items: dayPlanItems(on: day),
                         onAdd: {
                             blockSheet = BlockSheetContext(day: day, block: nil)
@@ -642,14 +662,26 @@ struct ContentView: View {
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
                         },
-                        onDropBacklog: { token in
-                            dropBacklogItem(token: token, day: day)
-                        }
-                    )
-                    .frame(maxWidth: .infinity, alignment: .top)
+                            onDropBacklog: { token in
+                                dropBacklogItem(token: token, day: day)
+                            }
+                        )
+                        .frame(maxWidth: .infinity, alignment: .top)
+                    }
                 }
             }
         }
+    }
+
+    /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
+    /// 타이머를 켜고 끄는 것과 무관하게, 계획에 적힌 시각만으로 정해진다.
+    private func currentSlot(at date: Date) -> ScheduleSlot? {
+        ScheduleClock.current(
+            ScheduleClock.slots(routines: routines, blocks: allBlocks,
+                                occurrences: allOccurrences, placements: allQuotaPlacements,
+                                around: date),
+            at: date
+        )
     }
 
     // MARK: helpers

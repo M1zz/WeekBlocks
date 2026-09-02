@@ -562,6 +562,12 @@ struct DayTimelineRow: View {
                     Label(restoreLabel(seg), systemImage: "arrow.uturn.backward")
                 }
             } else {
+                // 자 위에서도 바로 세기 시작한다 — 오늘 줄에서 지금 하는 것을 바로 집는 길 (→ TimerView.swift).
+                if let target = timerTarget(seg) {
+                    TimerMenuItems(token: target.token, title: target.title, hours: target.hours,
+                                   iconName: target.iconName, colorName: target.colorName)
+                    Divider()
+                }
                 Button(role: .destructive) { deleteSegment(seg) } label: {
                     Label(deleteLabel(seg), systemImage: "trash")
                 }
@@ -577,6 +583,26 @@ struct DayTimelineRow: View {
             return "\(seg.title) — 좌우로 끌어 시각 이동 (15분 단위) · 위아래로 끌어 다른 요일로 · 우클릭으로 삭제"
         }
         return "\(seg.title) — 드래그해서 시각 이동 (15분 단위) · 우클릭으로 삭제"
+    }
+
+    /// 이 구간을 타이머로 셀 수 있는가. 셀 수 있으면 무엇을 어떤 길이로 셀지.
+    /// 자정을 넘겨 잘린 조각이어도 **원본의 길이**(logicalDuration)로 센다 — 사람이 하는 일은 하나다.
+    private func timerTarget(_ seg: TimeSegment) -> (token: String, title: String, hours: Double,
+                                                     iconName: String, colorName: String?)? {
+        switch seg.source {
+        case .planBlock(let blk):
+            return (blk.dragToken, blk.title, blk.durationHours, "square.stack.3d.up", nil)
+        case .fixedRoutine(let name):
+            guard let r = routines.first(where: { $0.name == name }) else { return nil }
+            return (TaskTimer.token(for: r), r.name, r.durationHours, r.iconName, r.colorName)
+        case .quotaSession(let name, _):
+            guard let r = quotaRoutines.first(where: { $0.name == name }) else { return nil }
+            let sessions = max(1, r.sessionsPerDay)
+            return (TaskTimer.token(for: r), r.name, r.dailyQuotaHours / Double(sessions),
+                    r.iconName, r.colorName)
+        case .none:
+            return nil
+        }
     }
 
     private func deleteLabel(_ seg: TimeSegment) -> String {
