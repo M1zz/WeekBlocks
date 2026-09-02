@@ -59,9 +59,6 @@ enum TodoSharing {
     /// **값을 치렀다.** 이 기기에서 난 줄들을 상대에게도 보이게 한다.
     /// 그때부터 올라가는 것이 아니라 **이미 올라가 있던 것이 그제서야 보이는** 것이라
     /// 기다림이 없다.
-    ///
-    /// ⚠️ `isShared`는 false → true 로만 간다. 양쪽에서 반대로 뒤집으면 풀 방법이 없고,
-    ///    이미 상대에게 내려간 줄을 뒤늦게 감추면 데이터가 사라진 것으로 보인다.
     static func openMyItems(in context: ModelContext) {
         let mine = ((try? context.fetch(FetchDescriptor<BacklogItem>())) ?? [])
             .filter { !$0.isShared && isMine($0) }
@@ -69,6 +66,48 @@ enum TodoSharing {
         for item in mine { item.isShared = true }
         try? context.save()
         print("🔓 [Sharing] 이 기기의 할 일 \(mine.count)개를 함께 쓰기로 열었다")
+    }
+
+    /// **무료로 열려 있던 것을 도로 닫는다.** 팔기 시작했는데 안 산 기기에서.
+    ///
+    /// 팔기 전에는 `stamp`가 모두를 열린 채로 찍는다 — 그때는 살 수도 없으므로 그게 맞다.
+    /// 그런데 그대로 두면 **팔기 시작한 뒤에도 무료 기간에 적은 줄은 영영 열려 있다.**
+    /// 무료 기간에 깔아 둔 사람만 값을 안 치르고 함께 쓰기를 계속 갖는 셈이라, 그 구멍을
+    /// 여기서 막는다.
+    ///
+    /// ⚠️ **내 줄만 닫는다** (`isMine`). 이 방향이 안전한 이유가 여기 있다 — 줄을 만든
+    ///    기기 하나만 자기 줄을 뒤집으므로 양쪽이 서로 반대로 뒤집으며 싸울 일이 없다.
+    ///    남이 연 줄에는 손대지 않는다.
+    ///
+    /// ⚠️ 닫아도 **지우지 않는다.** 내 화면에서는 `isVisible`이 `isMine`으로 계속 그리고,
+    ///    상대 기기의 디스크에도 그대로 남아 있다가 값을 치르면 `openMyItems`가 도로 연다.
+    ///    되돌릴 수 있는 커튼이지 태우는 일이 아니다.
+    static func closeMyItems(in context: ModelContext) {
+        let mine = ((try? context.fetch(FetchDescriptor<BacklogItem>())) ?? [])
+            .filter { $0.isShared && isMine($0) }
+        guard !mine.isEmpty else { return }
+        for item in mine { item.isShared = false }
+        try? context.save()
+        print("🔒 [Sharing] 이 기기의 할 일 \(mine.count)개를 함께 쓰기에서 닫았다")
+    }
+
+    /// **영수증과 화면을 맞춘다.** 켤 때 한 번, 그리고 권한이 바뀔 때마다.
+    ///
+    /// 판정의 근거는 `isUnlocked`가 아니라 **`hasPurchased`**다 (→ MacEntitlement.swift).
+    /// 팔기 전에는 아무도 안 샀는데 `isUnlocked`가 참이라, 그 값으로 판정하면 무료 기간에
+    /// 적은 것이 산 것과 구별되지 않는다.
+    ///
+    /// ⚠️ 반드시 `PurchaseManager.refresh()` **뒤에** 부른다. 앞에서 부르면 UserDefaults에
+    ///    남은 헌 거울을 보고 산 사람의 줄을 닫는다.
+    static func reconcileMySharing(in context: ModelContext) {
+        if MacEntitlement.hasPurchased {
+            openMyItems(in: context)
+        } else if MacEntitlement.sellsAccess {
+            // 팔고 있는데 안 샀다 — 무료로 열려 있던 줄을 닫는다.
+            closeMyItems(in: context)
+        }
+        // 아직 팔기 전(`sellsAccess == false`)이면 아무것도 안 한다.
+        // 살 길이 없는 사람에게서 뺏으면 그건 값을 받는 게 아니라 고장이다.
     }
 
     /// 이 기기에서 난 줄 중 상대에게 **아직 안 보이는** 것의 수.

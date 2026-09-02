@@ -309,11 +309,11 @@ struct BacklogSection: View {
         .sheet(isPresented: $showingPaywall) {
             PaywallView()
         }
-        // 값을 치르면 이 맥에서 적어 둔 것이 아이폰에도 보이게 열린다
-        // (→ TodoSharing.swift). 그때부터 올라가는 게 아니라 이미 올라가 있던 것이
+        // 값을 치르면 이 맥에서 적어 둔 것이 아이폰에도 보이게 열리고, 환불되면 도로 닫힌다
+        // (→ TodoSharing.swift). 열 때는 그때부터 올라가는 게 아니라 이미 올라가 있던 것이
         // 그제서야 보이는 것이라 기다림이 없다.
-        .onChange(of: PurchaseManager.shared.isUnlocked) { _, unlocked in
-            if unlocked { TodoSharing.openMyItems(in: context) }
+        .onChange(of: PurchaseManager.shared.isUnlocked) { _, _ in
+            TodoSharing.reconcileMySharing(in: context)
         }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)

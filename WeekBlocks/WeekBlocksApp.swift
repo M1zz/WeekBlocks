@@ -49,8 +49,21 @@ struct WeekBlocksApp: App {
                 // App Group에 쌓아만 두므로, 앱이 켜지고 앞으로 나올 때 그 상자를 비운다.
                 // 받은 할 일은 할 일 스토어로 들어간다.
                 .task { TodoShareIntake.drain(into: TodoStore.shared.context) }
+                // 켤 때 영수증을 다시 읽는다 (→ MacEntitlement.swift).
+                // UserDefaults에 적힌 값은 화면이 빨리 그려지라고 둔 거울일 뿐이라,
+                // 다른 맥에서 산 것·환불된 것은 여기서 읽지 않으면 영영 안 잡힌다.
+                // 페이월을 열 때만 읽던 시절에는 산 사람이 잠긴 화면을 먼저 봐야 했다.
+                .task {
+                    await PurchaseManager.shared.refresh()
+                    // 영수증을 읽은 **뒤에** 맞춘다. 순서가 뒤집히면 헌 거울을 보고
+                    // 산 사람의 줄을 닫는다 (→ TodoSharing.swift).
+                    TodoSharing.reconcileMySharing(in: TodoStore.shared.context)
+                }
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active { TodoShareIntake.drain(into: TodoStore.shared.context) }
+                    guard phase == .active else { return }
+                    TodoShareIntake.drain(into: TodoStore.shared.context)
+                    // 앱을 켜 둔 채 다른 기기에서 사고 돌아오는 길.
+                    Task { await PurchaseManager.shared.refresh() }
                 }
         }
         .modelContainer(container)

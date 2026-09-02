@@ -1,0 +1,40 @@
+{
+  "identifier": "768FB382-0BB9-4039-AADF-6FC1D36AA96F",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "2D155F32-D51C-48F8-9F8E-150E1F4FE9C7",
+      "localizations": [
+        {
+          "description": "이 맥에서 적은 할 일이 아이폰에도 보입니다. 한 번 사면 끝이고 구독이 아닙니다.",
+          "displayName": "함께 쓰기",
+          "locale": "ko"
+        },
+        {
+          "description": "Write todos on this Mac and see them on your iPhone. One-time purchase, not a subscription.",
+          "displayName": "Sync Writing",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.sync",
+      "referenceName": "함께 쓰기 (이 맥에서 적기)",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "QGAQ3AY3R3",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "ko_KR",
+    "_storefront": "KOR",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

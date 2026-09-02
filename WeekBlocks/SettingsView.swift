@@ -18,6 +18,10 @@ struct SettingsView: View {
     @State private var refetchArmed = false
     @State private var showingRefetchAlert = false
 
+    /// 산 것을 되찾는 자리 (→ PaywallView.swift).
+    @State private var purchases = PurchaseManager.shared
+    @State private var showingPaywall = false
+
     /// 스토어를 세는 일은 화면을 그릴 때마다 할 일이 아니다 — 열 때 한 번, 누른 뒤 한 번.
     @State private var todoCount = 0
     @State private var categoryCount = 0
@@ -134,6 +138,8 @@ struct SettingsView: View {
 
                 ScheduleShareSettingsSection(snapshotsProvider: scheduleSnapshots)
 
+                purchaseSection
+
                 Section {
                     HStack {
                         Text("버전")
@@ -191,6 +197,7 @@ struct SettingsView: View {
         }
         .frame(minWidth: 460, minHeight: 540)
         .task { refreshCounts() }
+        .sheet(isPresented: $showingPaywall) { PaywallView() }
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
             Button("취소", role: .cancel) { }
             Button("다시 받아오기", role: .destructive) {
@@ -200,6 +207,76 @@ struct SettingsView: View {
         } message: {
             Text("이 기기의 사본(루틴·계획·할 일)을 버리고 iCloud에 있는 것을 처음부터 받습니다.\n버리기 전에 지금 할 일을 파일로 떠 두므로, iCloud에 없는 할 일은 다음 실행에서 되살아납니다.\n\n앱을 다시 켜야 실제로 받아옵니다.")
         }
+    }
+
+    /// **지금 무엇을 쓰고 있는가, 그리고 산 것을 되찾는 자리.**
+    ///
+    /// 등급은 팔기 전에도 **언제나 보인다.** "내가 프로인가 무료인가"는 살 수 있는지와
+    /// 상관없이 사람이 늘 궁금해하는 것이고, 문의가 왔을 때 서로 가리킬 자리도 필요하다.
+    /// 살 수 있을 때만 사고·되찾는 단추가 붙는다 — 살 수도 없는 것의 단추는 고장으로 읽힌다.
+    private var purchaseSection: some View {
+        Section {
+            HStack {
+                Image(systemName: isPro ? "checkmark.seal.fill" : "leaf")
+                    .foregroundStyle(isPro ? (Color(hex: Rainbow.indigo) ?? .indigo)
+                                           : (Color(hex: Rainbow.green) ?? .green))
+                Text("버전")
+                Spacer()
+                Text(isPro ? "프로" : "무료")
+                    .foregroundStyle(isPro ? .primary : .secondary)
+                    .fontWeight(isPro ? .semibold : .regular)
+            }
+
+            HStack {
+                Text("이 맥에서 적기")
+                Spacer()
+                Text(TodoAccess.canEdit ? "열림" : "잠김")
+                    .foregroundStyle(.secondary)
+            }
+
+            if MacEntitlement.sellsAccess && !isPro {
+                Button {
+                    showingPaywall = true
+                } label: {
+                    Label("프로로 열기", systemImage: "square.and.pencil")
+                }
+            }
+
+            if MacEntitlement.sellsAccess {
+                Button {
+                    Task { await purchases.restore() }
+                } label: {
+                    Label("구매 복원", systemImage: "arrow.clockwise")
+                }
+                .disabled(purchases.isWorking)
+
+                if let message = purchases.failureMessage {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+            }
+
+            Text(tierNote)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        } header: {
+            Text("함께 쓰기")
+        }
+    }
+
+    /// 값을 치렀는가. `sellsAccess`가 꺼진 무료 개방 기간에는 적을 수 있어도 프로가 아니다
+    /// (→ MacEntitlement.swift의 `hasPurchased`).
+    private var isPro: Bool { purchases.hasPurchased }
+
+    private var tierNote: String {
+        if isPro {
+            return "이 맥에서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다."
+        }
+        if MacEntitlement.sellsAccess {
+            return "주간 계획·루틴과 아이폰에서 온 할 일 보기는 무료입니다. 이 맥에서 적는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다."
+        }
+        return "지금은 모든 기능이 열려 있습니다. 판매를 시작하면 이 맥에서 적는 것만 프로가 됩니다."
     }
 
     private func ruleRow(_ field: String, _ rule: String) -> some View {

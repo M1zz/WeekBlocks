@@ -368,3 +368,51 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
 - [ ] ConcretenessChecker Level 3 — Claude API 판정
 - [ ] 시간 그리드 / 블록 드래그 이동 / 반복 계획 블록
 - [ ] 알림 / 메뉴바 위젯
+
+## 완료 (2026-09-02) — 유료화(함께 쓰기) 구멍 메우기
+
+- [x] StoreKit 설정 파일 신설 (`WeekBlocks.storekit`)
+      - 비소모성 `com.devkoan.ScheduleDensityApp.sync` 한 개, `familyShareable: false`
+      - `WeekBlocks.project.yml`의 스킴 run 액션에 `storeKitConfiguration`으로 연결
+      - App Store Connect 승인 전에도 페이월·구매·복원 흐름을 로컬에서 굴려볼 수 있다
+        (없으면 `Product.products()`가 빈 배열이라 '열기' 버튼이 영영 꺼져 있다)
+      - Release/archive에는 안 붙는다 — 출시 빌드는 언제나 진짜 App Store를 본다
+- [x] 켤 때 영수증 다시 읽기 (`WeekBlocksApp.swift`)
+      - `.task { await PurchaseManager.shared.refresh() }` + scenePhase `.active` 복귀 시에도
+      - 여태 페이월을 열 때만 읽어서, 다른 맥에서 산 사람이 잠긴 화면을 먼저 봐야 했다
+- [x] `Transaction.updates`에서 거래 끝내기 (`MacEntitlement.swift`)
+      - 안 끝내면 App Store가 켤 때마다 같은 거래를 다시 보낸다
+        (다른 맥 구매·가족 공유·'구입 요청' 승인분이 특히 그렇다)
+      - `purchase()`의 `.pending`/미검증도 말로 낸다 — 조용히 실패하면 버튼 고장으로 읽힌다
+- [x] 설정에 '구매 복원' 자리 (`SettingsView.swift` → `purchaseSection`)
+      - 여태 복원은 페이월 안에만 있었다. 페이월은 잠겼을 때만 열리는데, 사람은 설정에서 찾는다
+      - `sellsAccess == false`면 통째로 감춘다 — 살 수도 없는 것의 복원 버튼은 고장으로 읽힌다
+
+- [x] 무료 기간 유예 없애기 — '커튼'은 유지하되 새는 구멍만 막음
+      - 결정: iCloud 미러링은 계속 켠다. 끄면 루틴·계획 동기화와 아이폰 할 일 받아보기까지
+        함께 끊긴다 (한 컨테이너 한 스토어 — `Stores.swift:66`, `Stores.swift:8`의 금지 사항)
+      - `MacEntitlement.hasPurchased` 신설 — `isUnlocked`(= sellsAccess 포함)와 갈랐다.
+        '적을 수 있는가'와 '나눠 쓸 수 있는가'는 다른 질문이다
+      - `TodoSharing.closeMyItems` + `reconcileMySharing` 신설
+        · 샀다 → 내 줄을 연다 (기존 openMyItems)
+        · 팔고 있는데 안 샀다 → 무료로 열려 있던 **내 줄만** 닫는다
+        · 아직 팔기 전 → 아무것도 안 한다 (살 길이 없는 사람에게서 뺏지 않는다)
+      - 내 줄만 뒤집으므로 양쪽이 반대로 뒤집으며 싸울 일이 없다. 닫아도 안 지운다 —
+        내 화면엔 계속 보이고, 값을 치르면 openMyItems가 도로 연다
+      - 호출: `WeekBlocksApp` (refresh **뒤에**), `BacklogView`의 isUnlocked onChange
+      - 가족 공유: `.storekit`에 `familyShareable: false`. 앱 자체를 가족 공유로 받아도
+        잠긴 기기라 적지 못하므로 새어나갈 것이 없다
+- [x] 설정에 프로/무료 등급 표시 (`SettingsView.purchaseSection`)
+      - 등급은 팔기 전에도 **언제나 보인다** (문의 왔을 때 서로 가리킬 자리)
+      - 판정 근거는 `isUnlocked`가 아니라 `purchases.hasPurchased` — 무료 개방 기간에는
+        적을 수 있어도 '무료'로 나온다
+      - 사고·되찾는 단추는 `sellsAccess`가 켜졌을 때만 붙는다
+
+### 남은 일 (App Store Connect — 콘솔에서)
+- [ ] 유료 앱 계약 + 세금/은행 정보 (안 하면 상품이 아예 로드 안 된다)
+- [ ] 비소모성 상품 생성 — ID `com.devkoan.ScheduleDensityApp.sync` (글자 하나까지 동일)
+- [ ] **가족 공유 끄기** (기본이 꺼짐. 켜면 한 번 사서 6명이 쓴다)
+- [ ] 가격·표시명·설명·심사용 스크린샷(페이월 화면)
+- [ ] 앱 새 빌드와 **함께** 심사 제출 (IAP 단독 제출은 거절 잦음)
+- [ ] 상품이 실제로 팔리기 시작하면 `MacEntitlement.sellsAccess = true`
+- [ ] 출시 전 CloudKit 스키마 Development → Production 배포

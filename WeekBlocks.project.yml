@@ -5,6 +5,11 @@ options:
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
+# 빌드에 안 들어가지만 Xcode 파일 목록에서는 보여야 하는 것.
+# 스킴이 경로로만 가리키므로 여기 적어두지 않으면 네비게이터에서 열 길이 없다.
+fileGroups:
+  - WeekBlocks.storekit
+
 packages:
   LeeoKit:
     url: https://github.com/M1zz/LeeoKit.git
@@ -28,6 +33,12 @@ schemes:
         WeekBlocks: all
     run:
       config: Debug
+      # 로컬에서 구매 흐름을 굴려보는 가짜 스토어 (→ WeekBlocks.storekit).
+      # App Store Connect에 상품이 승인되기 전에는 이것 없이 페이월을 못 열어본다 —
+      # Product.products()가 빈 배열을 주고 '열기' 버튼이 영영 꺼져 있다.
+      # ⚠️ 이 파일의 productID는 콘솔에 만들 상품과 **글자 하나까지 같아야** 의미가 있다.
+      # ⚠️ Release/archive에는 안 붙는다. 실제 출시 빌드는 언제나 진짜 App Store를 본다.
+      storeKitConfiguration: WeekBlocks.storekit
     test:
       config: Debug
     profile:
