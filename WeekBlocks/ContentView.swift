@@ -655,6 +655,15 @@ struct ContentView: View {
                         onDayTargetChange: { target in
                             guard timelineDayTarget != target else { return }
                             withAnimation(.easeOut(duration: 0.12)) { timelineDayTarget = target }
+                        },
+                        onEditBlock: { block in
+                            blockSheet = BlockSheetContext(day: day, block: block)
+                        },
+                        onEditRoutine: { routine in
+                            routineDetailSheet = routine
+                        },
+                        onEditRoutineSchedule: { routine in
+                            routineSheet = RoutineSheetContext(routine: routine)
                         }
                     )
                     .background {
