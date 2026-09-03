@@ -75,17 +75,21 @@ struct DayColumn: View {
     @ViewBuilder
     private func chip(for item: DayPlanItem) -> some View {
         switch item {
-        case .fixedRoutine(let routine, _, let atHour, _):
-            // 길이는 뺀다 — BlockChip과 같은 이유다. 시각만 남긴다.
-            // (자정을 넘겨 쪼개진 조각도 시작 시각이 다르므로 여전히 구별된다.)
+        // 시각은 뺀다 — 칸이 이미 시각 순으로 서 있어서, 줄마다 시각을 또 적으면
+        // 자기 위아래를 되풀이할 뿐이다. 길이는 이 자리 말고는 어디에도 안 적혀 있다.
+        // (자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 된다.)
+        case .fixedRoutine(let routine, _, _, let hours):
             RoutineChip(routine: routine,
-                        subtitleOverride: formatHour(atHour),
+                        subtitleOverride: shortHours(hours),
                         currentSlot: liveSlot(for: item),
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
                 onEditRoutine(routine)
             }
-        case .quotaSession(let routine, let index, let atHour):
-            RoutineChip(routine: routine, subtitleOverride: formatHour(atHour),
+        case .quotaSession(let routine, let index, _):
+            // 쿼터는 주간 합계가 아니라 **회당** 길이를 보여야 한 줄이 한 번을 가리킨다.
+            RoutineChip(routine: routine,
+                        subtitleOverride: shortHours(routine.dailyQuotaHours
+                                                     / Double(max(1, routine.sessionsPerDay))),
                         currentSlot: liveSlot(for: item),
                         timerToken: "\(TaskTimer.token(for: routine)):\(index)",
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) { onEditRoutine(routine) }
