@@ -99,15 +99,23 @@ final class CalendarBridge {
         /// 사라진 일정인데 사람이 손을 댄 흔적이 있어 남겨 둔 것.
         var keptOrphans = 0
         var allDay = 0
+        /// 캘린더에서 사라졌지만 **아직 안 지운** 블록들.
+        ///
+        /// ⚠️ 여기 담아서 돌려보내는 이유: 지우면 그 삭제가 CloudKit을 타고 **아이폰까지
+        ///    건너간다.** 되돌릴 수 없는 일을 묻지도 않고 하면 안 된다. 부르는 쪽이
+        ///    사람에게 물어본 뒤 `removeOrphans`로 지운다.
+        var pendingRemovals: [PlanBlock] = []
 
-        var isEmpty: Bool { added == 0 && updated == 0 && removed == 0 }
+        var isEmpty: Bool {
+            added == 0 && updated == 0 && removed == 0 && pendingRemovals.isEmpty
+        }
 
         var summary: String {
             if isEmpty { return "바뀐 일정이 없습니다." }
             var parts: [String] = []
             if added > 0 { parts.append("\(added)개 가져옴") }
             if updated > 0 { parts.append("\(updated)개 갱신") }
-            if removed > 0 { parts.append("\(removed)개 정리") }
+            if removed > 0 { parts.append("\(removed)개 지움") }
             if keptOrphans > 0 { parts.append("손댄 \(keptOrphans)개는 남겨둠") }
             return parts.joined(separator: " · ")
         }
@@ -118,8 +126,9 @@ final class CalendarBridge {
     /// 세 갈래로 움직인다. **손댄 것은 건드리지 않는다**가 전부를 관통하는 규칙이다.
     ///  - 처음 보는 일정 → 새 블록
     ///  - 이미 있는 일정 → 시각·길이·제목만 맞춘다 (성공 기준·산출물은 사람 것이라 안 건드린다)
-    ///  - 캘린더에서 사라진 일정 → 블록도 지운다. **단, 사람이 손댄 블록은 남긴다**
-    ///    (캘린더 연결만 끊는다). 남의 일정이 없어졌다고 사람이 쓴 글까지 지우면 안 된다.
+    ///  - 캘린더에서 사라진 일정 → **지울 후보로 담아서 돌려준다.** 여기서 지우지 않는다.
+    ///    사람이 손댄 블록은 후보에도 안 넣고 캘린더 연결만 끊는다 —
+    ///    남의 일정이 없어졌다고 사람이 쓴 글까지 지우면 안 된다.
     @discardableResult
     func importWeek(_ weekStart: Date, into context: ModelContext) -> ImportResult {
         var result = ImportResult()
@@ -183,18 +192,31 @@ final class CalendarBridge {
         }
 
         // 남은 것 = 캘린더에서 사라진 일정.
+        //
+        // ⚠️ **여기서 지우지 않는다.** 지우면 그 삭제가 CloudKit을 타고 아이폰까지 건너가
+        //    거기서도 사라진다. 되돌릴 수 없는 일이라, 무엇을 지울 참인지 사람에게
+        //    보여주고 물어본 뒤에 지운다 (→ ContentView.importFromCalendar).
         for (_, orphan) in byKey {
             if Self.wasTouchedByPerson(orphan) {
                 orphan.calendarEventID = nil   // 연결만 끊고 글은 남긴다.
                 result.keptOrphans += 1
             } else {
-                context.delete(orphan)
-                result.removed += 1
+                result.pendingRemovals.append(orphan)
             }
         }
 
         try? context.save()
         return result
+    }
+
+    /// 물어본 뒤에 지운다 (→ `ImportResult.pendingRemovals`).
+    /// 이 삭제는 CloudKit을 타고 같은 계정의 다른 기기에서도 사라진다.
+    @discardableResult
+    func removeOrphans(_ blocks: [PlanBlock], in context: ModelContext) -> Int {
+        guard !blocks.isEmpty else { return 0 }
+        for block in blocks { context.delete(block) }
+        try? context.save()
+        return blocks.count
     }
 
     /// 사람이 이 블록에 무언가를 보탰는가. 보탰으면 캘린더가 사라져도 지우지 않는다.

@@ -16,6 +16,8 @@ struct ContentView: View {
     @State private var calendarNotice: String?
     /// 끼워 넣은 것이 틈보다 커서 겹쳤을 때 뜨는 붉은 줄.
     @State private var conflictNotice: String?
+    /// 캘린더에서 사라져 지울 참인 블록들. **묻기 전에는 안 지운다.**
+    @State private var pendingRemovals: [PlanBlock] = []
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: Routine?
@@ -182,6 +184,23 @@ struct ContentView: View {
                     Label("더 보기", systemImage: "ellipsis.circle")
                 }
             }
+        }
+        .alert("캘린더에서 사라진 일정 \(pendingRemovals.count)개를 지울까요?",
+               isPresented: Binding(get: { !pendingRemovals.isEmpty },
+                                    set: { if !$0 { pendingRemovals = [] } })) {
+            Button("남겨두기", role: .cancel) { pendingRemovals = [] }
+            Button("지우기", role: .destructive) {
+                let removed = CalendarBridge.shared.removeOrphans(pendingRemovals, in: context)
+                pendingRemovals = []
+                calendarNotice = "\(removed)개를 지웠습니다."
+            }
+        } message: {
+            Text("""
+            아래 블록은 캘린더에서 일정이 없어졌습니다.             지우면 **같은 iCloud 계정의 아이폰에서도 함께 사라지고, 되돌릴 수 없습니다.**
+            (성공 기준·산출물·회고를 적어 둔 것은 이 목록에 없습니다 — 그건 남깁니다.)
+
+            \(removalPrompt)
+            """)
         }
         .alert("캘린더에서 가져오기",
                isPresented: Binding(get: { calendarNotice != nil },
@@ -796,7 +815,25 @@ struct ContentView: View {
             return
         }
         let result = bridge.importWeek(selectedWeek, into: context)
+
+        // 캘린더에서 사라진 일정이 있으면 **지우기 전에 묻는다.**
+        // 이 삭제는 CloudKit을 타고 아이폰까지 건너가 거기서도 사라진다 — 되돌릴 수 없다.
+        if !result.pendingRemovals.isEmpty {
+            pendingRemovals = result.pendingRemovals
+            return
+        }
         calendarNotice = bridge.failureMessage ?? result.summary
+    }
+
+    /// 지울 참인 블록들을 사람이 읽을 수 있게 늘어놓는다. 숫자만 보여주고 지우면
+    /// "뭐가 지워졌지"가 남는다. 다섯 줄까지만 적고 나머지는 세어서 말한다.
+    private var removalPrompt: String {
+        let names = pendingRemovals.prefix(5).map { "· \($0.title) (\($0.day.shortLabel))" }
+        var text = names.joined(separator: "\n")
+        if pendingRemovals.count > names.count {
+            text += "\n… 외 \(pendingRemovals.count - names.count)개"
+        }
+        return text
     }
 
     /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
