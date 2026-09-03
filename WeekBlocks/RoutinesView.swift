@@ -258,18 +258,32 @@ struct RoutineEditorView: View {
                     }
                 } else {
                     Section("주간 쿼터") {
+                        // **횟수 → 회당 → 주 합계** 순으로 묻는다.
+                        // 사람은 "밥은 하루 세 번, 한 번에 한 시간"으로 생각하지
+                        // "주 21시간"으로 생각하지 않는다. 예전에는 주 합계만 받아서,
+                        // 회당 한 시간을 만들려고 21을 역산해 넣어야 했다.
+                        HStack {
+                            Text("하루 횟수")
+                            Spacer()
+                            Stepper(sessionsPerDay > 0 ? "\(sessionsPerDay)회 (끼니·세션)" : "미설정",
+                                    value: $sessionsPerDay, in: 0...12)
+                        }
+                        if sessionsPerDay > 0 {
+                            HStack {
+                                Text("회당 (h)")
+                                Spacer()
+                                TextField("", value: perSessionBinding,
+                                          format: .number.precision(.fractionLength(0...2)))
+                                    .frame(width: 100)
+                                    .multilineTextAlignment(.trailing)
+                            }
+                        }
                         HStack {
                             Text("주 (h)")
                             Spacer()
                             TextField("", value: $weeklyHours, format: .number.precision(.fractionLength(0...2)))
                                 .frame(width: 100)
                                 .multilineTextAlignment(.trailing)
-                        }
-                        HStack {
-                            Text("하루 횟수")
-                            Spacer()
-                            Stepper(sessionsPerDay > 0 ? "\(sessionsPerDay)회 (끼니·세션)" : "미설정",
-                                    value: $sessionsPerDay, in: 0...12)
                         }
                         if weeklyHours > 0 {
                             HStack(alignment: .firstTextBaseline) {
@@ -282,7 +296,9 @@ struct RoutineEditorView: View {
                             }
                             .font(.callout)
                         }
-                        Text("정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다.")
+                        Text(sessionsPerDay > 0
+                             ? "회당과 주 합계는 한 값의 두 얼굴입니다 — 한쪽을 고치면 다른 쪽이 따라 바뀝니다(회당 × 횟수 × 7일). 편한 쪽으로 넣으세요.\n정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다."
+                             : "정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -374,6 +390,27 @@ struct RoutineEditorView: View {
 
     private var endTimeLabel: String {
         "→ " + formatHour(startHour + durationHours)
+    }
+
+    /// **회당 시간으로 주 합계를 거꾸로 정한다.**
+    ///
+    /// 저장되는 값은 여전히 `weeklyHours` 하나다 — 모델을 늘리지 않고 입력하는 각도만
+    /// 하나 더 낸 것이다. 두 칸이 같은 값을 가리키므로 어느 쪽을 고쳐도 다른 쪽이 따라온다.
+    ///
+    ///     주 합계 = 회당 × 하루 횟수 × 7일
+    ///
+    /// ⚠️ 횟수가 0이면 회당이라는 말이 성립하지 않는다. 그때는 칸을 아예 안 띄운다.
+    private var perSessionBinding: Binding<Double> {
+        Binding(
+            get: {
+                guard sessionsPerDay > 0 else { return 0 }
+                return weeklyHours / 7 / Double(sessionsPerDay)
+            },
+            set: { newValue in
+                guard sessionsPerDay > 0 else { return }
+                weeklyHours = max(0, newValue) * Double(sessionsPerDay) * 7
+            }
+        )
     }
 
     private var quotaPreview: String {
