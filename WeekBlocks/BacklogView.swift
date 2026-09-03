@@ -24,6 +24,9 @@ struct BacklogSection: View {
     /// '요일에 올린 일'을 펼쳐 두었는가. 기본은 접힘 — 확인하러 갈 때만 연다.
     @State private var showsPlaced = false
 
+    /// 요일에서 끌어 내린 블록을 받는 중인가. 받는 자리가 어딘지 보여야 손이 안 헤맨다.
+    @State private var isReturnTargeted = false
+
     @State private var filterCategoryID: String? = nil   // nil = 전체
     @State private var showingComposer = false
     @State private var showingAllBacklog = false
@@ -305,6 +308,29 @@ struct BacklogSection: View {
                 placedSection
             }
         }
+        // **요일에서 끌어 내리면 다시 '아직 안 정한 일'이 된다.**
+        //
+        // 올리는 길(목록 → 요일 칸)만 있고 내리는 길이 없어서, 날짜를 무르려면 블록을
+        // 찾아 지우고 할 일이 도로 서기를 기다려야 했다. 끌어 올렸으면 끌어 내릴 수도
+        // 있어야 한다 — 같은 손짓의 반대 방향이다.
+        .background {
+            if isReturnTargeted {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.accentColor.opacity(0.08))
+                    .overlay(RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.accentColor.opacity(0.6), lineWidth: 1.5))
+                    .padding(-8)
+            }
+        }
+        .dropDestination(for: String.self) { dropped, _ in
+            isReturnTargeted = false
+            guard let token = dropped.first else { return false }
+            return returnToBacklog(token: token)
+        } isTargeted: { hovering in
+            // 할 일 카드끼리 끌 때는 켜지지 않게 — 여기서 받는 것은 **블록**뿐이다.
+            isReturnTargeted = hovering
+        }
+        .animation(.easeOut(duration: 0.12), value: isReturnTargeted)
         .task { await reconcileCategories() }
         .sheet(isPresented: $showingPaywall) {
             PaywallView()
@@ -451,6 +477,36 @@ struct BacklogSection: View {
         }
         .transition(.asymmetric(insertion: .scale(scale: 0.96).combined(with: .opacity),
                                 removal: .opacity))
+    }
+
+    /// **요일에 올린 것을 도로 목록으로 내린다.**
+    ///
+    /// 올릴 때 할 일을 지우지 않고 목록에서 '내리기만' 했으므로(→ `split`), 내리는 일은
+    /// **블록을 지우는 것**으로 끝난다. 지우면 그 할 일이 저절로 다시 목록에 선다.
+    ///
+    /// ⚠️ 할 일 없이 바로 세운 블록(블록 편집기·캘린더 가져오기)도 여기 떨어질 수 있다.
+    ///    그때는 지우기만 하면 통째로 사라지므로, 같은 이름의 할 일을 만들어 두고 지운다.
+    ///    "목록으로 옮긴다"고 했는데 없어지면 그건 옮긴 게 아니라 버린 것이다.
+    ///
+    /// - Returns: 받았는가. 블록이 아닌 것(할 일 카드·루틴)은 받지 않는다.
+    @discardableResult
+    private func returnToBacklog(token: String) -> Bool {
+        guard token.hasPrefix("block:"),
+              let block = PlanBlock.matching(dragToken: token, in: weekBlocks) else { return false }
+
+        // 단계를 올린 블록은 "할 일 · 단계" 꼴이다. 앞머리가 할 일의 이름이다.
+        let root = block.title.components(separatedBy: " · ").first ?? block.title
+        if !allItems.contains(where: { $0.title == root }) {
+            let item = BacklogItem(title: block.title,
+                                   durationHours: block.durationHours,
+                                   sortIndex: (allItems.map(\.sortIndex).min() ?? 0) - 1,
+                                   weekStartDate: weekStart)
+            TodoSharing.stamp(item)
+            context.insert(item)
+        }
+        context.delete(block)
+        try? context.save()
+        return true
     }
 
     /// 빈 칸을 연다. 분류는 지금 보고 있는 필터를 그대로 따른다 —

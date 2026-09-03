@@ -408,9 +408,12 @@ struct BlockChip: View {
             .contextMenu {
                 TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours)
             }
+            // 내리는 길이 생겼으니 말해 준다 — 손짓은 있는데 아무도 모르면 없는 것과 같다.
             .help(block.successCriteria.isEmpty
-                  ? "구체성 미검증 — 눌러서 다듬기 · 드래그해서 다른 요일로 옮기기"
-                  : block.successCriteria + "\n드래그해서 다른 요일로 옮길 수 있습니다.")
+                  ? "구체성 미검증 — 눌러서 다듬기 · 다른 요일로 끌어 옮기기 · 할 일 목록으로 끌어 내리면 날짜가 무름"
+                  : block.successCriteria
+                    + "\n다른 요일로 끌어 옮길 수 있습니다."
+                    + "\n할 일 목록으로 끌어 내리면 날짜가 무릅니다.")
     }
 
     @ViewBuilder
