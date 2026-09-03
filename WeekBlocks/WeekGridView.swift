@@ -75,10 +75,11 @@ struct DayColumn: View {
     @ViewBuilder
     private func chip(for item: DayPlanItem) -> some View {
         switch item {
-        case .fixedRoutine(let routine, _, let atHour, let hours):
-            // 자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 되도록.
+        case .fixedRoutine(let routine, _, let atHour, _):
+            // 길이는 뺀다 — BlockChip과 같은 이유다. 시각만 남긴다.
+            // (자정을 넘겨 쪼개진 조각도 시작 시각이 다르므로 여전히 구별된다.)
             RoutineChip(routine: routine,
-                        subtitleOverride: "\(formatHour(atHour))  \(String(format: "%.1fh", hours))",
+                        subtitleOverride: formatHour(atHour),
                         currentSlot: liveSlot(for: item),
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
                 onEditRoutine(routine)
@@ -114,7 +115,7 @@ struct DayColumn: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             VStack(spacing: 1) {
                 Text(day.shortLabel)
                     .font(.system(size: 13, weight: .medium))
@@ -143,7 +144,7 @@ struct DayColumn: View {
                     let now = Self.hourOfDay(ctx.date)
                     // 지금보다 늦은 첫 항목 **앞**에 선을 끼운다. 그런 항목이 없으면 맨 아래 = 오늘 계획을 다 지났다.
                     let cut = items.firstIndex { $0.atHour > now } ?? items.count
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 4) {
                         ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                             if index == cut { nowMarker(now) }
                             chip(for: item)
@@ -176,7 +177,7 @@ struct DayColumn: View {
             .help(canPlan ? "\(day.longLabel)에 블록 추가" : "고정 루틴을 먼저 추가하세요")
         }
         .padding(8)
-        .frame(minHeight: 180, alignment: .top)
+        .frame(minHeight: 150, alignment: .top)
         .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(isDropTargeted
@@ -268,12 +269,12 @@ struct RoutineChip: View {
                     .foregroundStyle(color)
                     .frame(width: 14)
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(routine.name)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(.system(size: 11))
                         .opacity(0.7)
                     // 지금 하고 있는 것이면 남은 시간이 한 줄 더 선다. 좁은 칸에서 눌리지 않게 제 줄로.
                     TimerBadge(token: token, tint: color, slot: currentSlot)
@@ -287,7 +288,7 @@ struct RoutineChip: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.vertical, 4)
             .background(color.opacity(isQuota ? (hovering ? 0.12 : 0.07) : (hovering ? 0.18 : 0.12)),
                         in: RoundedRectangle(cornerRadius: 7))
             .overlay(
@@ -353,32 +354,34 @@ struct BlockChip: View {
     }
 
     private var chipBody: some View {
-            VStack(alignment: .leading, spacing: 4) {
+            // 길이는 여기서 뺐다. 요일 칸은 **무엇을 언제쯤 하는가**를 보는 자리고,
+            // 몇 시간짜리인지는 시간 자(→ DayTimelineView.swift)가 폭으로 이미 말한다.
+            // 숫자로 또 적으면 한 줄을 더 먹으면서 아무것도 더 알려주지 않았다.
+            // 시간대는 제목 줄 끝으로 올려 두 줄을 한 줄로 접었다.
+            VStack(alignment: .leading, spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     if let status = block.reviewStatus {
                         Image(systemName: status.systemImage)
-                            .font(.system(size: 13))
+                            .font(.system(size: 11))
                             .foregroundStyle(reviewTint(status))
                     }
                     Text(block.title)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 13, weight: .semibold))
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                }
-                HStack(spacing: 4) {
+                    Spacer(minLength: 4)
                     Text(block.timeBand.shortLabel)
-                    Text("·")
-                    Text(String(format: "%.1fh", block.durationHours))
+                        .font(.system(size: 11))
+                        .opacity(0.7)
+                        .layoutPriority(1)
                 }
-                .font(.system(size: 13))
-                .opacity(0.8)
 
                 // 지금 하고 있는 것이면 남은 시간이 한 줄 더 선다.
                 TimerBadge(token: block.dragToken, tint: palette.fg, slot: currentSlot)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
             .background(palette.bg, in: RoundedRectangle(cornerRadius: 7))
             .overlay(
                 RoundedRectangle(cornerRadius: 7)
