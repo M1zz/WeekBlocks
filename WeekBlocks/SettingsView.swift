@@ -300,12 +300,15 @@ struct SettingsView: View {
     private var purchaseSection: some View {
         Section {
             HStack {
-                Image(systemName: isPro ? "checkmark.seal.fill" : "leaf")
+                Image(systemName: !purchases.isKnown ? "hourglass"
+                                  : (isPro ? "checkmark.seal.fill" : "leaf"))
                     .foregroundStyle(isPro ? (Color(hex: Rainbow.indigo) ?? .indigo)
                                            : (Color(hex: Rainbow.green) ?? .green))
                 Text("버전")
                 Spacer()
-                Text(isPro ? "프로" : "무료")
+                // 아직 애플에게 답을 못 받았으면 '무료'라고 단정하지 않는다 —
+                // 산 사람이 첫 실행에서 무료라고 읽으면 그건 거짓말이다.
+                Text(purchases.isKnown ? (isPro ? "프로" : "무료") : "확인 중…")
                     .foregroundStyle(isPro ? .primary : .secondary)
                     .fontWeight(isPro ? .semibold : .regular)
             }

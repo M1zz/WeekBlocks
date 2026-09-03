@@ -40,15 +40,26 @@ enum MacEntitlement {
         return hasPurchased
     }
 
+    /// 캐시에 적혀 있는 답. **nil은 '안 샀다'가 아니라 '아직 애플에게 안 물어봤다'** 이다.
+    ///
+    /// `UserDefaults.bool(forKey:)`는 이 둘을 똑같이 false로 돌려준다. 그 차이를 잃으면
+    /// 처음 켠 사람에게 — 산 사람이라도 — 잠깐 "무료"라고 **단정해서** 말하게 된다.
+    /// 캐시는 빠르라고 두는 것이지 없는 답을 지어내라고 두는 것이 아니다.
+    static var cachedPurchase: Bool? {
+        UserDefaults.standard.object(forKey: purchasedKey) as? Bool
+    }
+
     /// **값을 치렀는가.** `sellsAccess`와 무관한 영수증의 사실이다.
     ///
     /// `isUnlocked`와 갈라 두는 이유: 팔기 전에는 아무도 안 샀는데도 `isUnlocked`가
     /// true다. 그 값으로 '함께 쓰기'를 판정하면 **무료 기간에 적은 것이 산 것과 똑같이**
     /// 다른 기기에 열려 버리고, 팔기 시작한 뒤에도 그대로 남는다 (→ TodoSharing.swift의
     /// `reconcileMySharing`). '적을 수 있는가'와 '나눠 쓸 수 있는가'는 다른 질문이다.
-    static var hasPurchased: Bool {
-        UserDefaults.standard.bool(forKey: purchasedKey)
-    }
+    ///
+    /// ⚠️ 모를 때는 **안 산 쪽으로 기운다.** 문을 여는 판단이라 모르는 채로 열면 안 된다.
+    ///    대신 *화면에 뭐라고 쓸지*는 이 값만으로 정하지 않는다 — `PurchaseManager.isKnown`을
+    ///    함께 보고, 아직 모르면 '무료'가 아니라 '확인 중'이라고 말한다.
+    static var hasPurchased: Bool { cachedPurchase ?? false }
 
     /// 영수증 확인 결과를 적는다. `PurchaseManager`만 부른다.
     static func setPurchased(_ value: Bool) {
@@ -68,6 +79,10 @@ final class PurchaseManager {
     /// 무료 개방 기간에는 `isUnlocked`가 참이어도 이 값은 거짓이다 — 설정의 '프로/무료'는
     /// 이쪽을 본다.
     private(set) var hasPurchased: Bool = MacEntitlement.hasPurchased
+    /// **애플에게 물어봐서 답을 받았는가.**
+    /// false면 화면은 '무료'라고 단정하면 안 된다 — 산 사람일 수도 있다.
+    /// 캐시가 이미 있으면 처음부터 참이다(빠르라고 두는 캐시의 값이 여기서 나온다).
+    private(set) var isKnown: Bool = MacEntitlement.cachedPurchase != nil
     private(set) var product: Product?
     private(set) var isWorking = false
     /// 사다가 막혔을 때 화면에 그대로 보여줄 말. 조용히 실패하면 사용자는
@@ -107,6 +122,7 @@ final class PurchaseManager {
         MacEntitlement.setPurchased(owned)
         isUnlocked = MacEntitlement.isUnlocked
         hasPurchased = MacEntitlement.hasPurchased
+        isKnown = true
         product = try? await Product.products(for: [MacEntitlement.productID]).first
     }
 
