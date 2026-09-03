@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 추적하지 않는다. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- 수집하는 것이 없다. 받은 할 일은 App Group을 거쳐 본체 앱으로만 간다. -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!-- '이유를 밝혀야 하는 API'. 확장도 자기 매니페스트가 있어야 한다. -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<!-- UserDefaults(App Group) — 공유로 받은 할 일을 '받은 상자'에 잠시 적어 둔다
+			     (→ TodoShareInbox.swift). 본체 앱이 가져가면 지운다. -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

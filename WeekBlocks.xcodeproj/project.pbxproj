@@ -10,6 +10,7 @@
 		000C681D2D7046529311197E /* CalendarImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11B625903C69DAA3D0BC27A /* CalendarImport.swift */; };
 		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
 		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
+		0B6B259A6790F4A36E517BC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */; };
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
 		2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */; };
@@ -47,7 +48,9 @@
 		B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */; };
 		B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD35C8D5A757450762EFDC34 /* TodoTips.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
+		C2A5B375AC8D47ACC6A8421C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */; };
 		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
+		D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
 		EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 144D087CE2C3CFFED2EABEE8 /* LeeoKit */; };
 		ED80D0BA5F1168CBEDCE0747 /* ShareTodoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622A5D436D0F426C007C5246 /* ShareTodoView.swift */; };
@@ -82,6 +85,7 @@
 /* Begin PBXFileReference section */
 		0DAA819E703DC5BE377B3688 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoShareIntake.swift; sourceTree = "<group>"; };
+		2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSchemaPrimer.swift; sourceTree = "<group>"; };
 		28ADD71097A3C0E497BF731A /* BlockEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditorView.swift; sourceTree = "<group>"; };
 		295B1036D16FB52A4E7D0C74 /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
@@ -114,9 +118,11 @@
 		AB645C90135FC303A3A31FA0 /* TodoAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoAccess.swift; sourceTree = "<group>"; };
 		B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoShareInbox.swift; sourceTree = "<group>"; };
 		B30E4F0DBDE964141EDE57D1 /* TodoShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TodoShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C11B625903C69DAA3D0BC27A /* CalendarImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarImport.swift; sourceTree = "<group>"; };
 		C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStepsView.swift; sourceTree = "<group>"; };
 		C368657EE69104A4BA70BA52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		CC4A396C6929CB1C576DBA52 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		CD35C8D5A757450762EFDC34 /* TodoTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTips.swift; sourceTree = "<group>"; };
 		D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
@@ -146,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				9FCA2B090B06BBF2FEE2C830 /* Info.plist */,
+				BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */,
 				622A5D436D0F426C007C5246 /* ShareTodoView.swift */,
 				AA8A00620F11E5E0DA035BC8 /* ShareViewController.swift */,
 				7970A4DA39D1705294090BDC /* TodoShare.entitlements */,
@@ -172,6 +179,7 @@
 				295B1036D16FB52A4E7D0C74 /* BacklogView.swift */,
 				28ADD71097A3C0E497BF731A /* BlockEditorView.swift */,
 				C11B625903C69DAA3D0BC27A /* CalendarImport.swift */,
+				2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */,
 				ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */,
 				E29F659737698D0D348D6468 /* ContentView.swift */,
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
@@ -181,6 +189,7 @@
 				D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */,
 				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
+				C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */,
 				45EF8BFE32D234EF9576302C /* ReflectionView.swift */,
 				0DAA819E703DC5BE377B3688 /* Routine.swift */,
 				9F541E3039606B54D810E610 /* RoutineDetailView.swift */,
@@ -250,6 +259,7 @@
 			buildConfigurationList = 1D0C2F44BD9D903CEFF9D132 /* Build configuration list for PBXNativeTarget "TodoShareExtension" */;
 			buildPhases = (
 				F05602A7486B0E5C5FD77C5A /* Sources */,
+				6FC79A261161E7983E1CCC5C /* Resources */,
 			);
 			buildRules = (
 			);
@@ -310,6 +320,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F70D1C2183A69BB4642EE6B /* Assets.xcassets in Resources */,
+				C2A5B375AC8D47ACC6A8421C /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6FC79A261161E7983E1CCC5C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B6B259A6790F4A36E517BC3 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +345,7 @@
 				7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */,
 				2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */,
 				000C681D2D7046529311197E /* CalendarImport.swift in Sources */,
+				D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */,
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,
 				55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */,
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,

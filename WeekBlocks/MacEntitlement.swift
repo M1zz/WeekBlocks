@@ -30,7 +30,7 @@ enum MacEntitlement {
     ///
     /// ⚠️ 파는 것은 **적기가 아니라 건너가기**다. 적는 것은 이 앱의 본체라 잠그지
     ///    않는다 (→ TodoAccess.swift).
-    static let sellsAccess = false
+    static let sellsAccess = true
 
     private static let purchasedKey = "mac.sync.purchased"
 

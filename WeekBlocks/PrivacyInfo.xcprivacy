@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 추적하지 않는다. 광고 식별자도, 제3자 추적 도메인도 없다. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- 수집하는 것이 없다. 할 일·계획은 사용자 본인의 iCloud(CloudKit 개인 데이터베이스)에만
+	     머물고 개발자에게 오지 않는다. -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!-- '이유를 밝혀야 하는 API'. 안 적으면 업로드 뒤 ITMS-91053이 온다. -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<!-- UserDefaults — 설정(주 시작·수면 숨기기), 구매 여부 거울,
+			     설치본 ID, 고른 캘린더 목록. 전부 이 앱 안에서만 쓴다. -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+		<dict>
+			<!-- 파일 타임스탬프 — SwiftData/CloudKit 저장소 파일을 다룰 때 프레임워크가
+			     쓴다. 앱이 직접 남의 파일을 들여다보지는 않는다. -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+		<dict>
+			<!-- 디스크 여유 공간 — 저장소를 열고 쓸 때 프레임워크가 확인한다. -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>E174.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -427,6 +427,24 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
 - [x] 툴바 '더 보기 → 캘린더에서 가져오기' + 결과 알림
       (권한·선택이 없으면 설정으로 보낸다 — 아무 일도 안 일어나면 고장으로 읽힌다)
 
+## 완료 (2026-09-03) — 첫 유료 출시 점검
+
+- [x] **아이폰 앱에 같은 필터가 있는지 확인** (가장 중요했던 것)
+      - iOS 저장소: `/Users/leeo/Documents/workspace/code/ScheduleDensity`
+      - `Views/TodoView.swift:81` → `TodoTree(allItems.filter(TodoSharing.isVisible))`
+      - `Shared/TodoSharing.swift`의 `isVisible`·`isMine`·`stamp` 규칙이 맥과 동일 ✅
+      - 즉 맥이 `isShared = false`로 찍은 줄은 아이폰이 안 그린다 → 유료화가 실제로 작동
+- [x] `MacEntitlement.sellsAccess = true`
+      ⚠️ 첫 유료 출시라 **심사 빌드에 켜져 있어야 한다.** 꺼두면 심사자가 상품을 찾지 못해
+         "unable to locate the in-app purchase"로 거절당한다.
+      ⚠️ 켜는 순간 무료 기간에 적은 줄이 `closeMyItems`로 닫힌다 (의도한 '유예 없애기').
+- [x] 프라이버시 매니페스트 (`PrivacyInfo.xcprivacy`) — 앱·확장 각각
+      - UserDefaults(CA92.1) / 파일 타임스탬프(C617.1) / 디스크 여유(E174.1)
+      - 없으면 업로드 뒤 ITMS-91053이 온다. Release 번들에 실제로 들어간 것 확인
+- [x] `CloudSchemaPrimer.swift` 이식 (iOS → 맥, DEBUG 전용) + 설정에 실행 단추
+      - CloudKit은 **값이 쓰인 필드만** 만든다. `calendarEventID` 같은 옵셔널은 표본을
+        한 벌 올려야 Development 스키마에 칸이 생기고, 그래야 Production에 배포된다
+
 ### 남은 일 (App Store Connect — 콘솔에서)
 - [ ] 유료 앱 계약 + 세금/은행 정보 (안 하면 상품이 아예 로드 안 된다)
 - [ ] 비소모성 상품 생성 — ID `com.devkoan.ScheduleDensityApp.sync` (글자 하나까지 동일)

@@ -24,6 +24,11 @@ struct SettingsView: View {
     /// 캘린더에서 읽어 올 것을 고르는 자리 (→ CalendarImport.swift).
     @State private var calendars = CalendarBridge.shared
 
+    #if DEBUG
+    @State private var primerBusy = false
+    @State private var primerNote: String?
+    #endif
+
     /// 산 것을 되찾는 자리 (→ PaywallView.swift).
     @State private var purchases = PurchaseManager.shared
     @State private var showingPaywall = false
@@ -144,6 +149,8 @@ struct SettingsView: View {
 
                 ScheduleShareSettingsSection(snapshotsProvider: scheduleSnapshots)
 
+                schemaPrimerSection
+
                 calendarSection
 
                 purchaseSection
@@ -228,6 +235,37 @@ struct SettingsView: View {
         } message: {
             Text("이 기기의 사본(루틴·계획·할 일)을 버리고 iCloud에 있는 것을 처음부터 받습니다.\n버리기 전에 지금 할 일을 파일로 떠 두므로, iCloud에 없는 할 일은 다음 실행에서 되살아납니다.\n\n앱을 다시 켜야 실제로 받아옵니다.")
         }
+    }
+
+    /// **출시 전 한 번 누르는 단추** (→ CloudSchemaPrimer.swift). 디버그에만 있다.
+    ///
+    /// CloudKit은 값이 실제로 쓰인 필드만 만든다. 옵셔널에 한 번도 값을 안 넣으면 스키마에
+    /// 칸이 안 생기고, 그러면 출시 뒤 그 값을 처음 넣는 사람의 동기화가 통째로 멈춘다.
+    @ViewBuilder
+    private var schemaPrimerSection: some View {
+        #if DEBUG
+        Section {
+            Button {
+                Task {
+                    primerBusy = true
+                    let report = await CloudSchemaPrimer.prime(TodoStore.shared.context)
+                    primerNote = report.note
+                    primerBusy = false
+                    refreshCounts()
+                }
+            } label: {
+                Label(primerBusy ? "표본을 올리는 중… (약 25초)" : "CloudKit 스키마 채우기",
+                      systemImage: "arrow.up.doc")
+            }
+            .disabled(primerBusy)
+
+            Text(primerNote ?? "모든 옵셔널 필드에 값을 채운 표본을 한 벌 올렸다 지웁니다. 레코드는 지워도 스키마는 남습니다. **출시 전에 한 번 누르고, 콘솔에서 Development → Production 배포하세요.**")
+                .font(.caption)
+                .foregroundStyle(primerNote == nil ? .secondary : .primary)
+        } header: {
+            Text("개발자 · CloudKit 스키마")
+        }
+        #endif
     }
 
     /// **어느 캘린더를 읽어 올지 고르는 자리.**
