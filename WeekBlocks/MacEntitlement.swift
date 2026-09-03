@@ -30,7 +30,13 @@ enum MacEntitlement {
     ///
     /// ⚠️ 파는 것은 **적기가 아니라 건너가기**다. 적는 것은 이 앱의 본체라 잠그지
     ///    않는다 (→ TodoAccess.swift).
-    static let sellsAccess = true
+    ///
+    /// ⚠️ **팔 수 있게 되기 전에는 켜지 말 것.** 한 번 켰다가 되돌렸다.
+    ///    상품이 App Store Connect에 아직 없으니 아무도 못 사고, 그러면 모두가
+    ///    `hasPurchased == false`라 **쓰던 사람의 것이 아이폰에서 통째로 사라진다.**
+    ///    (심사 빌드에는 켜져 있어야 하지만, 그건 **아카이브하는 순간**에 켜는 것이지
+    ///     평소 쓰는 빌드에 켜 두는 것이 아니다.)
+    static let sellsAccess = false
 
     private static let purchasedKey = "mac.sync.purchased"
 

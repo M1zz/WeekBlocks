@@ -480,7 +480,10 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
 - [ ] **가족 공유 끄기** (기본이 꺼짐. 켜면 한 번 사서 6명이 쓴다)
 - [ ] 가격·표시명·설명·심사용 스크린샷(페이월 화면)
 - [ ] 앱 새 빌드와 **함께** 심사 제출 (IAP 단독 제출은 거절 잦음)
-- [ ] 상품이 실제로 팔리기 시작하면 `MacEntitlement.sellsAccess = true`
+- [ ] `MacEntitlement.sellsAccess = true` — **아카이브하는 순간에만.**
+      ⚠️ 한 번 미리 켰다가 되돌렸다. 상품이 콘솔에 없으면 아무도 못 사고, 그러면
+         모두가 `hasPurchased == false`라 쓰던 사람의 것이 아이폰에서 통째로 사라진다.
+         평소 쓰는 빌드에는 절대 켜 두지 말 것.
 - [ ] 출시 전 CloudKit 스키마 Development → Production 배포
       ⚠️ 이제 **배포할 것이 실제로 생겼다** — `PlanBlock.calendarEventID`,
          그리고 `PlanBlock`·`Routine`의 `isShared`·`originInstallID`가 새 필드다.

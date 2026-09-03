@@ -121,21 +121,26 @@ enum TodoSharing {
 
     /// **영수증과 화면을 맞춘다.** 켤 때 한 번, 그리고 권한이 바뀔 때마다.
     ///
-    /// 판정의 근거는 `isUnlocked`가 아니라 **`hasPurchased`**다 (→ MacEntitlement.swift).
-    /// 팔기 전에는 아무도 안 샀는데 `isUnlocked`가 참이라, 그 값으로 판정하면 무료 기간에
-    /// 적은 것이 산 것과 구별되지 않는다.
+    /// 판정의 근거는 **`TodoAccess.canSync`** 하나다. 세 경우가 이 한 줄에 다 들어간다.
+    ///   - 아직 안 판다      → canSync 참  → 연다 (모두에게 열려 있는 기간)
+    ///   - 팔고, 샀다        → canSync 참  → 연다
+    ///   - 팔고, 안 샀다     → canSync 거짓 → 닫는다 (무료 기간에 열린 것도 함께)
+    ///
+    /// ⚠️ 한때 `hasPurchased`로 판정하고 '안 팔 때는 아무것도 안 한다'를 두었다가 데었다.
+    ///    그러면 **한 번 닫힌 것을 되돌릴 길이 없다** — 판다고 켰다가 되돌려도 닫힌 채
+    ///    그대로 남는다. 여는 쪽으로도 돌아올 수 있어야 스위치가 스위치다.
     ///
     /// ⚠️ 반드시 `PurchaseManager.refresh()` **뒤에** 부른다. 앞에서 부르면 UserDefaults에
     ///    남은 헌 거울을 보고 산 사람의 줄을 닫는다.
     static func reconcileMySharing(in context: ModelContext) {
-        if MacEntitlement.hasPurchased {
+        // 묻는 것은 하나뿐이다: **지금 이 기기의 것이 건너가도 되는가.**
+        // 그 답이 곧 `canSync`이고, `stamp`가 새 줄에 찍는 값과 같은 값이다.
+        // 두 곳이 다른 질문을 하면 새로 적은 것과 예전에 적은 것의 운명이 갈린다.
+        if TodoAccess.canSync {
             openMyItems(in: context)
-        } else if MacEntitlement.sellsAccess {
-            // 팔고 있는데 안 샀다 — 무료로 열려 있던 줄을 닫는다.
+        } else {
             closeMyItems(in: context)
         }
-        // 아직 팔기 전(`sellsAccess == false`)이면 아무것도 안 한다.
-        // 살 길이 없는 사람에게서 뺏으면 그건 값을 받는 게 아니라 고장이다.
     }
 
     /// 이 기기에서 난 줄 중 상대에게 **아직 안 보이는** 것의 수.
