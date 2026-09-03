@@ -5,8 +5,9 @@
 //  **'함께 쓰기'를 사는 자리.**
 //
 //  화면이 먼저 하는 말은 **무엇이 그대로인가**다. 잠긴 것부터 늘어놓으면 앱이 인질처럼
-//  보이는데, 실제로 이 앱의 본체는 잠겨 있지 않다 — 주간 계획도, 루틴도, 아이폰에서
-//  내려온 할 일을 보는 것도 값을 안 받는다. 값을 받는 것은 **이 기기에서 적기** 하나다.
+//  보이는데, 실제로 이 앱의 본체는 잠겨 있지 않다 — 주간 계획도, 루틴도, **적는 것도**,
+//  아이폰에서 내려온 할 일을 보는 것도 값을 안 받는다.
+//  값을 받는 것은 **여기서 적은 것이 아이폰으로 건너가기** 하나다 (→ TodoAccess.swift).
 //  그 사실을 감추면 안 사는 사람이 앱을 못 쓴다고 오해하고 지운다.
 //
 
@@ -24,7 +25,7 @@ struct PaywallView: View {
                 .tracking(-0.6)
                 .padding(.bottom, 6)
 
-            Text("이 맥에서 적은 할 일이 아이폰에도 보입니다.")
+            Text("여기서 적은 할 일이 아이폰에도 보입니다.")
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 24)
@@ -35,6 +36,7 @@ struct PaywallView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
                 row("calendar", "주간 계획과 루틴", "값을 받지 않습니다.")
+                row("square.and.pencil", "이 맥에서 적기", "무엇이든, 얼마든지 적습니다.")
                 row("iphone", "아이폰에서 온 할 일 보기", "계속 내려옵니다.")
                 row("eye", "예전에 적어 둔 것", "그대로 보입니다.")
             }
@@ -44,8 +46,8 @@ struct PaywallView: View {
                 Text("사면 열리는 것")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
-                row("square.and.pencil", "이 맥에서 적기",
-                    "적은 것이 아이폰에도 보입니다. 예전에 여기서 적어 둔 것도 함께 열립니다.")
+                row("arrow.left.arrow.right", "아이폰으로 건너가기",
+                    "여기서 적은 것이 아이폰에도 보입니다. 예전에 적어 둔 것도 함께 열립니다.")
             }
             .padding(.bottom, 24)
 

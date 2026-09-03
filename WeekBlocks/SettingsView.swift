@@ -240,10 +240,13 @@ struct SettingsView: View {
                     .fontWeight(isPro ? .semibold : .regular)
             }
 
+            // ⚠️ 여기 거는 값은 `canEdit`이 아니라 **`canSync`**다.
+            //    적기는 언제나 무료라 `canEdit`은 늘 참이고, 그걸 걸면 무료 사용자에게도
+            //    영영 '열림'이라고만 말한다 (→ TodoAccess.swift).
             HStack {
-                Text("이 맥에서 적기")
+                Text("아이폰으로 건너가기")
                 Spacer()
-                Text(TodoAccess.canEdit ? "열림" : "잠김")
+                Text(TodoAccess.canSync ? "열림" : "잠김")
                     .foregroundStyle(.secondary)
             }
 
@@ -251,7 +254,7 @@ struct SettingsView: View {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Label("프로로 열기", systemImage: "square.and.pencil")
+                    Label("프로로 열기", systemImage: "arrow.left.arrow.right")
                 }
             }
 
@@ -278,18 +281,18 @@ struct SettingsView: View {
         }
     }
 
-    /// 값을 치렀는가. `sellsAccess`가 꺼진 무료 개방 기간에는 적을 수 있어도 프로가 아니다
-    /// (→ MacEntitlement.swift의 `hasPurchased`).
+    /// 값을 치렀는가. `sellsAccess`가 꺼진 무료 개방 기간에는 건너가기가 열려 있어도
+    /// 프로가 아니다 (→ MacEntitlement.swift의 `hasPurchased`).
     private var isPro: Bool { purchases.hasPurchased }
 
     private var tierNote: String {
         if isPro {
-            return "이 맥에서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다."
+            return "여기서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다."
         }
         if MacEntitlement.sellsAccess {
-            return "주간 계획·루틴과 아이폰에서 온 할 일 보기는 무료입니다. 이 맥에서 적는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다."
+            return "적는 데는 아무 지장이 없습니다. 주간 계획·루틴도, 아이폰에서 온 할 일을 보는 것도 무료입니다. 여기서 적은 것이 아이폰으로 건너가는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다."
         }
-        return "지금은 모든 기능이 열려 있습니다. 판매를 시작하면 이 맥에서 적는 것만 프로가 됩니다."
+        return "지금은 모든 기능이 열려 있습니다. 판매를 시작해도 적는 것은 계속 무료이고, 여기서 적은 것이 아이폰으로 건너가는 것만 프로가 됩니다."
     }
 
     private func ruleRow(_ field: String, _ rule: String) -> some View {
