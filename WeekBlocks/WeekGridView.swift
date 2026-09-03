@@ -300,6 +300,15 @@ struct RoutineChip: View {
     }
 }
 
+/// 칩 귀퉁이에 들어갈 **짧은** 길이.
+/// `formatDuration`의 "1시간 30분"은 좁은 요일 칸에서 제목을 밀어내므로 여기서는 안 쓴다.
+/// 딱 떨어지면 소수점을 떼서 "2h", 아니면 "1.5h".
+func shortHours(_ hours: Double) -> String {
+    let rounded = (hours * 10).rounded() / 10
+    if rounded == rounded.rounded() { return "\(Int(rounded))h" }
+    return String(format: "%.1fh", rounded)
+}
+
 struct BlockChip: View {
     let block: PlanBlock
     /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
@@ -354,10 +363,11 @@ struct BlockChip: View {
     }
 
     private var chipBody: some View {
-            // 길이는 여기서 뺐다. 요일 칸은 **무엇을 언제쯤 하는가**를 보는 자리고,
-            // 몇 시간짜리인지는 시간 자(→ DayTimelineView.swift)가 폭으로 이미 말한다.
-            // 숫자로 또 적으면 한 줄을 더 먹으면서 아무것도 더 알려주지 않았다.
-            // 시간대는 제목 줄 끝으로 올려 두 줄을 한 줄로 접었다.
+            // 제목 줄 끝에 **길이**를 붙인다.
+            //
+            // 한때 이 자리에 시간대(아침·오후·저녁)를 뒀는데, 칸이 이미 시각 순으로 서
+            // 있어서 그 줄은 자기 위아래를 되풀이할 뿐이었다. 길이는 어디에도 안 적혀
+            // 있으니 이 자리에서만 알 수 있다.
             VStack(alignment: .leading, spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     if let status = block.reviewStatus {
@@ -370,8 +380,9 @@ struct BlockChip: View {
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 4)
-                    Text(block.timeBand.shortLabel)
+                    Text(shortHours(block.durationHours))
                         .font(.system(size: 11))
+                        .monospacedDigit()
                         .opacity(0.7)
                         .layoutPriority(1)
                 }
