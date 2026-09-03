@@ -408,6 +408,25 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
         적을 수 있어도 '무료'로 나온다
       - 사고·되찾는 단추는 `sellsAccess`가 켜졌을 때만 붙는다
 
+## 완료 (2026-09-03) — 캘린더에서 일정 가져오기
+
+- [x] `CalendarImport.swift` 신설 — EventKit 다리(`CalendarBridge`)
+      - 설계: **계획 블록으로** / **캘린더 단위 선택** / **캘린더 → 앱 한 방향(읽기 전용)**
+      - 권한: macOS 14부터 일정을 *읽으려면* 전체 접근이어야 한다. 쓰기 전용으로는 못 읽는다
+        → `NSCalendarsFullAccessUsageDescription` + 샌드박스
+        `com.apple.security.personal-information.calendars`
+      - 아무 캘린더도 안 고르면 **아무것도 안 가져온다** (전부 가져오기를 기본으로 두면
+        개인 일정이 주간 계획에 쏟아진다)
+      - 반복 일정은 회차마다 `eventIdentifier`가 같다 → 키에 시작 시각을 붙여 가른다
+      - 종일 일정은 24h가 아니라 1h + 시각 비움(`startHour = -1`).
+        24h로 들이면 그 요일 자유 시간이 통째로 사라진다
+      - 다시 가져오기: 새것 추가 / 시각·길이·제목만 갱신 / 사라진 것 정리.
+        ⚠️ **사람이 손댄 블록(성공 기준·산출물·회고)은 지우지 않고 캘린더 연결만 끊는다**
+- [x] `PlanBlock.calendarEventID` 추가 — nil이면 사람이 세운 블록, 가져오기가 안 건드린다
+- [x] 설정에 캘린더 고르는 자리 (`SettingsView.calendarSection`)
+- [x] 툴바 '더 보기 → 캘린더에서 가져오기' + 결과 알림
+      (권한·선택이 없으면 설정으로 보낸다 — 아무 일도 안 일어나면 고장으로 읽힌다)
+
 ### 남은 일 (App Store Connect — 콘솔에서)
 - [ ] 유료 앱 계약 + 세금/은행 정보 (안 하면 상품이 아예 로드 안 된다)
 - [ ] 비소모성 상품 생성 — ID `com.devkoan.ScheduleDensityApp.sync` (글자 하나까지 동일)
@@ -416,3 +435,6 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
 - [ ] 앱 새 빌드와 **함께** 심사 제출 (IAP 단독 제출은 거절 잦음)
 - [ ] 상품이 실제로 팔리기 시작하면 `MacEntitlement.sellsAccess = true`
 - [ ] 출시 전 CloudKit 스키마 Development → Production 배포
+      ⚠️ 이제 **배포할 것이 실제로 생겼다** — `PlanBlock.calendarEventID`가 새 필드다.
+         디버그로 한 번 가져오기를 돌려 Development 스키마에 필드를 만든 뒤 배포할 것.
+         (CloudKit 필드는 값이 실제로 저장될 때 생긴다)

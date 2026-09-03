@@ -24,6 +24,14 @@ final class PlanBlock {
 
     var createdAt: Date = Date()
 
+    /// 맥 캘린더에서 온 블록이면 그 일정을 가리키는 이름 (→ CalendarImport.swift).
+    /// nil이면 사람이 직접 세운 블록이라 가져오기가 절대 건드리지 않는다.
+    ///
+    /// ⚠️ **CloudKit 스키마가 늘어나는 필드다.** 옵셔널이라 기존 레코드는 그대로 열리지만,
+    ///    출시 전에 Development → Production 스키마 배포를 빠뜨리면 이 필드를 모르는
+    ///    서버가 미러링 초기화 자체를 실패시킨다 (→ WeekBlocks.entitlements의 경고).
+    var calendarEventID: String? = nil
+
     // Review (populated after the day passes)
     var reviewStatusRaw: String? = nil
     var reviewNote: String? = nil

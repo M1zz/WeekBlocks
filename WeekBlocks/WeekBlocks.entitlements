@@ -8,6 +8,10 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<!-- 캘린더 읽기 (→ CalendarImport.swift). 샌드박스 앱은 이 항목이 없으면
+	     Info.plist에 설명을 적어 두어도 EventKit이 빈 목록만 돌려준다. -->
+	<key>com.apple.security.personal-information.calendars</key>
+	<true/>
 	<!-- CloudKit 환경.
 	     ⚠️ **Development 다.** 예전에는 Production으로 못박아 두었는데, 그게 이번
 	        동기화 사고의 뿌리였다. Production에는 CloudKit이 레코드 타입·필드를

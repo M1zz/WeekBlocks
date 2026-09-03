@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		000C681D2D7046529311197E /* CalendarImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11B625903C69DAA3D0BC27A /* CalendarImport.swift */; };
 		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
 		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
@@ -113,6 +114,7 @@
 		AB645C90135FC303A3A31FA0 /* TodoAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoAccess.swift; sourceTree = "<group>"; };
 		B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoShareInbox.swift; sourceTree = "<group>"; };
 		B30E4F0DBDE964141EDE57D1 /* TodoShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TodoShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C11B625903C69DAA3D0BC27A /* CalendarImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarImport.swift; sourceTree = "<group>"; };
 		C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStepsView.swift; sourceTree = "<group>"; };
 		C368657EE69104A4BA70BA52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CC4A396C6929CB1C576DBA52 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */,
 				295B1036D16FB52A4E7D0C74 /* BacklogView.swift */,
 				28ADD71097A3C0E497BF731A /* BlockEditorView.swift */,
+				C11B625903C69DAA3D0BC27A /* CalendarImport.swift */,
 				ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */,
 				E29F659737698D0D348D6468 /* ContentView.swift */,
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
@@ -322,6 +325,7 @@
 				5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */,
 				7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */,
 				2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */,
+				000C681D2D7046529311197E /* CalendarImport.swift in Sources */,
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,
 				55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */,
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,

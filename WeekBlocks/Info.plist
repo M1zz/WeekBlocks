@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- 캘린더를 왜 보는지 (→ CalendarImport.swift).
+	     ⚠️ 일정을 **읽으려면** macOS 14부터 전체 접근이어야 한다. 쓰기 전용 권한으로는
+	        읽어 올 수가 없다. 권한 이름은 '전체'지만 이 앱은 읽기만 하므로, 사람이 보는
+	        이 문구에 그 사실을 분명히 적는다. -->
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>맥 캘린더의 일정을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다.</string>
 	<key>CKSharingSupported</key>
 	<true/>
 </dict>

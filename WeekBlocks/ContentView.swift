@@ -12,6 +12,8 @@ struct ContentView: View {
     @Query private var allQuotaPlacements: [QuotaPlacement]
 
     @State private var selectedWeek: Date = .currentWeekStart
+    /// 캘린더에서 가져온 결과를 사람에게 알리는 자리. 조용히 끝나면 눌린 줄도 모른다.
+    @State private var calendarNotice: String?
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: Routine?
@@ -150,6 +152,14 @@ struct ContentView: View {
                         Label("할 일 창 열기 (⇧⌘T)", systemImage: "macwindow.on.rectangle")
                     }
                     Divider()
+                    // 이미 캘린더에 적혀 있는 것을 손으로 또 적게 하지 않는다
+                    // (→ CalendarImport.swift). 고를 캘린더는 설정에서 정한다.
+                    Button {
+                        importFromCalendar()
+                    } label: {
+                        Label("캘린더에서 가져오기", systemImage: "calendar.badge.plus")
+                    }
+                    Divider()
                     Button {
                         routineSheet = RoutineSheetContext(routine: nil)
                     } label: {
@@ -170,6 +180,13 @@ struct ContentView: View {
                     Label("더 보기", systemImage: "ellipsis.circle")
                 }
             }
+        }
+        .alert("캘린더에서 가져오기",
+               isPresented: Binding(get: { calendarNotice != nil },
+                                    set: { if !$0 { calendarNotice = nil } })) {
+            Button("확인", role: .cancel) { calendarNotice = nil }
+        } message: {
+            Text(calendarNotice ?? "")
         }
         .sheet(item: $blockSheet) { ctx in
             BlockEditorView(
@@ -722,6 +739,20 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    /// **캘린더의 이번 주 일정을 계획 블록으로 옮긴다** (→ CalendarImport.swift).
+    ///
+    /// 권한이 없거나 고른 캘린더가 없으면 설정으로 보낸다 — 아무 일도 안 일어나면
+    /// 사람은 기능이 고장 났다고 읽는다.
+    private func importFromCalendar() {
+        let bridge = CalendarBridge.shared
+        guard bridge.hasAccess, !bridge.selectedIDs.isEmpty else {
+            showingSettings = true
+            return
+        }
+        let result = bridge.importWeek(selectedWeek, into: context)
+        calendarNotice = bridge.failureMessage ?? result.summary
     }
 
     /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).

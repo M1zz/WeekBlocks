@@ -21,6 +21,9 @@ struct SettingsView: View {
     @State private var refetchArmed = false
     @State private var showingRefetchAlert = false
 
+    /// 캘린더에서 읽어 올 것을 고르는 자리 (→ CalendarImport.swift).
+    @State private var calendars = CalendarBridge.shared
+
     /// 산 것을 되찾는 자리 (→ PaywallView.swift).
     @State private var purchases = PurchaseManager.shared
     @State private var showingPaywall = false
@@ -141,6 +144,8 @@ struct SettingsView: View {
 
                 ScheduleShareSettingsSection(snapshotsProvider: scheduleSnapshots)
 
+                calendarSection
+
                 purchaseSection
 
                 Section {
@@ -209,7 +214,10 @@ struct SettingsView: View {
             .padding(20)
         }
         .frame(minWidth: 460, minHeight: 540)
-        .task { refreshCounts() }
+        .task {
+            refreshCounts()
+            calendars.reloadCalendarsIfAllowed()
+        }
         .sheet(isPresented: $showingPaywall) { PaywallView() }
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
             Button("취소", role: .cancel) { }
@@ -219,6 +227,68 @@ struct SettingsView: View {
             }
         } message: {
             Text("이 기기의 사본(루틴·계획·할 일)을 버리고 iCloud에 있는 것을 처음부터 받습니다.\n버리기 전에 지금 할 일을 파일로 떠 두므로, iCloud에 없는 할 일은 다음 실행에서 되살아납니다.\n\n앱을 다시 켜야 실제로 받아옵니다.")
+        }
+    }
+
+    /// **어느 캘린더를 읽어 올지 고르는 자리.**
+    ///
+    /// 고르는 단위가 캘린더인 이유는 한 번 정해두면 손이 안 가기 때문이다. 일정 하나하나를
+    /// 고르게 하면 매주 같은 목록을 다시 훑어야 한다.
+    ///
+    /// ⚠️ 아무것도 안 고르면 **아무것도 안 가져온다.** 전부 가져오는 쪽을 기본으로 두면
+    ///    개인 일정이 주간 계획에 통째로 쏟아진다.
+    @ViewBuilder
+    private var calendarSection: some View {
+        Section {
+            if calendars.hasAccess {
+                if calendars.calendars.isEmpty {
+                    Text("맥에 캘린더가 없습니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(calendars.calendars, id: \.calendarIdentifier) { cal in
+                        Toggle(isOn: Binding(
+                            get: { calendars.isSelected(cal) },
+                            set: { _ in calendars.toggle(cal) }
+                        )) {
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color(nsColor: cal.color ?? .secondaryLabelColor))
+                                    .frame(width: 9, height: 9)
+                                Text(cal.title)
+                                if let source = cal.source?.title, !source.isEmpty {
+                                    Text(source)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Text("고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Button {
+                    Task { await calendars.requestAccess() }
+                } label: {
+                    Label("캘린더 접근 허용", systemImage: "calendar.badge.plus")
+                }
+                .disabled(calendars.isWorking)
+
+                Text("맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let message = calendars.failureMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+        } header: {
+            Text("캘린더")
         }
     }
 
