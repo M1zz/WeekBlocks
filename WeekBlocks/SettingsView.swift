@@ -224,6 +224,9 @@ struct SettingsView: View {
         .task {
             refreshCounts()
             calendars.reloadCalendarsIfAllowed()
+            // 상품을 여기서 한 번 더 불러온다. 켤 때 한 번 읽지만 그때 못 받았으면
+            // 설정을 열어도 단추가 안 선다 — 설정은 사람이 '사러 오는' 자리다.
+            await purchases.refresh()
         }
         .sheet(isPresented: $showingPaywall) { PaywallView() }
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
@@ -361,27 +364,34 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            if MacEntitlement.sellsAccess && !isPro {
+            // **살 수 있을 때만 단추를 낸다** — 그 판정을 `sellsAccess`가 아니라
+            // **상품이 실제로 불러와졌는가**로 한다.
+            //
+            // 플래그로 가리면 두 쪽 다 틀린다. 켜 두면 콘솔에 상품이 없는 동안 눌러도
+            // 아무 일이 안 나는 단추가 서고, 꺼 두면 개발 빌드에서 구매 흐름을 볼 수가
+            // 없다. 애플이 상품을 내주면 살 수 있는 것이고 아니면 못 사는 것이라,
+            // `product != nil`이 그 사실 자체다.
+            if let product = purchases.product, !isPro {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Label("프로로 열기", systemImage: "arrow.left.arrow.right")
+                    Label("Pro 버전 구매 · \(product.displayPrice)", systemImage: "sparkles")
                 }
             }
 
-            if MacEntitlement.sellsAccess {
+            if purchases.product != nil || isPro {
                 Button {
                     Task { await purchases.restore() }
                 } label: {
                     Label("구매 복원", systemImage: "arrow.clockwise")
                 }
                 .disabled(purchases.isWorking)
+            }
 
-                if let message = purchases.failureMessage {
-                    Text(message)
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
+            if let message = purchases.failureMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.orange)
             }
 
             Text(tierNote)
