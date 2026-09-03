@@ -26,6 +26,18 @@ enum DayPlanItem: Identifiable {
         case .block(_, let h): h
         }
     }
+
+    /// 이 항목이 차지하는 시간. 칩 사이의 **틈을 재는** 데 쓴다 (→ DayColumn.gapZone).
+    var hours: Double {
+        switch self {
+        case .fixedRoutine(_, _, _, let h): h
+        case .quotaSession(let r, _, _): r.dailyQuotaHours / Double(max(1, r.sessionsPerDay))
+        case .block(let b, _): b.durationHours
+        }
+    }
+
+    /// 이 항목이 끝나는 시각.
+    var endHour: Double { atHour + hours }
 }
 
 struct DayColumn: View {
@@ -43,8 +55,13 @@ struct DayColumn: View {
     /// 루틴 '수정' — 이름·요일·시각을 바꾸는 편집기
     var onEditRoutineSchedule: ((Routine) -> Void)? = nil
     let onDropBacklog: (String) -> Void
+    /// 칩과 칩 **사이**에 떨어뜨렸을 때. (토큰, 놓을 시각, 그 틈의 크기)
+    /// 틈보다 큰 것이 들어오면 받는 쪽이 겹침을 알린다 (→ ContentView.dropIntoGap).
+    var onDropIntoGap: (String, Double, Double) -> Void = { _, _, _ in }
 
     @State private var isDropTargeted = false
+    /// 지금 겨냥한 틈. 그 자리에 파란 선이 선다.
+    @State private var targetedGap: Int?
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
 
@@ -69,6 +86,61 @@ struct DayColumn: View {
         case .block(let b, _):
             return slot.id == b.dragToken ? slot : nil
         }
+    }
+
+    /// 하루의 항목들. 오늘 칸에는 붉은 '지금' 선이, 항목 사이사이에는 **끼워 넣는 자리**가 선다.
+    ///
+    /// 예전에는 오늘/오늘 아닌 칸이 각자 목록을 그렸다가 한쪽만 고치는 일이 생겼다. 하나로 합쳤다.
+    @ViewBuilder
+    private func itemList(now: Double?) -> some View {
+        // 지금보다 늦은 첫 항목 **앞**에 선을 끼운다. 그런 항목이 없으면 맨 아래 = 오늘 계획을 다 지났다.
+        let cut = now.map { n in items.firstIndex { $0.atHour > n } ?? items.count }
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                if let now, index == cut { nowMarker(now) }
+                gapZone(at: index)
+                chip(for: item)
+            }
+            if let now, cut == items.count { nowMarker(now) }
+            gapZone(at: items.count)
+        }
+    }
+
+    /// **칩과 칩 사이에 끼워 넣는 자리.**
+    ///
+    /// 요일 칸에는 '수동 순서'라는 것이 없다 — 자리는 곧 시각이다(`PlanBlock.sortHour`).
+    /// 그래서 순서를 바꾼다는 것은 **시각을 정한다**는 뜻이고, 그 시각을 여기서 이웃한
+    /// 두 항목으로부터 잡는다: 앞 항목이 끝나는 시각에 놓는다.
+    private func gapZone(at index: Int) -> some View {
+        let targeted = targetedGap == index
+        return Color.clear
+            .frame(height: targeted ? 14 : 8)
+            .frame(maxWidth: .infinity)
+            .overlay {
+                if targeted {
+                    Capsule()
+                        .fill(Color.accentColor)
+                        .frame(height: 3)
+                        .padding(.horizontal, 2)
+                }
+            }
+            .contentShape(Rectangle())
+            .dropDestination(for: String.self) { dropped, _ in
+                targetedGap = nil
+                guard canPlan, let token = dropped.first else { return false }
+                let bounds = gapBounds(at: index)
+                onDropIntoGap(token, bounds.start, bounds.gap)
+                return true
+            } isTargeted: { targetedGap = ($0 && canPlan) ? index : nil }
+            .animation(.easeOut(duration: 0.12), value: targeted)
+    }
+
+    /// 이 틈이 **언제 시작해서 얼마나 넓은가.**
+    /// 맨 위는 0시부터, 맨 아래는 24시까지로 본다.
+    private func gapBounds(at index: Int) -> (start: Double, gap: Double) {
+        let start = index > 0 ? items[index - 1].endHour : 0
+        let next = index < items.count ? items[index].atHour : 24
+        return (max(0, min(start, 24)), max(0, next - start))
     }
 
     /// 한 항목의 칩. '지금' 선을 끼우느라 두 곳에서 쓰므로 따로 뺐다.
@@ -145,21 +217,10 @@ struct DayColumn: View {
             if isToday {
                 // 분이 바뀌면 선도 한 칸씩 내려간다. 다시 그리는 건 오늘 칸 하나뿐이다.
                 TimelineView(.everyMinute) { ctx in
-                    let now = Self.hourOfDay(ctx.date)
-                    // 지금보다 늦은 첫 항목 **앞**에 선을 끼운다. 그런 항목이 없으면 맨 아래 = 오늘 계획을 다 지났다.
-                    let cut = items.firstIndex { $0.atHour > now } ?? items.count
-                    VStack(alignment: .leading, spacing: 4) {
-                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                            if index == cut { nowMarker(now) }
-                            chip(for: item)
-                        }
-                        if cut == items.count { nowMarker(now) }
-                    }
+                    itemList(now: Self.hourOfDay(ctx.date))
                 }
             } else {
-                ForEach(items) { item in
-                    chip(for: item)
-                }
+                itemList(now: nil)
             }
 
             Button(action: onAdd) {

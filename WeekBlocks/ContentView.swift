@@ -14,6 +14,8 @@ struct ContentView: View {
     @State private var selectedWeek: Date = .currentWeekStart
     /// 캘린더에서 가져온 결과를 사람에게 알리는 자리. 조용히 끝나면 눌린 줄도 모른다.
     @State private var calendarNotice: String?
+    /// 끼워 넣은 것이 틈보다 커서 겹쳤을 때 뜨는 붉은 줄.
+    @State private var conflictNotice: String?
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: Routine?
@@ -607,6 +609,10 @@ struct ContentView: View {
             // 두 자리는 **겹쳐 세우고 옆으로 밀어** 바꾼다.
             // 위아래로 갈아 끼우면 새 자리가 어디서 왔는지 알 수 없어
             // 매번 화면을 처음부터 다시 읽게 된다.
+            if let notice = conflictNotice {
+                conflictBanner(notice)
+            }
+
             ZStack(alignment: .topLeading) {
                 switch weekLens {
                 case .plan:
@@ -618,6 +624,41 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    /// **겹쳤다고 알리는 붉은 줄.**
+    ///
+    /// 알림창(alert)으로 안 낸 이유: 끼워 넣기는 여러 번 이어서 하는 손짓이라, 매번 창이
+    /// 뜨면 흐름이 끊긴다. 그리고 겹침은 *지금 이 화면에서는 볼 수 없는* 일이므로,
+    /// 말만 하는 것으로 끝내지 않고 **볼 수 있는 자리로 가는 길**을 같은 줄에 둔다.
+    private func conflictBanner(_ notice: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12))
+            Text(notice)
+                .font(.system(size: 12, weight: .medium))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button("시간축으로 보기") {
+                withAnimation(.snappy(duration: 0.3)) { weekLensRaw = WeekLens.day.rawValue }
+                conflictNotice = nil
+            }
+            .buttonStyle(.plain)
+            .font(.system(size: 12, weight: .semibold))
+            .underline()
+            Button {
+                conflictNotice = nil
+            } label: {
+                Image(systemName: "xmark").font(.system(size: 11, weight: .semibold))
+            }
+            .buttonStyle(.plain)
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.red.opacity(0.92), in: RoundedRectangle(cornerRadius: 8))
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     /// 세그먼트를 누르면 값이 애니메이션과 함께 바뀐다.
@@ -732,6 +773,9 @@ struct ContentView: View {
                         },
                             onDropBacklog: { token in
                                 dropBacklogItem(token: token, day: day)
+                            },
+                            onDropIntoGap: { token, start, gap in
+                                dropIntoGap(token: token, day: day, startHour: start, gap: gap)
                             }
                         )
                         .frame(maxWidth: .infinity, alignment: .top)
@@ -844,6 +888,35 @@ struct ContentView: View {
             convertBacklogItem(item, to: day, atHour: atHour)
         }
         try? context.save()
+    }
+
+    /// **칩 사이에 끼워 넣는다 — 순서를 바꾼다는 건 시각을 정한다는 뜻이다.**
+    ///
+    /// 요일 칸에는 수동 순서가 없다. 자리는 곧 시각이라(`PlanBlock.sortHour`), 앞 항목이
+    /// 끝나는 시각에 놓아 원하는 자리에 서게 한다.
+    ///
+    /// ⚠️ 틈보다 큰 것이 들어오면 **그래도 옮긴다.** 안 옮기고 튕기면 사람은 드래그가
+    ///    고장 났다고 읽는다. 대신 겹쳤다는 사실을 붉게 알리고, 겹침이 실제로 보이는
+    ///    자리(시간축)로 갈 길을 함께 준다. 요일 칸은 겹침을 그리지 못한다.
+    private func dropIntoGap(token: String, day: DayOfWeek, startHour: Double, gap: Double) {
+        guard token.hasPrefix("block:") else {
+            // 백로그 항목·루틴은 원래 길로. 시각까지 정해서 넘긴다.
+            dropBacklogItem(token: token, day: day, atHour: startHour)
+            return
+        }
+        guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
+        blk.day = day
+        blk.startHour = clampStart(startHour, duration: blk.durationHours)
+        blk.timeBand = timeBand(for: blk.startHour)
+        try? context.save()
+
+        // 0.01은 반올림 앙금을 무시하려는 여유다. 1.5h가 1.4999h 틈에 안 들어간다고
+        // 경고하면 사람은 앱이 트집 잡는다고 느낀다.
+        if blk.durationHours > gap + 0.01 {
+            withAnimation(.snappy(duration: 0.2)) {
+                conflictNotice = "‘\(blk.title)’(\(shortHours(blk.durationHours)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다."
+            }
+        }
     }
 
     /// 떨어뜨린 시각을 하루 안에 가둔다 — 끝자락에 놓아도 자정을 넘겨 사라지지 않게.
