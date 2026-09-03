@@ -445,6 +445,24 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
       - CloudKit은 **값이 쓰인 필드만** 만든다. `calendarEventID` 같은 옵셔널은 표본을
         한 벌 올려야 Development 스키마에 칸이 생기고, 그래야 Production에 배포된다
 
+## 완료 (2026-09-03) — 유료 경계를 계획·루틴까지 넓힘 (두 앱 통일)
+
+- [x] `PlanBlock`·`Routine`에 `isShared`/`originInstallID` 추가 — **맥·아이폰 양쪽**
+      - 기본값 `true`/`""` — 기존 데이터는 그대로 보인다(뺏지 않는다)
+- [x] `SharedRecord` 프로토콜 신설 (양쪽) — 세 모델이 같은 규칙 한 벌을 쓴다.
+      규칙을 세 번 쓰면 언젠가 한 벌만 고쳐져 어긋난다
+- [x] 맥: **모델 `init`에서 찍는다.** 만드는 자리가 블록 6곳·루틴 6곳이라 부르는 쪽에
+      맡기면 언젠가 한 곳을 빠뜨리고, 빠뜨린 것은 조용한 구멍이 된다.
+      CloudKit이 내려준 레코드는 init을 안 거치므로 남의 값이 안 덮인다
+- [x] 맥: `@Query` 12개를 `~Raw`로 바꾸고 거른 계산 프로퍼티를 세웠다
+      ⚠️ `deleteAllData`만 예외 — 거르지 않은 Raw를 쓴다. '보이는 것'만 지우면
+         안 그려진 것이 남아 다음 실행에 되살아난 것처럼 보인다
+- [x] 아이폰: `WeekBlocksStore`의 읽는 자리 4곳에 필터
+      (`titlesAssigned`·`dayInput`·`mirrorCounts`·`loadVisualEvents`).
+      아이폰은 이 파일 밖에서 계획·루틴을 읽지 않아서 여기가 유일한 길목이다
+- [x] `openMyItems`/`closeMyItems`가 세 모델을 한 번에 뒤집는다 (`flipMine`)
+- [x] 스키마 표본(양쪽)에 새 칸을 채웠다
+
 ### 남은 일 (App Store Connect — 콘솔에서)
 - [ ] 유료 앱 계약 + 세금/은행 정보 (안 하면 상품이 아예 로드 안 된다)
 - [ ] 비소모성 상품 생성 — ID `com.devkoan.ScheduleDensityApp.sync` (글자 하나까지 동일)
@@ -453,6 +471,7 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
 - [ ] 앱 새 빌드와 **함께** 심사 제출 (IAP 단독 제출은 거절 잦음)
 - [ ] 상품이 실제로 팔리기 시작하면 `MacEntitlement.sellsAccess = true`
 - [ ] 출시 전 CloudKit 스키마 Development → Production 배포
-      ⚠️ 이제 **배포할 것이 실제로 생겼다** — `PlanBlock.calendarEventID`가 새 필드다.
+      ⚠️ 이제 **배포할 것이 실제로 생겼다** — `PlanBlock.calendarEventID`,
+         그리고 `PlanBlock`·`Routine`의 `isShared`·`originInstallID`가 새 필드다.
          디버그로 한 번 가져오기를 돌려 Development 스키마에 필드를 만든 뒤 배포할 것.
          (CloudKit 필드는 값이 실제로 저장될 때 생긴다)

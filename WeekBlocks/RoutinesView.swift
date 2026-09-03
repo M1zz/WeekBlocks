@@ -150,7 +150,10 @@ struct RoutineEditorView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     /// 겹침을 미리 말해 주려면 이미 세워 둔 것들을 알아야 한다.
-    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var allRoutines: [Routine]
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var allRoutinesRaw: [Routine]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allRoutines: [Routine] { allRoutinesRaw.filter(TodoSharing.isVisible) }
 
     let existing: Routine?
 

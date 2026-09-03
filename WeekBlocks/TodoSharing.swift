@@ -25,6 +25,19 @@
 import Foundation
 import SwiftData
 
+/// **함께 쓰는지를 스스로 말할 수 있는 것.**
+///
+/// 할 일에만 걸려 있던 규칙을 계획 블록·루틴까지 넓히면서, 세 모델이 같은 두 칸을
+/// 갖게 됐다. 규칙을 세 번 쓰면 언젠가 한 벌만 고쳐져 어긋나므로 하나로 묶는다.
+protocol SharedRecord: AnyObject {
+    var isShared: Bool { get set }
+    var originInstallID: String { get set }
+}
+
+extension BacklogItem: SharedRecord {}
+extension PlanBlock: SharedRecord {}
+extension Routine: SharedRecord {}
+
 enum TodoSharing {
 
     /// 이 설치본의 이름. 기기가 아니라 **이 앱이 깔린 자리**를 가리킨다.
@@ -40,18 +53,18 @@ enum TodoSharing {
     /// 이 줄을 이 기기에서 만들었는가.
     /// 이름이 비어 있으면(이 기능이 생기기 전에 적은 줄) 내 것으로 본다 —
     /// 쓰던 사람의 줄이 갑자기 남의 것이 되어 사라지면 안 된다.
-    static func isMine(_ item: BacklogItem) -> Bool {
+    static func isMine(_ item: some SharedRecord) -> Bool {
         item.originInstallID.isEmpty || item.originInstallID == installID
     }
 
     /// **화면에 그릴 줄인가.** 감추는 것은 *남이 잠긴 채로 적어 둔 줄* 하나뿐이다.
     /// 내 줄은 잠겨 있어도 내 화면에서는 그대로 보인다.
-    static func isVisible(_ item: BacklogItem) -> Bool {
+    static func isVisible(_ item: some SharedRecord) -> Bool {
         item.isShared || isMine(item)
     }
 
     /// 새로 적는 줄에 지금 상태를 새긴다.
-    static func stamp(_ item: BacklogItem) {
+    static func stamp(_ item: some SharedRecord) {
         item.originInstallID = installID
         item.isShared = TodoAccess.canSync
     }
@@ -60,12 +73,29 @@ enum TodoSharing {
     /// 그때부터 올라가는 것이 아니라 **이미 올라가 있던 것이 그제서야 보이는** 것이라
     /// 기다림이 없다.
     static func openMyItems(in context: ModelContext) {
-        let mine = ((try? context.fetch(FetchDescriptor<BacklogItem>())) ?? [])
-            .filter { !$0.isShared && isMine($0) }
-        guard !mine.isEmpty else { return }
-        for item in mine { item.isShared = true }
+        let n = flipMine(to: true, in: context)
+        guard n > 0 else { return }
         try? context.save()
-        print("🔓 [Sharing] 이 기기의 할 일 \(mine.count)개를 함께 쓰기로 열었다")
+        print("🔓 [Sharing] 이 기기의 것 \(n)개를 함께 쓰기로 열었다")
+    }
+
+    /// 세 모델을 한 번에 뒤집는다. **내 것만** 건드린다.
+    ///
+    /// 할 일·계획 블록·루틴이 모두 같은 규칙을 따르므로 한 자리에서 돈다.
+    /// 여기 빠진 모델이 있으면 그것만 조용히 새어 보인다 — 모델을 늘릴 때 같이 늘릴 것.
+    private static func flipMine(to value: Bool, in context: ModelContext) -> Int {
+        flip(BacklogItem.self, to: value, in: context)
+            + flip(PlanBlock.self, to: value, in: context)
+            + flip(Routine.self, to: value, in: context)
+    }
+
+    private static func flip<T: PersistentModel & SharedRecord>(
+        _ type: T.Type, to value: Bool, in context: ModelContext
+    ) -> Int {
+        let mine = ((try? context.fetch(FetchDescriptor<T>())) ?? [])
+            .filter { $0.isShared != value && isMine($0) }
+        for item in mine { item.isShared = value }
+        return mine.count
     }
 
     /// **무료로 열려 있던 것을 도로 닫는다.** 팔기 시작했는데 안 산 기기에서.
@@ -83,12 +113,10 @@ enum TodoSharing {
     ///    상대 기기의 디스크에도 그대로 남아 있다가 값을 치르면 `openMyItems`가 도로 연다.
     ///    되돌릴 수 있는 커튼이지 태우는 일이 아니다.
     static func closeMyItems(in context: ModelContext) {
-        let mine = ((try? context.fetch(FetchDescriptor<BacklogItem>())) ?? [])
-            .filter { $0.isShared && isMine($0) }
-        guard !mine.isEmpty else { return }
-        for item in mine { item.isShared = false }
+        let n = flipMine(to: false, in: context)
+        guard n > 0 else { return }
         try? context.save()
-        print("🔒 [Sharing] 이 기기의 할 일 \(mine.count)개를 함께 쓰기에서 닫았다")
+        print("🔒 [Sharing] 이 기기의 것 \(n)개를 함께 쓰기에서 닫았다")
     }
 
     /// **영수증과 화면을 맞춘다.** 켤 때 한 번, 그리고 권한이 바뀔 때마다.

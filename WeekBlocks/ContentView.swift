@@ -4,8 +4,14 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.openWindow) private var openWindow
-    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routines: [Routine]
-    @Query private var allBlocks: [PlanBlock]
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routinesRaw: [Routine]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var routines: [Routine] { routinesRaw.filter(TodoSharing.isVisible) }
+    @Query private var allBlocksRaw: [PlanBlock]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
     @Query(sort: [SortDescriptor(\BacklogItem.sortIndex), SortDescriptor(\BacklogItem.createdAt)])
     private var backlogItems: [BacklogItem]
     @Query private var allOccurrences: [RoutineOccurrence]
@@ -1110,9 +1116,12 @@ struct ContentView: View {
         try? context.save()
     }
 
+    /// ⚠️ **거르지 않은 목록(Raw)을 쓴다.** '모든 데이터 삭제'가 화면에 보이는 것만
+    ///    지우면, 안 그려진 것이 스토어에 남아 다음 실행에 되살아난 것처럼 보인다.
+    ///    '보이는 것'과 '있는 것'을 가르는 자리라 여기서만 예외를 둔다.
     private func deleteAllData() {
-        for b in allBlocks { context.delete(b) }
-        for r in routines { context.delete(r) }
+        for b in allBlocksRaw { context.delete(b) }
+        for r in routinesRaw { context.delete(r) }
         for o in allOccurrences { context.delete(o) }
         for i in backlogItems { context.delete(i) }
         try? context.save()

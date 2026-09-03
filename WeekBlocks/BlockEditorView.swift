@@ -6,9 +6,14 @@ struct BlockEditorView: View {
     @Environment(\.dismiss) private var dismiss
 
     /// 이 날에 이미 잡혀 있는 것들 — 만들기 전에 자리가 있는지 말해 주려고 본다.
-    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var allRoutines: [Routine]
-    @Query private var allBlocks: [PlanBlock]
-
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var allRoutinesRaw: [Routine]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allRoutines: [Routine] { allRoutinesRaw.filter(TodoSharing.isVisible) }
+    @Query private var allBlocksRaw: [PlanBlock]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
     let existing: PlanBlock?
     let day: DayOfWeek
     let weekStart: Date

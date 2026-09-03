@@ -32,6 +32,21 @@ final class PlanBlock {
     ///    서버가 미러링 초기화 자체를 실패시킨다 (→ WeekBlocks.entitlements의 경고).
     var calendarEventID: String? = nil
 
+
+    // MARK: - 함께 쓰는 것인가 (→ TodoSharing.swift)
+    //
+    // 할 일과 같은 규칙을 계획·루틴에도 건다. 동기화 엔진은 골라서 안 올리는 것을
+    // 못 하므로, **올라가게 두고 받는 쪽에서 안 그린다.** 그 판단에 필요한 것이
+    // 레코드에 같이 실려 가야 한다 — 받는 쪽은 상대가 그때 샀는지를 알 길이 없다.
+
+    /// 상대 기기에도 보여도 되는가. 잠긴 기기에서 만든 것은 false로 찍힌다.
+    var isShared: Bool = true
+
+    /// 이것이 난 자리(앱 설치본). 잠긴 기기의 스토어에는 자기 것과 상대 것이 섞여 있어서,
+    /// 감출 것을 고르려면 누가 만들었는지를 알아야 한다.
+    /// 비어 있으면 이 기능이 생기기 전에 만든 것이고, 그때는 내 것으로 본다.
+    var originInstallID: String = ""
+
     // Review (populated after the day passes)
     var reviewStatusRaw: String? = nil
     var reviewNote: String? = nil
@@ -59,6 +74,11 @@ final class PlanBlock {
         self.withinRoutine = withinRoutine
         self.startHour = startHour
         self.createdAt = Date()
+        // ⚠️ **여기서 찍는다.** 만드는 자리가 여섯 곳이라 부르는 쪽에 맡기면 언젠가
+        //    한 곳을 빠뜨리고, 빠뜨린 것은 '잠긴 기기에서 만든 게 상대에게 보인다'는
+        //    조용한 구멍이 된다. CloudKit이 내려준 레코드는 init을 거치지 않으므로
+        //    남의 값이 덮이지 않는다.
+        TodoSharing.stamp(self)
     }
 
     var day: DayOfWeek {

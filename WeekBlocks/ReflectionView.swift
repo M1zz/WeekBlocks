@@ -7,8 +7,10 @@ struct ReflectionView: View {
 
     let weekStart: Date
 
-    @Query private var allBlocks: [PlanBlock]
-
+    @Query private var allBlocksRaw: [PlanBlock]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
     private var weekBlocks: [PlanBlock] {
         allBlocks
             .filter { Calendar.current.isDate($0.weekStartDate, inSameDayAs: weekStart) }

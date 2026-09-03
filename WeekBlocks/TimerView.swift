@@ -15,8 +15,14 @@ import SwiftData
 // MARK: - 타이머 창
 
 struct TimerWindowView: View {
-    @Query private var allBlocks: [PlanBlock]
-    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routines: [Routine]
+    @Query private var allBlocksRaw: [PlanBlock]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routinesRaw: [Routine]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var routines: [Routine] { routinesRaw.filter(TodoSharing.isVisible) }
     @Query private var allOccurrences: [RoutineOccurrence]
     @Query private var allQuotaPlacements: [QuotaPlacement]
 

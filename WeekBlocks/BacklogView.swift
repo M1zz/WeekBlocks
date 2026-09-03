@@ -678,8 +678,14 @@ struct TodoWindowView: View {
 
     private let weekStart: Date = .currentWeekStart
 
-    @Query private var allBlocks: [PlanBlock]
-    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routines: [Routine]
+    @Query private var allBlocksRaw: [PlanBlock]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routinesRaw: [Routine]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
+    private var routines: [Routine] { routinesRaw.filter(TodoSharing.isVisible) }
 
     /// 이번 주의 계획 블록 — 카드에 '어느 요일에 올렸는지'를 붙이는 데 쓴다.
     private var weekBlocks: [PlanBlock] {

@@ -22,9 +22,9 @@
 //  ⚠️ 디버그 빌드에서만, Development 환경에서만 쓸 것. 표본이 잠깐 목록에 보였다 사라진다.
 //     Production에서는 애초에 필드가 자동 생성되지 않으므로 소용도 없다.
 //
-//  ⚠️ **모델에 옵셔널 필드를 더할 때마다 여기도 함께 고칠 것.** 안 고치면 이 파일이
-//     있으나 마나다 — 지금 채우는 것은 PlanBlock 넷과 BacklogItem 넷이다.
-//     (Routine·RoutineOccurrence·QuotaPlacement·BacklogCategory에는 옵셔널이 없다.)
+//  ⚠️ **모델에 칸을 더할 때마다 여기도 함께 고칠 것.** 안 고치면 이 파일이 있으나 마나다.
+//     지금 채우는 것: BacklogItem·PlanBlock의 옵셔널 전부, 그리고 세 모델
+//     (BacklogItem·PlanBlock·Routine)의 함께 쓰기 칸(isShared·originInstallID).
 //
 
 #if DEBUG
@@ -73,8 +73,17 @@ enum CloudSchemaPrimer {
         // 캘린더 가져오기가 더한 칸 (→ CalendarImport.swift). 이 줄이 없으면 이 필드는
         // 실제로 캘린더를 가져와 본 사람의 기기에서만 생긴다.
         block.calendarEventID = "schema-sample-event"
+        // 계획·루틴에도 걸린 함께 쓰기 칸 (→ TodoSharing.swift).
+        block.isShared = true
+        block.originInstallID = "schema-sample-install"
 
-        for model in [category as any PersistentModel, item, block] {
+        let routine = Routine(name: marker, kind: .quota)
+        routine.weeklyHours = 1
+        routine.sessionsPerDay = 1
+        routine.isShared = true
+        routine.originInstallID = "schema-sample-install"
+
+        for model in [category as any PersistentModel, item, block, routine] {
             context.insert(model)
         }
         do {
@@ -88,13 +97,13 @@ enum CloudSchemaPrimer {
 
         // ── 치운다. 스키마는 남는다. ────────────────────────────────────────
         var deleted = 0
-        for model in [category as any PersistentModel, item, block] {
+        for model in [category as any PersistentModel, item, block, routine] {
             context.delete(model)
             deleted += 1
         }
         try? context.save()
 
-        return Report(created: 3, deleted: deleted,
+        return Report(created: 4, deleted: deleted,
                       note: "표본을 올렸다 지웠습니다. 콘솔의 Development 스키마에 칸이 생겼는지 확인한 뒤 Production으로 배포하세요.")
     }
 }
