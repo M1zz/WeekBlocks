@@ -359,11 +359,21 @@ struct DayTimelineRow: View {
     /// 끌고 가는 동안 지나는 요일. 부모가 그 줄에 테두리를 세운다.
     var onDayTargetChange: (DayOfWeek?) -> Void = { _ in }
 
+    // 자 위에서도 요일 칸과 똑같이 고칠 수 있어야 한다 — 같은 일정을 보는 두 창일 뿐이다.
+    /// 계획 블록을 눌렀다 — 제목·시간·성공 기준을 고치는 편집기로.
+    var onEditBlock: (PlanBlock) -> Void = { _ in }
+    /// 루틴을 눌렀다 — 상세(정보·실행 전략·프리모템)로.
+    var onEditRoutine: (Routine) -> Void = { _ in }
+    /// 루틴의 요일·시각을 고치는 편집기로.
+    var onEditRoutineSchedule: (Routine) -> Void = { _ in }
+
     // 드래그 중인 세그먼트와 이동량(px). 같은 행 안에서만 유효.
     @State private var dragId: String? = nil
     @State private var dragPx: CGFloat = 0
     /// 카드를 이 줄 위로 끌고 와 있는가. 받을 자리라는 것을 테두리로 말한다.
     @State private var dropTargeted = false
+    /// 손이 올라가 있는 구간. 누를 수 있다는 것을 밝기로 말한다.
+    @State private var hoverId: String? = nil
 
     /// 그 시각을 0–24 소수 시간으로. (14:30 → 14.5)
     static func hourOfDay(_ date: Date) -> Double {
@@ -534,26 +544,40 @@ struct DayTimelineRow: View {
             }
         }
         .shadow(color: dragging ? .black.opacity(0.25) : .clear, radius: dragging ? 4 : 0, y: dragging ? 1 : 0)
+        // 손이 올라가면 살짝 밝아진다. 색칠한 띠가 '누를 수 있는 것'으로 읽히도록.
+        .brightness(hoverId == seg.id && !ghost ? 0.06 : 0)
         .contentShape(Rectangle())
+        .onHover { hoverId = $0 ? seg.id : (hoverId == seg.id ? nil : hoverId) }
         // 좌표계는 .global — 블록을 offset으로 움직여도 translation이 흔들리지 않게(로컬이면 자기 자신을 쫓아 찐득해짐).
         // highPriorityGesture로 바깥 ScrollView의 스크롤보다 드래그를 우선. 유령 블록은 드래그 불가.
+        //
+        // **누르기도 이 제스처 안에서 처리한다.** 따로 `.onTapGesture`를 붙이면 높은 우선순위의
+        // 이 드래그와 누가 마우스를 갖는지가 애매해진다. 최소 이동을 0으로 두고 끝났을 때
+        // 움직였는지로 끌기와 누르기를 가르면, 한 제스처가 둘을 다 맡아 어긋날 자리가 없다.
         .highPriorityGesture(
-            DragGesture(minimumDistance: 2, coordinateSpace: .global)
+            DragGesture(minimumDistance: 0, coordinateSpace: .global)
                 .onChanged { v in
-                    guard !seg.isGhost else { return }
+                    guard !seg.isGhost, moved(v.translation) else { return }
                     dragId = seg.id
                     dragPx = v.translation.width
                     // 위아래로도 끌 수 있다 — 지나는 요일 줄에 테두리가 선다.
                     onDayTargetChange(targetDay(seg, at: v.location))
                 }
                 .onEnded { v in
+                    defer {
+                        dragId = nil
+                        dragPx = 0
+                        onDayTargetChange(nil)
+                    }
                     guard !seg.isGhost else { return }
+                    // 움직이지 않았다 = 눌렀다. 요일 칸에서 칩을 누른 것과 같은 자리로 간다.
+                    guard moved(v.translation) else {
+                        edit(seg)
+                        return
+                    }
                     // 창이 좁아졌으면 같은 픽셀이 더 적은 시간을 의미한다.
                     let deltaHours = Double(v.translation.width / max(rowWidth, 1)) * window.span
                     commitDrag(seg, deltaHours: deltaHours, toDay: targetDay(seg, at: v.location))
-                    dragId = nil
-                    dragPx = 0
-                    onDayTargetChange(nil)
                 }
         )
         .contextMenu {
@@ -562,6 +586,22 @@ struct DayTimelineRow: View {
                     Label(restoreLabel(seg), systemImage: "arrow.uturn.backward")
                 }
             } else {
+                Button { edit(seg) } label: {
+                    Label(editLabel(seg), systemImage: "pencil")
+                }
+                if case .fixedRoutine(let name) = seg.source,
+                   let r = routines.first(where: { $0.name == name }) {
+                    Button { onEditRoutineSchedule(r) } label: {
+                        Label("요일·시각 수정…", systemImage: "calendar.badge.clock")
+                    }
+                }
+                Divider()
+                // 자 위에서도 바로 세기 시작한다 — 오늘 줄에서 지금 하는 것을 바로 집는 길 (→ TimerView.swift).
+                if let target = timerTarget(seg) {
+                    TimerMenuItems(token: target.token, title: target.title, hours: target.hours,
+                                   iconName: target.iconName, colorName: target.colorName)
+                    Divider()
+                }
                 Button(role: .destructive) { deleteSegment(seg) } label: {
                     Label(deleteLabel(seg), systemImage: "trash")
                 }
@@ -570,13 +610,63 @@ struct DayTimelineRow: View {
         .help(dragHelp(seg))
     }
 
+    /// 손이 떨린 정도인가, 정말 끈 것인가. 2pt를 넘어야 끌기로 본다.
+    private func moved(_ translation: CGSize) -> Bool {
+        abs(translation.width) > 2 || abs(translation.height) > 2
+    }
+
+    /// 자 위의 구간을 눌렀을 때 열리는 자리. 요일 칸의 칩을 누른 것과 같은 곳으로 간다.
+    /// 유령(숨긴 것)은 고칠 게 없다 — 되살리기부터다.
+    private func edit(_ seg: TimeSegment) {
+        guard !seg.isGhost else { return }
+        switch seg.source {
+        case .planBlock(let blk):
+            onEditBlock(blk)
+        case .fixedRoutine(let name):
+            if let r = routines.first(where: { $0.name == name }) { onEditRoutine(r) }
+        case .quotaSession(let name, _):
+            if let r = quotaRoutines.first(where: { $0.name == name }) { onEditRoutine(r) }
+        case .none:
+            break
+        }
+    }
+
+    private func editLabel(_ seg: TimeSegment) -> String {
+        switch seg.source {
+        case .planBlock:    return "이 계획 수정…"
+        case .fixedRoutine: return "이 루틴 보기·수정…"
+        case .quotaSession: return "이 루틴 보기·수정…"
+        case .none:         return "수정…"
+        }
+    }
+
     /// 이 블록으로 무엇을 할 수 있는지. 계획 블록만 요일을 넘나들 수 있으므로 안내도 다르다.
     private func dragHelp(_ seg: TimeSegment) -> String {
         if seg.isGhost { return "\(seg.title) — 삭제됨 · 우클릭으로 되살리기" }
         if case .planBlock = seg.source {
-            return "\(seg.title) — 좌우로 끌어 시각 이동 (15분 단위) · 위아래로 끌어 다른 요일로 · 우클릭으로 삭제"
+            return "\(seg.title) — 눌러서 수정 · 좌우로 끌어 시각 이동(15분 단위) · 위아래로 끌어 다른 요일로 · 우클릭으로 더 보기"
         }
-        return "\(seg.title) — 드래그해서 시각 이동 (15분 단위) · 우클릭으로 삭제"
+        return "\(seg.title) — 눌러서 보기·수정 · 드래그해서 시각 이동(15분 단위) · 우클릭으로 더 보기"
+    }
+
+    /// 이 구간을 타이머로 셀 수 있는가. 셀 수 있으면 무엇을 어떤 길이로 셀지.
+    /// 자정을 넘겨 잘린 조각이어도 **원본의 길이**(logicalDuration)로 센다 — 사람이 하는 일은 하나다.
+    private func timerTarget(_ seg: TimeSegment) -> (token: String, title: String, hours: Double,
+                                                     iconName: String, colorName: String?)? {
+        switch seg.source {
+        case .planBlock(let blk):
+            return (blk.dragToken, blk.title, blk.durationHours, "square.stack.3d.up", nil)
+        case .fixedRoutine(let name):
+            guard let r = routines.first(where: { $0.name == name }) else { return nil }
+            return (TaskTimer.token(for: r), r.name, r.durationHours, r.iconName, r.colorName)
+        case .quotaSession(let name, _):
+            guard let r = quotaRoutines.first(where: { $0.name == name }) else { return nil }
+            let sessions = max(1, r.sessionsPerDay)
+            return (TaskTimer.token(for: r), r.name, r.dailyQuotaHours / Double(sessions),
+                    r.iconName, r.colorName)
+        case .none:
+            return nil
+        }
     }
 
     private func deleteLabel(_ seg: TimeSegment) -> String {

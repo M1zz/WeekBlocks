@@ -26,8 +26,10 @@ enum MacEntitlement {
     /// ⚠️ 콘솔에 만든 것과 **글자 하나까지 같아야 한다.**
     static let productID = "com.devkoan.ScheduleDensityApp.sync"
 
-    /// **팔기 시작했는가.** false인 동안에는 모두에게 열려 있다.
-    /// 상품 심사가 끝나고 실제로 판매를 시작할 때 true로 바꾼다.
+    /// **'아이폰과 함께 쓰기'를 팔기 시작했는가.** false인 동안에는 모두 함께 쓴다.
+    ///
+    /// ⚠️ 파는 것은 **적기가 아니라 건너가기**다. 적는 것은 이 앱의 본체라 잠그지
+    ///    않는다 (→ TodoAccess.swift).
     static let sellsAccess = false
 
     private static let purchasedKey = "mac.sync.purchased"

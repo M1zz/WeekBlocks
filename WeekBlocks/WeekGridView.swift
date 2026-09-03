@@ -32,6 +32,8 @@ struct DayColumn: View {
     let day: DayOfWeek
     let date: Date
     var canPlan: Bool = true
+    /// 일정 기준으로 지금 하고 있는 조각. 그 칩에 남은 시간이 붙는다 (→ ScheduleClock.swift).
+    var currentSlot: ScheduleSlot? = nil
     /// 시각 순으로 정렬된 통합 항목(고정 루틴·쿼터·블록).
     let items: [DayPlanItem]
     let onAdd: () -> Void
@@ -52,6 +54,23 @@ struct DayColumn: View {
         return Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60
     }
 
+    /// 이 항목이 '지금 하고 있는 그것'인가.
+    ///
+    /// 이름만으로는 모자란다 — 같은 루틴이 이레 내내 서 있고, 자정을 넘긴 잠은
+    /// 두 칸에 나뉘어 그려진다. 요일과 시작 시각까지 맞아야 한 칩에만 남은 시간이 붙는다.
+    private func liveSlot(for item: DayPlanItem) -> ScheduleSlot? {
+        guard let slot = currentSlot, slot.day == day,
+              abs(slot.startHourInDay - item.atHour) < 0.01 else { return nil }
+        switch item {
+        case .fixedRoutine(let r, _, _, _):
+            return slot.id == TaskTimer.token(for: r) ? slot : nil
+        case .quotaSession(let r, let index, _):
+            return slot.id == "\(TaskTimer.token(for: r)):\(index)" ? slot : nil
+        case .block(let b, _):
+            return slot.id == b.dragToken ? slot : nil
+        }
+    }
+
     /// 한 항목의 칩. '지금' 선을 끼우느라 두 곳에서 쓰므로 따로 뺐다.
     @ViewBuilder
     private func chip(for item: DayPlanItem) -> some View {
@@ -60,14 +79,17 @@ struct DayColumn: View {
             // 자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 되도록.
             RoutineChip(routine: routine,
                         subtitleOverride: "\(formatHour(atHour))  \(String(format: "%.1fh", hours))",
+                        currentSlot: liveSlot(for: item),
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
                 onEditRoutine(routine)
             }
-        case .quotaSession(let routine, _, let atHour):
+        case .quotaSession(let routine, let index, let atHour):
             RoutineChip(routine: routine, subtitleOverride: formatHour(atHour),
+                        currentSlot: liveSlot(for: item),
+                        timerToken: "\(TaskTimer.token(for: routine)):\(index)",
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) { onEditRoutine(routine) }
         case .block(let block, _):
-            BlockChip(block: block) { onEdit(block) }
+            BlockChip(block: block, currentSlot: liveSlot(for: item)) { onEdit(block) }
         }
     }
 
@@ -177,6 +199,10 @@ struct RoutineChip: View {
     let routine: Routine
     /// 컬럼에서 끼니 세션처럼 '이 occurrence의 시각'을 보여주고 싶을 때 부제를 대체.
     var subtitleOverride: String? = nil
+    /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
+    var currentSlot: ScheduleSlot? = nil
+    /// 타이머가 이 칩을 부르는 이름. 끼니는 회차까지 달라야 세션 하나를 가리킬 수 있다.
+    var timerToken: String? = nil
     /// '수정' — 이름·요일·시각을 바꾸는 편집기로. 없으면 버튼을 띄우지 않는다.
     var onEdit: (() -> Void)? = nil
     let onTap: () -> Void
@@ -184,6 +210,15 @@ struct RoutineChip: View {
     @State private var hovering = false
 
     private var isQuota: Bool { routine.kind == .quota }
+
+    private var token: String { timerToken ?? TaskTimer.token(for: routine) }
+
+    /// 이 루틴 한 번의 길이. 쿼터는 주간 합계만 적혀 있으므로 회당 시간을 계산해 쓴다.
+    private var timerHours: Double {
+        guard isQuota else { return routine.durationHours }
+        let sessions = max(1, routine.sessionsPerDay)
+        return routine.dailyQuotaHours / Double(sessions)
+    }
 
     // 쿼터(유연)는 점선 테두리 + 더 옅은 배경으로 '시간 유연'임을 드러낸다(타임라인 점선과 일관).
     private var subtitle: String {
@@ -214,7 +249,15 @@ struct RoutineChip: View {
                 }
             }
             .onHover { hovering = $0 }
-            .help("\(routine.scheduleDescription)\n눌러서 상세 · '수정'으로 요일·시각 변경")
+            .contextMenu {
+                // 쿼터(끼니 등)는 회당 시간이 따로다 — 그 값으로 센다.
+                TimerMenuItems(token: token,
+                               title: routine.name,
+                               hours: timerHours,
+                               iconName: routine.iconName,
+                               colorName: routine.colorName)
+            }
+            .help("\(routine.scheduleDescription)\n눌러서 상세 · 우클릭으로 타이머 시작")
     }
 
     private var chipBody: some View {
@@ -232,6 +275,8 @@ struct RoutineChip: View {
                     Text(subtitle)
                         .font(.system(size: 12))
                         .opacity(0.7)
+                    // 지금 하고 있는 것이면 남은 시간이 한 줄 더 선다. 좁은 칸에서 눌리지 않게 제 줄로.
+                    TimerBadge(token: token, tint: color, slot: currentSlot)
                 }
 
                 Spacer()
@@ -256,6 +301,8 @@ struct RoutineChip: View {
 
 struct BlockChip: View {
     let block: PlanBlock
+    /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
+    var currentSlot: ScheduleSlot? = nil
     let onTap: () -> Void
 
     @State private var hovering = false
@@ -282,6 +329,10 @@ struct BlockChip: View {
             .onTapGesture(perform: onTap)
             .overlay(alignment: .topTrailing) { editButton }
             .onHover { hovering = $0 }
+            // 계획을 보는 자리에서 바로 세기 시작한다 — 창을 열러 갈 필요 없이 (→ TimerView.swift).
+            .contextMenu {
+                TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours)
+            }
             .help(block.successCriteria.isEmpty
                   ? "구체성 미검증 — 눌러서 다듬기 · 드래그해서 다른 요일로 옮기기"
                   : block.successCriteria + "\n드래그해서 다른 요일로 옮길 수 있습니다.")
@@ -321,6 +372,9 @@ struct BlockChip: View {
                 }
                 .font(.system(size: 13))
                 .opacity(0.8)
+
+                // 지금 하고 있는 것이면 남은 시간이 한 줄 더 선다.
+                TimerBadge(token: block.dragToken, tint: palette.fg, slot: currentSlot)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 10)

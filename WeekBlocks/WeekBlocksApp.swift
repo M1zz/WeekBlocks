@@ -15,6 +15,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
 enum WeekBlocksWindow {
     static let main = "main"
     static let todos = "todos"
+    static let timer = "timer"
 }
 
 @main
@@ -71,6 +72,13 @@ struct WeekBlocksApp: App {
         .windowResizability(.contentMinSize)
         .commands {
             CommandGroup(replacing: .newItem) { }
+            // 처음 쓰는 사람이 길을 잃었을 때 찾아가는 곳은 메뉴 막대의 '도움말'이다.
+            // 설정 안에만 두면 거기까지 가지 못한다.
+            CommandGroup(replacing: .help) {
+                Button("무지개 공방 사용법") {
+                    OnboardingPresenter.shared.present()
+                }
+            }
         }
 
         // 할 일은 따로 선 창이다 (→ TodoWindowView).
@@ -82,5 +90,15 @@ struct WeekBlocksApp: App {
         .defaultSize(width: 560, height: 620)
         .windowResizability(.contentMinSize)
         .keyboardShortcut("t", modifiers: [.command, .shift])
+
+        // 하고 있는 하나와 거기 남은 시간 (→ TimerView.swift).
+        // 한 주를 짜는 창과 따로 세운다 — 계획을 보는 동안에도 옆에 띄워 둘 수 있어야 한다.
+        Window("타이머", id: WeekBlocksWindow.timer) {
+            TimerWindowView()
+        }
+        .modelContainer(container)
+        .defaultSize(width: 400, height: 500)
+        .windowResizability(.contentMinSize)
+        .keyboardShortcut("r", modifiers: [.command, .shift])
     }
 }

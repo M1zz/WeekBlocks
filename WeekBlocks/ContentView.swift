@@ -18,13 +18,18 @@ struct ContentView: View {
     @State private var showingReflection = false
     @State private var showingSettings = false
     @State private var showingSampleAlert = false
-    /// 처음 켠 사람에게 고정 루틴을 함께 세우자고 묻는 자리.
-    @State private var showingRoutineOnboarding = false
+    /// 처음 켠 사람에게 앱을 건네는 자리 (→ OnboardingView.swift).
+    /// 메뉴 막대(도움말)에서도 같은 자리를 열기에 스토어를 가운데에 둔다.
+    @State private var onboarding = OnboardingPresenter.shared
+    /// '다음 한 걸음' 줄을 아주 닫았는가. 다 아는 사람에게 계속 말을 걸지 않는다.
+    @AppStorage("didDismissNextStep") private var didDismissNextStep = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
     @State private var shareStore = ScheduleShareStore.shared
+    /// 지금 하고 있는 하나와 남은 시간 (→ TaskTimer.swift). 기기에만 남는다.
+    @State private var taskTimer = TaskTimer.shared
 
     /// 시간 자에서 요일 줄들이 각각 화면 어디에 서 있는가(요일 rawValue → 화면 좌표).
     /// 계획 블록을 세로로 끌 때 "지금 어느 요일 위인가"를 여기서 답한다.
@@ -67,6 +72,17 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 weekHeader
+                // 지금 화면에서 다음에 할 일 하나. 흐름을 다 지나면 사라진다.
+                if let step = nextStep {
+                    NextStepBanner(step: step,
+                                   onAction: { perform(step) },
+                                   onDismiss: {
+                                       withAnimation(.snappy(duration: 0.2)) {
+                                           didDismissNextStep = true
+                                       }
+                                   })
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
                 if showsWeekSummary {
                     VStack(alignment: .leading, spacing: 10) {
@@ -106,6 +122,13 @@ struct ContentView: View {
         .navigationTitle("무지개 공방")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    openWindow(id: WeekBlocksWindow.timer)
+                } label: {
+                    Label("타이머", systemImage: "timer")
+                }
+                .help("지금 하는 일에 남은 시간 (⇧⌘R)")
+
                 Button {
                     showingReflection = true
                 } label: {
@@ -160,10 +183,10 @@ struct ContentView: View {
             )
             .frame(minWidth: 520, minHeight: 540)
         }
-        .sheet(isPresented: $showingRoutineOnboarding) {
-            RoutineOnboardingView(onWriteMyOwn: {
+        .sheet(isPresented: $onboarding.isPresented) {
+            OnboardingView(onWriteMyOwn: {
                 routineSheet = RoutineSheetContext(routine: nil)
-            })
+            }, startPage: onboarding.startPage)
         }
         .sheet(item: $routineSheet) { ctx in
             RoutineEditorView(existing: ctx.routine)
@@ -180,6 +203,11 @@ struct ContentView: View {
         .sheet(isPresented: $showingSettings) {
             SettingsView(scheduleSnapshots: {
                 ScheduleSnapshotBuilder.snapshots(routines: routines, allBlocks: allBlocks, currentWeek: selectedWeek)
+            }, onReplayOnboarding: {
+                RoutineOnboarding.reset()
+                didDismissNextStep = false
+                showingSettings = false
+                onboarding.present()
             })
         }
         .alert("샘플 데이터 추가", isPresented: $showingSampleAlert) {
@@ -221,6 +249,29 @@ struct ContentView: View {
         .onChange(of: shareSignature) { _, _ in
             // 루틴·블록이 바뀌면 공유 중인 일정을 자동 갱신.
             Task { await autoPublishSharedSchedule() }
+        }
+    }
+
+    /// 지금 화면에서 **다음에 할 일 하나** (→ OnboardingView.swift).
+    ///
+    /// 순서는 앱이 실제로 흐르는 순서다: 고정 루틴 → 할 일 → 요일에 올리기.
+    /// 세 개를 다 지나면 nil이 되어 줄이 사라진다. 처음 온 사람만 보게 된다.
+    private var nextStep: NextStep? {
+        guard !didDismissNextStep else { return nil }
+        if routines.isEmpty { return .setRoutines }
+        guard weekBlocks.isEmpty else { return nil }
+        let hasOpenTodo = backlogItems.contains { $0.parentToken == nil && !$0.isCompleted }
+        return hasOpenTodo ? .placeTodos : .writeTodos
+    }
+
+    private func perform(_ step: NextStep) {
+        switch step {
+        case .setRoutines:
+            onboarding.present(from: 1)
+        case .writeTodos:
+            openWindow(id: WeekBlocksWindow.todos)
+        case .placeTodos:
+            break
         }
     }
 
@@ -287,6 +338,14 @@ struct ContentView: View {
             // 한 줄의 무게를 양 끝으로 나눈다. 왼쪽은 '언제'(날짜), 오른쪽은 '어떻게 볼까'.
             // 가운데에 몰아 두면 오른쪽이 통째로 비어 한쪽으로 쏠려 보인다.
             Spacer()
+
+            // 지금 세고 있는 일이 있으면 남은 시간이 여기 늘 서 있다.
+            // 타이머 창을 닫아 두어도 "무엇을 하는 중이고 얼마 남았는지"는 사라지지 않는다.
+            TimelineView(.everyMinute) { ctx in
+                TimerPill(slot: currentSlot(at: ctx.date)) {
+                    openWindow(id: WeekBlocksWindow.timer)
+                }
+            }
 
             // 한 주를 보는 두 자리. 날짜 줄에 함께 세운다 —
             // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
@@ -397,7 +456,7 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 8) {
-                        Button("만드는 걸 도와드릴게요") { showingRoutineOnboarding = true }
+                        Button("만드는 걸 도와드릴게요") { onboarding.present(from: 1) }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)
                         Button("직접 적기") { routineSheet = RoutineSheetContext(routine: nil) }
@@ -596,6 +655,15 @@ struct ContentView: View {
                         onDayTargetChange: { target in
                             guard timelineDayTarget != target else { return }
                             withAnimation(.easeOut(duration: 0.12)) { timelineDayTarget = target }
+                        },
+                        onEditBlock: { block in
+                            blockSheet = BlockSheetContext(day: day, block: block)
+                        },
+                        onEditRoutine: { routine in
+                            routineDetailSheet = routine
+                        },
+                        onEditRoutineSchedule: { routine in
+                            routineSheet = RoutineSheetContext(routine: routine)
                         }
                     )
                     .background {
@@ -622,13 +690,16 @@ struct ContentView: View {
     }
 
     private var weekGridSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 8) {
-                ForEach(DayOfWeek.allCases) { day in
-                    DayColumn(
-                        day: day,
-                        date: dayDate(day),
-                        canPlan: hasFixedRoutines,
+        // 분이 바뀌면 '지금 하고 있는 것'이 달라질 수 있다. 그때 칩의 남은 시간도 자리를 옮긴다.
+        TimelineView(.everyMinute) { ctx in
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top, spacing: 8) {
+                    ForEach(DayOfWeek.allCases) { day in
+                        DayColumn(
+                            day: day,
+                            date: dayDate(day),
+                            canPlan: hasFixedRoutines,
+                            currentSlot: currentSlot(at: ctx.date),
                         items: dayPlanItems(on: day),
                         onAdd: {
                             blockSheet = BlockSheetContext(day: day, block: nil)
@@ -642,14 +713,26 @@ struct ContentView: View {
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
                         },
-                        onDropBacklog: { token in
-                            dropBacklogItem(token: token, day: day)
-                        }
-                    )
-                    .frame(maxWidth: .infinity, alignment: .top)
+                            onDropBacklog: { token in
+                                dropBacklogItem(token: token, day: day)
+                            }
+                        )
+                        .frame(maxWidth: .infinity, alignment: .top)
+                    }
                 }
             }
         }
+    }
+
+    /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
+    /// 타이머를 켜고 끄는 것과 무관하게, 계획에 적힌 시각만으로 정해진다.
+    private func currentSlot(at date: Date) -> ScheduleSlot? {
+        ScheduleClock.current(
+            ScheduleClock.slots(routines: routines, blocks: allBlocks,
+                                occurrences: allOccurrences, placements: allQuotaPlacements,
+                                around: date),
+            at: date
+        )
     }
 
     // MARK: helpers
@@ -817,7 +900,7 @@ struct ContentView: View {
         // 기다린 뒤에는 @Query가 아니라 스토어에 직접 묻는다 —
         // 기다리는 동안 뷰가 새로 만들어져 손에 든 값이 옛것일 수 있다.
         guard PlanStore.shared.fetch(Routine.self).isEmpty else { return }
-        showingRoutineOnboarding = true
+        onboarding.present()
     }
 
     /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.
