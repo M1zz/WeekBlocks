@@ -1,8 +1,10 @@
-무지개 공방 (macOS) 1.1.0
+무지개 공방 (macOS) 1.1.1
 App Store Connect "이 버전의 새로운 기능"에 그대로 붙여넣는 글입니다.
 줄바꿈만 쓰고 글머리표·번호·이모지는 넣지 않습니다.
 
 ────────────────────────────── 한국어
+
+영어를 지원합니다. 시스템 언어가 영어면 앱이 영어로 열립니다. 적어 두신 것은 그대로입니다.
 
 아이폰과 할 일이 오가지 않던 문제를 고쳤습니다.
 
@@ -28,6 +30,8 @@ Pro가 생겼습니다. 적는 것은 계속 무료입니다. 주간 계획도 �
 
 ────────────────────────────── English
 
+The app now speaks English. Set your Mac to English and every screen opens in English. Nothing you wrote changes.
+
 Fixed todos not syncing with your iPhone.
 
 Import events from your Mac Calendar into the week. Pick which calendars to read and you no longer retype meetings by hand. It only reads; it never writes to your calendar.
@@ -51,6 +55,8 @@ Pro has arrived. Writing stays free. Weekly plans, routines, writing todos on th
 If you have been using the app, todos you write on this Mac will no longer appear on your iPhone from this version. Nothing you wrote is deleted. It all stays on this Mac, and todos from your iPhone keep arriving. Buying Pro also reopens everything you wrote before.
 
 ────────────────────────────── 日本語
+
+英語に対応しました。システムの言語が英語なら、アプリが英語で開きます。書いたものはそのままです。
 
 iPhone とタスクが同期しない問題を修正しました。
 
