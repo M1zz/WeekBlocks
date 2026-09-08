@@ -1,6 +1,24 @@
 # 릴리즈 노트
 
-## 1.1.1
+## 1.1.2
+
+### 앱스토어 (한국어)
+
+시스템 언어가 영어면 앱도 영어로 열립니다.
+아이폰과 할 일이 오가지 않던 문제를 고쳤습니다.
+맥 캘린더의 일정을 주간 계획으로 가져옵니다.
+지금 하는 일에 얼마나 남았는지 늘 보입니다.
+적는 것은 계속 무료이고 Pro는 아이폰으로 건너가는 것만 엽니다.
+이번 버전부터 이 맥에서 적은 것은 아이폰에 가지 않습니다.
+
+### App Store (English)
+
+Set your Mac to English and the app opens in English.
+Fixed to-dos not syncing with your iPhone.
+Import your Mac Calendar events into the week.
+Always see the time left on what you are doing.
+Writing stays free, and Pro only opens sending to your iPhone.
+To-dos you write here no longer reach your iPhone.
 
 ### 무지개 공방 (macOS)
 
