@@ -23,11 +23,20 @@ enum WeekBlocksSpec: LeeoAppSpec {
     )
 
     /// LeeoKit 3부터는 기본값이 없다 — 모든 앱이 한 번은 선언해야 하는 의무 링크.
-    static let legal = LeeoLegalConfig(
-        privacyURL: URL(string: "https://m1zz.github.io/WeekBlocks/privacy.html")!,
-        supportURL: URL(string: "https://m1zz.github.io/WeekBlocks/")!,
-        marketingURL: URL(string: "https://m1zz.github.io/WeekBlocks/")!
-    )
+    ///
+    /// ⚠️ 주소도 번역한다. 영어로 쓰는 사람에게 한국어 방침을 열어 주면 읽을 수가 없다.
+    ///    영어 자리는 docs/privacy-en.html · docs/support-en.html 이다.
+    ///    스토어(App Store Connect)에 넣는 주소도 같은 것을 쓴다 (→ docs/STORE_NOTES_*.txt).
+    static var legal: LeeoLegalConfig {
+        LeeoLegalConfig(
+            privacyURL: URL(string: String(localized: "https://m1zz.github.io/WeekBlocks/privacy.html",
+                                           comment: "개인정보 처리방침 주소"))!,
+            supportURL: URL(string: String(localized: "https://m1zz.github.io/WeekBlocks/",
+                                           comment: "지원 페이지 주소"))!,
+            marketingURL: URL(string: String(localized: "https://m1zz.github.io/WeekBlocks/",
+                                             comment: "지원 페이지 주소"))!
+        )
+    }
 
     /// 결제가 없는 앱이다. 페이월·복원·약관 의무도 여기서 따라오지 않는다.
     static let monetization = LeeoMonetization.free

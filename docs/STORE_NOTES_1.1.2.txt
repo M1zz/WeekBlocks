@@ -17,3 +17,54 @@ DeployBar 가 배포할 때 그 절을 읽어 갑니다. 두 벌로 두면 반�
 English
   Name      Rainbow Workshop (16)
   Subtitle  See where your 168 hours go (27)
+
+═════════════════════════════ 영어(미국) 필수 필드
+
+설명 (Description · 4000자까지)
+──
+A to-do list cannot tell you whether your week actually holds it. Rainbow Workshop lets you put the week down where you can see it.
+
+Lay down the hours you cannot take back first, such as sleep, meals and work. What is left is the time you can actually use. Then drag your to-dos onto the days that are still open.
+
+PLAN THE WEEK YOU REALLY HAVE
+A week is 168 hours. Fixed routines take their share, and the app shows you the remainder in plain numbers before you commit to anything.
+
+DRAG IT WHERE IT GOES
+Drag a to-do onto a day and it becomes a plan block. Move it to another day, reorder it within a day, or drag it back to the list when the date no longer holds.
+
+SEE A DAY ACROSS 24 HOURS
+Timeline view opens a day on a 24-hour ruler. Drag sideways to move the time, up or down to move the day. Gaps and collisions are visible at a glance.
+
+SPLIT A JOB INTO STEPS THAT CLOSE
+Big jobs stall because something is still in the way. The app asks two questions about every step. Can you start without spinning up, and does it finish within five minutes? Steps that answer yes to both are fragments, and you can pick them up whenever five minutes open up. Everything else needs time you have protected. When the app gets it wrong, you overturn it.
+
+KNOW WHAT IS LEFT
+A timer follows the times in your plan, so you always know what you are doing now and how much of it remains.
+
+BRING IN YOUR CALENDAR
+Import meetings and appointments from your Mac Calendar instead of typing them twice. It only reads. It never writes to your calendar.
+
+LOOK BACK ON THE WEEK
+The weekly review works like a checklist. Mark what you did, what you half did and what you skipped, and use it to build the next week.
+
+WORKS WITH YOUR IPHONE
+On the same iCloud account, to-dos travel between this app and Rainbow of Desire on iOS.
+
+PRIVACY
+There is no server. What you write stays on your device and in your own iCloud. No accounts, no analytics, no advertising identifiers.
+
+Writing on this Mac is free. Pro covers only sending what you write here over to your iPhone. One purchase, not a subscription.
+──
+
+키워드 (Keywords · 100자까지, 쉼표로 구분하고 쉼표 뒤에 공백을 두지 않는다)
+──
+time blocking,weekly planner,schedule,routine,focus,deep work,todo,task,timer,time tracker,168
+──
+
+지원 URL              https://m1zz.github.io/WeekBlocks/support-en.html
+마케팅 URL            https://m1zz.github.io/WeekBlocks/support-en.html
+개인정보 처리방침 URL   https://m1zz.github.io/WeekBlocks/privacy-en.html
+
+한국어 쪽 URL은 이렇게 넣습니다.
+지원 URL              https://m1zz.github.io/WeekBlocks/
+개인정보 처리방침 URL   https://m1zz.github.io/WeekBlocks/privacy.html

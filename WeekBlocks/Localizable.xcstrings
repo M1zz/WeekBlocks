@@ -230,16 +230,16 @@
     },
     "%@h/일  ·  %@h/주": {
       "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$@h/일  ·  %2$@h/주"
-          }
-        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%@h/day  ·  %@h/week"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@h/일  ·  %2$@h/주"
           }
         }
       }
@@ -783,6 +783,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "h"
+          }
+        }
+      }
+    },
+    "https://m1zz.github.io/WeekBlocks/": {
+      "comment": "지원 페이지 주소",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://m1zz.github.io/WeekBlocks/support-en.html"
+          }
+        }
+      }
+    },
+    "https://m1zz.github.io/WeekBlocks/privacy.html": {
+      "comment": "개인정보 처리방침 주소",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://m1zz.github.io/WeekBlocks/privacy-en.html"
           }
         }
       }

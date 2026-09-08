@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rainbow Workshop Privacy Policy</title>
+<meta name="description" content="What Rainbow Workshop (macOS) handles, where it is stored, and what it never does." />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+</style>
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+
+<main class="wrap">
+
+<p style="padding-top:28px"><a href="index.html">Back to Rainbow Workshop</a> &middot; <a href="privacy.html">한국어</a></p>
+
+<header style="padding:8px 0 28px">
+  <h1 style="font-size:34px; text-align:left; margin:0 0 8px">Privacy Policy</h1>
+  <p class="muted" style="margin:0">Rainbow Workshop (macOS) &middot; Last updated: September 8, 2026</p>
+</header>
+
+<section style="border-top:1px solid var(--line); padding-top:28px">
+  <p>Rainbow Workshop (the app) is a local-first app with no server of its own. This document explains what the app handles, where it stores it, and what it never does.</p>
+  <div class="note">
+    In short. The app does not collect or transmit personal information on its own. What you write is stored only on your device and in your own private iCloud database. The developer cannot reach that data.
+  </div>
+</section>
+
+<section>
+  <h2>1. What the app does not collect</h2>
+  <p class="lead">The app does not collect any of the following.</p>
+  <ul class="plain">
+    <li>Account or contact details such as your name, email address, or phone number</li>
+    <li>Location</li>
+    <li>Advertising identifiers, usage analytics, or tracking data</li>
+    <li>Other data on your device, such as contacts or photos</li>
+  </ul>
+  <p>There is no sign-up and no login.</p>
+  <p class="muted">Your calendar is read only when you choose to run Import from Calendar. See section 4.</p>
+</section>
+
+<section>
+  <h2>2. What you write</h2>
+  <p class="lead">To do its job, the app stores what you type on your device.</p>
+  <ul class="plain">
+    <li>Plan blocks (activity, success criteria, deliverable, day and time of day, length)</li>
+    <li>Fixed routines (hours and weekly quota settings)</li>
+    <li>To-dos and their steps (title, estimated time, whether it is done, order, and your answers to the fragment questions)</li>
+    <li>To-do categories (name, color, icon)</li>
+    <li>Reviews (done, partly done, skipped, notes)</li>
+    <li>Anything shared in from another app (the title)</li>
+  </ul>
+  <p>This data is used only to provide the app's features. It is never sent to the developer and never given to third parties.</p>
+</section>
+
+<section>
+  <h2>3. Where it is stored</h2>
+  <p>Everything is stored on your device through Apple's SwiftData. If you are signed in to iCloud, it is stored in your own private iCloud database (container iCloud.com.devkoan.ScheduleDensity) and syncs automatically between devices on the same iCloud account.</p>
+  <p>Storage and transfer through iCloud are governed by Apple's privacy policy. The developer cannot access your private iCloud database.</p>
+  <p>Content shared in from another app waits briefly in an app group area on your device until the app picks it up. That file never leaves your device.</p>
+</section>
+
+<section>
+  <h2>4. Reading your Mac Calendar</h2>
+  <p>Only when you have chosen calendars in Settings and run Import from Calendar does the app read the titles and times of events in those calendars and turn them into plan blocks for the week. It only reads; it never writes to or changes your calendar.</p>
+  <p>What it reads is stored in the same place as everything else you write (your device and your own iCloud) and is never sent to the developer. If you choose no calendars, nothing is read.</p>
+  <p class="muted">macOS requires full access permission in order to read events. Despite the name of the permission, this app only reads.</p>
+</section>
+
+<section>
+  <h2>5. Sharing with other people</h2>
+  <p>When you use sharing, whoever receives the invitation link you created can see that list or schedule. You decide entirely what is shared and with whom, and once you stop sharing they can no longer see it.</p>
+  <p>Anyone holding an invitation link can join, so send it only to people you mean to share with. Sharing uses Apple's CloudKit sharing directly, and the developer does not hold your data in between.</p>
+</section>
+
+<section>
+  <h2>6. Sending questions and feedback</h2>
+  <p>When you send a question or feedback from the Settings screen, what you wrote at that moment and your app version are sent to an iCloud container the developer runs (iCloud.com.Ysoup.FeedbackHub). It is used only to answer you and to fix the app.</p>
+  <p>This happens only when you press send yourself. Nothing is transmitted automatically while you use the app. If you write by email, your address is used only to reply.</p>
+</section>
+
+<section>
+  <h2>7. Purchases</h2>
+  <p>Pro is purchased only through Apple's App Store. Apple handles payment. The developer never receives or stores your card number or payment method.</p>
+  <p>The app records only whether a purchase exists. On another Mac using the same Apple Account, Restore Purchase brings it back.</p>
+</section>
+
+<section>
+  <h2>8. Keeping and deleting</h2>
+  <p class="lead">Data is kept until you delete it or remove the app.</p>
+  <ul class="plain">
+    <li>You can delete individual items inside the app.</li>
+    <li>Deleting the app removes the data stored on that device.</li>
+    <li>Data synced to iCloud can be managed or deleted on your device under Settings, Apple Account, iCloud, Manage Storage.</li>
+    <li>If you want feedback you sent to be deleted, ask at the email address below.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>9. Children's privacy</h2>
+  <p>The app is not directed at children and does not knowingly collect any personal information from children.</p>
+</section>
+
+<section>
+  <h2>10. Changes to this policy</h2>
+  <p>This policy may be updated as the law or the app's features change. If something important changes, it will be announced on this page and the last updated date above will change.</p>
+</section>
+
+<section>
+  <h2>11. Contact</h2>
+  <p>For questions or requests about how your information is handled, please get in touch.</p>
+  <p>Email: <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a></p>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 Rainbow Workshop</div>
+  <div class="fam">Rainbow Workshop (macOS) &middot; Rainbow of Desire (iOS)</div>
+</footer>
+
+</body>
+</html>

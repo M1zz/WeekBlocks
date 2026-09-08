@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rainbow Workshop Support</title>
+<meta name="description" content="Help and contact for Rainbow Workshop, a weekly time-blocking app for macOS." />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+</style>
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+
+<main class="wrap">
+
+<header class="hero" style="padding:56px 0 40px">
+  <span class="badge">macOS</span>
+  <h1>Rainbow Workshop</h1>
+  <p class="tagline">A workbench for planning your week by day and by hour. Drag a to-do onto a day, and watch what actually fits.</p>
+</header>
+
+<section>
+  <h2>What it does</h2>
+  <p class="lead">A to-do list cannot tell you whether the week holds it. You have to put things down and look.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="emoji">&#128207;</span>
+      <h3>Drag onto a day</h3>
+      <p>Drag a to-do from the list onto a day and it becomes a plan block. Blocks can be moved, resized and deleted.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">&#128338;</span>
+      <h3>Fixed routines</h3>
+      <p>Lay down sleep, meals and work first. Whatever is left is the time you can actually use.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">&#128202;</span>
+      <h3>Day timeline</h3>
+      <p>Open a day across 24 hours. You can see at once where the gaps are and where things collide.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Splitting a to-do into steps</h2>
+  <p class="lead">A big job usually stalls not because you are lazy, but because something is still in the way before you can touch it.</p>
+  <p>The app asks two questions about every step.</p>
+  <ul class="plain">
+    <li><b>Can you start without spinning up?</b> Work that makes you load the context back in will spend a whole five-minute gap just starting.</li>
+    <li><b>Does it finish within five minutes?</b> Unfinished work leaves residue that eats into the next block of time.</li>
+  </ul>
+  <p>Answer yes to both and it is a fragment: something you can pick up whenever five minutes open up. Anything else needs time you have protected. The app answers first from the wording and the length, and you can overturn it whenever it is wrong.</p>
+</section>
+
+<section>
+  <h2>Works with your iPhone</h2>
+  <p>On the same iCloud account, Rainbow Workshop connects with the iOS app Rainbow of Desire. To-dos written on your Mac appear on your iPhone, and the other way round.</p>
+  <p class="muted">Writing on this Mac is free. Pro covers only sending what you write here over to your iPhone.</p>
+</section>
+
+<section>
+  <h2>Questions</h2>
+  <details>
+    <summary>Do I need to be signed in to iCloud?</summary>
+    <p>Not to use it alone on one Mac. You need it to connect with your iPhone and to use sharing.</p>
+  </details>
+  <details>
+    <summary>What happens to what I already wrote?</summary>
+    <p>It stays exactly as it is. Nothing you wrote is changed or deleted by an update.</p>
+  </details>
+  <details>
+    <summary>Does closing the window quit the app?</summary>
+    <p>No. The app stays open and you can bring the window back from the Window menu, or by clicking the Dock icon.</p>
+  </details>
+  <details>
+    <summary>Does the app change my calendar?</summary>
+    <p>Never. Import from Calendar only reads the calendars you chose. It does not write to them or change them.</p>
+  </details>
+  <details>
+    <summary>The app is in Korean. How do I get English?</summary>
+    <p>The app follows your Mac's language. Set System Settings, General, Language &amp; Region to English and reopen the app. Your own routine names and to-dos are never translated.</p>
+  </details>
+</section>
+
+<section>
+  <div class="contact">
+    <h2 style="margin-bottom:6px">Need help?</h2>
+    <p class="lead" style="margin-bottom:0">If you get stuck or something looks wrong, tell me. There is also a contact item in the app's Settings.</p>
+    <a class="btn" href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>
+  </div>
+</section>
+
+<section>
+  <h2>Privacy</h2>
+  <p>There is no server. What you write is stored only on your device and in your own iCloud. No advertising identifiers, no analytics, no location, no sign-up.</p>
+  <p><a href="privacy-en.html">Read the privacy policy</a></p>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 Rainbow Workshop</div>
+  <div class="fam">Rainbow Workshop (macOS) &middot; Rainbow of Desire (iOS)</div>
+  <div class="fam"><a href="privacy-en.html">Privacy Policy</a> &middot; <a href="index.html">한국어</a></div>
+</footer>
+
+</body>
+</html>
