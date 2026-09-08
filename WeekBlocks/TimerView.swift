@@ -214,7 +214,7 @@ private struct SlotRow: View {
             Spacer(minLength: 6)
 
             Text(isNow
-                 ? formatCountdown(slot.remaining(at: now)) + " 남음"
+                 ? String(localized: "\(formatCountdown(slot.remaining(at: now))) 남음")
                  : formatHour(hourOfDay(slot.start)))
                 .font(.system(size: 12, weight: isNow ? .semibold : .regular))
                 .monospacedDigit()
@@ -285,7 +285,7 @@ struct RunningTimerFace: View {
                 .multilineTextAlignment(.center)
 
             if let planned = timer.target?.plannedSeconds {
-                Text("지금부터 " + formatDuration(planned / 3600))
+                Text(String(localized: "지금부터 \(formatDuration(planned / 3600))"))
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
@@ -301,11 +301,11 @@ struct RunningTimerFace: View {
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
         } else if timer.isOvertime {
-            Text("계획보다 " + formatDuration(-timer.remaining / 3600) + " 넘겼습니다")
+            Text(String(localized: "계획보다 \(formatDuration(-timer.remaining / 3600)) 넘겼습니다"))
                 .font(.system(size: 13))
                 .foregroundStyle(.red)
         } else {
-            Text("이대로면 " + formatHour(hourOfDay(timer.projectedEnd)) + "에 끝납니다")
+            Text(String(localized: "이대로면 \(formatHour(hourOfDay(timer.projectedEnd)))에 끝납니다"))
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
         }

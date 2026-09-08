@@ -408,15 +408,15 @@ struct SettingsView: View {
 
     private var tierNote: String {
         if isPro {
-            return "여기서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다."
+            return String(localized: "여기서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
         }
         if MacEntitlement.sellsAccess {
-            return "적는 데는 아무 지장이 없습니다. 주간 계획·루틴도, 아이폰에서 온 할 일을 보는 것도 무료입니다. 여기서 적은 것이 아이폰으로 건너가는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다."
+            return String(localized: "적는 데는 아무 지장이 없습니다. 주간 계획·루틴도, 아이폰에서 온 할 일을 보는 것도 무료입니다. 여기서 적은 것이 아이폰으로 건너가는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다.")
         }
-        return "지금은 모든 기능이 열려 있습니다. 판매를 시작해도 적는 것은 계속 무료이고, 여기서 적은 것이 아이폰으로 건너가는 것만 프로가 됩니다."
+        return String(localized: "지금은 모든 기능이 열려 있습니다. 판매를 시작해도 적는 것은 계속 무료이고, 여기서 적은 것이 아이폰으로 건너가는 것만 프로가 됩니다.")
     }
 
-    private func ruleRow(_ field: String, _ rule: String) -> some View {
+    private func ruleRow(_ field: LocalizedStringKey, _ rule: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(field)
                 .font(.callout.weight(.medium))

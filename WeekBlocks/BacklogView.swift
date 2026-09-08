@@ -242,7 +242,7 @@ struct BacklogSection: View {
             if canPlan, showsCategoryFilter {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        FilterChip(label: "전체", color: .secondary,
+                        FilterChip(label: String(localized: "전체"), color: .secondary,
                                    selected: filterCategoryID == nil) { filterCategoryID = nil }
                         ForEach(categories) { c in
                             FilterChip(label: c.name, color: c.displayColor,
@@ -703,10 +703,10 @@ struct BacklogSection: View {
         guard !didSeedCategories, categories.isEmpty else { return }
         didSeedCategories = true
         let defaults: [(String, String, String)] = [
-            ("업무", "blue", "briefcase"),
-            ("개인", "green", "person"),
-            ("건강", "orange", "heart"),
-            ("학습", "purple", "book"),
+            (String(localized: "업무", comment: "기본 분류"), "blue", "briefcase"),
+            (String(localized: "개인", comment: "기본 분류"), "green", "person"),
+            (String(localized: "건강", comment: "기본 분류"), "orange", "heart"),
+            (String(localized: "학습", comment: "기본 분류"), "purple", "book"),
         ]
         var existingNames = Set(categories.map { $0.name.trimmingCharacters(in: .whitespaces) })
         for (i, d) in defaults.enumerated() where !existingNames.contains(d.0) {
@@ -890,7 +890,7 @@ struct BacklogBlock: View {
                                 .foregroundStyle(steps.currentTitle == nil
                                                  ? Color.green
                                                  : ((steps.isMarked || isFragment) ? Self.nowGreen : Color.orange))
-                            Text(steps.currentTitle ?? "모든 단계 완료")
+                            Text(steps.currentTitle ?? String(localized: "모든 단계 완료"))
                                 .font(.system(size: 13, weight: .medium))
                                 .lineLimit(1)
                         }
@@ -1119,7 +1119,7 @@ struct BacklogComposerView: View {
         } label: {
             HStack(spacing: 4) {
                 Circle().fill(current?.displayColor ?? Color.secondary.opacity(0.4)).frame(width: 9, height: 9)
-                Text(current?.name ?? "미분류").font(.callout)
+                Text(current?.name ?? String(localized: "미분류")).font(.callout)
                 Image(systemName: "chevron.down").font(.system(size: 10)).foregroundStyle(.secondary)
             }
         }
@@ -1220,7 +1220,7 @@ struct ComposerItemRow: View {
         }
         .menuStyle(.borderlessButton)
         .fixedSize()
-        .help(category?.name ?? "미분류")
+        .help(category?.name ?? String(localized: "미분류"))
     }
 }
 
@@ -1313,16 +1313,16 @@ struct AllBacklogView: View {
     private func weekLabel(_ week: Date) -> String {
         let days = cal.dateComponents([.day], from: currentWeek, to: week).day ?? 0
         let offset = Int((Double(days) / 7).rounded())
-        let f = DateFormatter(); f.dateFormat = "M월 d일"
+        let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("MMMd")
         let end = cal.date(byAdding: .day, value: 6, to: week) ?? week
         let range = "\(f.string(from: week))–\(f.string(from: end))"
         let rel: String
         switch offset {
-        case 0: rel = "이번 주"
-        case -1: rel = "지난 주"
-        case 1: rel = "다음 주"
-        case let n where n < 0: rel = "\(-n)주 전"
-        default: rel = "\(offset)주 후"
+        case 0: rel = String(localized: "이번 주")
+        case -1: rel = String(localized: "지난 주")
+        case 1: rel = String(localized: "다음 주")
+        case let n where n < 0: rel = String(localized: "\(-n)주 전")
+        default: rel = String(localized: "\(offset)주 후")
         }
         return "\(rel) · \(range)"
     }

@@ -69,7 +69,7 @@ struct RoutineDetailView: View {
                     icon: "clock",
                     title: "시간",
                     value: routine.kind == .fixed
-                        ? String(format: "%.1fh/일  ·  %.1fh/주", routine.durationHours, routine.totalWeeklyHours)
+                        ? String(localized: "\(String(format: "%.1f", routine.durationHours))h/일  ·  \(String(format: "%.1f", routine.totalWeeklyHours))h/주")
                         : routine.scheduleDescription,
                     color: routine.displayColor
                 )
@@ -89,7 +89,7 @@ struct RoutineDetailView: View {
         }
     }
 
-    private func infoCard(icon: String, title: String, value: String, color: Color) -> some View {
+    private func infoCard(icon: String, title: LocalizedStringKey, value: String, color: Color) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.system(size: 17))
@@ -178,7 +178,7 @@ struct RoutineDetailView: View {
 
     // MARK: Helpers
 
-    private func sectionHeader(icon: String, color: Color, title: String, subtitle: String) -> some View {
+    private func sectionHeader(icon: String, color: Color, title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 22))

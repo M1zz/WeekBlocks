@@ -198,7 +198,7 @@ struct ContentView: View {
             Button("지우기", role: .destructive) {
                 let removed = CalendarBridge.shared.removeOrphans(pendingRemovals, in: context)
                 pendingRemovals = []
-                calendarNotice = "\(removed)개를 지웠습니다."
+                calendarNotice = String(localized: "\(removed)개를 지웠습니다.")
             }
         } message: {
             Text("""
@@ -395,7 +395,7 @@ struct ContentView: View {
             // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
             Picker("", selection: lensBinding) {
                 ForEach(WeekLens.allCases) { lens in
-                    Label(lens.rawValue, systemImage: lens.symbol).tag(lens.rawValue)
+                    Label(lens.label, systemImage: lens.symbol).tag(lens.rawValue)
                 }
             }
             .pickerStyle(.segmented)
@@ -422,7 +422,9 @@ struct ContentView: View {
     private var weekRangeString: String {
         let end = Calendar.current.date(byAdding: .day, value: 6, to: selectedWeek) ?? selectedWeek
         let f = DateFormatter()
-        f.dateFormat = "M월 d일"
+        // ⚠️ "M월 d일"로 못 박지 않는다. 언어마다 월·일 차례와 사이에 오는 것이 다르므로,
+        //    무엇을 보일지(월과 일)만 말하고 어떻게 쓸지는 로케일에 맡긴다.
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return "\(f.string(from: selectedWeek)) – \(f.string(from: end))"
     }
 
@@ -436,18 +438,18 @@ struct ContentView: View {
     private var weekSubtitle: String {
         let rel: String
         switch weekOffset {
-        case 0: rel = "이번 주"
-        case 1: rel = "다음 주"
-        case -1: rel = "지난 주"
-        case let n where n > 0: rel = "\(n)주 후"
-        default: rel = "\(-weekOffset)주 전"
+        case 0: rel = String(localized: "이번 주")
+        case 1: rel = String(localized: "다음 주")
+        case -1: rel = String(localized: "지난 주")
+        case let n where n > 0: rel = String(localized: "\(n)주 후")
+        default: rel = String(localized: "\(-weekOffset)주 전")
         }
         // 연도는 올해가 아닐 때만 말한다. 늘 붙여 두면 매번 읽히지만 매번 필요하지는 않다.
         let cal = Calendar.current
         guard cal.component(.year, from: selectedWeek) != cal.component(.year, from: Date())
         else { return rel }
         let f = DateFormatter()
-        f.dateFormat = "yyyy년"
+        f.setLocalizedDateFormatFromTemplate("yyyy")
         return "\(f.string(from: selectedWeek)) · \(rel)"
     }
 
@@ -458,20 +460,21 @@ struct ContentView: View {
 
     private var metricsRow: some View {
         HStack(spacing: 12) {
-            MetricCard(label: "한 주", value: "168", unit: "h", subtitle: "하루 24h")
+            MetricCard(label: String(localized: "한 주"), value: "168", unit: "h",
+                       subtitle: String(localized: "하루 24h"))
             MetricCard(
-                label: "고정 루틴",
+                label: String(localized: "고정 루틴"),
                 value: String(format: "%.1f", routineHours),
                 unit: "h",
-                subtitle: "하루 약 \(String(format: "%.1f", routineHours / 7))h"
+                subtitle: String(localized: "하루 약 \(String(format: "%.1f", routineHours / 7))h")
             )
             // 자유 시간은 '아직 계획이 없는 시간' — 계획(파랑)과 같은 색을 쓰면 뜻이 겹친다.
             // 아래 막대에서도 남은 자유는 빈 구간으로 그리므로 여기서도 색을 주지 않는다.
             MetricCard(
-                label: "남은 자유 시간",
+                label: String(localized: "남은 자유 시간"),
                 value: String(format: "%.1f", freeHours),
                 unit: "h",
-                subtitle: "하루 약 \(String(format: "%.1f", freeHours / 7))h"
+                subtitle: String(localized: "하루 약 \(String(format: "%.1f", freeHours / 7))h")
             )
         }
     }
@@ -837,7 +840,7 @@ struct ContentView: View {
         let names = pendingRemovals.prefix(5).map { "· \($0.title) (\($0.day.shortLabel))" }
         var text = names.joined(separator: "\n")
         if pendingRemovals.count > names.count {
-            text += "\n… 외 \(pendingRemovals.count - names.count)개"
+            text += "\n" + String(localized: "… 외 \(pendingRemovals.count - names.count)개")
         }
         return text
     }
@@ -957,7 +960,7 @@ struct ContentView: View {
         // 경고하면 사람은 앱이 트집 잡는다고 느낀다.
         if blk.durationHours > gap + 0.01 {
             withAnimation(.snappy(duration: 0.2)) {
-                conflictNotice = "‘\(blk.title)’(\(shortHours(blk.durationHours)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다."
+                conflictNotice = String(localized: "‘\(blk.title)’(\(shortHours(blk.durationHours)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다.")
             }
         }
     }
@@ -1053,11 +1056,11 @@ struct ContentView: View {
     /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.
     private static var defaultRoutines: [Routine] {
         [
-            Routine(name: "수면", iconName: "moon.fill", kind: .fixed, colorName: "indigo",
+            Routine(name: String(localized: "수면", comment: "기본 루틴 이름"), iconName: "moon.fill", kind: .fixed, colorName: "indigo",
                     dayMask: 0b1111111, startHour: 23, durationHours: 8, sortIndex: 0),
-            Routine(name: "식사", iconName: "fork.knife", kind: .quota, colorName: "green",
+            Routine(name: String(localized: "식사", comment: "기본 루틴 이름"), iconName: "fork.knife", kind: .quota, colorName: "green",
                     weeklyHours: 17.5, sessionsPerDay: 3, sortIndex: 1),
-            Routine(name: "운동", iconName: "figure.run", kind: .fixed, colorName: "orange",
+            Routine(name: String(localized: "운동", comment: "기본 루틴 이름"), iconName: "figure.run", kind: .fixed, colorName: "orange",
                     dayMask: 0b0110101, startHour: 7.5, durationHours: 1, sortIndex: 2),
         ]
     }
@@ -1094,9 +1097,9 @@ struct ContentView: View {
 
         let base = backlogItems.map(\.sortIndex).max() ?? -1
         let samples: [(String, Double)] = [
-            ("기획서 초안 작성", 2),
-            ("논문 1편 정독", 1.5),
-            ("주간 회고 정리", 0.5),
+            (String(localized: "기획서 초안 작성", comment: "샘플 할 일"), 2),
+            (String(localized: "논문 1편 정독", comment: "샘플 할 일"), 1.5),
+            (String(localized: "주간 회고 정리", comment: "샘플 할 일"), 0.5),
         ]
         for (i, s) in samples.enumerated() {
             context.insert(BacklogItem(title: s.0, durationHours: s.1,
@@ -1107,9 +1110,9 @@ struct ContentView: View {
             day: .mon,
             timeBand: .evening,
             durationHours: 2,
-            title: "Swift Combine 학습",
-            successCriteria: "sink·assign 차이를 노트에 정리하고 예제 실행에 성공한다",
-            deliverable: "정리 노트 1장 + 동작하는 예제 1개",
+            title: String(localized: "Swift Combine 학습", comment: "샘플 계획 블록"),
+            successCriteria: String(localized: "sink·assign 차이를 노트에 정리하고 예제 실행에 성공한다", comment: "샘플 계획 블록"),
+            deliverable: String(localized: "정리 노트 1장 + 동작하는 예제 1개", comment: "샘플 계획 블록"),
             weekStartDate: selectedWeek,
             concreteVerified: true
         ))
@@ -1138,6 +1141,15 @@ enum WeekLens: String, CaseIterable, Identifiable {
     case day = "시간축으로 보기"
 
     var id: String { rawValue }
+
+    /// ⚠️ rawValue를 화면에 그대로 쓰지 않는다. 그 값은 @AppStorage("weekLens")에
+    ///    저장되는 것이라, 번역하면 예전에 고른 자리를 못 알아본다.
+    var label: String {
+        switch self {
+        case .plan: String(localized: "블록으로 보기")
+        case .day:  String(localized: "시간축으로 보기")
+        }
+    }
 
     var symbol: String {
         switch self {
@@ -1228,9 +1240,9 @@ struct WeekBarChart: View {
             .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.secondary.opacity(0.15), lineWidth: 0.5))
 
             HStack(spacing: 20) {
-                barLegend(color: .secondary.opacity(0.6), label: "루틴", hours: routineHours)
-                barLegend(color: isOverPlanned ? .red : .accentColor, label: "계획", hours: plannedHours)
-                barLegend(color: .secondary.opacity(0.15), label: "남은 자유 (계획 없음)", hours: freeRemaining)
+                barLegend(color: .secondary.opacity(0.6), label: String(localized: "루틴"), hours: routineHours)
+                barLegend(color: isOverPlanned ? .red : .accentColor, label: String(localized: "계획"), hours: plannedHours)
+                barLegend(color: .secondary.opacity(0.15), label: String(localized: "남은 자유 (계획 없음)"), hours: freeRemaining)
             }
             .font(.caption)
             .foregroundStyle(.secondary)

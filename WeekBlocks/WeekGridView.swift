@@ -290,8 +290,8 @@ struct RoutineChip: View {
     private var subtitle: String {
         if let subtitleOverride { return subtitleOverride }
         if isQuota {
-            var s = String(format: "주 %.1fh", routine.weeklyHours)
-            if routine.sessionsPerDay > 0 { s += " · \(routine.sessionsPerDay)회" }
+            var s = String(localized: "주 \(String(format: "%.1f", routine.weeklyHours))h")
+            if routine.sessionsPerDay > 0 { s += String(localized: " · \(routine.sessionsPerDay)회") }
             return s
         }
         return "\(formatHour(routine.startHour))  \(String(format: "%.1fh", routine.durationHours))"
@@ -410,10 +410,10 @@ struct BlockChip: View {
             }
             // 내리는 길이 생겼으니 말해 준다 — 손짓은 있는데 아무도 모르면 없는 것과 같다.
             .help(block.successCriteria.isEmpty
-                  ? "구체성 미검증 — 눌러서 다듬기 · 다른 요일로 끌어 옮기기 · 할 일 목록으로 끌어 내리면 날짜가 무름"
+                  ? String(localized: "구체성 미검증 — 눌러서 다듬기 · 다른 요일로 끌어 옮기기 · 할 일 목록으로 끌어 내리면 날짜가 무름")
                   : block.successCriteria
-                    + "\n다른 요일로 끌어 옮길 수 있습니다."
-                    + "\n할 일 목록으로 끌어 내리면 날짜가 무릅니다.")
+                    + "\n" + String(localized: "다른 요일로 끌어 옮길 수 있습니다.")
+                    + "\n" + String(localized: "할 일 목록으로 끌어 내리면 날짜가 무릅니다."))
     }
 
     @ViewBuilder

@@ -72,12 +72,12 @@ final class CalendarBridge {
         do {
             _ = try await store.requestFullAccessToEvents()
         } catch {
-            failureMessage = "캘린더 권한을 얻지 못했습니다: \(error.localizedDescription)"
+            failureMessage = String(localized: "캘린더 권한을 얻지 못했습니다: \(error.localizedDescription)")
         }
         status = EKEventStore.authorizationStatus(for: .event)
         reloadCalendarsIfAllowed()
         if status == .denied || status == .restricted {
-            failureMessage = "시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 '무지개 공방'을 켜주세요."
+            failureMessage = String(localized: "시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 '무지개 공방'을 켜주세요.")
         }
     }
 
@@ -111,12 +111,12 @@ final class CalendarBridge {
         }
 
         var summary: String {
-            if isEmpty { return "바뀐 일정이 없습니다." }
+            if isEmpty { return String(localized: "바뀐 일정이 없습니다.") }
             var parts: [String] = []
-            if added > 0 { parts.append("\(added)개 가져옴") }
-            if updated > 0 { parts.append("\(updated)개 갱신") }
-            if removed > 0 { parts.append("\(removed)개 지움") }
-            if keptOrphans > 0 { parts.append("손댄 \(keptOrphans)개는 남겨둠") }
+            if added > 0 { parts.append(String(localized: "\(added)개 가져옴")) }
+            if updated > 0 { parts.append(String(localized: "\(updated)개 갱신")) }
+            if removed > 0 { parts.append(String(localized: "\(removed)개 지움")) }
+            if keptOrphans > 0 { parts.append(String(localized: "손댄 \(keptOrphans)개는 남겨둠")) }
             return parts.joined(separator: " · ")
         }
     }
@@ -133,12 +133,12 @@ final class CalendarBridge {
     func importWeek(_ weekStart: Date, into context: ModelContext) -> ImportResult {
         var result = ImportResult()
         guard hasAccess else {
-            failureMessage = "캘린더 접근 권한이 없습니다."
+            failureMessage = String(localized: "캘린더 접근 권한이 없습니다.")
             return result
         }
         let chosen = calendars.filter { isSelected($0) }
         guard !chosen.isEmpty else {
-            failureMessage = "가져올 캘린더를 먼저 고르세요."
+            failureMessage = String(localized: "가져올 캘린더를 먼저 고르세요.")
             return result
         }
         failureMessage = nil
@@ -161,7 +161,7 @@ final class CalendarBridge {
 
             let hour = event.isAllDay ? -1 : Self.hourOfDay(start, calendar: cal)
             let duration = Self.duration(of: event, startHour: hour)
-            let title = (event.title ?? "").isEmpty ? "(제목 없는 일정)" : event.title!
+            let title = (event.title ?? "").isEmpty ? String(localized: "(제목 없는 일정)") : event.title!
 
             if let block = byKey.removeValue(forKey: key) {
                 var changed = false

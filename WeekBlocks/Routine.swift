@@ -98,7 +98,7 @@ final class Routine {
     var isSleepRoutine: Bool {
         guard kind == .fixed else { return false }
         let n = name.lowercased().replacingOccurrences(of: " ", with: "")
-        return ["수면", "잠", "취침", "sleep"].contains { n.contains($0) }
+        return ["수면", "잠", "취침", "sleep", "bedtime", "nap"].contains { n.contains($0) }
     }
 
     var scheduleDescription: String {
@@ -110,11 +110,12 @@ final class Routine {
                 .joined(separator: "·")
             let start = formatHour(startHour)
             let end = formatHour(startHour + durationHours)
-            return days.isEmpty ? "요일 미지정" : "\(days) \(start)–\(end)"
+            return days.isEmpty ? String(localized: "요일 미지정") : "\(days) \(start)–\(end)"
         case .quota:
-            var s = String(format: "주 %.1fh · 일 평균 ", weeklyHours) + formatDuration(dailyQuotaHours)
+            let weekly = String(format: "%.1f", weeklyHours)
+            var s = String(localized: "주 \(weekly)h · 일 평균 \(formatDuration(dailyQuotaHours))")
             if sessionsPerDay > 0 {
-                s += " · 회당 약 " + formatDuration(dailyQuotaHours / Double(sessionsPerDay))
+                s += String(localized: " · 회당 약 \(formatDuration(dailyQuotaHours / Double(sessionsPerDay)))")
             }
             return s
         }

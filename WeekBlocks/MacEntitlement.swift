@@ -134,7 +134,7 @@ final class PurchaseManager {
 
     func purchase() async {
         guard let product else {
-            failureMessage = "상품을 아직 못 불러왔습니다. 잠시 뒤 다시 시도해 주세요."
+            failureMessage = String(localized: "상품을 아직 못 불러왔습니다. 잠시 뒤 다시 시도해 주세요.")
             return
         }
         isWorking = true
@@ -142,19 +142,19 @@ final class PurchaseManager {
         defer { isWorking = false }
         let result: Product.PurchaseResult
         do { result = try await product.purchase() }
-        catch { failureMessage = "구매하지 못했습니다: \(error.localizedDescription)"; return }
+        catch { failureMessage = String(localized: "구매하지 못했습니다: \(error.localizedDescription)"); return }
         // 성공만 보고 나머지를 흘리면, 승인 대기(구입 요청)에 걸린 사람은 아무 말도 못 듣고
         // 버튼이 고장 난 줄 안다. 취소만 조용하다 — 스스로 그만둔 것이라 할 말이 없다.
         switch result {
         case .success(let verification):
             guard case .verified(let transaction) = verification else {
-                failureMessage = "영수증을 확인하지 못했습니다. 잠시 뒤 다시 시도해 주세요."
+                failureMessage = String(localized: "영수증을 확인하지 못했습니다. 잠시 뒤 다시 시도해 주세요.")
                 return
             }
             await transaction.finish()
             await refresh()
         case .pending:
-            failureMessage = "승인을 기다리는 중입니다. 승인되면 앱이 알아서 열립니다."
+            failureMessage = String(localized: "승인을 기다리는 중입니다. 승인되면 앱이 알아서 열립니다.")
         case .userCancelled:
             break
         @unknown default:

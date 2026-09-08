@@ -125,7 +125,7 @@ final class ShareTodoModel {
 
         let ok = TodoShareInbox.add(SharedTodoDraft(title: text))
         guard ok else {
-            errorMessage = "할 일을 저장하지 못했습니다. 앱을 한 번 열고 다시 시도해 주세요."
+            errorMessage = String(localized: "할 일을 저장하지 못했습니다. 앱을 한 번 열고 다시 시도해 주세요.")
             return
         }
         onDone?()

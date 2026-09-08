@@ -28,11 +28,11 @@ struct RoutineRow: View {
             Spacer()
             VStack(alignment: .trailing, spacing: 1) {
                 if routine.kind == .fixed {
-                    Text(String(format: "%.1fh/일", routine.durationHours))
+                    Text(String(localized: "\(String(format: "%.1f", routine.durationHours))h/일"))
                         .font(.callout.weight(.medium))
                         .foregroundStyle(.primary)
                 }
-                Text(String(format: "%.1fh/주", routine.totalWeeklyHours))
+                Text(String(localized: "\(String(format: "%.1f", routine.totalWeeklyHours))h/주"))
                     .font(routine.kind == .fixed ? .caption : .callout)
                     .foregroundStyle(.secondary)
             }
@@ -124,10 +124,10 @@ struct RoutineBlock: View {
 
             HStack(spacing: 6) {
                 if routine.kind == .fixed {
-                    Text(String(format: "%.1fh/일", routine.durationHours))
+                    Text(String(localized: "\(String(format: "%.1f", routine.durationHours))h/일"))
                         .font(.system(size: 13, weight: .medium))
                 }
-                Text(String(format: "%.1fh/주", routine.totalWeeklyHours))
+                Text(String(localized: "\(String(format: "%.1f", routine.totalWeeklyHours))h/주"))
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
@@ -418,9 +418,9 @@ struct RoutineEditorView: View {
 
     private var quotaPreview: String {
         let daily = weeklyHours / 7
-        var s = "일 평균 " + formatDuration(daily)
+        var s = String(localized: "일 평균 \(formatDuration(daily))")
         if sessionsPerDay > 0 {
-            s += " · 회당 약 " + formatDuration(daily / Double(sessionsPerDay))
+            s += String(localized: " · 회당 약 \(formatDuration(daily / Double(sessionsPerDay)))")
         }
         return s
     }
@@ -428,12 +428,12 @@ struct RoutineEditorView: View {
     /// 저장하려면 아직 채워야 하는 것들. 비어 있으면 저장할 수 있다.
     private var missing: [String] {
         var m: [String] = []
-        if name.trimmingCharacters(in: .whitespaces).isEmpty { m.append("이름") }
+        if name.trimmingCharacters(in: .whitespaces).isEmpty { m.append(String(localized: "이름", comment: "루틴을 저장하려면 채워야 하는 칸")) }
         if kind == .fixed {
-            if selectedDays.isEmpty { m.append("요일") }
-            if durationHours <= 0 { m.append("길이") }
+            if selectedDays.isEmpty { m.append(String(localized: "요일", comment: "루틴을 저장하려면 채워야 하는 칸")) }
+            if durationHours <= 0 { m.append(String(localized: "길이", comment: "루틴을 저장하려면 채워야 하는 칸")) }
         } else if weeklyHours <= 0 {
-            m.append("주당 시간")
+            m.append(String(localized: "주당 시간", comment: "루틴을 저장하려면 채워야 하는 칸"))
         }
         return m
     }
@@ -453,7 +453,7 @@ struct RoutineEditorView: View {
             guard !days.isEmpty, let overlap = Self.overlapHours(mine, theirs), overlap > 0.01
             else { continue }
             let dayLabels = days.sorted { $0.rawValue < $1.rawValue }.map(\.shortLabel).joined(separator: "·")
-            found.append("\(dayLabels) — \(other.name)와 \(fmtHours(overlap))시간")
+            found.append(String(localized: "\(dayLabels) — \(other.name)와 \(fmtHours(overlap))시간"))
         }
         return found
     }

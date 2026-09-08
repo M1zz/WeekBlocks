@@ -42,6 +42,8 @@ enum TodoAccess {
         return MacEntitlement.isUnlocked
     }
 
-    static let lockedTitle = "여기서 적은 것은 아직 아이폰에 안 갑니다"
-    static let lockedNote = "적는 데는 아무 지장이 없습니다. 아이폰에서 적은 것도 계속 내려옵니다. 열면 지금까지 적어 둔 것까지 함께 보입니다."
+    /// ⚠️ 저장 프로퍼티로 두지 않는다. 그러면 앱이 처음 켜질 때의 언어로 굳어
+    ///    시스템 언어를 바꿔도 옛 말이 남는다.
+    static var lockedTitle: String { String(localized: "여기서 적은 것은 아직 아이폰에 안 갑니다") }
+    static var lockedNote: String { String(localized: "적는 데는 아무 지장이 없습니다. 아이폰에서 적은 것도 계속 내려옵니다. 열면 지금까지 적어 둔 것까지 함께 보입니다.") }
 }

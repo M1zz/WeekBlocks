@@ -152,7 +152,7 @@ final class ScheduleShareStore {
             let (items, _) = try await fetchZone(db: container.sharedCloudDatabase, zoneID: zone.zoneID)
             let weeks = items.map { $0.0 }.sorted { $0.weekStartEpoch < $1.weekStartEpoch }
             guard !weeks.isEmpty else { continue }
-            let owner = weeks.last(where: { !$0.ownerName.isEmpty })?.ownerName ?? "공유받은 일정"
+            let owner = weeks.last(where: { !$0.ownerName.isEmpty })?.ownerName ?? String(localized: "공유받은 일정")
             result.append(ReceivedSchedule(zoneID: zone.zoneID, ownerName: owner, weeks: weeks))
         }
         received = result.sorted { $0.ownerName < $1.ownerName }
@@ -205,7 +205,7 @@ final class ScheduleShareStore {
             }
 
             let share = CKShare(recordZoneID: ownerZoneID)
-            share[CKShare.SystemFieldKey.title] = "내 주간 일정" as CKRecordValue
+            share[CKShare.SystemFieldKey.title] = String(localized: "내 주간 일정") as CKRecordValue
             // 링크를 받은 사람은 '보기 전용'으로만 참여한다.
             share.publicPermission = .readOnly
             let saved = try await container.privateCloudDatabase.save(share)
@@ -324,15 +324,15 @@ final class ScheduleShareStore {
             switch ck.code {
             case .notAuthenticated:
                 iCloudAvailable = false
-                errorMessage = "iCloud에 로그인하면 일정을 공유할 수 있습니다."
+                errorMessage = String(localized: "iCloud에 로그인하면 일정을 공유할 수 있습니다.")
                 return
             case .networkUnavailable, .networkFailure:
-                errorMessage = "네트워크 연결을 확인해주세요."
+                errorMessage = String(localized: "네트워크 연결을 확인해주세요.")
                 return
             default:
                 break
             }
         }
-        errorMessage = "동기화 오류: \(error.localizedDescription)"
+        errorMessage = String(localized: "동기화 오류: \(error.localizedDescription)")
     }
 }

@@ -23,6 +23,10 @@
 //  - 몸은 조각으로 된다 (Stamatakis 2022 VILPA) / 머리는 안 된다 (Albulescu 2022)
 //    신체 활동만 1~2분 조각으로도 축적된다.
 //
+//  ⚠️ 낱말 사전은 **한국어와 영어를 나란히** 둔다 (→ WordSet). 영어로 적은 할 일도
+//     같은 판정을 받아야 하기 때문이다. 한국어는 낱말 경계가 없어 부분 문자열로 찾고,
+//     영어는 경계가 있으므로 낱말 단위로 찾는다 — 안 그러면 "some"이 "handsome"에 걸린다.
+//
 //  ⚠️ 이 파일은 iOS('욕망의 무지개')와 macOS('무지개 공방') 두 레포에 **같은 내용으로**
 //     복제돼 있다. 한쪽을 고치면 다른 쪽도 반드시 같이 고칠 것.
 //
@@ -42,9 +46,9 @@ enum ChunkKind: String {
 
     var label: String {
         switch self {
-        case .fragment: return "조각"
-        case .short:    return "짧은 덩어리"
-        case .block:    return "덩어리"
+        case .fragment: return String(localized: "조각")
+        case .short:    return String(localized: "짧은 덩어리")
+        case .block:    return String(localized: "덩어리")
         }
     }
 
@@ -70,8 +74,8 @@ enum FragmentQuestion: String, CaseIterable, Identifiable {
     /// 화면에 그대로 나가는 물음.
     var text: String {
         switch self {
-        case .start:   return "시동 없이 바로 시작되나요?"
-        case .closing: return "5분 안에 끝까지 가나요?"
+        case .start:   return String(localized: "시동 없이 바로 시작되나요?")
+        case .closing: return String(localized: "5분 안에 끝까지 가나요?")
         }
     }
 
@@ -79,13 +83,13 @@ enum FragmentQuestion: String, CaseIterable, Identifiable {
     var why: String {
         switch self {
         case .start:
-            return "맥락을 다시 읽어 와야 하는 일은 조각에서 시동만 걸다 끝납니다."
+            return String(localized: "맥락을 다시 읽어 와야 하는 일은 조각에서 시동만 걸다 끝납니다.")
         case .closing:
-            return "끝나지 않은 일은 잔여물이 되어 그다음 덩어리 시간까지 갉아먹습니다."
+            return String(localized: "끝나지 않은 일은 잔여물이 되어 그다음 덩어리 시간까지 갉아먹습니다.")
         }
     }
 
-    /// 근거 표기.
+    /// 근거 표기. 사람 이름과 연도라 언어를 타지 않는다.
     var source: String {
         switch self {
         case .start:   return "Mark 2008"
@@ -164,11 +168,11 @@ struct StepAdvice {
     var verdict: String {
         switch kind {
         case .fragment:
-            return "조각입니다. 5분이 나면 이걸 집으면 됩니다."
+            return String(localized: "조각입니다. 5분이 나면 이걸 집으면 됩니다.")
         case .short:
-            return "짧은 덩어리입니다. 앉아야 하지만 한 자리에서 끝납니다."
+            return String(localized: "짧은 덩어리입니다. 앉아야 하지만 한 자리에서 끝납니다.")
         case .block:
-            return "덩어리입니다. 지켜 둔 시간에 두세요."
+            return String(localized: "덩어리입니다. 지켜 둔 시간에 두세요.")
         }
     }
 }
@@ -188,6 +192,26 @@ struct SplitHint: Identifiable {
     let source: String?
 }
 
+// MARK: - 낱말 사전
+
+/// 제목에서 성질을 읽어내는 낱말 묶음. 한국어와 영어를 한 자리에 둔다.
+///
+/// 한국어는 낱말 경계가 없으므로 **공백을 지운 문자열의 부분 일치**로 찾고,
+/// 영어는 경계가 있으므로 **낱말 단위 일치**로 찾는다. 영어를 부분 일치로 찾으면
+/// "some"이 "handsome"에, "post"가 "postpone"에 걸려 판정이 엉뚱해진다.
+struct WordSet {
+    let ko: [String]
+    let en: [String]
+
+    /// `normalized`는 공백을 지우고 소문자로 바꾼 것, `padded`는 앞뒤에 공백을 댄 원문.
+    func matches(normalized: String, padded: String) -> Bool {
+        if ko.contains(where: { normalized.contains($0.replacingOccurrences(of: " ", with: "")) }) {
+            return true
+        }
+        return en.contains { padded.contains(" \($0) ") }
+    }
+}
+
 // MARK: - 판정기
 
 enum TodoSplitAdvisor {
@@ -203,41 +227,80 @@ enum TodoSplitAdvisor {
     // 사용자가 스스로 알아채도록 건드리는 게 목적이다.
 
     /// 시동 비용이 큰 일 — 조각에 넣으면 시동만 걸다 끝난다.
-    static let blockWords = [
-        "쓰기", "작성", "글", "원고", "구현", "코딩", "개발", "설계", "리팩터", "리팩토링",
-        "디자인", "기획", "전략", "분석", "조사", "학습", "공부", "이해", "정리하기",
-        "녹화", "편집", "만들기", "제작", "번역", "논문", "발표자료", "기능"
-    ]
+    static let blockWords = WordSet(
+        ko: [
+            "쓰기", "작성", "글", "원고", "구현", "코딩", "개발", "설계", "리팩터", "리팩토링",
+            "디자인", "기획", "전략", "분석", "조사", "학습", "공부", "이해", "정리하기",
+            "녹화", "편집", "만들기", "제작", "번역", "논문", "발표자료", "기능"
+        ],
+        en: [
+            "write", "writing", "draft", "drafting", "essay", "manuscript", "article",
+            "implement", "code", "coding", "build", "develop", "design", "architect",
+            "refactor", "plan", "planning", "strategy", "analyze", "analyse", "analysis",
+            "research", "study", "learn", "learning", "understand", "record", "edit",
+            "editing", "make", "produce", "translate", "paper", "thesis", "deck",
+            "slides", "presentation", "feature", "prototype"
+        ])
 
     /// 결과가 정해져 있어 바로 닫히는 일.
-    static let fragmentWords = [
-        "보내기", "발송", "제출", "발행", "업로드", "공유하기", "답장", "회신", "승인",
-        "예약", "확인", "체크", "결제", "신청", "등록", "캡처", "메모", "적기", "기록",
-        "복습", "암기", "카드", "고르기", "선택", "전화", "문자", "주문",
-        "올리기", "게시", "포스팅", "모아두기", "챙기기"
-    ]
+    static let fragmentWords = WordSet(
+        ko: [
+            "보내기", "발송", "제출", "발행", "업로드", "공유하기", "답장", "회신", "승인",
+            "예약", "확인", "체크", "결제", "신청", "등록", "캡처", "메모", "적기", "기록",
+            "복습", "암기", "카드", "고르기", "선택", "전화", "문자", "주문",
+            "올리기", "게시", "포스팅", "모아두기", "챙기기"
+        ],
+        en: [
+            "send", "submit", "publish", "upload", "share", "reply", "respond", "approve",
+            "book", "schedule", "confirm", "check", "pay", "apply", "register", "sign up",
+            "capture", "screenshot", "note", "jot", "log", "review flashcards", "memorize",
+            "flashcards", "pick", "choose", "call", "text", "order", "post", "collect",
+            "gather", "bookmark", "file", "rsvp", "email"
+        ])
 
     /// 몸으로 하는 일 — 조각으로도 실제로 축적된다 (VILPA).
-    static let bodyWords = [
-        "운동", "스트레칭", "걷기", "산책", "계단", "달리기", "러닝", "요가", "청소",
-        "설거지", "빨래", "정리정돈", "환기"
-    ]
+    static let bodyWords = WordSet(
+        ko: [
+            "운동", "스트레칭", "걷기", "산책", "계단", "달리기", "러닝", "요가", "청소",
+            "설거지", "빨래", "정리정돈", "환기"
+        ],
+        en: [
+            "exercise", "workout", "stretch", "stretching", "walk", "walking", "stairs",
+            "run", "running", "jog", "yoga", "clean", "cleaning", "dishes", "laundry",
+            "tidy", "vacuum", "pushups", "push-ups", "squats", "air out"
+        ])
 
     /// 탐색이 필요해 조각 안에서 닫히지 않는 일.
-    static let decisionWords = [
-        "정하기", "결정", "고민", "검토", "판단", "선정", "구상", "아이디어 내기"
-    ]
+    static let decisionWords = WordSet(
+        ko: [
+            "정하기", "결정", "고민", "검토", "판단", "선정", "구상", "아이디어 내기"
+        ],
+        en: [
+            "decide", "decision", "figure out", "think through", "consider", "evaluate",
+            "assess", "compare", "brainstorm", "ideate", "scope", "explore options"
+        ])
 
     /// 일이 아니라 조각이 새는 곳.
-    static let drainWords = [
-        "sns", "유튜브", "인스타", "피드", "쇼츠", "릴스", "스크롤", "웹서핑", "눈팅"
-    ]
+    static let drainWords = WordSet(
+        ko: [
+            "sns", "유튜브", "인스타", "피드", "쇼츠", "릴스", "스크롤", "웹서핑", "눈팅"
+        ],
+        en: [
+            "sns", "youtube", "instagram", "insta", "tiktok", "feed", "shorts", "reels",
+            "scroll", "scrolling", "browse", "browsing", "twitter", "reddit", "lurk"
+        ])
 
     /// 끝을 닫는 마감 동작 — 마지막 단계에 이게 있으면 잔여물이 남지 않는다.
-    static let closingWords = [
-        "보내기", "발송", "제출", "발행", "업로드", "공유하기", "배포", "커밋", "머지",
-        "마무리", "제출하기", "회신", "답장", "결제", "청구", "올리기", "게시", "포스팅"
-    ]
+    static let closingWords = WordSet(
+        ko: [
+            "보내기", "발송", "제출", "발행", "업로드", "공유하기", "배포", "커밋", "머지",
+            "마무리", "제출하기", "회신", "답장", "결제", "청구", "올리기", "게시", "포스팅"
+        ],
+        en: [
+            "send", "submit", "publish", "upload", "share", "ship", "deploy", "release",
+            "commit", "merge", "finish", "wrap up", "finalize", "reply", "respond",
+            "pay", "invoice", "post", "hand in", "hand off"
+        ])
 
     // MARK: 단계 하나 판정
 
@@ -250,67 +313,68 @@ enum TodoSplitAdvisor {
                        pick: FragmentPick = .none) -> StepAdvice
     {
         let text = normalize(title)
+        let words = padded(title)
 
-        let looksDrain    = contains(text, drainWords)
-        let looksBody     = contains(text, bodyWords)
-        let looksBlock    = contains(text, blockWords)
-        let looksFragment = contains(text, fragmentWords)
-        let looksDecision = contains(text, decisionWords)
-        let looksClosing  = contains(text, closingWords)
+        let looksDrain    = drainWords.matches(normalized: text, padded: words)
+        let looksBody     = bodyWords.matches(normalized: text, padded: words)
+        let looksBlock    = blockWords.matches(normalized: text, padded: words)
+        let looksFragment = fragmentWords.matches(normalized: text, padded: words)
+        let looksDecision = decisionWords.matches(normalized: text, padded: words)
+        let looksClosing  = closingWords.matches(normalized: text, padded: words)
 
         // 질문 하나 — 시동 없이 바로 시작할 수 있는가.
         var start: StepAdvice.Answer = {
             if looksDecision {
-                return .init(isYes: false, reason: "안 정한 것이 먼저 막고 있습니다.")
+                return .init(isYes: false, reason: String(localized: "안 정한 것이 먼저 막고 있습니다."))
             }
             if looksBlock {
-                return .init(isYes: false, reason: "어디까지 했는지 다시 읽어 와야 시작됩니다.")
+                return .init(isYes: false, reason: String(localized: "어디까지 했는지 다시 읽어 와야 시작됩니다."))
             }
             if looksBody {
-                return .init(isYes: true, reason: "몸으로 하는 일이라 시동이 없습니다.")
+                return .init(isYes: true, reason: String(localized: "몸으로 하는 일이라 시동이 없습니다."))
             }
             if looksFragment || looksClosing {
-                return .init(isYes: true, reason: "할 것이 정해져 있어 바로 손이 갑니다.")
+                return .init(isYes: true, reason: String(localized: "할 것이 정해져 있어 바로 손이 갑니다."))
             }
-            return .init(isYes: true, reason: "앞에서 막고 있는 것이 안 보입니다.")
+            return .init(isYes: true, reason: String(localized: "앞에서 막고 있는 것이 안 보입니다."))
         }()
 
         // 질문 둘 — 조각 안에서 완전히 끝나는가.
         var closing: StepAdvice.Answer = {
             // 몸으로 하는 일만은 나눠 해도 쌓인다 (VILPA). 크기로 자르지 않는다.
             if looksBody {
-                return .init(isYes: true, reason: "몸으로 하는 일은 나눠 해도 쌓입니다.")
+                return .init(isYes: true, reason: String(localized: "몸으로 하는 일은 나눠 해도 쌓입니다."))
             }
             if looksDrain {
-                return .init(isYes: false, reason: "끝이 정해져 있지 않아 안 닫힙니다.")
+                return .init(isYes: false, reason: String(localized: "끝이 정해져 있지 않아 안 닫힙니다."))
             }
             if durationHours >= tooBigHours {
-                return .init(isYes: false, reason: "\(formatHours(durationHours))짜리입니다. 한 자리에서도 안 닫힙니다.")
+                return .init(isYes: false, reason: String(localized: "\(formatHours(durationHours))짜리입니다. 한 자리에서도 안 닫힙니다."))
             }
             if durationHours > fragmentMaxHours {
-                return .init(isYes: false, reason: "\(formatHours(durationHours))짜리라 조각에 안 들어갑니다.")
+                return .init(isYes: false, reason: String(localized: "\(formatHours(durationHours))짜리라 조각에 안 들어갑니다."))
             }
             if looksBlock {
-                return .init(isYes: false, reason: "짧게 잡아 두어도 여기서 끝나지는 않습니다.")
+                return .init(isYes: false, reason: String(localized: "짧게 잡아 두어도 여기서 끝나지는 않습니다."))
             }
             if looksDecision {
-                return .init(isYes: false, reason: "뭘 할지 고르는 동안 조각이 끝납니다.")
+                return .init(isYes: false, reason: String(localized: "뭘 할지 고르는 동안 조각이 끝납니다."))
             }
             if looksClosing || looksFragment {
-                return .init(isYes: true, reason: "끝이 정해져 있어 여기서 닫힙니다.")
+                return .init(isYes: true, reason: String(localized: "끝이 정해져 있어 여기서 닫힙니다."))
             }
             if durationHours <= 0 {
-                return .init(isYes: true, reason: "시간을 안 잡은 줄이라 조각에 들어갑니다.")
+                return .init(isYes: true, reason: String(localized: "시간을 안 잡은 줄이라 조각에 들어갑니다."))
             }
-            return .init(isYes: true, reason: "\(formatHours(durationHours))짜리라 조각 안에 들어갑니다.")
+            return .init(isYes: true, reason: String(localized: "\(formatHours(durationHours))짜리라 조각 안에 들어갑니다."))
         }()
 
         // 사용자가 답한 것이 있으면 그 자리만 갈아 끼운다.
         if let yes = pick.start {
-            start = .init(isYes: yes, reason: "직접 정한 답입니다.", isUserSet: true)
+            start = .init(isYes: yes, reason: String(localized: "직접 정한 답입니다."), isUserSet: true)
         }
         if let yes = pick.closing {
-            closing = .init(isYes: yes, reason: "직접 정한 답입니다.", isUserSet: true)
+            closing = .init(isYes: yes, reason: String(localized: "직접 정한 답입니다."), isUserSet: true)
         }
 
         let kind = self.kind(start: start, closing: closing, durationHours: durationHours)
@@ -361,22 +425,22 @@ enum TodoSplitAdvisor {
         if pick.isSet { return nil }
 
         if looksDrain {
-            return .init(message: "이건 할 일이 아니라 조각이 새어 나가는 곳입니다. 단계로 두면 진행률만 부풉니다.",
-                         source: "배수구")
+            return .init(message: String(localized: "이건 할 일이 아니라 조각이 새어 나가는 곳입니다. 단계로 두면 진행률만 부풉니다."),
+                         source: String(localized: "배수구", comment: "경고의 근거 표기 — 연구가 아니라 앱의 규칙"))
         }
         // 시동 비용이 큰 일을 조각 시간에 욱여넣은 경우.
         if looksBlock && durationHours <= fragmentMaxHours {
-            return .init(message: "다시 붙잡는 데만 평균 23분이 듭니다. 조각에 넣으면 시동만 걸다 끝나니, 시간을 늘리거나 덩어리 시간에 두세요.",
+            return .init(message: String(localized: "다시 붙잡는 데만 평균 23분이 듭니다. 조각에 넣으면 시동만 걸다 끝나니, 시간을 늘리거나 덩어리 시간에 두세요."),
                          source: "Mark 2008")
         }
         // 아직 안 정해진 일은 조각 안에서 닫히지 않는다.
         if looksDecision && durationHours < blockMinHours {
-            return .init(message: "뭘 할지 고르는 동안 조각이 끝납니다. 결정은 덩어리에서 하고, 정해진 것만 조각 단계로 보내세요.",
-                         source: "판정 기준 3")
+            return .init(message: String(localized: "뭘 할지 고르는 동안 조각이 끝납니다. 결정은 덩어리에서 하고, 정해진 것만 조각 단계로 보내세요."),
+                         source: String(localized: "판정 기준 3", comment: "경고의 근거 표기 — 연구가 아니라 앱의 규칙"))
         }
         // 한 자리에서 안 닫히는 크기.
         if durationHours >= tooBigHours {
-            return .init(message: "한 번에 못 끝내는 크기입니다. 끝이 닫히도록 더 쪼개지 않으면 '하다 만 상태'가 다음 시간까지 따라옵니다.",
+            return .init(message: String(localized: "한 번에 못 끝내는 크기입니다. 끝이 닫히도록 더 쪼개지 않으면 '하다 만 상태'가 다음 시간까지 따라옵니다."),
                          source: "Leroy 2009")
         }
         return nil
@@ -385,10 +449,10 @@ enum TodoSplitAdvisor {
     /// 조언 문장에 넣을 시간 표기. (화면의 formatDuration과 달리 로직 파일 안에서 쓴다)
     private static func formatHours(_ hours: Double) -> String {
         let minutes = Int((max(0, hours) * 60).rounded())
-        if minutes < 60 { return "\(minutes)분" }
+        if minutes < 60 { return String(localized: "\(minutes)분") }
         let h = minutes / 60
         let m = minutes % 60
-        return m == 0 ? "\(h)시간" : "\(h)시간 \(m)분"
+        return m == 0 ? String(localized: "\(h)시간") : String(localized: "\(h)시간 \(m)분")
     }
 
     // MARK: 구성 전체 판정
@@ -407,8 +471,8 @@ enum TodoSplitAdvisor {
             return [SplitHint(
                 code: "before-split",
                 tone: .info,
-                title: "쪼개기 전에 한 가지",
-                detail: "조각 시간은 총량으로 환산되지 않습니다. 5분 열두 번은 60분이 아닙니다. 그래서 '5분이 생겼을 때 집을 수 있는 단계'와 '지킨 시간에만 하는 단계'를 처음부터 나눠 두는 편이 낫습니다.",
+                title: String(localized: "쪼개기 전에 한 가지"),
+                detail: String(localized: "조각 시간은 총량으로 환산되지 않습니다. 5분 열두 번은 60분이 아닙니다. 그래서 '5분이 생겼을 때 집을 수 있는 단계'와 '지킨 시간에만 하는 단계'를 처음부터 나눠 두는 편이 낫습니다."),
                 source: "Schulte 2014 · Whillans 2020")]
         }
 
@@ -420,18 +484,19 @@ enum TodoSplitAdvisor {
             result.append(SplitHint(
                 code: "no-fragment",
                 tone: .caution,
-                title: "5분이 생겼을 때 집을 단계가 없습니다",
-                detail: "모든 단계가 자리를 잡아야 하는 크기입니다. 자료 모아두기·한 줄 메모처럼 조각에서 닫히는 단계를 하나 만들어두면, 흘려보내던 틈이 이 할 일에 쓰입니다.",
+                title: String(localized: "5분이 생겼을 때 집을 단계가 없습니다"),
+                detail: String(localized: "모든 단계가 자리를 잡아야 하는 크기입니다. 자료 모아두기·한 줄 메모처럼 조각에서 닫히는 단계를 하나 만들어두면, 흘려보내던 틈이 이 할 일에 쓰입니다."),
                 source: "Whillans 2020"))
         }
 
         // 2. 마지막이 닫히지 않는다.
-        if let last = steps.last, !contains(normalize(last.title), closingWords) {
+        if let last = steps.last,
+           !closingWords.matches(normalized: normalize(last.title), padded: padded(last.title)) {
             result.append(SplitHint(
                 code: "no-closing",
                 tone: .caution,
-                title: "마지막을 닫는 단계가 없습니다",
-                detail: "'보내기·발행하기·제출하기'처럼 끝을 닫는 단계를 마지막에 두세요. 90% 끝난 일의 마지막 10%는 조각의 가장 좋은 용도이고, 닫아두면 그 뒤의 덩어리 시간까지 깨끗해집니다.",
+                title: String(localized: "마지막을 닫는 단계가 없습니다"),
+                detail: String(localized: "'보내기·발행하기·제출하기'처럼 끝을 닫는 단계를 마지막에 두세요. 90% 끝난 일의 마지막 10%는 조각의 가장 좋은 용도이고, 닫아두면 그 뒤의 덩어리 시간까지 깨끗해집니다."),
                 source: "Leroy 2009"))
         }
 
@@ -441,34 +506,36 @@ enum TodoSplitAdvisor {
             result.append(SplitHint(
                 code: "too-big",
                 tone: .caution,
-                title: "‘\(first.title)’은(는) 한 번에 안 끝납니다",
+                title: String(localized: "‘\(first.title)’은(는) 한 번에 안 끝납니다"),
                 detail: tooBig.count > 1
-                    ? "\(tooBig.count)개 단계가 2시간을 넘습니다. 끝이 닫히는 크기로 더 쪼개세요. 하다 만 단계는 다음 시간까지 주의를 끌고 갑니다."
-                    : "끝이 닫히는 크기로 더 쪼개세요. 하다 만 단계는 다음 시간까지 주의를 끌고 갑니다.",
+                    ? String(localized: "\(tooBig.count)개 단계가 2시간을 넘습니다. 끝이 닫히는 크기로 더 쪼개세요. 하다 만 단계는 다음 시간까지 주의를 끌고 갑니다.")
+                    : String(localized: "끝이 닫히는 크기로 더 쪼개세요. 하다 만 단계는 다음 시간까지 주의를 끌고 갑니다."),
                 source: "Leroy 2009"))
         }
 
         // 4. 시동 비용 경고 (개별 단계에서 이미 뜨지만, 개수가 많으면 구성 문제다).
+        //    ⚠️ 여기서 세는 "Mark 2008"은 사람 이름과 연도라 번역하지 않는 표기다.
+        //       근거 표기를 번역하게 되면 이 셈이 언어마다 달라진다.
         let startupIssues = zip(steps, advices).filter { $0.1.warning?.source == "Mark 2008" }
         if startupIssues.count >= 2 {
             result.append(SplitHint(
                 code: "startup-cost",
                 tone: .caution,
-                title: "짧게 잡힌 덩어리 작업이 \(startupIssues.count)개 있습니다",
-                detail: "글쓰기·구현·설계처럼 맥락을 다시 불러와야 하는 일은 조각 크기로 잡아두면 시동만 걸다 끝납니다. 시간을 늘리거나, 그 앞에 '준비' 조각 단계를 따로 두세요.",
+                title: String(localized: "짧게 잡힌 덩어리 작업이 \(startupIssues.count)개 있습니다"),
+                detail: String(localized: "글쓰기·구현·설계처럼 맥락을 다시 불러와야 하는 일은 조각 크기로 잡아두면 시동만 걸다 끝납니다. 시간을 늘리거나, 그 앞에 '준비' 조각 단계를 따로 두세요."),
                 source: "Mark 2008"))
         }
 
         // 5. 결정이 안 끝난 채로 작업이 먼저 온다.
-        if let decisionIndex = steps.firstIndex(where: { contains(normalize($0.title), decisionWords) }),
-           let workIndex = steps.firstIndex(where: { contains(normalize($0.title), blockWords) }),
+        if let decisionIndex = steps.firstIndex(where: { decisionWords.matches(normalized: normalize($0.title), padded: padded($0.title)) }),
+           let workIndex = steps.firstIndex(where: { blockWords.matches(normalized: normalize($0.title), padded: padded($0.title)) }),
            decisionIndex > workIndex {
             result.append(SplitHint(
                 code: "decision-late",
                 tone: .caution,
-                title: "결정이 작업 뒤에 있습니다",
-                detail: "‘\(steps[decisionIndex].title)’이(가) ‘\(steps[workIndex].title)’보다 뒤입니다. 정해지지 않은 채 시작한 작업은 조각에서도 덩어리에서도 닫히지 않습니다. 결정 단계를 앞으로 옮기세요.",
-                source: "판정 기준 3"))
+                title: String(localized: "결정이 작업 뒤에 있습니다"),
+                detail: String(localized: "‘\(steps[decisionIndex].title)’이(가) ‘\(steps[workIndex].title)’보다 뒤입니다. 정해지지 않은 채 시작한 작업은 조각에서도 덩어리에서도 닫히지 않습니다. 결정 단계를 앞으로 옮기세요."),
+                source: String(localized: "판정 기준 3", comment: "경고의 근거 표기 — 연구가 아니라 앱의 규칙")))
         }
 
         // 6. 잘 쪼갠 경우엔 그렇다고 말해준다.
@@ -477,8 +544,8 @@ enum TodoSplitAdvisor {
             result.append(SplitHint(
                 code: "well-split",
                 tone: .good,
-                title: "조각과 덩어리가 나뉘어 있습니다",
-                detail: "조각에서 집을 수 있는 단계가 \(fragmentCount)개, 지킨 시간에 할 단계가 \(advices.count - fragmentCount)개입니다. 5분이 생기면 조각 단계를, 확보한 시간에는 덩어리 단계를 하시면 됩니다.",
+                title: String(localized: "조각과 덩어리가 나뉘어 있습니다"),
+                detail: String(localized: "조각에서 집을 수 있는 단계가 \(fragmentCount)개, 지킨 시간에 할 단계가 \(advices.count - fragmentCount)개입니다. 5분이 생기면 조각 단계를, 확보한 시간에는 덩어리 단계를 하시면 됩니다."),
                 source: nil))
         }
 
@@ -496,26 +563,33 @@ enum TodoSplitAdvisor {
     /// 일이 굴러가는 순서대로다 — 정하고 → 펼치고 → 몰입해서 → 바로.
     static func template(for rootTitle: String) -> [TemplateStep] {
         let name = rootTitle.trimmingCharacters(in: .whitespaces)
-        let subject = name.isEmpty ? "이 일" : name
+        let subject = name.isEmpty ? String(localized: "이 일", comment: "제목을 아직 안 적었을 때 대신 부르는 말") : name
         return [
-            TemplateStep(title: "무엇을 할지 정하기",
-                         note: "안 정해진 게 남아 있으면 아래 단계가 전부 안 열립니다."),
-            TemplateStep(title: "필요한 것 모아두기",
-                         note: "링크·자료를 펼쳐만 둡니다. 본 작업의 시동 비용을 여기서 미리 냅니다."),
-            TemplateStep(title: "\(subject) 실제로 하기",
-                         note: "끊기면 다시 올라와야 합니다. 방해 없는 시간에 두세요."),
-            TemplateStep(title: "마무리해서 보내기",
-                         note: "끝을 닫는 단계. 짬이 나면 바로 집을 수 있습니다."),
+            TemplateStep(title: String(localized: "무엇을 할지 정하기"),
+                         note: String(localized: "안 정해진 게 남아 있으면 아래 단계가 전부 안 열립니다.")),
+            TemplateStep(title: String(localized: "필요한 것 모아두기"),
+                         note: String(localized: "링크·자료를 펼쳐만 둡니다. 본 작업의 시동 비용을 여기서 미리 냅니다.")),
+            TemplateStep(title: String(localized: "\(subject) 실제로 하기"),
+                         note: String(localized: "끊기면 다시 올라와야 합니다. 방해 없는 시간에 두세요.")),
+            TemplateStep(title: String(localized: "마무리해서 보내기"),
+                         note: String(localized: "끝을 닫는 단계. 짬이 나면 바로 집을 수 있습니다.")),
         ]
     }
 
     // MARK: 내부
 
+    /// 한국어를 찾기 위한 꼴 — 공백을 지우고 소문자로.
     private static func normalize(_ text: String) -> String {
         text.lowercased().replacingOccurrences(of: " ", with: "")
     }
 
-    private static func contains(_ text: String, _ words: [String]) -> Bool {
-        words.contains { text.contains($0.replacingOccurrences(of: " ", with: "")) }
+    /// 영어를 낱말 단위로 찾기 위한 꼴 — 공백을 지우지 않고, 문장부호를 공백으로 바꾼 뒤 앞뒤에 공백을 댄다.
+    private static func padded(_ text: String) -> String {
+        let lowered = text.lowercased()
+        let cleaned = lowered.map { ch -> Character in
+            if ch.isLetter || ch.isNumber || ch == "-" || ch == "'" { return ch }
+            return " "
+        }
+        return " " + String(cleaned) + " "
     }
 }

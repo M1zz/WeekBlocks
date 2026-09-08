@@ -322,7 +322,7 @@ struct SharedScheduleWeekView: View {
         let start = snapshot.weekStart
         let end = Calendar(identifier: .iso8601).date(byAdding: .day, value: 6, to: start) ?? start
         let f = DateFormatter()
-        f.dateFormat = "M월 d일"
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return "\(f.string(from: start)) – \(f.string(from: end))"
     }
 }

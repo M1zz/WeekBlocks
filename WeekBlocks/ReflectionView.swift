@@ -82,7 +82,7 @@ struct ReflectionView: View {
         .padding(20)
     }
 
-    private func statTile(label: String, value: Int, color: Color) -> some View {
+    private func statTile(label: LocalizedStringKey, value: Int, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
                 .font(.caption)

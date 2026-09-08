@@ -93,7 +93,7 @@ struct OnboardingView: View {
         }
     }
 
-    private func band(width: CGFloat, color: Color, label: String, dark: Bool = true) -> some View {
+    private func band(width: CGFloat, color: Color, label: LocalizedStringKey, dark: Bool = true) -> some View {
         RoundedRectangle(cornerRadius: 5)
             .fill(color.opacity(dark ? 0.85 : 1))
             .frame(width: max(0, width))
@@ -107,7 +107,7 @@ struct OnboardingView: View {
             )
     }
 
-    private func bullet(_ icon: String, _ title: String, _ detail: String) -> some View {
+    private func bullet(_ icon: String, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 14))
@@ -136,24 +136,26 @@ struct OnboardingView: View {
     }
 
     private let suggestions: [Suggestion] = [
-        Suggestion(name: "잠", icon: "moon.fill", color: "indigo",
-                   detail: "매일 23:00부터 8시간") {
-            Routine(name: "잠", iconName: "moon.fill", kind: .fixed, colorName: "indigo",
+        Suggestion(name: String(localized: "잠", comment: "기본 루틴 이름"), icon: "moon.fill", color: "indigo",
+                   detail: String(localized: "매일 23:00부터 8시간")) {
+            Routine(name: String(localized: "잠", comment: "기본 루틴 이름"), iconName: "moon.fill", kind: .fixed, colorName: "indigo",
                     dayMask: 0b1111111, startHour: 23, durationHours: 8, sortIndex: 0)
         },
-        Suggestion(name: "끼니", icon: "fork.knife", color: "green",
-                   detail: "주 17.5시간 · 하루 세 번 (시각은 유연하게)") {
-            Routine(name: "끼니", iconName: "fork.knife", kind: .quota, colorName: "green",
+        Suggestion(name: String(localized: "끼니", comment: "기본 루틴 이름"), icon: "fork.knife", color: "green",
+                   detail: String(localized: "주 17.5시간 · 하루 세 번 (시각은 유연하게)")) {
+            Routine(name: String(localized: "끼니", comment: "기본 루틴 이름"), iconName: "fork.knife", kind: .quota, colorName: "green",
                     weeklyHours: 17.5, sessionsPerDay: 3, sortIndex: 1)
         },
-        Suggestion(name: "일 · 학교", icon: "calendar", color: "blue",
-                   detail: "평일 09:00부터 9시간") {
-            Routine(name: "일", iconName: "calendar", kind: .fixed, colorName: "blue",
+        Suggestion(name: String(localized: "일 · 학교"), icon: "calendar", color: "blue",
+                   detail: String(localized: "평일 09:00부터 9시간")) {
+            // ⚠️ 열쇠를 따로 둔다. 낱말 "일"은 요일의 '일'과 겹쳐서, 한 열쇠로 두면
+            //    영어에서 Sun과 Work 중 하나를 못 고른다.
+            Routine(name: String(localized: "routine.name.work", defaultValue: "일", comment: "기본 루틴 이름 — 직장·학교"), iconName: "calendar", kind: .fixed, colorName: "blue",
                     dayMask: 0b0011111, startHour: 9, durationHours: 9, sortIndex: 2)
         },
-        Suggestion(name: "운동", icon: "figure.run", color: "orange",
-                   detail: "월·수·금 07:30부터 1시간") {
-            Routine(name: "운동", iconName: "figure.run", kind: .fixed, colorName: "orange",
+        Suggestion(name: String(localized: "운동", comment: "기본 루틴 이름"), icon: "figure.run", color: "orange",
+                   detail: String(localized: "월·수·금 07:30부터 1시간")) {
+            Routine(name: String(localized: "운동", comment: "기본 루틴 이름"), iconName: "figure.run", kind: .fixed, colorName: "orange",
                     dayMask: 0b0010101, startHour: 7.5, durationHours: 1, sortIndex: 3)
         },
     ]
@@ -264,7 +266,7 @@ struct OnboardingView: View {
         .padding(28)
     }
 
-    private func step(_ number: Int, _ icon: String, _ title: String, _ detail: String) -> some View {
+    private func step(_ number: Int, _ icon: String, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 11) {
             Text("\(number)")
                 .font(.system(size: 12, weight: .bold))
@@ -327,9 +329,9 @@ struct OnboardingView: View {
 
     private var nextTitle: String {
         switch page {
-        case 0: "시작하기"
-        case 1: picked.isEmpty ? "건너뛰고 다음" : "\(picked.count)개 만들고 다음"
-        default: "다 봤습니다"
+        case 0: String(localized: "시작하기")
+        case 1: picked.isEmpty ? String(localized: "건너뛰고 다음") : String(localized: "\(picked.count)개 만들고 다음")
+        default: String(localized: "다 봤습니다")
         }
     }
 
@@ -394,20 +396,20 @@ enum NextStep {
 
     var title: String {
         switch self {
-        case .setRoutines: "먼저, 빼놓을 수 없는 시간을 세웁니다"
-        case .writeTodos:  "이번 주에 할 일을 적어 보세요"
-        case .placeTodos:  "할 일을 요일 칸으로 끌어다 놓으세요"
+        case .setRoutines: String(localized: "먼저, 빼놓을 수 없는 시간을 세웁니다")
+        case .writeTodos:  String(localized: "이번 주에 할 일을 적어 보세요")
+        case .placeTodos:  String(localized: "할 일을 요일 칸으로 끌어다 놓으세요")
         }
     }
 
     var detail: String {
         switch self {
         case .setRoutines:
-            "잠·끼니·일처럼 뺄 수 없는 시간을 먼저 깔면, 남는 자리가 이번 주에 실제로 쓸 수 있는 시간이 됩니다."
+            String(localized: "잠·끼니·일처럼 뺄 수 없는 시간을 먼저 깔면, 남는 자리가 이번 주에 실제로 쓸 수 있는 시간이 됩니다.")
         case .writeTodos:
-            "화면 아래 '할 일'에 한 줄씩 적습니다. 언제 할지는 아직 정하지 않아도 됩니다."
+            String(localized: "화면 아래 '할 일'에 한 줄씩 적습니다. 언제 할지는 아직 정하지 않아도 됩니다.")
         case .placeTodos:
-            "할 일 카드를 잡아 요일 칸에 떨어뜨리면 그 요일의 계획이 됩니다. 올려 둔 뒤에도 다른 요일로 다시 끌 수 있습니다."
+            String(localized: "할 일 카드를 잡아 요일 칸에 떨어뜨리면 그 요일의 계획이 됩니다. 올려 둔 뒤에도 다른 요일로 다시 끌 수 있습니다.")
         }
     }
 
@@ -422,8 +424,8 @@ enum NextStep {
     /// 눌러서 바로 갈 수 있는 자리가 있으면 그 이름. 없으면 말로만 안내한다.
     var actionTitle: String? {
         switch self {
-        case .setRoutines: "안내 받기"
-        case .writeTodos:  "할 일 창 열기"
+        case .setRoutines: String(localized: "안내 받기")
+        case .writeTodos:  String(localized: "할 일 창 열기")
         case .placeTodos:  nil
         }
     }

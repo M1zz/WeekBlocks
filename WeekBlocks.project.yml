@@ -1,6 +1,17 @@
 name: WeekBlocks
 options:
   bundleIdPrefix: com.devkoan
+  # 원문은 한국어다. 소스에 적힌 한국어 문장이 그대로 번역 열쇠가 되고,
+  # 영어는 WeekBlocks/Localizable.xcstrings · TodoShare/Localizable.xcstrings 에 붙는다.
+  # 앱 이름·캘린더 권한 문구처럼 Info.plist 로 나가는 말은 InfoPlist.xcstrings 쪽이다.
+  #
+  # ⚠️ 새 문장을 적을 때 **Xcode 로 빌드하면** 카탈로그가 저절로 채워진다.
+  #    xcodebuild 만으로는 안 채워지므로, 터미널에서 작업했다면 한 번은 이렇게 맞춘다:
+  #      xcrun xcstringstool sync WeekBlocks/Localizable.xcstrings \
+  #        --stringsdata <DerivedData>/…/WeekBlocks.build/Objects-normal/arm64/*.stringsdata
+  #
+  # ⚠️ SwiftUI 의 Text("…")·Button("…") 은 저절로 번역되지만, 그냥 String 을 돌려주는
+  #    자리는 String(localized: "…") 로 감싸야 한다. 감싸지 않으면 조용히 한국어로 남는다.
   developmentLanguage: ko
   deploymentTarget:
     macOS: "14.0"
@@ -16,11 +27,11 @@ packages:
     from: "3.5.1"
 settings:
   base:
-    MARKETING_VERSION: "1.1.0"
+    MARKETING_VERSION: "1.1.1"
     # ⚠️ 빌드 번호는 **한 번 올린 것보다 항상 커야 한다.** 스토어에 9까지 올라가 있어서
     #    1로 되돌렸다가 업로드가 거절됐다("must contain a higher version than [9]").
     #    마케팅 버전(1.1.0)과 달리 이 값은 되돌리거나 다시 쓰지 못한다. 올리기만 한다.
-    CURRENT_PROJECT_VERSION: "11"
+    CURRENT_PROJECT_VERSION: "12"
     DEVELOPMENT_TEAM: QGAQ3AY3R3
     SWIFT_VERSION: "5.0"
     ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES

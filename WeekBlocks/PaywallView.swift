@@ -76,7 +76,7 @@ struct PaywallView: View {
                     if purchases.isWorking {
                         ProgressView().controlSize(.small)
                     } else {
-                        Text(purchases.product.map { "\($0.displayPrice)에 열기" } ?? "열기")
+                        Text(purchases.product.map { String(localized: "\($0.displayPrice)에 열기") } ?? String(localized: "열기"))
                     }
                 }
                 .keyboardShortcut(.defaultAction)
@@ -93,7 +93,7 @@ struct PaywallView: View {
         .task { await purchases.refresh() }
     }
 
-    private func row(_ icon: String, _ title: String, _ note: String) -> some View {
+    private func row(_ icon: String, _ title: LocalizedStringKey, _ note: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 13, weight: .semibold))

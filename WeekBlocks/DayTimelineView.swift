@@ -633,20 +633,20 @@ struct DayTimelineRow: View {
 
     private func editLabel(_ seg: TimeSegment) -> String {
         switch seg.source {
-        case .planBlock:    return "이 계획 수정…"
-        case .fixedRoutine: return "이 루틴 보기·수정…"
-        case .quotaSession: return "이 루틴 보기·수정…"
-        case .none:         return "수정…"
+        case .planBlock:    return String(localized: "이 계획 수정…")
+        case .fixedRoutine: return String(localized: "이 루틴 보기·수정…")
+        case .quotaSession: return String(localized: "이 루틴 보기·수정…")
+        case .none:         return String(localized: "수정…")
         }
     }
 
     /// 이 블록으로 무엇을 할 수 있는지. 계획 블록만 요일을 넘나들 수 있으므로 안내도 다르다.
     private func dragHelp(_ seg: TimeSegment) -> String {
-        if seg.isGhost { return "\(seg.title) — 삭제됨 · 우클릭으로 되살리기" }
+        if seg.isGhost { return String(localized: "\(seg.title) — 삭제됨 · 우클릭으로 되살리기") }
         if case .planBlock = seg.source {
-            return "\(seg.title) — 눌러서 수정 · 좌우로 끌어 시각 이동(15분 단위) · 위아래로 끌어 다른 요일로 · 우클릭으로 더 보기"
+            return String(localized: "\(seg.title) — 눌러서 수정 · 좌우로 끌어 시각 이동(15분 단위) · 위아래로 끌어 다른 요일로 · 우클릭으로 더 보기")
         }
-        return "\(seg.title) — 눌러서 보기·수정 · 드래그해서 시각 이동(15분 단위) · 우클릭으로 더 보기"
+        return String(localized: "\(seg.title) — 눌러서 보기·수정 · 드래그해서 시각 이동(15분 단위) · 우클릭으로 더 보기")
     }
 
     /// 이 구간을 타이머로 셀 수 있는가. 셀 수 있으면 무엇을 어떤 길이로 셀지.
@@ -671,18 +671,18 @@ struct DayTimelineRow: View {
 
     private func deleteLabel(_ seg: TimeSegment) -> String {
         switch seg.source {
-        case .fixedRoutine: return "이번 주 \(day.shortLabel)요일에서 빼기"
-        case .quotaSession: return "이 끼니 빼기 (이번 주 \(day.shortLabel))"
-        case .planBlock:    return "이 계획 삭제"
-        case .none:         return "삭제"
+        case .fixedRoutine: return String(localized: "이번 주 \(day.longLabel)에서 빼기")
+        case .quotaSession: return String(localized: "이 끼니 빼기 (이번 주 \(day.shortLabel))")
+        case .planBlock:    return String(localized: "이 계획 삭제")
+        case .none:         return String(localized: "삭제")
         }
     }
 
     private func restoreLabel(_ seg: TimeSegment) -> String {
         switch seg.source {
-        case .fixedRoutine: return "\(seg.title) 되살리기"
-        case .quotaSession: return "이 끼니 되살리기"
-        default:            return "되살리기"
+        case .fixedRoutine: return String(localized: "\(seg.title) 되살리기")
+        case .quotaSession: return String(localized: "이 끼니 되살리기")
+        default:            return String(localized: "되살리기")
         }
     }
 

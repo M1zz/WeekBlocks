@@ -235,10 +235,10 @@ struct BlockEditorView: View {
 
     /// 저장하려면 아직 해야 하는 것. 비어 있으면 저장할 수 있다.
     private var missing: [String] {
-        if title.trimmingCharacters(in: .whitespaces).isEmpty { return ["제목을 적어 주세요"] }
+        if title.trimmingCharacters(in: .whitespaces).isEmpty { return [String(localized: "제목을 적어 주세요")] }
         if withinRoutine { return [] }
-        if !hasCheckedOnce { return ["'구체성 검사'를 눌러 주세요"] }
-        if !issues.isEmpty { return ["위 검사에서 걸린 것을 고쳐 주세요"] }
+        if !hasCheckedOnce { return [String(localized: "'구체성 검사'를 눌러 주세요")] }
+        if !issues.isEmpty { return [String(localized: "위 검사에서 걸린 것을 고쳐 주세요")] }
         return []
     }
 
@@ -260,9 +260,9 @@ struct BlockEditorView: View {
         guard durationHours > free else { return nil }
         let f = { (h: Double) in h == h.rounded() ? String(format: "%.0f", h) : String(format: "%.1f", h) }
         if free <= 0 {
-            return "\(day.longLabel)은 이미 꽉 찼습니다 — 루틴과 계획으로 24시간을 다 썼어요"
+            return String(localized: "\(day.longLabel)은 이미 꽉 찼습니다 — 루틴과 계획으로 24시간을 다 썼어요")
         }
-        return "\(day.longLabel)에 남은 자리는 \(f(free))시간입니다 — \(f(durationHours))시간을 넣으면 넘칩니다"
+        return String(localized: "\(day.longLabel)에 남은 자리는 \(f(free))시간입니다 — \(f(durationHours))시간을 넣으면 넘칩니다")
     }
 
     // MARK: logic
