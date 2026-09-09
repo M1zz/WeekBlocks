@@ -61,6 +61,9 @@ Writing on this Mac is free. Pro covers only sending what you write here over to
 time blocking,weekly planner,schedule,routine,focus,deep work,todo,task,timer,time tracker,168
 ──
 
+스크린샷은 appstore/ko/ 와 appstore/en/ 에 2880x1800 여섯 장씩 들어 있습니다
+(appstore/README.md).
+
 지원 URL              https://m1zz.github.io/WeekBlocks/support-en.html
 마케팅 URL            https://m1zz.github.io/WeekBlocks/support-en.html
 개인정보 처리방침 URL   https://m1zz.github.io/WeekBlocks/privacy-en.html
