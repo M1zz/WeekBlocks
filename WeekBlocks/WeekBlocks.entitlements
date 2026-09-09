@@ -12,6 +12,24 @@
 	     Info.plist에 설명을 적어 두어도 EventKit이 빈 목록만 돌려준다. -->
 	<key>com.apple.security.personal-information.calendars</key>
 	<true/>
+	<!-- **아이폰이 적은 것을 곧바로 받아 오는 길.**
+
+	     CloudKit 미러링은 상대가 뭔가 올리면 조용한 푸시로 알려 준다. 그 푸시를
+	     받으려면 앱에 푸시 권한이 있어야 하는데, 이 맥 타깃에는 그게 없어서
+	     **알림이 아예 안 왔다.** 그러면 코어데이터는 켤 때와 이따금 도는 예약 작업에서만
+	     내려받는다 — 실제로 아이폰에서 적은 할 일이 8분 21초 뒤에야 도착했다
+	     (17:36:56 작성 → 17:45:17 도착). 반대 방향은 3초였다. 아이폰 쪽에는
+	     aps-environment 가 붙어 있었기 때문이다.
+
+	     ⚠️ 맥은 키 이름이 다르다 — iOS는 `aps-environment`, 맥은 이 이름이다.
+	     ⚠️ 이 줄을 넣으면 서명 프로필에 Push Notifications 권한이 필요하다.
+	        자동 서명이면 Xcode가 App ID 에 알아서 켜 준다. 안 켜지면 빌드가
+	        "provisioning profile doesn't support..." 로 막히니, 개발자 사이트에서
+	        com.devkoan.ScheduleDensityApp 의 Push Notifications 를 켠다.
+	     ⚠️ 값은 development 로 둔다. 배포 빌드는 아카이브할 때 Xcode가 production 으로
+	        바꿔 서명한다 (iOS 쪽 파일과 같은 규칙). -->
+	<key>com.apple.developer.aps-environment</key>
+	<string>development</string>
 	<!-- CloudKit 환경.
 	     ⚠️ **Development 다.** 예전에는 Production으로 못박아 두었는데, 그게 이번
 	        동기화 사고의 뿌리였다. Production에는 CloudKit이 레코드 타입·필드를

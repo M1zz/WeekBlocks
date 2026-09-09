@@ -4,6 +4,25 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
 ## 완료
+- [x] 아이폰에서 적은 것이 맥에 몇 분씩 늦게 뜨던 것 (2026-09-03)
+      "맥에서 적은 건 아이폰에 바로 뜨는데 아이폰에서 적은 건 맥에서 안 보인다."
+      **없어진 것이 아니라 늦게 온 것이었다.** 재어 보니:
+        아이폰 17:36:56 작성 → 맥 도착 17:45:17  (8분 21초)
+        맥    17:38:41 작성 → 아이폰 도착 17:38:44 (3초)
+      미러링은 상대가 올리면 조용한 푸시로 알려 주는데, **맥 타깃에만 푸시 권한이
+      없었다**(`com.apple.developer.aps-environment`). 아이폰 쪽 entitlements 에는
+      `aps-environment` 가 붙어 있어서 그쪽만 즉시 깨어났다. 푸시가 없으면 코어데이터는
+      켤 때와 이따금 도는 예약 작업에서만 내려받는다 — 그 간격이 곧 지연이었다.
+      - `WeekBlocks.entitlements` 에 `com.apple.developer.aps-environment` 추가
+        (⚠️ 맥은 키 이름이 iOS 와 다르다)
+      - `MacAppDelegate` 에서 `registerForRemoteNotifications()` — 권한만 있고 등록을
+        안 하면 푸시는 여전히 안 온다. 성공/실패를 로그로 남긴다(📡 [Push])
+      - ⚠️ 데이터는 한 톨도 안 샜다. 양쪽 스토어를 열어 대조했고 5개로 같았다
+      - ⚠️ 남은 비대칭: 아이폰은 '맥과 함께 쓰기'를 팔고(`sellsSync = true`) 맥은 안 판다
+        (`sellsAccess = false`). 그래서 **출시 빌드에서 안 산 아이폰이 적은 줄은
+        맥에서 안 보인다** — 이건 고장이 아니라 커튼이다(→ TodoSharing.swift).
+        같은 증상으로 보이니 문의가 오면 이것부터 가른다.
+
 - [x] WeekBlocks 소스를 `WeekBlocks/` 폴더로 흡수
 - [x] `ScheduleDensityApp.xcodeproj`에 macOS 타깃 `WeekBlocks` 추가
 - [x] WeekBlocks 타깃에 macOS 빌드 설정(SDKROOT/배포타깃) 오버라이드

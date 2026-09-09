@@ -3,8 +3,34 @@ import SwiftData
 import CloudKit
 import LeeoKit
 
-/// CloudKit 일정 공유 초대 링크를 눌렀을 때 수락 콜백을 받는다.
+/// CloudKit 일정 공유 초대 링크를 눌렀을 때 수락 콜백을 받고,
+/// **조용한 푸시를 받을 자리를 연다.**
 final class MacAppDelegate: NSObject, NSApplicationDelegate {
+
+    /// **아이폰이 적은 것을 기다리지 않고 받는다.**
+    ///
+    /// 미러링은 상대가 뭔가 올리면 조용한 푸시로 알려 주는데, 그 푸시는 앱이 APNs에
+    /// 등록해야 온다. 등록을 안 하면 코어데이터는 켤 때와 이따금 도는 예약 작업에서만
+    /// 내려받아서, 아이폰에서 적은 줄이 **몇 분 뒤에** 나타난다 (재어 보니 8분 21초였다.
+    /// 반대 방향은 3초 — 아이폰에는 푸시 권한이 붙어 있었기 때문이다).
+    ///
+    /// ⚠️ 권한(`com.apple.developer.aps-environment`)이 없으면 등록이 실패한다.
+    ///    실패해도 앱은 그대로 돌아간다 — 늦게 받을 뿐이다. 그래서 실패를 로그로만
+    ///    남기고 사용자에게는 말하지 않는다. 대신 로그를 보면 원인이 바로 드러난다.
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApplication.shared.registerForRemoteNotifications()
+    }
+
+    func application(_ application: NSApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("📡 [Push] 등록됨 — 아이폰이 올린 것을 바로 받는다")
+    }
+
+    func application(_ application: NSApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("⚠️ [Push] 등록 실패 — 아이폰이 적은 것이 몇 분 늦게 온다: \(error)")
+    }
+
     func application(_ application: NSApplication,
                      userDidAcceptCloudKitShareWith metadata: CKShare.Metadata) {
         Task { await ScheduleShareStore.shared.accept(metadata) }
