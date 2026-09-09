@@ -7,6 +7,13 @@
 @font-face { font-family: UI; src: url(fonts/inter-700.ttf); font-weight: 700 }
 @font-face { font-family: UI; src: url(fonts/inter-800.ttf); font-weight: 800 }
 
+/* Pretendard carries the Hangul; Inter has none, so it falls through per glyph. */
+@font-face { font-family: KR; src: url(fonts/pretendard-400.woff2); font-weight: 400 }
+@font-face { font-family: KR; src: url(fonts/pretendard-500.woff2); font-weight: 500 }
+@font-face { font-family: KR; src: url(fonts/pretendard-600.woff2); font-weight: 600 }
+@font-face { font-family: KR; src: url(fonts/pretendard-700.woff2); font-weight: 700 }
+@font-face { font-family: KR; src: url(fonts/pretendard-800.woff2); font-weight: 800 }
+
 :root {
   /* Theme.swift — Rainbow palette (Apple system colors) */
   --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
@@ -20,7 +27,8 @@
 }
 
 * { box-sizing:border-box; margin:0; padding:0 }
-body { font-family:UI, system-ui, sans-serif; -webkit-font-smoothing:antialiased; background:#111 }
+body { font-family:UI, KR, system-ui, sans-serif; -webkit-font-smoothing:antialiased; background:#111;
+       word-break:keep-all }   /* Hangul wraps between words, not inside one */
 
 .shot {
   width:1440px; height:900px; overflow:hidden; position:relative;
@@ -221,7 +229,11 @@ body { font-family:UI, system-ui, sans-serif; -webkit-font-smoothing:antialiased
 .row .rt { font-size:13px; font-weight:500 }
 .row .rs { font-size:11px; color:var(--ink2); margin-top:3px }
 .row.done .rt { text-decoration:line-through; color:var(--ink2) }
-.row .rd { margin-left:auto; font-size:11px; color:var(--ink2); font-variant-numeric:tabular-nums }
+.row .note { margin-top:6px; height:24px; border-radius:5px; background:#fff;
+              border:.5px solid rgba(0,0,0,.18); display:flex; align-items:center;
+              padding:0 8px; font-size:12px }
+.row .note.empty { color:rgba(0,0,0,.3) }
+.rows { max-height:474px; overflow:hidden }
 .pfoot { padding:16px 20px; display:flex; justify-content:flex-end; background:var(--window) }
 .btn-def { background:var(--blue); color:#fff; border-radius:6px; padding:5px 18px; font-size:13px; font-weight:500 }
 
