@@ -457,8 +457,16 @@ struct DayTimelineRow: View {
                             segmentView(seg, width: max(1, segW), rowWidth: w)
                                 .offset(x: x + dragOffset)
                                 .zIndex(seg.id == dragId ? 1 : 0)
+                                // 놓는 순간 15분 격자로 붙는 그 한 걸음만 결을 준다.
+                                // **끄는 동안에는 결을 안 건다** — 손보다 늦게 따라오면
+                                // 띠가 손가락에 매달린 것처럼 찐득해진다.
+                                .animation(seg.id == dragId ? nil : Motion.timeline, value: x)
+                                .animation(seg.id == dragId ? nil : Motion.timeline, value: segW)
+                                .transition(.card)
                         }
                     }
+                    // 계획을 지우거나 되살리면 띠가 스러지고 돋는다.
+                    .animation(Motion.card, value: segments.map(\.id))
 
                     // 지금 — 오늘 줄에만, 모든 구간 위에 붉은 선 하나.
                     // 하루 어디까지 왔는지가 이 한 줄로 읽힌다.
@@ -471,6 +479,7 @@ struct DayTimelineRow: View {
                                         .fill(Color.red)
                                         .frame(width: 1.5)
                                         .offset(x: window.x(h, width: w) - 0.75)
+                                        .transition(.opacity)
                                 }
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -485,6 +494,7 @@ struct DayTimelineRow: View {
                     // 다른 줄에서 계획 블록을 끌고 와도 같은 테두리로 "여기 놓으면 이 요일"이라고 말한다.
                     RoundedRectangle(cornerRadius: 4)
                         .strokeBorder(Color.accentColor, lineWidth: (dropTargeted || isDayDropTarget) ? 2 : 0)
+                        .animation(Motion.target, value: dropTargeted || isDayDropTarget)
                 }
                 // 자 위에 바로 떨어뜨린다 — 떨어뜨린 가로 위치가 곧 시작 시각이다.
                 .dropDestination(for: String.self) { items, location in
@@ -492,7 +502,7 @@ struct DayTimelineRow: View {
                     onDropBacklog(token, window.hour(atX: location.x, width: w))
                     return true
                 } isTargeted: { targeted in
-                    withAnimation(.easeOut(duration: 0.12)) { dropTargeted = targeted }
+                    withAnimation(Motion.target) { dropTargeted = targeted }
                 }
             }
             .frame(height: 28)
@@ -502,6 +512,10 @@ struct DayTimelineRow: View {
                 .monospacedDigit()
                 .foregroundStyle(isOverbooked ? .red : .secondary)
                 .frame(width: 96, alignment: .trailing)
+                // 띠 하나를 옮기면 이 숫자가 함께 움직인다. 자릿수가 굴러가야
+                // 방금 한 손짓이 어디에 닿았는지가 눈에 붙는다.
+                .contentTransition(.numericText())
+                .animation(Motion.number, value: freeHours)
         }
     }
 
@@ -546,6 +560,7 @@ struct DayTimelineRow: View {
         .shadow(color: dragging ? .black.opacity(0.25) : .clear, radius: dragging ? 4 : 0, y: dragging ? 1 : 0)
         // 손이 올라가면 살짝 밝아진다. 색칠한 띠가 '누를 수 있는 것'으로 읽히도록.
         .brightness(hoverId == seg.id && !ghost ? 0.06 : 0)
+        .animation(Motion.hover, value: hoverId == seg.id)
         .contentShape(Rectangle())
         .onHover { hoverId = $0 ? seg.id : (hoverId == seg.id ? nil : hoverId) }
         // 좌표계는 .global — 블록을 offset으로 움직여도 translation이 흔들리지 않게(로컬이면 자기 자신을 쫓아 찐득해짐).
@@ -696,7 +711,7 @@ struct DayTimelineRow: View {
         default:
             return
         }
-        try? context.save()
+        withAnimation(Motion.card) { try? context.save() }
     }
 
     /// 타임라인에서 블록 하나를 삭제. 종류별로 다르게 반영되어 그리드·남은 시간 등에 즉시 적용된다.
@@ -727,7 +742,7 @@ struct DayTimelineRow: View {
         case .none:
             return
         }
-        try? context.save()
+        withAnimation(Motion.card) { try? context.save() }
     }
 
     /// 이 드래그가 옮겨 갈 다른 요일. 옆 줄로 넘어가지 않았으면 nil.
@@ -774,7 +789,8 @@ struct DayTimelineRow: View {
         case .none:
             return
         }
-        try? context.save()
+        // 놓은 자리에서 15분 격자로 붙는 그 한 걸음. 결이 없으면 손을 뗀 순간 띠가 튄다.
+        withAnimation(Motion.timeline) { try? context.save() }
     }
 
     private var dayNumber: String {
@@ -816,6 +832,7 @@ struct HourAxis: View {
                                     .background(Color.red, in: Capsule())
                                     // 라벨 가운데가 지금에 오도록 당기고, 양끝에서는 잘리지 않게 잡아둔다.
                                     .offset(x: min(w - 34, max(0, window.x(h, width: w) - 17)))
+                                    .transition(.opacity)
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)

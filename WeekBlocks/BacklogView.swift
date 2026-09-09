@@ -243,22 +243,30 @@ struct BacklogSection: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         FilterChip(label: String(localized: "전체"), color: .secondary,
-                                   selected: filterCategoryID == nil) { filterCategoryID = nil }
+                                   selected: filterCategoryID == nil) {
+                            withAnimation(Motion.card) { filterCategoryID = nil }
+                        }
                         ForEach(categories) { c in
                             FilterChip(label: c.name, color: c.displayColor,
                                        selected: filterCategoryID == c.uuid) {
-                                filterCategoryID = (filterCategoryID == c.uuid) ? nil : c.uuid
+                                withAnimation(Motion.card) {
+                                    filterCategoryID = (filterCategoryID == c.uuid) ? nil : c.uuid
+                                }
                             }
+                            .transition(.card)
                         }
                     }
                     .padding(.vertical, 1)
                 }
+                .transition(.disclose)
             }
 
             if !canPlan {
                 lockedNotice
+                    .transition(.disclose)
             } else if filteredItems.isEmpty && !isAdding {
                 emptyState
+                    .transition(.opacity)
             } else {
                 // 카드마다 다시 만들지 않는다. 트리·색·배치는 한 번 만들어 나눠 쓴다
                 // (예전에는 카드 수만큼 TodoTree와 색 지도를 새로 지었다).
@@ -289,23 +297,32 @@ struct BacklogSection: View {
                             onEditSteps: { stepsSheetItem = item },
                             // 단계까지 통째로 지운다.
                             onDelete: {
-                                for node in tree.subtree(of: item) { context.delete(node) }
-                                try? context.save()
+                                withAnimation(Motion.card) {
+                                    for node in tree.subtree(of: item) { context.delete(node) }
+                                    try? context.save()
+                                }
                             },
                             onSetCategory: { id in
-                                item.categoryID = id
-                                try? context.save()
+                                withAnimation(Motion.card) {
+                                    item.categoryID = id
+                                    try? context.save()
+                                }
                             },
                             onToggleNow: { toggleNow(item) }
                         )
+                        .transition(.card)
                     }
                 }
+                // 카드가 스스로 늘고 주는 자리다(@Query·다른 기기의 동기화까지).
+                // 무엇이 서 있는가가 바뀔 때만 결이 붙는다.
+                .animation(Motion.card, value: filteredItems.map(\.dragToken))
             }
 
             // 요일에 올린 일은 위 목록에서 내렸다. 그렇다고 사라진 것은 아니므로
             // **끝냈는지 확인하고 체크하는 자리**를 여기 남긴다. 기본은 접힘.
             if canPlan, !placedItems.isEmpty {
                 placedSection
+                    .transition(.disclose)
             }
         }
         // **요일에서 끌어 내리면 다시 '아직 안 정한 일'이 된다.**
@@ -330,7 +347,7 @@ struct BacklogSection: View {
             // 할 일 카드끼리 끌 때는 켜지지 않게 — 여기서 받는 것은 **블록**뿐이다.
             isReturnTargeted = hovering
         }
-        .animation(.easeOut(duration: 0.12), value: isReturnTargeted)
+        .animation(Motion.target, value: isReturnTargeted)
         .task { await reconcileCategories() }
         .sheet(isPresented: $showingPaywall) {
             PaywallView()
@@ -384,7 +401,7 @@ struct BacklogSection: View {
     /// 지금 할 단계를 끝내고 다음 단계로 넘긴다.
     private func advance(_ item: BacklogItem) {
         let tree = self.tree
-        withAnimation {
+        withAnimation(Motion.card) {
             // 표시해 둔 단계를 세워 뒀으면 끝나는 것도 그 단계여야 한다.
             if let marked = tree.markedStep(of: item), tree.hasChildren(item) {
                 tree.setCompleted(marked, true)
@@ -403,7 +420,7 @@ struct BacklogSection: View {
             ?? (tree.hasChildren(item) ? tree.currentStep(of: item) : item)
         guard let target else { return }
         let on = !target.isMarkedNow
-        withAnimation {
+        withAnimation(Motion.card) {
             target.setFragmentAnswer(on ? true : nil, for: .start)
             target.setFragmentAnswer(on ? true : nil, for: .closing)
             try? context.save()
@@ -412,7 +429,7 @@ struct BacklogSection: View {
 
     /// 마지막으로 끝낸 단계를 되돌린다.
     private func rewind(_ item: BacklogItem) {
-        withAnimation {
+        withAnimation(Motion.card) {
             tree.rewind(item)
             try? context.save()
         }
@@ -475,8 +492,7 @@ struct BacklogSection: View {
         .onChange(of: addFocused) { _, focused in
             if !focused { commitDraft(keepOpen: false) }
         }
-        .transition(.asymmetric(insertion: .scale(scale: 0.96).combined(with: .opacity),
-                                removal: .opacity))
+        .transition(.card)
     }
 
     /// **요일에 올린 것을 도로 목록으로 내린다.**
@@ -504,8 +520,10 @@ struct BacklogSection: View {
             TodoSharing.stamp(item)
             context.insert(item)
         }
-        context.delete(block)
-        try? context.save()
+        withAnimation(Motion.card) {
+            context.delete(block)
+            try? context.save()
+        }
         return true
     }
 
@@ -519,14 +537,14 @@ struct BacklogSection: View {
             showingPaywall = true
             return
         }
-        withAnimation(.easeOut(duration: 0.18)) { isAdding = true }
+        withAnimation(Motion.card) { isAdding = true }
         addFocused = true
     }
 
     private func endAdding() {
         newTitle = ""
         addFocused = false
-        withAnimation(.easeOut(duration: 0.18)) { isAdding = false }
+        withAnimation(Motion.card) { isAdding = false }
     }
 
     /// 적은 것을 할 일로 담는다.
@@ -546,7 +564,7 @@ struct BacklogSection: View {
                                categoryID: filterCategoryID,
                                weekStartDate: weekStart)
         TodoSharing.stamp(item)
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(Motion.card) {
             context.insert(item)
             try? context.save()
         }
@@ -554,7 +572,7 @@ struct BacklogSection: View {
         if keepOpen {
             addFocused = true          // 손이 키보드를 떠나지 않게 둔다
         } else {
-            withAnimation(.easeOut(duration: 0.18)) { isAdding = false }
+            withAnimation(Motion.card) { isAdding = false }
         }
     }
 
@@ -574,7 +592,7 @@ struct BacklogSection: View {
         let overdueTokens = Set(overdue.map(\.dragToken))
         return VStack(alignment: .leading, spacing: 6) {
             Button {
-                withAnimation(.easeOut(duration: 0.18)) { showsPlaced.toggle() }
+                withAnimation(Motion.disclose) { showsPlaced.toggle() }
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: showsPlaced ? "chevron.down" : "chevron.right")
@@ -638,9 +656,11 @@ struct BacklogSection: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 5)
                         .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
+                        .transition(.row)
                     }
                 }
-                .transition(.opacity)
+                .animation(Motion.row, value: placedItems.map(\.dragToken))
+                .transition(.disclose)
             }
         }
         .padding(.top, 2)
@@ -649,7 +669,7 @@ struct BacklogSection: View {
     /// 끝냈다고 표시한다. 단계로 쪼갠 일이면 남은 단계까지 함께 닫는 것은
     /// TodoTree가 아는 규칙이라 그쪽에 맡긴다 (여기서 다시 쓰면 규칙이 둘이 된다).
     private func complete(_ item: BacklogItem) {
-        withAnimation {
+        withAnimation(Motion.card) {
             tree.setCompleted(item, true)
             try? context.save()
         }
@@ -799,6 +819,8 @@ struct FilterChip: View {
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
+        .animation(Motion.card, value: selected)
     }
 }
 
@@ -902,6 +924,7 @@ struct BacklogBlock: View {
                     ProgressView(value: steps.progress)
                         .tint(steps.progress >= 1 ? .green : tint)
                         .frame(maxWidth: 110)
+                        .animation(Motion.number, value: steps.progress)
                 }
 
                 // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
@@ -946,6 +969,7 @@ struct BacklogBlock: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
+                .transition(.control)
             }
         }
         .padding(.horizontal, 8)
@@ -956,6 +980,10 @@ struct BacklogBlock: View {
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .draggable(item.dragToken)
         .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
+        // 성질이 바뀌면 색이 바뀐다('바로 하면 되는 일'로 표시하는 순간처럼).
+        // 툭 갈아 끼우면 무엇이 바뀐 건지 눈이 못 좇는다.
+        .animation(Motion.card, value: laneBackground)
         .contextMenu {
             Button(steps == nil ? "단계로 쪼개기…" : "단계 보기·편집…", action: onEditSteps)
             Button(lane == .now ? "'바로' 표시 거두기" : "바로 하면 되는 일로 표시",
@@ -1077,11 +1105,15 @@ struct BacklogComposerView: View {
                     LazyVStack(spacing: 6) {
                         ForEach(weekItems) { item in
                             ComposerItemRow(item: item, categories: categories) {
-                                context.delete(item); try? context.save()
+                                withAnimation(Motion.row) {
+                                    context.delete(item); try? context.save()
+                                }
                             }
+                            .transition(.row)
                         }
                     }
                     .padding(20)
+                    .animation(Motion.row, value: weekItems.map(\.dragToken))
                 }
             }
 
@@ -1141,8 +1173,10 @@ struct BacklogComposerView: View {
                                sortIndex: maxIndex + 1,
                                categoryID: defaultCategoryID, weekStartDate: weekStart)
         TodoSharing.stamp(item)
-        context.insert(item)
-        try? context.save()
+        withAnimation(Motion.row) {
+            context.insert(item)
+            try? context.save()
+        }
         newTitle = ""
         focused = true
     }
@@ -1294,15 +1328,19 @@ struct AllBacklogView: View {
                                         item: item,
                                         categories: categories,
                                         onDelete: {
-                                            for node in tree.subtree(of: item) { context.delete(node) }
-                                            try? context.save()
+                                            withAnimation(Motion.row) {
+                                                for node in tree.subtree(of: item) { context.delete(node) }
+                                                try? context.save()
+                                            }
                                         }
                                     )
+                                    .transition(.row)
                                 }
                             }
                         }
                     }
                     .padding(20)
+                    .animation(Motion.row, value: rootItems.map(\.dragToken))
                 }
             }
         }
@@ -1362,6 +1400,7 @@ struct AllBacklogRow: View {
         .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
         .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
     }
 }
 
@@ -1406,9 +1445,11 @@ struct CategoryManagerView: View {
                                 category: c,
                                 onDelete: { deleteCategory(c) }
                             )
+                            .transition(.row)
                         }
                     }
                     .padding()
+                    .animation(Motion.row, value: categories.map(\.uuid))
                 }
             }
 
@@ -1432,8 +1473,10 @@ struct CategoryManagerView: View {
         let t = newName.trimmingCharacters(in: .whitespaces)
         guard !t.isEmpty else { return }
         let maxIndex = categories.map(\.sortIndex).max() ?? -1
-        context.insert(BacklogCategory(name: t, colorName: newColor, iconName: newIcon, sortIndex: maxIndex + 1))
-        try? context.save()
+        withAnimation(Motion.row) {
+            context.insert(BacklogCategory(name: t, colorName: newColor, iconName: newIcon, sortIndex: maxIndex + 1))
+            try? context.save()
+        }
         newName = ""
         newColor = "blue"
         newIcon = "tag"
@@ -1441,11 +1484,13 @@ struct CategoryManagerView: View {
 
     private func deleteCategory(_ c: BacklogCategory) {
         // 이 카테고리를 쓰던 항목은 미분류로 되돌림
-        for item in allItems where item.categoryID == c.uuid {
-            item.categoryID = nil
+        withAnimation(Motion.row) {
+            for item in allItems where item.categoryID == c.uuid {
+                item.categoryID = nil
+            }
+            context.delete(c)
+            try? context.save()
         }
-        context.delete(c)
-        try? context.save()
     }
 }
 

@@ -1,23 +1,35 @@
 {
-  "sourceLanguage": "ko",
-  "strings": {
-    "CFBundleDisplayName": {
-      "extractionState": "manual",
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "할 일로"
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to To-dos"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add to To-dos"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "할 일로"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "TodoShareExtension"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

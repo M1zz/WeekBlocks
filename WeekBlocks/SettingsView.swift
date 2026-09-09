@@ -327,10 +327,15 @@ struct SettingsView: View {
                 Text(message)
                     .font(.caption)
                     .foregroundStyle(.orange)
+                    .transition(.disclose)
             }
         } header: {
             Text("캘린더")
         }
+        // 권한을 허용하면 이 묶음이 통째로 다른 것이 된다. 갈아 끼우는 결을 준다.
+        .animation(Motion.disclose, value: calendars.hasAccess)
+        .animation(Motion.disclose, value: calendars.calendars.count)
+        .animation(Motion.disclose, value: calendars.failureMessage)
     }
 
     /// **지금 무엇을 쓰고 있는가, 그리고 산 것을 되찾는 자리.**
@@ -392,6 +397,7 @@ struct SettingsView: View {
                 Text(message)
                     .font(.caption)
                     .foregroundStyle(.orange)
+                    .transition(.disclose)
             }
 
             Text(tierNote)
@@ -400,6 +406,9 @@ struct SettingsView: View {
         } header: {
             Text("함께 쓰기")
         }
+        // 사고 나면 단추가 내려가고 문구가 바뀐다. 그 순간이 툭 갈리지 않게.
+        .animation(Motion.disclose, value: isPro)
+        .animation(Motion.disclose, value: purchases.failureMessage)
     }
 
     /// 값을 치렀는가. `sellsAccess`가 꺼진 무료 개방 기간에는 건너가기가 열려 있어도

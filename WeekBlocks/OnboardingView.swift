@@ -28,16 +28,20 @@ struct OnboardingView: View {
 
     @State private var page = 0
     @State private var picked: Set<UUID> = []
+    /// 앞으로 가는 중인가. 새 걸음은 간 쪽에서 들어온다.
+    @State private var pageForward = true
 
     private static let lastPage = 2
 
     var body: some View {
         VStack(spacing: 0) {
-            Group {
+            // 걸음은 **옆으로 넘어간다**. 위아래로 갈아 끼우면 앞 걸음이 어디로 갔는지
+            // 알 수 없어, 뒤로 갈 수 있다는 것도 안 읽힌다.
+            ZStack(alignment: .topLeading) {
                 switch page {
-                case 0: whyPage
-                case 1: routinePage
-                default: howPage
+                case 0: whyPage.transition(.pageSlide(forward: pageForward))
+                case 1: routinePage.transition(.pageSlide(forward: pageForward))
+                default: howPage.transition(.pageSlide(forward: pageForward))
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -226,6 +230,7 @@ struct OnboardingView: View {
             .contentShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
+        .animation(Motion.hover, value: isOn)
     }
 
     // MARK: 3. 어떻게 — 한 주를 짜는 순서
@@ -306,25 +311,32 @@ struct OnboardingView: View {
                     Circle()
                         .fill(i == page ? Color.accentColor : Color.secondary.opacity(0.3))
                         .frame(width: 6, height: 6)
+                        .scaleEffect(i == page ? 1.35 : 1)
                 }
             }
 
             Spacer()
 
             if page > 0 {
-                Button("이전") { withAnimation(.snappy(duration: 0.2)) { page -= 1 } }
+                Button("이전") {
+                    pageForward = false
+                    withAnimation(Motion.screen) { page -= 1 }
+                }
                     .buttonStyle(.bordered)
+                    .transition(.control)
             }
 
             Button(nextTitle) {
                 if page == 1 { createPicked() }        // 고른 것은 넘어갈 때 만든다
                 if page == Self.lastPage { finish(); return }
-                withAnimation(.snappy(duration: 0.2)) { page += 1 }
+                pageForward = true
+                withAnimation(Motion.screen) { page += 1 }
             }
             .buttonStyle(.borderedProminent)
             .keyboardShortcut(.defaultAction)
         }
         .padding(20)
+        .animation(Motion.screen, value: page)
     }
 
     private var nextTitle: String {
@@ -389,7 +401,7 @@ enum RoutineOnboarding {
 /// 온보딩 시트는 한 번 보고 닫으면 끝이라, 정작 화면 앞에 앉았을 때는 남는 게 없다.
 /// 이 줄은 상태를 보고 말한다 — 루틴이 없으면 루틴을, 할 일이 없으면 할 일을,
 /// 요일에 아무것도 안 올렸으면 끌어다 놓는 법을. 다 하고 나면 저절로 없어진다.
-enum NextStep {
+enum NextStep: Equatable {
     case setRoutines
     case writeTodos
     case placeTodos

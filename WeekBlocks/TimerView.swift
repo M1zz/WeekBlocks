@@ -33,13 +33,17 @@ struct TimerWindowView: View {
             if timer.isActive {
                 // 직접 센 것이 우선이다 — 사람이 손으로 누른 것이 일정보다 지금을 잘 안다.
                 RunningTimerFace()
+                    .transition(.opacity.combined(with: .scale(scale: 0.97)))
             } else {
                 // 1초마다 다시 그린다. 세는 주체가 따로 없고, 계산은 '지금'에서 바로 나온다.
                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
                     ScheduleTimerFace(slots: slots, now: ctx.date)
                 }
+                .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
         }
+        // 세기 시작하고 멈추는 그 한 걸음. 창이 통째로 다른 물건으로 바뀌어 보이면 안 된다.
+        .animation(Motion.screen, value: timer.isActive)
         .frame(minWidth: 380, minHeight: 480)
         .background(Color(nsColor: .windowBackgroundColor))
     }
@@ -66,13 +70,17 @@ struct ScheduleTimerFace: View {
         VStack(spacing: 14) {
             if let slot = current {
                 runningSlot(slot)
+                    .transition(.opacity)
             } else {
                 idle
+                    .transition(.opacity)
             }
 
             Divider().padding(.horizontal, -4)
             todayList
         }
+        // 한 일정이 끝나고 다음이 시작되는 그 분. 제목이 툭 갈리면 다른 창처럼 읽힌다.
+        .animation(Motion.screen, value: current?.id)
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
@@ -179,8 +187,12 @@ struct ScheduleTimerFace: View {
                     VStack(spacing: 5) {
                         ForEach(rest) { slot in
                             SlotRow(slot: slot, now: now)
+                                .transition(.row)
                         }
                     }
+                    // 지나간 일정은 목록에서 내려간다. 한 줄이 조용히 사라지면
+                    // 아래 것들이 이유 없이 뛰어오른 것으로 보인다.
+                    .animation(Motion.row, value: rest.map(\.id))
                 }
             }
         }
@@ -271,6 +283,8 @@ struct RunningTimerFace: View {
             .padding(.vertical, 4)
 
             footnote
+                .animation(Motion.row, value: timer.isRunning)
+                .animation(Motion.row, value: timer.isOvertime)
             controls
         }
         .padding(24)

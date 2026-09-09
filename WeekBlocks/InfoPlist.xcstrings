@@ -1,57 +1,69 @@
 {
-  "sourceLanguage": "ko",
-  "strings": {
-    "CFBundleDisplayName": {
-      "extractionState": "manual",
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "무지개 공방"
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Workshop"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rainbow Workshop"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무지개 공방"
           }
         }
       }
     },
-    "CFBundleName": {
-      "extractionState": "manual",
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "무지개 공방"
+    "CFBundleName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Workshop"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rainbow Workshop"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무지개 공방"
           }
         }
       }
     },
-    "NSCalendarsFullAccessUsageDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "맥 캘린더의 일정을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다."
+    "NSCalendarsFullAccessUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brings events from your Mac calendar into your weekly plan. It only reads; it never writes to or changes your calendar."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Brings events from your Mac calendar into your weekly plan. It only reads; it never writes to or changes your calendar."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "맥 캘린더의 일정을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다."
+          }
+        }
+      }
+    },
+    "NSHumanReadableCopyright" : {
+      "comment" : "Copyright (human-readable)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : ""
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

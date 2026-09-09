@@ -130,6 +130,10 @@ struct BlockEditorView: View {
                 }
             }
             .formStyle(.grouped)
+            // '루틴 안'을 켜면 묻는 칸이 통째로 달라진다. 구체성 판정도 적는 대로 바뀐다.
+            .animation(Motion.disclose, value: withinRoutine)
+            .animation(Motion.disclose, value: hasCheckedOnce)
+            .animation(Motion.row, value: issues.map(\.message))
 
             Divider()
 
@@ -201,12 +205,17 @@ struct BlockEditorView: View {
                 Label(crowding, systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)
+                    .transition(.disclose)
             }
 
             HStack {
             if existing != nil {
                 Button(role: .destructive) {
-                    if let existing { context.delete(existing); try? context.save() }
+                    if let existing {
+                        withAnimation(Motion.card) {
+                            context.delete(existing); try? context.save()
+                        }
+                    }
                     dismiss()
                 } label: {
                     Text("삭제")
@@ -222,6 +231,7 @@ struct BlockEditorView: View {
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .padding(.trailing, 4)
+                    .transition(.control)
             }
 
             Button("저장") { save() }
@@ -231,6 +241,8 @@ struct BlockEditorView: View {
             }
         }
         .padding(20)
+        .animation(Motion.hover, value: missing)
+        .animation(Motion.disclose, value: crowding)
     }
 
     /// 저장하려면 아직 해야 하는 것. 비어 있으면 저장할 수 있다.
@@ -331,7 +343,8 @@ struct BlockEditorView: View {
             )
             context.insert(block)
         }
-        try? context.save()
+        // 시트가 닫히면서 뒤 화면에 새 칩이 돋는다. 결 없이 담으면 툭 나타난다.
+        withAnimation(Motion.card) { try? context.save() }
         dismiss()
     }
 }

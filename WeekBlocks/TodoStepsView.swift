@@ -95,6 +95,7 @@ struct TodoStepsView: View {
                     }
                     .padding(20)
                 }
+                .transition(.opacity)
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 2) {
@@ -127,6 +128,7 @@ struct TodoStepsView: View {
                                 onMoveDown: { move(row.item, by: 1) },
                                 onDelete: { remove(row.item) }
                             )
+                            .transition(.row)
                         }
 
                         if let hint = topHint, SplitHintTip(hint: hint).shouldDisplay {
@@ -136,7 +138,10 @@ struct TodoStepsView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 12)
+                    // 단계는 붙고 떨어지고 위아래로 자리를 옮긴다. 그 셋이 한 결이다.
+                    .animation(Motion.row, value: rows.map(\.item.dragToken))
                 }
+                .transition(.opacity)
             }
 
             Divider()
@@ -144,6 +149,7 @@ struct TodoStepsView: View {
             inputBar
         }
         .frame(minWidth: 560, minHeight: 480)
+        .animation(Motion.screen, value: rows.isEmpty)
     }
 
     // MARK: - 헤더
@@ -184,12 +190,14 @@ struct TodoStepsView: View {
                     .font(.system(size: 30, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(progress >= 1 ? Color.green : Color.accentColor)
+                    .contentTransition(.numericText())
                 Button("완료") { dismiss() }
                     .buttonStyle(.borderedProminent)
             }
 
             ProgressView(value: progress)
                 .tint(progress >= 1 ? .green : .accentColor)
+                .animation(Motion.number, value: progress)
 
             // 지금 할 단계에 경고가 있으면 그것만 팁으로. (다른 줄에는 안 깐다)
             if let step = tree.currentStep(of: root),
@@ -211,6 +219,8 @@ struct TodoStepsView: View {
             }
         }
         .padding(20)
+        // '지금 단계'가 다음으로 넘어가고, 퍼센트가 굴러가고, 다 마쳤다는 줄이 대신 선다.
+        .animation(Motion.row, value: progress)
     }
 
     /// 이 일 전체에 걸리는 시간. 고르는 게 아니라 **단계들의 합**이다 —
@@ -254,9 +264,7 @@ struct TodoStepsView: View {
                     .buttonStyle(.plain)
                 }
                 .foregroundStyle(.secondary)
-            }
-
-            if !newTitle.trimmingCharacters(in: .whitespaces).isEmpty {
+                .transition(.row)
             }
 
             HStack(spacing: 10) {
@@ -273,6 +281,7 @@ struct TodoStepsView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
+        .animation(Motion.row, value: addTarget?.dragToken)
     }
 
     /// 지금 빈 줄에 적히면 붙을 속성.
@@ -309,7 +318,7 @@ struct TodoStepsView: View {
         let updated = TodoTree(allItems + [step])
         if updated.children(of: parent).count >= 2 { ShareSplitTip.hasSplit = true }
         updated.rollUp(from: step)
-        try? context.save()
+        withAnimation(Motion.row) { try? context.save() }
 
         newTitle = ""
         focused = true
@@ -331,11 +340,11 @@ struct TodoStepsView: View {
         }
         let updated = TodoTree(allItems + made)
         updated.rollUp(from: root)
-        try? context.save()
+        withAnimation(Motion.row) { try? context.save() }
     }
 
     private func toggle(_ item: BacklogItem) {
-        withAnimation {
+        withAnimation(Motion.row) {
             tree.setCompleted(item, !item.isCompleted)
             try? context.save()
         }
@@ -346,7 +355,7 @@ struct TodoStepsView: View {
         let tree = self.tree
         let parent = tree.parent(of: item)
         let victims = Set(tree.subtree(of: item).map(\.dragToken))
-        withAnimation {
+        withAnimation(Motion.row) {
             for node in tree.subtree(of: item) { context.delete(node) }
             if let parent {
                 // 시간은 남은 단계들의 합이라 저절로 줄어든다. 완료 상태만 다시 굴려 준다.
@@ -366,7 +375,7 @@ struct TodoStepsView: View {
         guard siblings.indices.contains(target) else { return }
         siblings.swapAt(index, target)
         for (i, sibling) in siblings.enumerated() { sibling.sortIndex = i }
-        withAnimation { try? context.save() }
+        withAnimation(Motion.row) { try? context.save() }
     }
 }
 
@@ -433,6 +442,7 @@ private struct StepRow: View {
                     ProgressView(value: progress)
                         .tint(progress >= 1 ? .green : .accentColor)
                         .frame(maxWidth: 160)
+                        .animation(Motion.number, value: progress)
                 } else if advice.isFragment {
                     // 표식은 조각에만. iOS('욕망의 무지개')와 같은 말·같은 기준이다.
                     HStack(spacing: 4) {
@@ -478,11 +488,13 @@ private struct StepRow: View {
                 }
                 .buttonStyle(.plain)
                 .help("하위 단계 추가")
+                .transition(.control)
                 Button(action: onDelete) {
                     Image(systemName: "xmark").font(.system(size: 11))
                 }
                 .buttonStyle(.plain)
                 .help("삭제")
+                .transition(.control)
             }
         }
         .padding(.horizontal, 8)
@@ -490,6 +502,9 @@ private struct StepRow: View {
         .background(isCurrent ? Color.orange.opacity(0.08) : Color.clear,
                     in: RoundedRectangle(cornerRadius: 6))
         .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
+        // 차례가 이 줄로 넘어오면 바탕색이 켜진다. 툭 갈리면 어느 줄로 넘어왔는지 놓친다.
+        .animation(Motion.row, value: isCurrent)
         .contextMenu {
             Button("하위 단계 추가", action: onAddChild)
             Button("위로", action: onMoveUp)

@@ -43,6 +43,7 @@ struct ReflectionView: View {
                     description: Text("주간 계획을 먼저 채운 뒤 다시 확인하세요.")
                 )
                 .frame(maxHeight: .infinity)
+                .transition(.opacity)
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
@@ -53,7 +54,9 @@ struct ReflectionView: View {
                             Divider()
                         }
                     }
+                    .animation(Motion.row, value: weekBlocks.map(\.dragToken))
                 }
+                .transition(.opacity)
             }
 
             Divider()
@@ -78,6 +81,9 @@ struct ReflectionView: View {
                 statTile(label: "건너뜀", value: stats.skipped, color: .red)
                 statTile(label: "미회고", value: stats.pending, color: .secondary)
             }
+            // 한 줄에 표시를 찍으면 위쪽 숫자 넷이 함께 움직인다.
+            // 굴러가야 방금 누른 것이 어느 칸에 닿았는지가 보인다.
+            .animation(Motion.number, value: stats.done + stats.partial * 100 + stats.skipped * 10000)
         }
         .padding(20)
     }
@@ -91,6 +97,7 @@ struct ReflectionView: View {
                 .font(.title3.weight(.medium))
                 .foregroundStyle(color)
                 .monospacedDigit()
+                .contentTransition(.numericText())
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -138,6 +145,7 @@ private struct ReflectionRow: View {
                 // (마우스를 안 쓰는 사람을 위해 줄 전체에 같은 메뉴를 우클릭으로도 단다.)
                 stateMenu
                     .opacity(hovering ? 1 : 0)
+                    .scaleEffect(hovering ? 1 : 0.8)
             }
 
             if !block.successCriteria.isEmpty {
@@ -159,12 +167,16 @@ private struct ReflectionRow: View {
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(1...3)
                 .padding(.leading, 52)
+                .transition(.disclose)
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
+        // 표시를 찍으면 회고 칸이 아래로 열리고, 제목에 줄이 그어진다. 한 결로 묶는다.
+        .animation(Motion.row, value: block.reviewStatus)
+        .animation(Motion.hover, value: hovering)
         .contextMenu { stateButtons }
     }
 
@@ -172,7 +184,9 @@ private struct ReflectionRow: View {
     /// 부분·건너뜀이 찍혀 있을 때 누르면 그것도 풀린다 — 체크박스는 늘 '지금 상태를 끈다'.
     private var checkButton: some View {
         Button {
-            block.reviewStatus = block.reviewStatus == nil ? .done : nil
+            withAnimation(Motion.row) {
+                block.reviewStatus = block.reviewStatus == nil ? .done : nil
+            }
             onChange()
         } label: {
             Image(systemName: block.reviewStatus?.systemImage ?? "circle")
@@ -201,7 +215,9 @@ private struct ReflectionRow: View {
     private var stateButtons: some View {
         ForEach(ReviewStatus.allCases) { status in
             Button {
-                block.reviewStatus = block.reviewStatus == status ? nil : status
+                withAnimation(Motion.row) {
+                    block.reviewStatus = block.reviewStatus == status ? nil : status
+                }
                 onChange()
             } label: {
                 Label(status.label, systemImage: block.reviewStatus == status
@@ -213,7 +229,7 @@ private struct ReflectionRow: View {
             // 지우는 것은 **표시뿐**이다. 적어 둔 한 줄 회고는 그대로 둔다 —
             // 잘못 눌러서 쓴 글이 날아가면 다시는 안 적는다.
             Button("표시 지우기") {
-                block.reviewStatus = nil
+                withAnimation(Motion.row) { block.reviewStatus = nil }
                 onChange()
             }
         }

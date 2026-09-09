@@ -49,6 +49,10 @@ struct ContentView: View {
     /// 지금 끌고 가는 계획 블록이 놓이려는 요일. 그 줄에 테두리가 선다.
     @State private var timelineDayTarget: DayOfWeek?
 
+    /// 마지막으로 주를 어느 쪽으로 넘겼는가. 새 주는 넘긴 쪽에서 들어온다 —
+    /// 방향이 없으면 다음 주로 가나 지난 주로 가나 같은 그림이라 어디로 갔는지 모른다.
+    @State private var weekForward = true
+
     /// 한 주 요약(총량·고정 루틴·남은 자유 시간)을 펼쳐 두었는가. 기본은 접힘.
     @AppStorage("showsWeekSummary") private var showsWeekSummary = false
 
@@ -89,11 +93,11 @@ struct ContentView: View {
                     NextStepBanner(step: step,
                                    onAction: { perform(step) },
                                    onDismiss: {
-                                       withAnimation(.snappy(duration: 0.2)) {
+                                       withAnimation(Motion.banner) {
                                            didDismissNextStep = true
                                        }
                                    })
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.banner)
                 }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
                 if showsWeekSummary {
@@ -104,10 +108,7 @@ struct ContentView: View {
                     // 접히고 펴지는 결이 양쪽으로 같아야 한 덩어리가 여닫히는 것으로 읽힌다.
                     // 예전에는 펼 때만 밀려 내려오고 접을 때는 그 자리에서 사라져서,
                     // 접는 순간 아래 화면이 툭 끊기며 올라왔다.
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .top).combined(with: .opacity),
-                        removal: .move(edge: .top).combined(with: .opacity)
-                    ))
+                    .transition(.disclose)
                     .clipped()
                 }
                 weekLensSection
@@ -124,11 +125,16 @@ struct ContentView: View {
                 // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
                 if !shareStore.received.isEmpty {
                     ReceivedSchedulesSection()
+                        .transition(.disclose)
                 }
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 18)
             .frame(maxWidth: .infinity, alignment: .leading)
+            // @Query가 스스로 새 값을 물어오는 자리에는 `withAnimation`을 걸 손이 없다.
+            // "무엇이 서 있는가"가 바뀌었을 때만 결이 붙도록 값으로 건다.
+            .animation(Motion.screen, value: nextStep)
+            .animation(Motion.disclose, value: shareStore.received.count)
         }
         .frame(minWidth: 980, minHeight: 700)
         .navigationTitle("무지개 공방")
@@ -361,6 +367,9 @@ struct ContentView: View {
                 .font(.system(size: 19, weight: .semibold))
                 .monospacedDigit()
                 .fixedSize()
+                // 주를 넘기면 날짜도 함께 굴러간다. 화면만 밀리고 날짜가 툭 바뀌면
+                // 두 개가 따로 노는 것으로 읽힌다.
+                .contentTransition(.numericText())
 
             Button { shiftWeek(by: 1) } label: {
                 Image(systemName: "chevron.right").font(.body.weight(.semibold))
@@ -368,15 +377,17 @@ struct ContentView: View {
             .buttonStyle(.borderless)
 
             Text(weekSubtitle)
+                .contentTransition(.opacity)
                 .font(.callout.weight(.medium))
                 .foregroundStyle(weekOffset == 0 ? Color.red : .secondary)
                 .fixedSize()
                 .padding(.leading, 2)
 
             if weekOffset != 0 {
-                Button("이번 주로") { selectedWeek = .currentWeekStart }
+                Button("이번 주로") { shiftWeek(to: .currentWeekStart) }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
+                    .transition(.control)
             }
 
             // 한 줄의 무게를 양 끝으로 나눈다. 왼쪽은 '언제'(날짜), 오른쪽은 '어떻게 볼까'.
@@ -407,7 +418,7 @@ struct ContentView: View {
             // 좋은 숫자지만 **매번 볼 숫자는 아니다** — 한 주에 한 번 확인하면 되는 값이
             // 화면 맨 위 제일 좋은 자리를 늘 차지하고 있었다. 버튼 뒤로 접고, 접힘 상태를 기억한다.
             Button {
-                withAnimation(.snappy(duration: 0.3)) { showsWeekSummary.toggle() }
+                withAnimation(Motion.disclose) { showsWeekSummary.toggle() }
             } label: {
                 Label(showsWeekSummary ? "요약 접기" : "요약",
                       systemImage: showsWeekSummary ? "chevron.up" : "chart.bar.xaxis")
@@ -514,6 +525,7 @@ struct ContentView: View {
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 10))
+                .transition(.disclose)
             } else {
                 LazyVGrid(
                     columns: [GridItem(.adaptive(minimum: 180, maximum: 260), spacing: 8)],
@@ -525,14 +537,19 @@ struct ContentView: View {
                             routine: routine,
                             onEdit: { routineSheet = RoutineSheetContext(routine: routine) },
                             onDelete: {
-                                context.delete(routine)
-                                try? context.save()
+                                withAnimation(Motion.card) {
+                                    context.delete(routine)
+                                    try? context.save()
+                                }
                             }
                         )
+                        .transition(.card)
                     }
                 }
             }
         }
+        // 비어 있는 안내와 카드 무리가 서로 갈아 끼워지는 것까지 한 결로 묶는다.
+        .animation(Motion.card, value: routines.map(\.name))
     }
 
     /// 해당 요일에 이번 주 배치된 고정 루틴들.
@@ -641,16 +658,32 @@ struct ContentView: View {
                 conflictBanner(notice)
             }
 
+            // 바깥 껍질은 **보는 자리**가 바뀌는 결(옆으로 넘김), 안쪽 껍질은 **주**가
+            // 바뀌는 결이다. 한 뷰에 `.transition`을 두 번 붙이면 바깥 것만 살아남으므로
+            // 껍질을 두 겹으로 나눈다.
+            //
+            // ⚠️ 안쪽도 **ZStack**이어야 한다. VStack으로 감싸면 넘기는 동안 나가는 주와
+            //    들어오는 주가 위아래로 나란히 서서 화면 높이가 잠깐 두 배가 되고,
+            //    아래에 있는 할 일 목록이 통째로 밀려 내려갔다 올라온다.
             ZStack(alignment: .topLeading) {
                 switch weekLens {
                 case .plan:
-                    weekGridSection
-                        .transition(lensTransition)
+                    ZStack(alignment: .topLeading) {
+                        weekGridSection
+                            .id(selectedWeek)
+                            .transition(.pageSlide(forward: weekForward, distance: 40))
+                    }
+                    .transition(lensTransition)
                 case .day:
-                    dayTimelineSection
-                        .transition(lensTransition)
+                    ZStack(alignment: .topLeading) {
+                        dayTimelineSection
+                            .id(selectedWeek)
+                            .transition(.pageSlide(forward: weekForward, distance: 40))
+                    }
+                    .transition(lensTransition)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
         }
     }
 
@@ -668,14 +701,16 @@ struct ContentView: View {
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 8)
             Button("시간축으로 보기") {
-                withAnimation(.snappy(duration: 0.3)) { weekLensRaw = WeekLens.day.rawValue }
-                conflictNotice = nil
+                withAnimation(Motion.screen) {
+                    weekLensRaw = WeekLens.day.rawValue
+                    conflictNotice = nil
+                }
             }
             .buttonStyle(.plain)
             .font(.system(size: 12, weight: .semibold))
             .underline()
             Button {
-                conflictNotice = nil
+                withAnimation(Motion.banner) { conflictNotice = nil }
             } label: {
                 Image(systemName: "xmark").font(.system(size: 11, weight: .semibold))
             }
@@ -686,7 +721,7 @@ struct ContentView: View {
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.red.opacity(0.92), in: RoundedRectangle(cornerRadius: 8))
-        .transition(.move(edge: .top).combined(with: .opacity))
+        .transition(.banner)
     }
 
     /// 세그먼트를 누르면 값이 애니메이션과 함께 바뀐다.
@@ -695,7 +730,7 @@ struct ContentView: View {
             get: { weekLensRaw },
             set: { newValue in
                 guard newValue != weekLensRaw else { return }
-                withAnimation(.snappy(duration: 0.3)) { weekLensRaw = newValue }
+                withAnimation(Motion.screen) { weekLensRaw = newValue }
             }
         )
     }
@@ -705,11 +740,7 @@ struct ContentView: View {
     /// (오른쪽 칸으로 갔으면 오른쪽에서 들어온다).
     /// 밀리는 거리는 짧게(28pt) 둔다. 화면이 통째로 날아다니면 산만하다.
     private var lensTransition: AnyTransition {
-        let forward = (weekLens == .day)
-        return .asymmetric(
-            insertion: .offset(x: forward ? 28 : -28).combined(with: .opacity),
-            removal: .offset(x: forward ? -28 : 28).combined(with: .opacity)
-        )
+        .pageSlide(forward: weekLens == .day)
     }
 
     private var dayTimelineSection: some View {
@@ -740,7 +771,7 @@ struct ContentView: View {
                         dayAtGlobalPoint: dayRow(atGlobalPoint:),
                         onDayTargetChange: { target in
                             guard timelineDayTarget != target else { return }
-                            withAnimation(.easeOut(duration: 0.12)) { timelineDayTarget = target }
+                            withAnimation(Motion.target) { timelineDayTarget = target }
                         },
                         onEditBlock: { block in
                             blockSheet = BlockSheetContext(day: day, block: block)
@@ -959,7 +990,7 @@ struct ContentView: View {
         // 0.01은 반올림 앙금을 무시하려는 여유다. 1.5h가 1.4999h 틈에 안 들어간다고
         // 경고하면 사람은 앱이 트집 잡는다고 느낀다.
         if blk.durationHours > gap + 0.01 {
-            withAnimation(.snappy(duration: 0.2)) {
+            withAnimation(Motion.banner) {
                 conflictNotice = String(localized: "‘\(blk.title)’(\(shortHours(blk.durationHours)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다.")
             }
         }
@@ -1026,9 +1057,17 @@ struct ContentView: View {
     private func timeBand(for startHour: Double) -> TimeBand { .containing(startHour) }
 
     private func shiftWeek(by weeks: Int) {
-        if let next = Calendar.current.date(byAdding: .day, value: weeks * 7, to: selectedWeek) {
-            selectedWeek = next.weekStart()
-        }
+        guard let next = Calendar.current.date(byAdding: .day, value: weeks * 7, to: selectedWeek)
+        else { return }
+        shiftWeek(to: next.weekStart())
+    }
+
+    /// 주를 옮긴다. **방향을 먼저 정하고 옮긴다** — 화면이 어느 쪽에서 들어올지가
+    /// 여기서 정해지기 때문이다. 같은 주를 다시 부르면 아무 일도 일어나지 않는다.
+    private func shiftWeek(to week: Date) {
+        guard !Calendar(identifier: .iso8601).isDate(week, inSameDayAs: selectedWeek) else { return }
+        weekForward = week > selectedWeek
+        withAnimation(Motion.screen) { selectedWeek = week }
     }
 
     /// 처음 켠 사람에게 **고정 루틴을 함께 세우자고 묻는다.** 대신 깔아 주지 않는다.

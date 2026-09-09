@@ -121,6 +121,9 @@ targets:
       - path: TodoShare
       # 앱과 함께 쓰는 파일만 골라 넣는다.
       - path: WeekBlocks/TodoShareInbox.swift
+      # 움직임의 어휘. 확장 창도 같은 결로 움직여야 한 앱으로 읽힌다
+      # (SwiftUI 말고는 아무것도 안 딸려온다).
+      - path: WeekBlocks/Motion.swift
       # TodoLabel 정의. 모델에 얹힌 확장은 BacklogItem+Label.swift로 떼어냈으므로
       # 이 파일만으로 충분하다 (SwiftData 모델이 따라오지 않는다).
       - path: WeekBlocks/TodoSplitAdvisor.swift

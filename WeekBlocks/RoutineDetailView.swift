@@ -21,6 +21,8 @@ struct RoutineDetailView: View {
                     .tabItem { Label("프리모템", systemImage: "exclamationmark.triangle") }
             }
         }
+        // 색을 고르면 머리의 동그라미·바탕까지 함께 물든다. 한 번에 갈리지 않게.
+        .animation(Motion.disclose, value: routine.colorName)
         .onDisappear { try? context.save() }
     }
 
@@ -208,16 +210,18 @@ private struct ColorPicker: View {
         HStack(spacing: 10) {
             ForEach(routineColorOptions, id: \.name) { option in
                 Button {
-                    selected = option.name
+                    withAnimation(Motion.hover) { selected = option.name }
                 } label: {
                     ZStack {
                         Circle()
                             .fill(option.color)
                             .frame(width: 26, height: 26)
+                            .scaleEffect(selected == option.name ? 1.12 : 1)
                         if selected == option.name {
                             Circle()
                                 .stroke(Color.white, lineWidth: 2)
                                 .frame(width: 20, height: 20)
+                                .transition(.scale.combined(with: .opacity))
                         }
                     }
                 }

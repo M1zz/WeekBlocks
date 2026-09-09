@@ -35,16 +35,15 @@ struct ShareTodoView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
+                        .transition(.disclose)
                 }
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
             }
 
             if let errorMessage = model.errorMessage {
                 Label(errorMessage, systemImage: "exclamationmark.triangle")
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
+                    .transition(.disclose)
             }
 
             Spacer(minLength: 0)
@@ -67,8 +66,13 @@ struct ShareTodoView: View {
                     .controlSize(.large)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(.background)
+                    .transition(.opacity)
             }
         }
+        // 다 읽고 나면 가림막이 걷히고 그 아래 적힌 것이 드러난다.
+        .animation(Motion.screen, value: model.isLoading)
+        .animation(Motion.disclose, value: model.link)
+        .animation(Motion.disclose, value: model.errorMessage)
         .onAppear { titleFocused = true }
     }
 }

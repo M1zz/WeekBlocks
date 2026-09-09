@@ -25,6 +25,7 @@
 		58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */; };
 		5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */; };
 		5E079B41299757EB1D8C47D0 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F3EF66EAB632EF007258912A /* Localizable.xcstrings */; };
+		5EDE5B050A5B14698839D7A9 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD73EF7D52999BFEC85767 /* Motion.swift */; };
 		624A0F5C801F2937DDCA2691 /* TodoSplitAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */; };
 		651A1BCE01591AEDA87AEFAA /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */; };
 		67A12313C3A920C6F3B8C092 /* TodoSplitAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */; };
@@ -44,6 +45,7 @@
 		918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
 		9D5EEDBB4DA71FED5DFA3AE7 /* ScheduleClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AB47D0D95CB6D901FC0D81 /* ScheduleClock.swift */; };
+		9F5A4B6B73214FA1C5C353B4 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD73EF7D52999BFEC85767 /* Motion.swift */; };
 		A14391170989592054428F6E /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 557E8F32612BE4E8BC96E369 /* InfoPlist.xcstrings */; };
 		AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526E2EF2A25551766D802F91 /* TodoSharing.swift */; };
 		ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */; };
@@ -93,6 +95,7 @@
 		28ADD71097A3C0E497BF731A /* BlockEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditorView.swift; sourceTree = "<group>"; };
 		295B1036D16FB52A4E7D0C74 /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
+		30CD73EF7D52999BFEC85767 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOccurrence.swift; sourceTree = "<group>"; };
 		3DC93778BE68B512FD31ECFF /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogCategory.swift; sourceTree = "<group>"; };
@@ -198,6 +201,7 @@
 				F3EF66EAB632EF007258912A /* Localizable.xcstrings */,
 				7826FECD3C214B59C8E531EB /* MacEntitlement.swift */,
 				CC4A396C6929CB1C576DBA52 /* Models.swift */,
+				30CD73EF7D52999BFEC85767 /* Motion.swift */,
 				D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */,
 				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
@@ -368,6 +372,7 @@
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
 				8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */,
 				12DCD47B097FBED701EECC11 /* Models.swift in Sources */,
+				5EDE5B050A5B14698839D7A9 /* Motion.swift in Sources */,
 				918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */,
 				076A03104420525A517BD699 /* PaywallView.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
@@ -403,6 +408,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2BD0550462640DD942B3590F /* Models.swift in Sources */,
+				9F5A4B6B73214FA1C5C353B4 /* Motion.swift in Sources */,
 				ED80D0BA5F1168CBEDCE0747 /* ShareTodoView.swift in Sources */,
 				82F6C212A68907007B4A9F96 /* ShareViewController.swift in Sources */,
 				34C9F08D4446670D54F3BDD2 /* TodoShareInbox.swift in Sources */,

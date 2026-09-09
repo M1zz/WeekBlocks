@@ -113,8 +113,11 @@ struct ReceivedSchedulesSection: View {
                 ReceivedScheduleCard(schedule: schedule) {
                     Task { await store.leave(schedule) }
                 }
+                .transition(.card)
             }
         }
+        // 새로고침이나 다른 사람이 나갈 때 카드가 늘고 준다.
+        .animation(Motion.card, value: store.received.map(\.id))
     }
 }
 
@@ -192,6 +195,8 @@ private struct ReceivedScheduleCard: View {
     let onLeave: () -> Void
 
     @State private var index: Int = 0
+    /// 주를 어느 쪽으로 넘겼는가. 새 주는 넘긴 쪽에서 들어온다.
+    @State private var forward = true
 
     var body: some View {
         let weeks = schedule.weeks
@@ -212,7 +217,8 @@ private struct ReceivedScheduleCard: View {
                 Spacer()
 
                 Button {
-                    index = safeIndex - 1
+                    forward = false
+                    withAnimation(Motion.screen) { index = safeIndex - 1 }
                 } label: {
                     Image(systemName: "chevron.left")
                 }
@@ -223,10 +229,12 @@ private struct ReceivedScheduleCard: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
+                    .contentTransition(.numericText())
                     .frame(minWidth: 52)
 
                 Button {
-                    index = safeIndex + 1
+                    forward = true
+                    withAnimation(Motion.screen) { index = safeIndex + 1 }
                 } label: {
                     Image(systemName: "chevron.right")
                 }
@@ -239,8 +247,13 @@ private struct ReceivedScheduleCard: View {
                 .buttonStyle(.borderless)
             }
 
-            if weeks.indices.contains(safeIndex) {
-                SharedScheduleWeekView(snapshot: weeks[safeIndex])
+            // 남의 일정도 내 화면과 같은 결로 넘어간다. 두 자리가 다른 물건이면 안 된다.
+            ZStack(alignment: .topLeading) {
+                if weeks.indices.contains(safeIndex) {
+                    SharedScheduleWeekView(snapshot: weeks[safeIndex])
+                        .id(safeIndex)
+                        .transition(.pageSlide(forward: forward))
+                }
             }
         }
         .padding(14)

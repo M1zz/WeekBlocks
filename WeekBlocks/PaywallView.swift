@@ -56,6 +56,7 @@ struct PaywallView: View {
                     .font(.callout)
                     .foregroundStyle(.orange)
                     .padding(.bottom, 12)
+                    .transition(.disclose)
             }
 
             HStack(spacing: 10) {
@@ -75,8 +76,10 @@ struct PaywallView: View {
                 } label: {
                     if purchases.isWorking {
                         ProgressView().controlSize(.small)
+                            .transition(.opacity)
                     } else {
                         Text(purchases.product.map { String(localized: "\($0.displayPrice)에 열기") } ?? String(localized: "열기"))
+                            .transition(.opacity)
                     }
                 }
                 .keyboardShortcut(.defaultAction)
@@ -90,6 +93,9 @@ struct PaywallView: View {
         }
         .padding(24)
         .frame(width: 460)
+        // 사는 동안 단추가 도는 바퀴로 바뀌고, 실패하면 줄이 하나 열린다.
+        .animation(Motion.disclose, value: purchases.isWorking)
+        .animation(Motion.disclose, value: purchases.failureMessage)
         .task { await purchases.refresh() }
     }
 

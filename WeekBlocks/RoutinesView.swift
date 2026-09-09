@@ -63,6 +63,7 @@ struct RoutineRow: View {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary.opacity(0.45))
+                    .transition(.control)
             }
         }
         .padding(.horizontal, 14)
@@ -71,6 +72,7 @@ struct RoutineRow: View {
         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
         .draggable("routine:\(routine.name)")
         .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) { onEdit() }
     }
@@ -113,6 +115,7 @@ struct RoutineBlock: View {
                     }
                 } else if routine.kind == .fixed {
                     Image(systemName: "lock.fill").font(.system(size: 12)).foregroundStyle(.secondary.opacity(0.45))
+                        .transition(.control)
                 }
             }
 
@@ -141,6 +144,7 @@ struct RoutineBlock: View {
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .draggable("routine:\(routine.name)")
         .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
         .onTapGesture(count: 2) { onEdit() }
         .help(routine.scheduleDescription)
     }
@@ -248,6 +252,7 @@ struct RoutineEditorView: View {
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .transition(.disclose)
                         }
 
                         HStack {
@@ -308,6 +313,12 @@ struct RoutineEditorView: View {
                 }
             }
             .formStyle(.grouped)
+            // 방식(고정 ↔ 쿼터)을 바꾸면 묻는 칸이 통째로 갈린다.
+            // 겹침 안내도 값이 바뀌는 대로 스스로 서고 내려간다.
+            .animation(Motion.disclose, value: kind)
+            .animation(Motion.disclose, value: conflicts)
+            .animation(Motion.disclose, value: sessionsPerDay > 0)
+            .animation(Motion.disclose, value: weeklyHours > 0)
 
             Divider()
 
@@ -317,7 +328,9 @@ struct RoutineEditorView: View {
                         if existing.kind == .fixed {
                             showingDeleteConfirm = true   // 고정 루틴은 확인 후 삭제
                         } else {
-                            context.delete(existing); try? context.save()
+                            withAnimation(Motion.card) {
+                                context.delete(existing); try? context.save()
+                            }
                             dismiss()
                         }
                     } label: {
@@ -332,6 +345,7 @@ struct RoutineEditorView: View {
                         .font(.caption)
                         .foregroundStyle(.orange)
                         .padding(.leading, 4)
+                        .transition(.control)
                 }
 
                 Spacer()
@@ -343,11 +357,16 @@ struct RoutineEditorView: View {
                     .disabled(!isValid)
             }
             .padding(20)
+            .animation(Motion.hover, value: missing)
         }
         .onAppear { loadExisting() }
         .alert("고정 루틴 삭제", isPresented: $showingDeleteConfirm) {
             Button("삭제", role: .destructive) {
-                if let existing { context.delete(existing); try? context.save() }
+                if let existing {
+                    withAnimation(Motion.card) {
+                        context.delete(existing); try? context.save()
+                    }
+                }
                 dismiss()
             }
             Button("취소", role: .cancel) { }
@@ -519,7 +538,7 @@ struct RoutineEditorView: View {
             )
             context.insert(r)
         }
-        try? context.save()
+        withAnimation(Motion.card) { try? context.save() }
         dismiss()
     }
 }
@@ -545,6 +564,7 @@ private struct DayToggle: View {
                 )
         }
         .buttonStyle(.plain)
+        .animation(Motion.hover, value: isOn)
     }
 }
 

@@ -100,10 +100,14 @@ struct DayColumn: View {
                 if let now, index == cut { nowMarker(now) }
                 gapZone(at: index)
                 chip(for: item)
+                    .transition(.card)
             }
             if let now, cut == items.count { nowMarker(now) }
             gapZone(at: items.count)
         }
+        // 요일 칸은 @Query가 스스로 갈아 끼우는 자리다 — 무엇이 서 있는지가 바뀌었을 때만
+        // 결이 붙게 값으로 건다. (분이 흘러 '지금' 선만 내려가는 것에는 반응하지 않는다)
+        .animation(Motion.card, value: items.map(\.id))
     }
 
     /// **칩과 칩 사이에 끼워 넣는 자리.**
@@ -132,7 +136,7 @@ struct DayColumn: View {
                 onDropIntoGap(token, bounds.start, bounds.gap)
                 return true
             } isTargeted: { targetedGap = ($0 && canPlan) ? index : nil }
-            .animation(.easeOut(duration: 0.12), value: targeted)
+            .animation(Motion.target, value: targeted)
     }
 
     /// 이 틈이 **언제 시작해서 얼마나 넓은가.**
@@ -181,6 +185,7 @@ struct DayColumn: View {
                 .foregroundStyle(Color.red)
         }
         .padding(.vertical, 1)
+        .transition(.opacity)
         .accessibilityLabel("지금 \(formatHour(hour))")
     }
 
@@ -257,7 +262,9 @@ struct DayColumn: View {
             guard canPlan, let token = items.first else { return false }
             onDropBacklog(token)
             return true
-        } isTargeted: { isDropTargeted = canPlan && $0 }
+        } isTargeted: { targeted in
+            withAnimation(Motion.target) { isDropTargeted = canPlan && targeted }
+        }
     }
 }
 
@@ -312,9 +319,11 @@ struct RoutineChip: View {
                         .background(Color(nsColor: .controlBackgroundColor), in: Capsule())
                         .overlay(Capsule().stroke(routine.displayColor.opacity(0.5), lineWidth: 0.5))
                         .padding(4)
+                        .transition(.control)
                 }
             }
             .onHover { hovering = $0 }
+            .animation(Motion.hover, value: hovering)
             .contextMenu {
                 // 쿼터(끼니 등)는 회당 시간이 따로다 — 그 값으로 센다.
                 TimerMenuItems(token: token,
@@ -404,6 +413,7 @@ struct BlockChip: View {
             .onTapGesture(perform: onTap)
             .overlay(alignment: .topTrailing) { editButton }
             .onHover { hovering = $0 }
+            .animation(Motion.hover, value: hovering)
             // 계획을 보는 자리에서 바로 세기 시작한다 — 창을 열러 갈 필요 없이 (→ TimerView.swift).
             .contextMenu {
                 TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours)
@@ -427,6 +437,7 @@ struct BlockChip: View {
                 .background(Color(nsColor: .controlBackgroundColor), in: Capsule())
                 .overlay(Capsule().stroke(palette.stroke, lineWidth: 0.5))
                 .padding(4)
+                .transition(.control)
         }
     }
 
