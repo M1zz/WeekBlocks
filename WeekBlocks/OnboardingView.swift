@@ -361,6 +361,7 @@ struct OnboardingView: View {
     /// 다시 묻지 않는다. 안 고르고 닫았어도 마찬가지다 —
     /// 루틴이 없으면 '고정 루틴' 자리와 '다음 한 걸음'이 계속 도와주겠다고 말하고 있다.
     private func finish() {
+        Telemetry.record(.onboardingFinished)
         UserDefaults.standard.set(true, forKey: RoutineOnboarding.shownKey)
         dismiss()
     }

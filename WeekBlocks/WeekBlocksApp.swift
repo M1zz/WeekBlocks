@@ -60,8 +60,16 @@ struct WeekBlocksApp: App {
         // 저장소를 세우는 일이 가장 먼저다. 순서가 곧 안전이다 (→ Stores.swift).
         StoreBootstrap.run()
         container = PlanStore.shared.container
-        // LeeoKit 사용량 트래커 — 리뷰 요청·만족도 프롬프트 게이팅에 쓰인다.
-        _ = LeeoEngagement.shared.registerLaunch()
+        // **계약을 켜는 한 줄** (→ WeekBlocksSpec.swift). 이걸 안 부르면 계약을 아무리
+        // 잘 채워도 아무 일도 안 일어난다 — 실행 횟수가 안 세지니 만족도·리뷰 프롬프트가
+        // 영영 안 뜨고, 분석 싱크가 안 꽂히니 페이월을 봤는지조차 알 수 없다.
+        //
+        // ⚠️ 사용현황 스냅샷만 여기서 끈다(`usageReporting: false`). LeeoKit 기본 스냅샷은
+        //    실행 횟수·설치 후 경과일까지만 담는데, 이 앱은 할 일·계획·루틴 개수까지 실어
+        //    보낸다. 그러려면 스토어가 선 뒤라야 해서 창이 열릴 때 따로 부른다
+        //    (→ Telemetry.reportSnapshot). 여기서 끄지 않으면 같은 스냅샷이 숫자 없이
+        //    먼저 올라가고, 12시간 간격에 걸려 **숫자 있는 쪽이 하루 종일 안 올라간다.**
+        LeeoKit.bootstrap(WeekBlocksSpec.self, usageReporting: false)
         // 할 일 화면의 조언은 전부 TipKit으로 낸다 (→ TodoTips.swift).
         TodoTips.configure()
     }
@@ -85,6 +93,10 @@ struct WeekBlocksApp: App {
                     // 영수증을 읽은 **뒤에** 맞춘다. 순서가 뒤집히면 헌 거울을 보고
                     // 산 사람의 줄을 닫는다 (→ TodoSharing.swift).
                     TodoSharing.reconcileMySharing(in: TodoStore.shared.context)
+                    // 이 설치가 지금 어떤 모습인지 한 줄로 올린다 (→ Telemetry.swift).
+                    // 스토어가 선 뒤라야 개수를 셀 수 있어서 init이 아니라 여기다.
+                    // 끈 사람에게는 아무것도 나가지 않는다.
+                    Telemetry.reportSnapshot()
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }

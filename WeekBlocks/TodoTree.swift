@@ -206,6 +206,9 @@ struct TodoTree {
             node.completedAt = value ? (node.completedAt ?? now) : nil
         }
         rollUp(from: item, now: now)
+        // 끝낸 것만 센다. 되돌리기(`rewind`)로 false가 들어오는 자리도 같은 문을 지나므로
+        // 여기서 갈라 두지 않으면 체크를 껐다 켰다 한 것이 '많이 끝냈다'로 읽힌다.
+        if value { Telemetry.record(.todoCompleted) }
     }
 
     /// 조상들의 완료 상태를 자식 기준으로 다시 계산한다.

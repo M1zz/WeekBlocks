@@ -31,6 +31,17 @@ struct SettingsView: View {
 
     /// 산 것을 되찾는 자리 (→ PaywallView.swift).
     @State private var purchases = PurchaseManager.shared
+
+    /// **익명 사용 통계를 보낼 것인가** (→ Telemetry.swift).
+    ///
+    /// ⚠️ 저장하는 값이 '끄기'라 화면의 스위치와 방향이 반대다. 기본값이 '보냄'이어야
+    ///    하는데 `UserDefaults`의 Bool 기본값은 false이기 때문이다 — '보내기'로 저장하면
+    ///    설정을 한 번도 안 연 사람이 전부 '끔'이 된다.
+    @AppStorage(Telemetry.optOutKey) private var usageOptOut = false
+
+    /// 개발자 모드 — LeeoSupportSection에서 버전을 일곱 번 누르면 켜진다.
+    /// 통계 화면은 남의 기록을 읽는 자리라 이 스위치 뒤에 둔다.
+    @AppStorage("dev.masterMode") private var devMode = false
     @State private var showingPaywall = false
 
     /// 스토어를 세는 일은 화면을 그릴 때마다 할 일이 아니다 — 열 때 한 번, 누른 뒤 한 번.
@@ -206,6 +217,8 @@ struct SettingsView: View {
                 } header: {
                     Text("피드백 & 리뷰")
                 }
+
+                usageSection
             }
             .formStyle(.grouped)
             }
@@ -409,6 +422,38 @@ struct SettingsView: View {
         // 사고 나면 단추가 내려가고 문구가 바뀐다. 그 순간이 툭 갈리지 않게.
         .animation(Motion.disclose, value: isPro)
         .animation(Motion.disclose, value: purchases.failureMessage)
+    }
+
+    /// **무엇을 보내는지 먼저 말하고, 그 다음에 끌 수 있게 한다** (→ Telemetry.swift).
+    ///
+    /// 스위치만 있고 설명이 없으면 사람은 최악을 상상한다. 실제로 나가는 것은
+    /// 개수와 버전뿐이고 적은 내용은 한 글자도 안 가는데, 그 사실을 말하지 않으면
+    /// 끄는 것 말고는 확인할 길이 없다.
+    private var usageSection: some View {
+        Section {
+            Toggle("익명 사용 통계 보내기", isOn: Binding(
+                get: { !usageOptOut },
+                set: { usageOptOut = !$0 }
+            ))
+
+            Text("나가는 것: 앱 버전과 macOS 버전, 언어, 실행 횟수, 할 일·계획·루틴의 **개수**, 그리고 '할 일을 적었다' 같은 행동의 이름뿐입니다.\n나가지 않는 것: 적은 내용, 제목, 이름, 이메일, 애플 계정, 기기를 가리키는 어떤 값도 보내지 않습니다. 설치할 때 만든 무작위 번호 하나로만 묶이고, 앱을 지우면 그 번호도 사라집니다.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            if devMode {
+                NavigationLink {
+                    LeeoUsageStatsView<WeekBlocksSpec>()
+                } label: {
+                    Label("사용 통계 보기 (개발자)", systemImage: "chart.bar")
+                }
+            }
+        } header: {
+            Text("사용 통계")
+        } footer: {
+            Text("끄면 이 기기에서는 아무것도 나가지 않습니다. 이미 보낸 기록의 삭제를 원하시면 개발자에게 알려 주세요.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
     }
 
     /// 값을 치렀는가. `sellsAccess`가 꺼진 무료 개방 기간에는 건너가기가 열려 있어도

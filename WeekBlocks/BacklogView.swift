@@ -568,6 +568,7 @@ struct BacklogSection: View {
             context.insert(item)
             try? context.save()
         }
+        Telemetry.record(.todoAdded)
         newTitle = ""
         if keepOpen {
             addFocused = true          // 손이 키보드를 떠나지 않게 둔다
@@ -1177,6 +1178,7 @@ struct BacklogComposerView: View {
             context.insert(item)
             try? context.save()
         }
+        Telemetry.record(.todoAdded)
         newTitle = ""
         focused = true
     }

@@ -509,6 +509,65 @@ WeekBlocks `Routine`/`PlanBlock`을 메모리상 `Event`로 변환해 기존 밀
          디버그로 한 번 가져오기를 돌려 Development 스키마에 필드를 만든 뒤 배포할 것.
          (CloudKit 필드는 값이 실제로 저장될 때 생긴다)
 
+## 완료 (2026-09-09) — LeeoKit 페이월 엔진 + 피드백 허브 데이터 수집
+
+**"쓰이는지 모르면 무엇을 고칠지도 모른다."** 계약(LeeoAppSpec)에 수익모델과 분석 싱크를
+선언하고, 결제의 속을 LeeoKit으로 갈아 끼웠다.
+
+- [x] **계약**(→ WeekBlocksSpec.swift): `.free` → `.freemium`. 이 한 줄에서 페이월 구성
+      (상품 ID·약관·개인정보 링크)과 게이트(`proOnly: ["sync"]`)가 따라 나온다.
+      상품 ID의 근거를 계약 한 곳(`syncProductID`)으로 모았다.
+      `analytics`·`capabilities`도 함께 신고.
+      ⚠️ 선언했다고 파는 게 아니다. 실제로 잠글지는 `MacEntitlement.sellsAccess`(여전히 false).
+- [x] **결제 엔진**(→ MacEntitlement.swift): 손으로 짜던 `PurchaseManager`의 StoreKit
+      부분(상품 로드·구매·복원·`Transaction.updates` 리스너)을 **`LeeoStore`로 교체**.
+      화면이 쓰는 이름(`isUnlocked`/`hasPurchased`/`isKnown`/`product`/`isWorking`/
+      `failureMessage`)은 그대로 뒀다 — 갈아탄 것은 속이지 부르는 자리가 아니다.
+      ⚠️ **페이월 화면은 안 바꿨다.** `LeeoPaywallView`는 CTA가 "구독 시작하기", 하단 고지가
+         "구독은 App Store 설정에서 해지"로 **못박혀** 있는데 이 앱 상품은 1회 구매라
+         문구가 사실과 다르다(심사 리스크). 화면은 우리 것을 쓰고 속만 LeeoKit이다.
+      ⚠️ `entitlementsChecked`가 서기 전에는 캐시에 안 쓴다. LeeoStore는 상품 로드 중에도
+         값이 바뀌었다고 알려 오는데 거기 대고 `hasPro`(아직 false)를 적으면
+         **처음 켠 구매자가 '무료'로 못박힌다.** '모른다'와 '아니다'를 가르는 자리다.
+- [x] **데이터 수집**(→ Telemetry.swift): 피드백과 **같은 허브**(iCloud.com.Ysoup.FeedbackHub)로
+      `UsageSnapshot`(설치당 한 줄, 덮어쓰기)과 `UsageEvent`(행동 한 건)를 보낸다.
+      스냅샷에 앱 고유 숫자(할 일·완료·분류·계획 블록·루틴 **개수**)를 실었다.
+      행동 8가지: 처음 안내 완료 / 할 일 적기·끝내기 / 계획 블록 / 루틴 / 캘린더 가져오기 /
+      타이머 0 도달 / 일정 공유.
+      ⚠️ 같은 이름은 **하루 한 번**까지만 보낸다. 공개 DB 쓰기라 값이 들고, '할 일 추가'를
+         한 건씩 남기면 허브가 이 앱 하나로 찬다. 횟수는 `LeeoEngagement`가 기기 안에서 세고
+         그 합계(`eventCount`)가 스냅샷에 실려 나가므로 **횟수 자체는 안 잃는다.**
+      ⚠️ 구매 퍼널(paywall_shown → purchase_started → completed/failed → restored)은
+         하루 상한을 안 건다. 분모·분자가 어긋나면 퍼널이 아니다. 노출만 앱이 손으로 남기고
+         나머지는 `LeeoStore`가 낸다.
+- [x] **켜는 한 줄**(→ WeekBlocksApp.swift): `LeeoKit.bootstrap(WeekBlocksSpec.self,
+      usageReporting: false)`. 실행 횟수·분석 싱크·진단이 여기서 붙는다.
+      ⚠️ 스냅샷만 껐다. LeeoKit 기본 스냅샷은 개수를 모르는데, 그게 먼저 올라가면
+         12시간 간격에 걸려 **숫자 있는 쪽이 하루 종일 안 올라간다.**
+      ⚠️ 그동안 `registerSignificantEvent()`를 **아무 데서도 안 불렀다.** 만족도·리뷰
+         프롬프트가 영영 안 뜨고 있었던 것 — 이번에 행동마다 붙였다.
+- [x] **끌 수 있게**(→ SettingsView.swift '사용 통계'): 무엇이 나가고 무엇이 안 나가는지
+      먼저 적고 스위치를 둔다. 저장 키는 `usage.optOut`(끄기)이다 —
+      `UserDefaults.bool`의 기본값이 false라 '보내기'로 두면 설정을 한 번도 안 연 사람이
+      전부 '끔'이 된다. 스위치는 `WeekBlocksAnalytics`가 함께 보므로 LeeoKit이 스스로 내는
+      이벤트까지 막힌다. 개발자 모드(버전 7번 탭)에서 `LeeoUsageStatsView` 진입.
+- [x] **말과 사실 맞추기**: `PrivacyInfo.xcprivacy`에 `ProductInteraction`(분석)과
+      `OtherUserContent`(피드백 글)를 신고 — 둘 다 Linked/Tracking false.
+      `docs/privacy.html`·`privacy-en.html`에 7절 '익명 사용 통계' 신설.
+      ⚠️ 방침에 **"자동으로 전송되는 것은 없습니다"**라고 적혀 있었다. 수집을 켜는 순간
+         그 문장이 거짓말이 된다. 코드보다 이쪽이 먼저다.
+
+### 🚢 출시 전에 반드시
+- [ ] **CloudKit 콘솔에서 FeedbackHub 컨테이너의 `UsageSnapshot`·`UsageEvent`
+      레코드 타입을 Production에 배포한다.** Development에서는 자동으로 생기지만
+      Production은 안 만든다 — 안 배포하면 출시 빌드에서 조용히 아무것도 안 쌓인다.
+      (스냅샷을 증분으로 읽으려면 `modificationDate`가 Queryable이어야 한다.)
+- [ ] App Store Connect의 앱 개인정보(App Privacy)에 '사용 데이터 > 제품 상호작용'을
+      추가한다. 매니페스트만 고치고 콘솔을 안 고치면 심사에서 걸린다.
+- [ ] 새 문장 5개는 영어를 손으로 넣었다(→ Localizable.xcstrings).
+      ⚠️ 터미널의 `xcstringstool sync`는 **stringsdata가 낡았으면 카탈로그를 망친다.**
+         한 번 시도했다가 3천 줄이 갈려서 되돌렸다. 카탈로그는 Xcode 빌드로 채운다.
+
 ## 완료 (2026-09-09) — 움직임 (1.1.3)
 
 **바뀌는 것은 다 움직인다.** 화면을 넘기고, 카드가 서고 내려가고, 손이 올라가는

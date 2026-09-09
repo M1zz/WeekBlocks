@@ -58,6 +58,7 @@
 		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
 		D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
+		E9C19CBAE78FAC241507D607 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE20311F927F785DA2C6677B /* Telemetry.swift */; };
 		EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 144D087CE2C3CFFED2EABEE8 /* LeeoKit */; };
 		ED80D0BA5F1168CBEDCE0747 /* ShareTodoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622A5D436D0F426C007C5246 /* ShareTodoView.swift */; };
 		EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */; };
@@ -139,6 +140,7 @@
 		D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		D500334C7133BD6E4CFCC361 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTimer.swift; sourceTree = "<group>"; };
+		DE20311F927F785DA2C6677B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		F3EF66EAB632EF007258912A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -217,6 +219,7 @@
 				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
 				50CC675B4E440CD50573C3A4 /* Stores.swift */,
 				DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */,
+				DE20311F927F785DA2C6677B /* Telemetry.swift */,
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
 				D500334C7133BD6E4CFCC361 /* TimerView.swift */,
 				AB645C90135FC303A3A31FA0 /* TodoAccess.swift */,
@@ -387,6 +390,7 @@
 				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
 				032C842F55D754CDF99B7CEF /* Stores.swift in Sources */,
 				885ED0917CD0F523548B558B /* TaskTimer.swift in Sources */,
+				E9C19CBAE78FAC241507D607 /* Telemetry.swift in Sources */,
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
 				682DEFEE6B1A522E1AA94BAA /* TimerView.swift in Sources */,
 				B121540A19F0977281258CD9 /* TodoAccess.swift in Sources */,

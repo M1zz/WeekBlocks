@@ -537,6 +537,7 @@ struct RoutineEditorView: View {
                 sortIndex: Int(Date().timeIntervalSince1970)
             )
             context.insert(r)
+            Telemetry.record(.routineAdded)
         }
         withAnimation(Motion.card) { try? context.save() }
         dismiss()

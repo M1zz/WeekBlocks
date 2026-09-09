@@ -13,6 +13,7 @@
 
 import SwiftUI
 import StoreKit
+import LeeoKit
 
 struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
@@ -96,7 +97,16 @@ struct PaywallView: View {
         // 사는 동안 단추가 도는 바퀴로 바뀌고, 실패하면 줄이 하나 열린다.
         .animation(Motion.disclose, value: purchases.isWorking)
         .animation(Motion.disclose, value: purchases.failureMessage)
-        .task { await purchases.refresh() }
+        .task {
+            // LeeoPaywallView를 쓰면 저절로 나는 이벤트지만, 이 앱은 자체 화면이라
+            // 여기서 손으로 남긴다. 이게 없으면 "안 샀다"와 "볼 기회도 없었다"가 같아진다.
+            //
+            // ⚠️ Telemetry.record가 아니라 **분석 싱크**로 보낸다. 그쪽은 하루 한 번으로
+            //    줄이지 않으므로 뒤따르는 purchase_started/completed와 분모·분자가 맞고,
+            //    페이월을 연 것이 '만족한 행동'으로 잘못 세어지지도 않는다.
+            LeeoAnalyticsCenter.track(.paywallShown(reason: WeekBlocksSpec.Gate.sync))
+            await purchases.refresh()
+        }
     }
 
     private func row(_ icon: String, _ title: LocalizedStringKey, _ note: LocalizedStringKey) -> some View {

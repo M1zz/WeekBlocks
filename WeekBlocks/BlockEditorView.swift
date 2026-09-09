@@ -342,6 +342,7 @@ struct BlockEditorView: View {
                 startHour: withinRoutine ? startHour : -1
             )
             context.insert(block)
+            Telemetry.record(.planBlockAdded)
         }
         // 시트가 닫히면서 뒤 화면에 새 칩이 돋는다. 결 없이 담으면 툭 나타난다.
         withAnimation(Motion.card) { try? context.save() }

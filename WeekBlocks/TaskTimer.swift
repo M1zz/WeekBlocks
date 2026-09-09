@@ -171,6 +171,7 @@ final class TaskTimer {
         if !didRingZero, isActive, remaining <= 0 {
             didRingZero = true
             NSSound(named: "Glass")?.play()
+            Telemetry.record(.timerFinished)
         }
     }
 

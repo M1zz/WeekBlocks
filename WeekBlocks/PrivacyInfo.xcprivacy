@@ -8,10 +8,49 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 
-	<!-- 수집하는 것이 없다. 할 일·계획은 사용자 본인의 iCloud(CloudKit 개인 데이터베이스)에만
-	     머물고 개발자에게 오지 않는다. -->
+	<!-- **할 일·계획은 여전히 안 온다.** 그건 사용자 본인의 iCloud(개인 데이터베이스,
+	     iCloud.com.devkoan.ScheduleDensity)에만 머물고 개발자는 열 수 없다.
+	     아래 두 줄은 그것과 **다른 통로**다 — 개발자가 운영하는 공용 허브
+	     (iCloud.com.Ysoup.FeedbackHub)로 가는 것들이고, 여기 안 적으면 심사에서 걸린다.
+
+	     ⚠️ 둘 다 Linked=false 다. 붙는 것은 설치할 때 만든 무작위 번호 하나뿐이고
+	        애플 계정·기기 ID·이메일 같은 신원과 이어 붙일 길이 없다.
+	     ⚠️ 둘 다 Tracking=false 다. 다른 회사의 데이터와 맞춰 보지 않고,
+	        광고 식별자를 쓰지 않으며, 제3자에게 넘기지 않는다. -->
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<!-- 익명 사용 통계 (→ Telemetry.swift). 앱·OS 버전, 언어, 실행 횟수,
+			     할 일·계획·루틴의 **개수**, 행동의 이름('할 일을 적었다').
+			     제목이나 적은 내용은 한 글자도 포함하지 않는다.
+			     ⚠️ 설정에서 끌 수 있다 — 끄면 이 기기에서는 아무것도 나가지 않는다. -->
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeProductInteraction</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+		<dict>
+			<!-- 사용자가 '피드백 보내기'를 눌러 직접 적어 보낸 글. 누르지 않으면 없다.
+			     답신 주소를 적어 넣은 경우 그 주소도 이 글에 함께 담긴다. -->
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeOtherUserContent</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+				<string>NSPrivacyCollectedDataTypePurposeCustomerSupport</string>
+			</array>
+		</dict>
+	</array>
 
 	<!-- '이유를 밝혀야 하는 API'. 안 적으면 업로드 뒤 ITMS-91053이 온다. -->
 	<key>NSPrivacyAccessedAPITypes</key>

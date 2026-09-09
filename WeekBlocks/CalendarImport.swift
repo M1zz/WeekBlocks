@@ -206,6 +206,8 @@ final class CalendarBridge {
         }
 
         try? context.save()
+        // 고르기만 하고 아무것도 안 들어온 주가 흔하다. '가져왔다'는 들어왔을 때만이다.
+        if result.added > 0 || result.updated > 0 { Telemetry.record(.calendarImported) }
         return result
     }
 

@@ -16,15 +16,23 @@
 //  ⚠️ 권한의 근거는 언제나 `Transaction.currentEntitlements`다. 아래 UserDefaults 값은
 //     화면이 빨리 그려지라고 둔 거울이지 근거가 아니다. 켤 때마다 다시 확인해 덮어쓴다.
 //
+//  ⚠️ **영수증을 읽는 일은 이제 LeeoKit(`LeeoStore`)이 한다.** 상품 로드·구매·복원·
+//     거래 리스너를 앱마다 다시 짜다가 빠뜨리던 것들(다른 기기에서 산 것, 가족 공유,
+//     '구입 요청' 승인분, 환불)이 거기 다 들어 있다. 이 파일에 남은 것은 **정책**뿐이다 —
+//     "지금 팔고 있는가(`sellsAccess`)"와 "모를 때 뭐라고 말할 것인가(`cachedPurchase`)".
+//     파는 상품이 무엇인지는 계약이 정한다 (→ WeekBlocksSpec.swift).
+//
 
 import Foundation
+import Combine
 import StoreKit
+import LeeoKit
 
 enum MacEntitlement {
 
-    /// App Store Connect의 비소모성 상품 ID.
-    /// ⚠️ 콘솔에 만든 것과 **글자 하나까지 같아야 한다.**
-    static let productID = "com.devkoan.ScheduleDensityApp.sync"
+    /// App Store Connect의 비소모성 상품 ID. 근거는 계약 한 곳이다.
+    /// ⚠️ 콘솔·`WeekBlocks.storekit`에 적은 것과 **글자 하나까지 같아야 한다.**
+    static var productID: String { WeekBlocksSpec.syncProductID }
 
     /// **'아이폰과 함께 쓰기'를 팔기 시작했는가.** false인 동안에는 모두 함께 쓴다.
     ///
@@ -51,6 +59,10 @@ enum MacEntitlement {
     /// `UserDefaults.bool(forKey:)`는 이 둘을 똑같이 false로 돌려준다. 그 차이를 잃으면
     /// 처음 켠 사람에게 — 산 사람이라도 — 잠깐 "무료"라고 **단정해서** 말하게 된다.
     /// 캐시는 빠르라고 두는 것이지 없는 답을 지어내라고 두는 것이 아니다.
+    ///
+    /// ⚠️ `LeeoStore`도 제 나름의 캐시를 UserDefaults에 둔다. 그건 상품 ID로 이름을 지은
+    ///    LeeoKit 내부 값이라 여기서 읽지 않는다. 이 키는 **'물어봤는가'까지 담는**
+    ///    앱의 거울이고, 그 차이가 화면의 '확인 중…'을 만든다.
     static var cachedPurchase: Bool? {
         UserDefaults.standard.object(forKey: purchasedKey) as? Bool
     }
@@ -74,10 +86,22 @@ enum MacEntitlement {
 }
 
 /// 영수증을 확인하고 사는 일을 맡는다. 화면은 `isUnlocked`만 본다.
+///
+/// **속은 전부 `LeeoStore`다.** 이 클래스가 하는 일은 두 가지뿐이다 —
+///  ① LeeoKit의 값(`ObservableObject`)을 SwiftUI의 `@Observable` 세계로 옮겨 적는 것,
+///  ② 그 값을 **앱의 정책**(`MacEntitlement`)에 통과시켜 `isUnlocked`를 만드는 것.
+///
+/// ⚠️ 화면이 쓰는 이름(`isUnlocked`·`hasPurchased`·`isKnown`·`product`·`isWorking`·
+///    `failureMessage`)은 그대로 두었다. LeeoKit으로 갈아탄 것은 속이지 부르는 자리가 아니다.
 @MainActor
 @Observable
 final class PurchaseManager {
     static let shared = PurchaseManager()
+
+    /// 상품 로드·구매·복원·거래 리스너 — 전부 LeeoKit이 맡는다.
+    /// 구성(상품 ID·약관·개인정보 링크)은 계약에서 유도된 것을 그대로 쓴다
+    /// (→ WeekBlocksSpec.monetization).
+    @ObservationIgnored let store: LeeoStore
 
     private(set) var isUnlocked: Bool = MacEntitlement.isUnlocked
     /// 값을 치렀는가 (→ `MacEntitlement.hasPurchased`).
@@ -95,78 +119,70 @@ final class PurchaseManager {
     /// 버튼이 고장 난 줄 안다.
     private(set) var failureMessage: String?
 
-    private var updates: Task<Void, Never>?
+    /// **이번 실행에서 영수증을 실제로 읽었는가.**
+    ///
+    /// ⚠️ 이 플래그가 서기 전에는 캐시에 아무것도 쓰지 않는다. LeeoStore는 상품을
+    ///    불러오는 중에도 값이 바뀌었다고 알려 오는데, 그 알림에 대고 `hasPro`(아직 false)를
+    ///    캐시에 적어 버리면 **처음 켠 구매자가 '무료'로 못박힌다.** '모른다'와 '아니다'를
+    ///    가르는 것이 이 파일의 절반이라 여기서 무너뜨리면 안 된다.
+    @ObservationIgnored private var entitlementsChecked = false
+    @ObservationIgnored private var observation: AnyCancellable?
 
     private init() {
-        // 다른 기기에서 사거나 환불한 것이 뒤늦게 도착한다. 계속 듣는다.
-        updates = Task { [weak self] in
-            for await update in Transaction.updates {
-                // ⚠️ 여기로 온 거래는 **반드시 끝냈다고 알려야 한다.** 안 그러면 App Store가
-                //    켤 때마다 같은 거래를 다시 보낸다 — 다른 맥에서 산 것, 가족 공유로
-                //    들어온 것, '구입 요청' 승인분이 특히 그렇다. 끝났다고 말하지 않는 한
-                //    App Store는 우리가 물건을 못 받았다고 여긴다.
-                //
-                //    권한의 근거는 여전히 아래 refresh()가 영수증에서 다시 읽는다.
-                //    여기서 하는 일은 '받았다'는 회신 하나뿐이다.
-                if case .verified(let transaction) = update {
-                    await transaction.finish()
-                }
-                await self?.refresh()
-            }
+        // 계약이 페이월을 요구하지 않는 모델(.free/.paidUpfront)로 바뀌면 여기서 걸린다.
+        // 파는 것이 없는데 결제 화면이 서 있는 상태를 조용히 두지 않으려는 것이다.
+        guard let config = WeekBlocksSpec.paywall else {
+            preconditionFailure("계약에 페이월이 없다 — WeekBlocksSpec.monetization을 확인할 것")
+        }
+        store = LeeoStore(config: config)
+
+        // LeeoStore는 Combine 쪽 관찰(ObservableObject)이라 @Observable 화면이 직접 못 본다.
+        // ⚠️ objectWillChange는 값이 바뀌기 **직전**에 온다. 그 자리에서 읽으면 옛 값이므로
+        //    다음 차례로 미뤄서 읽는다.
+        observation = store.objectWillChange.sink { [weak self] _ in
+            Task { @MainActor in self?.pull() }
         }
     }
 
     /// 영수증을 다시 읽어 권한을 맞춘다. 켤 때마다 부른다.
     func refresh() async {
-        var owned = false
-        for await entitlement in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = entitlement else { continue }
-            if transaction.productID == MacEntitlement.productID, transaction.revocationDate == nil {
-                owned = true
-            }
-        }
-        MacEntitlement.setPurchased(owned)
-        isUnlocked = MacEntitlement.isUnlocked
-        hasPurchased = MacEntitlement.hasPurchased
-        isKnown = true
-        product = try? await Product.products(for: [MacEntitlement.productID]).first
+        await store.refreshEntitlements()
+        await store.loadProducts()
+        entitlementsChecked = true
+        pull()
     }
 
     func purchase() async {
-        guard let product else {
+        if store.products.isEmpty { await store.loadProducts() }
+        guard let product = store.products.first else {
             failureMessage = String(localized: "상품을 아직 못 불러왔습니다. 잠시 뒤 다시 시도해 주세요.")
             return
         }
-        isWorking = true
-        failureMessage = nil
-        defer { isWorking = false }
-        let result: Product.PurchaseResult
-        do { result = try await product.purchase() }
-        catch { failureMessage = String(localized: "구매하지 못했습니다: \(error.localizedDescription)"); return }
-        // 성공만 보고 나머지를 흘리면, 승인 대기(구입 요청)에 걸린 사람은 아무 말도 못 듣고
-        // 버튼이 고장 난 줄 안다. 취소만 조용하다 — 스스로 그만둔 것이라 할 말이 없다.
-        switch result {
-        case .success(let verification):
-            guard case .verified(let transaction) = verification else {
-                failureMessage = String(localized: "영수증을 확인하지 못했습니다. 잠시 뒤 다시 시도해 주세요.")
-                return
-            }
-            await transaction.finish()
-            await refresh()
-        case .pending:
-            failureMessage = String(localized: "승인을 기다리는 중입니다. 승인되면 앱이 알아서 열립니다.")
-        case .userCancelled:
-            break
-        @unknown default:
-            break
-        }
+        // 성공·취소·승인 대기·실패의 갈래와 거래 끝맺음(`finish`)은 전부 LeeoStore 안에 있다.
+        // 구매 퍼널 이벤트(purchase_started/completed/failed)도 거기서 저절로 나간다.
+        _ = await store.purchase(product)
+        entitlementsChecked = true
+        pull()
     }
 
     /// 기기를 바꿨거나 다시 깔았을 때.
     func restore() async {
-        isWorking = true
-        defer { isWorking = false }
-        try? await AppStore.sync()
-        await refresh()
+        await store.restore()
+        entitlementsChecked = true
+        pull()
+    }
+
+    /// LeeoStore의 값을 앱 정책에 통과시켜 화면이 보는 자리에 옮겨 적는다.
+    private func pull() {
+        if entitlementsChecked {
+            MacEntitlement.setPurchased(store.hasPro)
+        }
+        hasPurchased = MacEntitlement.hasPurchased
+        isUnlocked = MacEntitlement.isUnlocked
+        isKnown = entitlementsChecked || MacEntitlement.cachedPurchase != nil
+        product = store.products.first
+        isWorking = store.purchasingProductID != nil || store.isRestoring
+        // 스스로 그만둔 것(취소)에는 LeeoStore가 아무 말도 남기지 않는다 — 할 말이 없으니 조용하다.
+        failureMessage = store.lastError
     }
 }

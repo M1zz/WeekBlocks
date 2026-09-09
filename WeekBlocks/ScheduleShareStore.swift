@@ -212,6 +212,7 @@ final class ScheduleShareStore {
             isSharing = true
             shareURL = (saved as? CKShare)?.url
             errorMessage = nil
+            Telemetry.record(.scheduleShared)
             return shareURL
         } catch {
             handle(error)
