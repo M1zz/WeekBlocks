@@ -109,7 +109,11 @@ struct ContentView: View {
                     // 예전에는 펼 때만 밀려 내려오고 접을 때는 그 자리에서 사라져서,
                     // 접는 순간 아래 화면이 툭 끊기며 올라왔다.
                     .transition(.disclose)
+                    // 미끄러져 들어오는 동안 위의 날짜 줄을 덮지 않게 자른다. 다만 요약 카드의
+                    // 그림자까지 잘리지 않게, 자르는 테두리를 둘레만큼 넓혀 둔다 (→ Surface.swift).
+                    .padding(20)
                     .clipped()
+                    .padding(-20)
                 }
                 weekLensSection
                 // 할 일 목록은 한 주를 보는 자리 **아래**에 둔다.
@@ -121,10 +125,13 @@ struct ContentView: View {
                                weekBlocks: weekBlocks,
                                canPlan: hasFixedRoutines,
                                showsCategoryFilter: false)
+                .dashboardPanel()
                 routinesSection
+                    .dashboardPanel()
                 // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
                 if !shareStore.received.isEmpty {
                     ReceivedSchedulesSection()
+                        .dashboardPanel()
                         .transition(.disclose)
                 }
             }
@@ -135,7 +142,14 @@ struct ContentView: View {
             // "무엇이 서 있는가"가 바뀌었을 때만 결이 붙도록 값으로 건다.
             .animation(Motion.screen, value: nextStep)
             .animation(Motion.disclose, value: shareStore.received.count)
+            // ⚠️ **@AppStorage 값은 `withAnimation`만으로는 안 움직인다.** 값이 UserDefaults를 한 바퀴
+            //    돌아 돌아오는 사이에 애니메이션이 떨어져 나가서, 요약이 늘고 줄 때 아래 화면이 툭
+            //    끊겨 올라왔다. 값 자체에 결을 건다 — 어디서 바꾸든(단추·다른 창·다음 실행) 같은 결로 움직인다.
+            .animation(Motion.disclose, value: showsWeekSummary)
+            .animation(Motion.screen, value: weekLensRaw)
         }
+        // 대시보드의 바닥. 요일 칸·할 일·루틴이 이 위에 올라간 카드로 읽힌다 (→ Surface.swift).
+        .background(Color.canvas)
         .frame(minWidth: 980, minHeight: 700)
         .navigationTitle("무지개 공방")
         .toolbar {
@@ -524,7 +538,7 @@ struct ContentView: View {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.primary.opacity(0.04), in: .soft(Corner.panel))
                 .transition(.disclose)
             } else {
                 LazyVGrid(
@@ -677,6 +691,7 @@ struct ContentView: View {
                 case .day:
                     ZStack(alignment: .topLeading) {
                         dayTimelineSection
+                            .dashboardPanel()
                             .id(selectedWeek)
                             .transition(.pageSlide(forward: weekForward, distance: 40))
                     }
@@ -720,7 +735,7 @@ struct ContentView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.red.opacity(0.92), in: RoundedRectangle(cornerRadius: 8))
+        .background(Color.red.opacity(0.92), in: .soft(Corner.card))
         .transition(.banner)
     }
 
@@ -810,7 +825,7 @@ struct ContentView: View {
         // 분이 바뀌면 '지금 하고 있는 것'이 달라질 수 있다. 그때 칩의 남은 시간도 자리를 옮긴다.
         TimelineView(.everyMinute) { ctx in
             VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top, spacing: 8) {
+                HStack(alignment: .top, spacing: 10) {
                     ForEach(DayOfWeek.allCases) { day in
                         DayColumn(
                             day: day,
@@ -840,6 +855,8 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, alignment: .top)
                     }
                 }
+                // 일곱 칸의 키를 가장 긴 칸에 맞춘다 (칸 쪽은 `maxHeight: .infinity`로 늘어난다).
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -927,6 +944,10 @@ struct ContentView: View {
     /// 요일 칸(블록으로 보기)과 시간 자(시간축으로 보기)가 함께 쓰는 받는 자리.
     /// - Parameter atHour: 자 위에 떨어뜨렸을 때의 시작 시각. 요일 칸에서는 nil(시간대만 정한다).
     private func dropBacklogItem(token: String, day: DayOfWeek, atHour: Double? = nil) {
+        if let move = RoutineDragToken(token) {
+            moveRoutine(move, to: day, startHour: atHour, gap: nil)
+            return
+        }
         if token.hasPrefix("block:") {
             // 이미 계획에 올린 블록을 옮긴다 — 요일 칸에서는 요일만, 자 위에서는 시각까지.
             guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
@@ -976,6 +997,10 @@ struct ContentView: View {
     ///    고장 났다고 읽는다. 대신 겹쳤다는 사실을 붉게 알리고, 겹침이 실제로 보이는
     ///    자리(시간축)로 갈 길을 함께 준다. 요일 칸은 겹침을 그리지 못한다.
     private func dropIntoGap(token: String, day: DayOfWeek, startHour: Double, gap: Double) {
+        if let move = RoutineDragToken(token) {
+            moveRoutine(move, to: day, startHour: startHour, gap: gap)
+            return
+        }
         guard token.hasPrefix("block:") else {
             // 백로그 항목·루틴은 원래 길로. 시각까지 정해서 넘긴다.
             dropBacklogItem(token: token, day: day, atHour: startHour)
@@ -994,6 +1019,67 @@ struct ContentView: View {
                 conflictNotice = String(localized: "‘\(blk.title)’(\(shortHours(blk.durationHours)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다.")
             }
         }
+    }
+
+    /// **요일 칸에서 루틴·끼니 칩을 끌어 옮긴다 — 이번 주 그 요일의 시각만.**
+    ///
+    /// 시간축에서 띠를 좌우로 끄는 것과 같은 자리에 적는다(고정 루틴 → `RoutineOccurrence.startHourOverride`,
+    /// 끼니 → `QuotaPlacement`, → DayTimelineRow.commitDrag). 루틴 정의(모든 주의 기본 시각)는 안 건드린다.
+    ///
+    /// ⚠️ **요일은 못 옮긴다.** 고정 루틴의 요일은 루틴 자체의 약속이라 칩 하나 끌어서 바꾸면
+    ///    다음 주부터 어긋난다. 그렇다고 놓아도 튕기기만 하면 고장으로 읽히므로 이유를 붉게 알린다.
+    private func moveRoutine(_ move: RoutineDragToken, to day: DayOfWeek, startHour: Double?, gap: Double?) {
+        guard move.day == day else {
+            withAnimation(Motion.banner) {
+                conflictNotice = String(localized: "‘\(move.name)’은(는) 요일을 옮길 수 없습니다. 같은 요일 안에서 시각만 옮기고, 요일은 루틴 수정에서 바꿉니다.")
+            }
+            return
+        }
+        guard let startHour else { return }   // 칸 바탕에 놓았다 — 틈을 안 골랐으니 그대로 둔다.
+        let cal = Calendar(identifier: .iso8601)
+
+        switch move.kind {
+        case .fixed(let pieceStart):
+            guard let routine = routines.first(where: { $0.name == move.name }) else { return }
+            let occ = allOccurrences.first {
+                $0.routineName == move.name && $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+            }
+            let logical = (occ?.startHourOverride ?? -1) >= 0 ? occ!.startHourOverride : routine.startHour
+            // 자정을 넘겨 둘로 그려진 잠은 어느 조각을 잡았든 **잡은 조각의 머리**가 놓은 자리에 오게,
+            // 원래 시작 시각을 같은 만큼 민다.
+            var newStart = (logical + (startHour - pieceStart)).truncatingRemainder(dividingBy: 24)
+            if newStart < 0 { newStart += 24 }
+            newStart = min(max(newStart, 0), 23.75)
+            if let occ {
+                occ.startHourOverride = newStart
+            } else {
+                let created = RoutineOccurrence(routineName: move.name, day: day, weekStartDate: selectedWeek)
+                created.startHourOverride = newStart
+                context.insert(created)
+            }
+
+        case .quota(let index):
+            guard let routine = routines.first(where: { $0.name == move.name && $0.kind == .quota }) else { return }
+            let each = routine.dailyQuotaHours / Double(max(1, routine.sessionsPerDay))
+            let newStart = clampStart(startHour, duration: each)
+            if let placement = allQuotaPlacements.first(where: {
+                $0.routineName == move.name && $0.day == day && $0.sessionIndex == index
+                    && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+            }) {
+                placement.startHour = newStart
+            } else {
+                context.insert(QuotaPlacement(routineName: move.name, day: day, weekStartDate: selectedWeek,
+                                              sessionIndex: index, startHour: newStart))
+            }
+            // 틈보다 크면 다음 일정과 겹친다 — 겹친 끼니는 요일 칸에서 접히므로(→ dayPlanItems) 말없이
+            // 사라진 것처럼 보인다. 계획 블록과 같은 말로 알린다.
+            if let gap, each > gap + 0.01 {
+                withAnimation(Motion.banner) {
+                    conflictNotice = String(localized: "‘\(routine.name)’(\(shortHours(each)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다.")
+                }
+            }
+        }
+        withAnimation(Motion.card) { try? context.save() }
     }
 
     /// 떨어뜨린 시각을 하루 안에 가둔다 — 끝자락에 놓아도 자정을 넘겨 사라지지 않게.
@@ -1229,6 +1315,8 @@ struct MetricCard: View {
                 Text(value)
                     .font(.title.weight(.medium))
                     .monospacedDigit()
+                    // 계획을 올리고 내리면 숫자가 굴러간다.
+                    .contentTransition(.numericText())
                 Text(unit)
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -1242,13 +1330,18 @@ struct MetricCard: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
+        .background { DashboardSurface() }
+        .animation(Motion.number, value: value)
     }
 }
 
 struct WeekBarChart: View {
     let routineHours: Double
     let plannedHours: Double
+
+    /// 막대가 다 차올랐는가. 요약을 펴면 왼쪽에서부터 자란다.
+    @State private var drawn = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let total = 168.0
     private var isOverPlanned: Bool { plannedHours > total - routineHours }
@@ -1262,12 +1355,12 @@ struct WeekBarChart: View {
                     if routineHours > 0 {
                         Rectangle()
                             .fill(Color.secondary.opacity(0.45))
-                            .frame(width: barWidth(geo.size.width, routineHours))
+                            .frame(width: barWidth(geo.size.width, drawn ? routineHours : 0))
                     }
                     if clampedPlanned > 0 {
                         Rectangle()
                             .fill(isOverPlanned ? Color.red.opacity(0.7) : Color.accentColor.opacity(0.8))
-                            .frame(width: barWidth(geo.size.width, clampedPlanned))
+                            .frame(width: barWidth(geo.size.width, drawn ? clampedPlanned : 0))
                     }
                     Rectangle()
                         .fill(Color.primary.opacity(0.05))
@@ -1275,8 +1368,16 @@ struct WeekBarChart: View {
                 }
             }
             .frame(height: 18)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.secondary.opacity(0.15), lineWidth: 0.5))
+            .clipShape(Capsule())
+            .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.15), lineWidth: 0.5))
+            // 계획을 올리고 내리면 그만큼 자라고 준다. 툭 바뀌면 무엇이 얼마나 늘었는지
+            // 앞뒤를 견줄 수가 없다.
+            .animation(Motion.chart, value: routineHours)
+            .animation(Motion.chart, value: plannedHours)
+            .onAppear {
+                if reduceMotion { drawn = true; return }
+                withAnimation(Motion.chart.delay(0.08)) { drawn = true }
+            }
 
             HStack(spacing: 20) {
                 barLegend(color: .secondary.opacity(0.6), label: String(localized: "루틴"), hours: routineHours)
@@ -1294,10 +1395,12 @@ struct WeekBarChart: View {
 
     private func barLegend(color: Color, label: String, hours: Double) -> some View {
         HStack(spacing: 5) {
-            RoundedRectangle(cornerRadius: 2)
+            Circle()
                 .fill(color)
                 .frame(width: 10, height: 10)
             Text("\(label) \(String(format: "%.0f", hours))h")
+                .contentTransition(.numericText())
+                .animation(Motion.number, value: hours)
         }
     }
 }

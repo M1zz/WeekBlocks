@@ -234,9 +234,10 @@ private struct SlotRow: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 6)
-        .background(RoundedRectangle(cornerRadius: 7).fill(tint.opacity(isNow ? 0.12 : 0.05)))
-        .overlay(RoundedRectangle(cornerRadius: 7)
-            .stroke(tint.opacity(isNow ? 0.5 : 0.15), lineWidth: isNow ? 1.1 : 0.6))
+        .background(RoundedRectangle.soft(Corner.chip).fill(tint.opacity(isNow ? 0.12 : 0.05)))
+        // 지금 하는 줄에만 테두리. 나머지까지 두르면 '지금'이 묻힌다.
+        .overlay(RoundedRectangle.soft(Corner.chip)
+            .strokeBorder(tint.opacity(isNow ? 0.5 : 0), lineWidth: 1))
         .contextMenu {
             TimerMenuItems(token: slot.id, title: slot.title, hours: slot.hours,
                            iconName: slot.iconName, colorName: slot.colorName)
@@ -407,7 +408,6 @@ struct TimerPill: View {
             .padding(.horizontal, 9)
             .padding(.vertical, 4)
             .background(tint.opacity(0.14), in: Capsule())
-            .overlay(Capsule().stroke(tint.opacity(0.4), lineWidth: 0.8))
         }
         .buttonStyle(.plain)
         .help("타이머 창 열기 (⇧⌘R)")

@@ -332,9 +332,9 @@ struct BacklogSection: View {
         // 있어야 한다 — 같은 손짓의 반대 방향이다.
         .background {
             if isReturnTargeted {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle.soft(Corner.panel)
                     .fill(Color.accentColor.opacity(0.08))
-                    .overlay(RoundedRectangle(cornerRadius: 10)
+                    .overlay(RoundedRectangle.soft(Corner.panel)
                         .stroke(Color.accentColor.opacity(0.6), lineWidth: 1.5))
                     .padding(-8)
             }
@@ -460,7 +460,7 @@ struct BacklogSection: View {
     /// 시간·단계는 나중에 카드에서 고친다. 적는 순간에 정할 것을 늘리면 적기를 그만두게 된다.
     private var newTodoCard: some View {
         HStack(spacing: 7) {
-            RoundedRectangle(cornerRadius: 2)
+            Capsule()
                 .fill(draftTint)
                 .frame(width: 3)
 
@@ -482,9 +482,9 @@ struct BacklogSection: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(draftTint.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
+        .background(draftTint.opacity(0.10), in: .soft(Corner.card))
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle.soft(Corner.card)
                 .strokeBorder(draftTint.opacity(0.55),
                               style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
         )
@@ -656,7 +656,7 @@ struct BacklogSection: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 5)
-                        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
+                        .background(Color.primary.opacity(0.04), in: .soft(Corner.chip))
                         .transition(.row)
                     }
                 }
@@ -703,7 +703,7 @@ struct BacklogSection: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
-        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
+        .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.card))
     }
 
     private func reconcileCategories() async {
@@ -890,7 +890,7 @@ struct BacklogBlock: View {
 
     var body: some View {
         HStack(spacing: 7) {
-            RoundedRectangle(cornerRadius: 2)
+            Capsule()
                 .fill(tint)
                 .frame(width: 3)
 
@@ -976,9 +976,10 @@ struct BacklogBlock: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(laneBackground, in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(laneBorder, lineWidth: 0.6))
-        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .background(laneBackground, in: .soft(Corner.card))
+        // 갈래(지금·잔일·계획)는 바탕색과 왼쪽 막대가 이미 말한다. 테두리는 가리킬 때만 선다.
+        .overlay(RoundedRectangle.soft(Corner.card).strokeBorder(laneBorder.opacity(hovering ? 1 : 0), lineWidth: 1))
+        .contentShape(.soft(Corner.card))
         .draggable(item.dragToken)
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
@@ -1218,7 +1219,7 @@ struct ComposerItemRow: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
-        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
+        .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.chip))
         .onChange(of: item.title) { _, _ in try? context.save() }
     }
 
@@ -1399,8 +1400,7 @@ struct AllBacklogRow: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
-        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
+        .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.chip))
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
     }
@@ -1518,7 +1518,7 @@ struct CategoryEditRow: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
+        .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.chip))
     }
 }
 

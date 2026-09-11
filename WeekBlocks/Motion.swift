@@ -35,6 +35,18 @@ enum Motion {
 
     /// 숫자가 바뀐다 (남은 시간·퍼센트). 자릿수가 굴러가는 결.
     static let number = Animation.snappy(duration: 0.25)
+
+    /// 그래프가 차오른다 — 막대가 자라고 시간 자 위의 띠가 그려진다.
+    ///
+    /// 다른 결보다 길게 잡는다(약 0.55초). 손짓에 답하는 움직임이 아니라 **눈이 따라가며
+    /// 비율을 읽는** 움직임이라, 너무 빠르면 차오른 게 아니라 깜빡인 것으로 보인다.
+    /// 그 사이 손은 막히지 않는다 — 막대는 누르는 것이 아니다.
+    static let chart = Animation.spring(response: 0.55, dampingFraction: 0.86)
+
+    /// 줄마다 조금씩 늦게. 일곱 요일이 한꺼번에가 아니라 위에서부터 차례로 그려진다.
+    static func stagger(_ index: Int, step: Double = 0.035) -> Animation {
+        chart.delay(Double(index) * step)
+    }
 }
 
 extension AnyTransition {

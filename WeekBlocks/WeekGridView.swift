@@ -38,6 +38,72 @@ enum DayPlanItem: Identifiable {
 
     /// 이 항목이 끝나는 시각.
     var endHour: Double { atHour + hours }
+
+    /// 요일 칸에서 이 항목을 끌 때 실어 보내는 표.
+    /// 계획 블록은 제 토큰(`block:`), 루틴·끼니는 **어느 요일의 어느 조각인지**까지 싣는다.
+    func dragToken(on day: DayOfWeek) -> String {
+        switch self {
+        case .fixedRoutine(let r, _, let h, _):
+            RoutineDragToken(kind: .fixed(pieceStart: h), day: day, name: r.name).encoded
+        case .quotaSession(let r, let index, _):
+            RoutineDragToken(kind: .quota(sessionIndex: index), day: day, name: r.name).encoded
+        case .block(let b, _):
+            b.dragToken
+        }
+    }
+}
+
+/// **요일 칸의 루틴·끼니 칩을 끌 때 실어 보내는 표.**
+///
+/// 받는 쪽은 이 표로 이번 주 그 요일의 시각만 옮긴다 (→ ContentView.moveRoutine).
+///
+/// ⚠️ `routine:`(아래 루틴 카드를 끌어 **새 계획 블록을 만드는** 표)과 머리를 따로 쓴다.
+///    같은 머리를 쓰면 칩을 옮기려다 블록이 하나 더 생긴다.
+struct RoutineDragToken {
+    enum Kind {
+        /// 고정 루틴. 자정을 넘겨 둘로 그려진 잠은 **잡은 조각**이 어디서 시작했는지를 싣는다.
+        case fixed(pieceStart: Double)
+        case quota(sessionIndex: Int)
+    }
+
+    let kind: Kind
+    let day: DayOfWeek
+    let name: String
+
+    private static let prefix = "move-routine:"
+
+    init(kind: Kind, day: DayOfWeek, name: String) {
+        self.kind = kind
+        self.day = day
+        self.name = name
+    }
+
+    var encoded: String {
+        switch kind {
+        case .fixed(let start): "\(Self.prefix)f|\(day.rawValue)|\(start)|\(name)"
+        case .quota(let index): "\(Self.prefix)q|\(day.rawValue)|\(index)|\(name)"
+        }
+    }
+
+    /// 이름에 `|`가 들어 있어도 되게, 앞의 세 칸만 자르고 나머지는 통째로 이름으로 본다.
+    init?(_ token: String) {
+        guard token.hasPrefix(Self.prefix) else { return nil }
+        let parts = token.dropFirst(Self.prefix.count)
+            .split(separator: "|", maxSplits: 3, omittingEmptySubsequences: false)
+        guard parts.count == 4, let rawDay = Int(parts[1]), let day = DayOfWeek(rawValue: rawDay) else { return nil }
+        switch parts[0] {
+        case "f":
+            guard let start = Double(parts[2]) else { return nil }
+            kind = .fixed(pieceStart: start)
+        case "q":
+            guard let index = Int(parts[2]) else { return nil }
+            kind = .quota(sessionIndex: index)
+        default:
+            return nil
+        }
+        self.day = day
+        self.name = String(parts[3])
+    }
 }
 
 struct DayColumn: View {
@@ -132,7 +198,7 @@ struct DayColumn: View {
             .dropDestination(for: String.self) { dropped, _ in
                 targetedGap = nil
                 guard canPlan, let token = dropped.first else { return false }
-                let bounds = gapBounds(at: index)
+                let bounds = gapBounds(at: index, excluding: token)
                 onDropIntoGap(token, bounds.start, bounds.gap)
                 return true
             } isTargeted: { targetedGap = ($0 && canPlan) ? index : nil }
@@ -141,10 +207,16 @@ struct DayColumn: View {
 
     /// 이 틈이 **언제 시작해서 얼마나 넓은가.**
     /// 맨 위는 0시부터, 맨 아래는 24시까지로 본다.
-    private func gapBounds(at index: Int) -> (start: Double, gap: Double) {
-        let start = index > 0 ? items[index - 1].endHour : 0
-        let next = index < items.count ? items[index].atHour : 24
-        return (max(0, min(start, 24)), max(0, next - start))
+    ///
+    /// ⚠️ **끌고 있는 그 항목은 빼고 잰다.** 제 바로 아래 틈에 놓았는데 자기 끝 시각부터 재면,
+    ///    제자리에 둔 것이 제 길이만큼 뒤로 밀린다.
+    private func gapBounds(at index: Int, excluding token: String? = nil) -> (start: Double, gap: Double) {
+        let isDragged: (DayPlanItem) -> Bool = { token != nil && $0.dragToken(on: day) == token }
+        let prev = items[..<index].last { !isDragged($0) }
+        let next = items[index...].first { !isDragged($0) }
+        let start = prev?.endHour ?? 0
+        let end = next?.atHour ?? 24
+        return (max(0, min(start, 24)), max(0, end - start))
     }
 
     /// 한 항목의 칩. '지금' 선을 끼우느라 두 곳에서 쓰므로 따로 뺐다.
@@ -158,7 +230,8 @@ struct DayColumn: View {
             RoutineChip(routine: routine,
                         subtitleOverride: shortHours(hours),
                         currentSlot: liveSlot(for: item),
-                        onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) {
+                        onEdit: onEditRoutineSchedule.map { f in { f(routine) } },
+                        dragToken: item.dragToken(on: day)) {
                 onEditRoutine(routine)
             }
         case .quotaSession(let routine, let index, _):
@@ -168,7 +241,8 @@ struct DayColumn: View {
                                                      / Double(max(1, routine.sessionsPerDay))),
                         currentSlot: liveSlot(for: item),
                         timerToken: "\(TaskTimer.token(for: routine)):\(index)",
-                        onEdit: onEditRoutineSchedule.map { f in { f(routine) } }) { onEditRoutine(routine) }
+                        onEdit: onEditRoutineSchedule.map { f in { f(routine) } },
+                        dragToken: item.dragToken(on: day)) { onEditRoutine(routine) }
         case .block(let block, _):
             BlockChip(block: block, currentSlot: liveSlot(for: item)) { onEdit(block) }
         }
@@ -235,7 +309,7 @@ struct DayColumn: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 28)
                     .background(
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle.soft(Corner.chip)
                             .strokeBorder(
                                 Color.secondary.opacity(0.25),
                                 style: StrokeStyle(lineWidth: 0.5, dash: [3, 3])
@@ -247,15 +321,17 @@ struct DayColumn: View {
             .help(canPlan ? "\(day.longLabel)에 블록 추가" : "고정 루틴을 먼저 추가하세요")
         }
         .padding(8)
-        .frame(minHeight: 150, alignment: .top)
+        // 이웃 칸과 키를 맞춘다 — 들쭉날쭉한 카드는 대시보드가 아니라 쌓아 둔 종이로 읽힌다.
+        // (가장 긴 칸에 맞추는 것은 부르는 쪽 HStack의 `.fixedSize(vertical:)`다.)
+        .frame(minHeight: 150, maxHeight: .infinity, alignment: .top)
         .background {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(isDropTargeted
-                      ? Color.accentColor.opacity(0.08)
-                      : Color(nsColor: .controlBackgroundColor))
+            // 요일 칸 하나하나가 대시보드 위에 올라간 카드다 (→ Surface.swift).
+            DashboardSurface()
             if isDropTargeted {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.accentColor.opacity(0.6), lineWidth: 1.5)
+                RoundedRectangle.soft(Corner.panel)
+                    .fill(Color.accentColor.opacity(0.08))
+                RoundedRectangle.soft(Corner.panel)
+                    .strokeBorder(Color.accentColor.opacity(0.6), lineWidth: 1.5)
             }
         }
         .dropDestination(for: String.self) { items, _ in
@@ -278,6 +354,8 @@ struct RoutineChip: View {
     var timerToken: String? = nil
     /// '수정' — 이름·요일·시각을 바꾸는 편집기로. 없으면 버튼을 띄우지 않는다.
     var onEdit: (() -> Void)? = nil
+    /// 끌 때 실어 보낼 표. 있으면 같은 요일 안에서 끌어 시각을 옮길 수 있다 (→ RoutineDragToken).
+    var dragToken: String? = nil
     let onTap: () -> Void
 
     @State private var hovering = false
@@ -305,26 +383,23 @@ struct RoutineChip: View {
     }
 
     var body: some View {
-        // 겉을 Button으로 두면 안에 놓은 '수정' 버튼이 클릭을 못 받는다.
+        // 누르면 상세. 요일·시각 수정은 우클릭 메뉴로 간다.
+        // (손을 올리면 뜨던 '수정' 단추는 뗐다 — 좁은 칸에서 제목을 가리고, 끌려고 잡는 자리와 겹쳤다.)
         chipBody
-            .contentShape(RoundedRectangle(cornerRadius: 7))
+            .contentShape(.soft(Corner.chip))
+            // 끌기를 탭보다 안쪽에 둔다 — 순서가 뒤집히면 누르는 동안 끌기가 시작되지 못한다 (→ BlockChip).
+            .modifier(OptionalDraggable(token: dragToken))
             .onTapGesture(perform: onTap)
-            .overlay(alignment: .topTrailing) {
-                if hovering, let onEdit {
-                    Button("수정", action: onEdit)
-                        .buttonStyle(.plain)
-                        .font(.system(size: 11))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color(nsColor: .controlBackgroundColor), in: Capsule())
-                        .overlay(Capsule().stroke(routine.displayColor.opacity(0.5), lineWidth: 0.5))
-                        .padding(4)
-                        .transition(.control)
-                }
-            }
             .onHover { hovering = $0 }
+            .grabCursor(enabled: dragToken != nil)
             .animation(Motion.hover, value: hovering)
             .contextMenu {
+                if let onEdit {
+                    Button(action: onEdit) {
+                        Label("요일·시각 수정…", systemImage: "calendar.badge.clock")
+                    }
+                    Divider()
+                }
                 // 쿼터(끼니 등)는 회당 시간이 따로다 — 그 값으로 센다.
                 TimerMenuItems(token: token,
                                title: routine.name,
@@ -332,7 +407,7 @@ struct RoutineChip: View {
                                iconName: routine.iconName,
                                colorName: routine.colorName)
             }
-            .help("\(routine.scheduleDescription)\n눌러서 상세 · 우클릭으로 타이머 시작")
+            .help("\(routine.scheduleDescription)\n눌러서 상세 · 같은 요일 안에서 끌어 시각 옮기기 · 우클릭으로 타이머 시작")
     }
 
     private var chipBody: some View {
@@ -356,21 +431,37 @@ struct RoutineChip: View {
 
                 Spacer()
 
-                Image(systemName: isQuota ? "arrow.left.and.right" : "lock.fill")
-                    .font(.system(size: 11))
-                    .opacity(isQuota ? 0.5 : 0.35)
+                // 끝에 자물쇠·↔ 표시를 두지 않는다. 루틴 칩도 같은 요일 안에서는 끌어 옮길 수 있어
+                // 자물쇠는 '못 옮긴다'로, ↔는 '다른 요일로도 간다'로 잘못 읽혔다.
+                // 잡힌다는 건 손 모양 커서가, 쿼터의 유연함은 점선 테두리가 말한다.
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(color.opacity(isQuota ? (hovering ? 0.12 : 0.07) : (hovering ? 0.18 : 0.12)),
-                        in: RoundedRectangle(cornerRadius: 7))
+            .background(color.opacity(isQuota ? (hovering ? 0.12 : 0.07) : (hovering ? 0.20 : 0.14)),
+                        in: .soft(Corner.chip))
+            // 테두리는 **유연한 시간(쿼터)에만** 긋는다 — 점선이 '자리를 옮길 수 있다'는 뜻이다.
+            // 고정 루틴은 채움만으로 가려지고, 선까지 두르면 요일 칸 안이 선으로 빽빽해진다.
             .overlay(
-                RoundedRectangle(cornerRadius: 7)
-                    .stroke(color.opacity(hovering ? 0.55 : 0.4),
-                            style: isQuota ? StrokeStyle(lineWidth: 1, dash: [3, 2]) : StrokeStyle(lineWidth: 1))
+                RoundedRectangle.soft(Corner.chip)
+                    .strokeBorder(color.opacity(isQuota ? (hovering ? 0.55 : 0.4) : (hovering ? 0.35 : 0)),
+                                  style: isQuota ? StrokeStyle(lineWidth: 1, dash: [3, 2]) : StrokeStyle(lineWidth: 1))
             )
             .foregroundStyle(color)
+    }
+}
+
+/// 표가 있을 때만 끌 수 있게 한다.
+private struct OptionalDraggable: ViewModifier {
+    let token: String?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let token {
+            content.draggable(token)
+        } else {
+            content
+        }
     }
 }
 
@@ -400,10 +491,10 @@ struct BlockChip: View {
     }
 
     var body: some View {
-        // 겉을 Button으로 두면 안에 놓은 '수정' 버튼이 클릭을 못 받는다.
-        // 칩 전체는 탭 제스처로, 수정은 별도 버튼으로 분리한다.
+        // 칩 전체를 탭 제스처로 연다 — 누르면 곧 편집기다.
+        // (손을 올리면 뜨던 '수정' 단추는 뗐다 — 누르는 것과 같은 일을 두 번 말했다.)
         chipBody
-            .contentShape(RoundedRectangle(cornerRadius: 7))
+            .contentShape(.soft(Corner.chip))
             // 다른 요일로 끌어 옮기기 — 드롭 대상(DayColumn)에서 요일을 바꾼다.
             //
             // ⚠️ 순서가 중요하다. `.onTapGesture`를 먼저 붙이면 탭이 안쪽(우선순위 높은)
@@ -411,8 +502,9 @@ struct BlockChip: View {
             //    드래그를 안쪽에 두면, 움직이지 않은 클릭만 바깥의 탭으로 떨어진다.
             .draggable(block.dragToken)
             .onTapGesture(perform: onTap)
-            .overlay(alignment: .topTrailing) { editButton }
             .onHover { hovering = $0 }
+            // 잡을 수 있다는 것을 손 모양으로 (→ Affordance.swift).
+            .grabCursor()
             .animation(Motion.hover, value: hovering)
             // 계획을 보는 자리에서 바로 세기 시작한다 — 창을 열러 갈 필요 없이 (→ TimerView.swift).
             .contextMenu {
@@ -426,20 +518,7 @@ struct BlockChip: View {
                     + "\n" + String(localized: "할 일 목록으로 끌어 내리면 날짜가 무릅니다."))
     }
 
-    @ViewBuilder
-    private var editButton: some View {
-        if hovering {
-            Button("수정", action: onTap)
-                .buttonStyle(.plain)
-                .font(.system(size: 11))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Color(nsColor: .controlBackgroundColor), in: Capsule())
-                .overlay(Capsule().stroke(palette.stroke, lineWidth: 0.5))
-                .padding(4)
-                .transition(.control)
-        }
-    }
+    
 
     private var chipBody: some View {
             // 제목 줄 끝에 **길이**를 붙인다.
@@ -472,12 +551,26 @@ struct BlockChip: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
-            .background(palette.bg, in: RoundedRectangle(cornerRadius: 7))
+            // **옮길 수 있는 것은 떠 있다.** 요일 칸에서 끌어 옮길 수 있는 건 계획 블록뿐이라,
+            // 이것만 흰 바탕 위에 색을 얹고 그림자를 깔아 칸에서 들어 올린다. 루틴 칩은 칸에
+            // 붙은 납작한 색면으로 둔다 — 둘이 같은 높이면 무엇이 잡히는지 끌어 봐야 안다.
+            // 손이 올라가면 한 뼘 더 뜬다(집어 들기 직전).
+            .background {
+                ZStack {
+                    RoundedRectangle.soft(Corner.chip).fill(Color.surface)
+                    RoundedRectangle.soft(Corner.chip).fill(palette.bg)
+                }
+                .compositingGroup()
+                .shadow(color: palette.fg.opacity(hovering ? 0.32 : 0.22),
+                        radius: hovering ? 6 : 2.5, y: hovering ? 3 : 1.5)
+            }
+            // 검증됐는지는 채움 색(파랑·주황)이 이미 말한다. 테두리는 가리킬 때만 선다.
             .overlay(
-                RoundedRectangle(cornerRadius: 7)
-                    .stroke(palette.stroke, lineWidth: hovering ? 1.5 : 1)
+                RoundedRectangle.soft(Corner.chip)
+                    .strokeBorder(palette.stroke.opacity(hovering ? 1 : 0), lineWidth: 1.2)
             )
             .foregroundStyle(palette.fg)
+            .offset(y: hovering ? -1 : 0)
     }
 
     private func reviewTint(_ status: ReviewStatus) -> Color {

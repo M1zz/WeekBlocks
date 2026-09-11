@@ -257,8 +257,8 @@ private struct ReceivedScheduleCard: View {
             }
         }
         .padding(14)
-        .background(Color(nsColor: .controlBackgroundColor).opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
+        .background(Color(nsColor: .controlBackgroundColor).opacity(0.5), in: RoundedRectangle.soft(Corner.panel))
+        .overlay(RoundedRectangle.soft(Corner.panel).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
         .onAppear { index = initialIndex(weeks) }
     }
 
@@ -298,7 +298,7 @@ struct SharedScheduleWeekView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150, maximum: 240), spacing: 6)], alignment: .leading, spacing: 4) {
                     ForEach(snapshot.routines) { r in
                         HStack(spacing: 5) {
-                            RoundedRectangle(cornerRadius: 2)
+                            Circle()
                                 .fill(sharedTokenColor(r.color).opacity(0.85))
                                 .frame(width: 9, height: 9)
                             Text(r.name)
@@ -364,7 +364,7 @@ private struct SharedDayRow: View {
             GeometryReader { geo in
                 let w = geo.size.width
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle.soft(Corner.track)
                         .fill(Color.primary.opacity(0.05))
 
                     ForEach(1..<24) { h in
@@ -382,7 +382,7 @@ private struct SharedDayRow: View {
                             .offset(x: x)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipShape(RoundedRectangle.soft(Corner.track))
             }
             .frame(height: 24)
         }
@@ -390,7 +390,7 @@ private struct SharedDayRow: View {
 
     @ViewBuilder
     private func segmentView(_ seg: SharedScheduleSnapshot.Seg, width: CGFloat) -> some View {
-        let shape = RoundedRectangle(cornerRadius: 3)
+        let shape = RoundedRectangle.soft(Corner.segment)
         let color = sharedTokenColor(seg.color)
         ZStack {
             if seg.isFlexible {

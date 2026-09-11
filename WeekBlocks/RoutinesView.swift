@@ -68,8 +68,8 @@ struct RoutineRow: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
+        .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle.soft(Corner.card))
+        .overlay(RoundedRectangle.soft(Corner.card).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
         .draggable("routine:\(routine.name)")
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
@@ -139,9 +139,10 @@ struct RoutineBlock: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(color.opacity(hovering ? 0.16 : 0.10), in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(color.opacity(hovering ? 0.45 : 0.28), lineWidth: 1))
-        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .background(color.opacity(hovering ? 0.16 : 0.10), in: .soft(Corner.card))
+        // 색 채움이 곧 경계다. 테두리는 가리킬 때만 선다.
+        .overlay(RoundedRectangle.soft(Corner.card).strokeBorder(color.opacity(hovering ? 0.4 : 0), lineWidth: 1))
+        .contentShape(.soft(Corner.card))
         .draggable("routine:\(routine.name)")
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
@@ -556,11 +557,11 @@ private struct DayToggle: View {
                 .frame(width: 36, height: 32)
                 .background(
                     isOn ? Color.accentColor.opacity(0.18) : Color(nsColor: .controlBackgroundColor),
-                    in: RoundedRectangle(cornerRadius: 6)
+                    in: RoundedRectangle.soft(Corner.chip)
                 )
                 .foregroundStyle(isOn ? Color.accentColor : .primary)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle.soft(Corner.chip)
                         .stroke(isOn ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.2), lineWidth: 0.5)
                 )
         }

@@ -500,7 +500,7 @@ private struct StepRow: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
         .background(isCurrent ? Color.orange.opacity(0.08) : Color.clear,
-                    in: RoundedRectangle(cornerRadius: 6))
+                    in: .soft(Corner.chip))
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
         // 차례가 이 줄로 넘어오면 바탕색이 켜진다. 툭 갈리면 어느 줄로 넘어왔는지 놓친다.

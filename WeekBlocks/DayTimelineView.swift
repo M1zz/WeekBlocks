@@ -374,6 +374,9 @@ struct DayTimelineRow: View {
     @State private var dropTargeted = false
     /// 손이 올라가 있는 구간. 누를 수 있다는 것을 밝기로 말한다.
     @State private var hoverId: String? = nil
+    /// 띠가 다 그려졌는가. 줄이 처음 설 때(보는 자리를 바꾸거나 주를 넘길 때) 왼쪽에서부터 차오른다.
+    @State private var drawn = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// 그 시각을 0–24 소수 시간으로. (14:30 → 14.5)
     static func hourOfDay(_ date: Date) -> Double {
@@ -436,7 +439,7 @@ struct DayTimelineRow: View {
             GeometryReader { geo in
                 let w = geo.size.width
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle.soft(Corner.track)
                         .fill(Color.primary.opacity(0.05))
 
                     // 시간 격자 — 3시간마다 굵은 선으로 시간대를 더 잘게 구분.
@@ -449,21 +452,29 @@ struct DayTimelineRow: View {
                     }
 
                     // 활동 구간 — 창 밖은 그리지 않고, 걸친 것은 잘라서 그린다.
-                    ForEach(segments) { seg in
-                        if let vis = window.clamp(seg.start, seg.end) {
-                            let x = window.x(vis.start, width: w)
-                            let segW = window.x(vis.end, width: w) - x
-                            let dragOffset = (seg.id == dragId) ? dragPx : 0
-                            segmentView(seg, width: max(1, segW), rowWidth: w)
-                                .offset(x: x + dragOffset)
-                                .zIndex(seg.id == dragId ? 1 : 0)
-                                // 놓는 순간 15분 격자로 붙는 그 한 걸음만 결을 준다.
-                                // **끄는 동안에는 결을 안 건다** — 손보다 늦게 따라오면
-                                // 띠가 손가락에 매달린 것처럼 찐득해진다.
-                                .animation(seg.id == dragId ? nil : Motion.timeline, value: x)
-                                .animation(seg.id == dragId ? nil : Motion.timeline, value: segW)
-                                .transition(.card)
+                    ZStack(alignment: .leading) {
+                        ForEach(segments) { seg in
+                            if let vis = window.clamp(seg.start, seg.end) {
+                                let x = window.x(vis.start, width: w)
+                                let segW = window.x(vis.end, width: w) - x
+                                let dragOffset = (seg.id == dragId) ? dragPx : 0
+                                segmentView(seg, width: max(1, segW), rowWidth: w)
+                                    .offset(x: x + dragOffset)
+                                    .zIndex(seg.id == dragId ? 1 : 0)
+                                    // 놓는 순간 15분 격자로 붙는 그 한 걸음만 결을 준다.
+                                    // **끄는 동안에는 결을 안 건다** — 손보다 늦게 따라오면
+                                    // 띠가 손가락에 매달린 것처럼 찐득해진다.
+                                    .animation(seg.id == dragId ? nil : Motion.timeline, value: x)
+                                    .animation(seg.id == dragId ? nil : Motion.timeline, value: segW)
+                                    .transition(.card)
+                            }
                         }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                    // 줄이 처음 서면 띠가 왼쪽에서부터 그려진다. 자(바탕·격자)는 먼저 서 있고
+                    // 그 위에 하루가 채워지는 결이라, 그래프가 **읽히며** 나타난다.
+                    .mask(alignment: .leading) {
+                        Rectangle().frame(width: drawn ? w : 0)
                     }
                     // 계획을 지우거나 되살리면 띠가 스러지고 돋는다.
                     .animation(Motion.card, value: segments.map(\.id))
@@ -488,11 +499,11 @@ struct DayTimelineRow: View {
                         .zIndex(2)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipShape(RoundedRectangle.soft(Corner.track))
                 .overlay {
                     // 받을 자리 표시. 카드가 올라와 있는 동안에만 테두리가 선다.
                     // 다른 줄에서 계획 블록을 끌고 와도 같은 테두리로 "여기 놓으면 이 요일"이라고 말한다.
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle.soft(Corner.track)
                         .strokeBorder(Color.accentColor, lineWidth: (dropTargeted || isDayDropTarget) ? 2 : 0)
                         .animation(Motion.target, value: dropTargeted || isDayDropTarget)
                 }
@@ -506,6 +517,11 @@ struct DayTimelineRow: View {
                 }
             }
             .frame(height: 28)
+            .onAppear {
+                // 요일 순서대로 조금씩 늦게 — 일곱 줄이 위에서부터 차례로 그려진다.
+                if reduceMotion { drawn = true; return }
+                withAnimation(Motion.stagger(day.rawValue)) { drawn = true }
+            }
 
             Text("남은 시간 \(fmtHours(freeHours))h")
                 .font(.system(size: 13, weight: .medium))
@@ -521,7 +537,7 @@ struct DayTimelineRow: View {
 
     @ViewBuilder
     private func segmentView(_ seg: TimeSegment, width: CGFloat, rowWidth: CGFloat) -> some View {
-        let shape = RoundedRectangle(cornerRadius: 3)
+        let shape = RoundedRectangle.soft(Corner.segment)
         let dragging = seg.id == dragId
         let ghost = seg.isGhost
         ZStack {
@@ -542,6 +558,12 @@ struct DayTimelineRow: View {
                 shape.fill(seg.color.opacity(0.85))
             }
         }
+        // **옮길 수 있는 것은 떠 있다.** 계획 블록은 시각도 요일도 옮길 수 있어 그림자를 깔아
+        // 자 위로 살짝 들어 올리고, 루틴·끼니는 자에 붙여 둔다(시각만 옮겨진다).
+        // 그림자는 모양에만 건다 — 위에 얹힌 글씨까지 번지지 않게.
+        .compositingGroup()
+        .shadow(color: isPlanBlock(seg) && !ghost && !dragging ? .black.opacity(0.22) : .clear,
+                radius: 2, y: 1)
         // 루틴 안 일정은 위아래로 살짝 인셋해 루틴 위에 '얹힌' 느낌을 준다.
         .padding(.vertical, seg.isNested ? 5 : 0)
         .frame(width: width)
@@ -563,6 +585,8 @@ struct DayTimelineRow: View {
         .animation(Motion.hover, value: hoverId == seg.id)
         .contentShape(Rectangle())
         .onHover { hoverId = $0 ? seg.id : (hoverId == seg.id ? nil : hoverId) }
+        // 잡을 수 있는 띠 위에서는 손 모양이 된다 (→ Affordance.swift).
+        .grabCursor(enabled: !ghost)
         // 좌표계는 .global — 블록을 offset으로 움직여도 translation이 흔들리지 않게(로컬이면 자기 자신을 쫓아 찐득해짐).
         // highPriorityGesture로 바깥 ScrollView의 스크롤보다 드래그를 우선. 유령 블록은 드래그 불가.
         //
@@ -575,6 +599,7 @@ struct DayTimelineRow: View {
                     guard !seg.isGhost, moved(v.translation) else { return }
                     dragId = seg.id
                     dragPx = v.translation.width
+                    NSCursor.closedHand.set()
                     // 위아래로도 끌 수 있다 — 지나는 요일 줄에 테두리가 선다.
                     onDayTargetChange(targetDay(seg, at: v.location))
                 }
@@ -623,6 +648,12 @@ struct DayTimelineRow: View {
             }
         }
         .help(dragHelp(seg))
+    }
+
+    /// 요일까지 넘나들 수 있는 것(계획 블록)인가. 떠 있게 그릴지 여기서 정한다.
+    private func isPlanBlock(_ seg: TimeSegment) -> Bool {
+        if case .planBlock = seg.source { return true }
+        return false
     }
 
     /// 손이 떨린 정도인가, 정말 끈 것인가. 2pt를 넘어야 끌기로 본다.

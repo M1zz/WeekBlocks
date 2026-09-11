@@ -107,7 +107,7 @@ struct RoutineDetailView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(color.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+        .background(color.opacity(0.08), in: .soft(Corner.panel))
     }
 
     // MARK: Tab 2 — 실행 전략
@@ -125,8 +125,8 @@ struct RoutineDetailView: View {
                     .font(.body)
                     .frame(minHeight: 260)
                     .padding(10)
-                    .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.15), lineWidth: 1))
+                    .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle.soft(Corner.card))
+                    .overlay(RoundedRectangle.soft(Corner.card).stroke(Color.secondary.opacity(0.15), lineWidth: 1))
             }
             .padding(24)
         }
@@ -155,8 +155,7 @@ struct RoutineDetailView: View {
                         .font(.body)
                         .frame(minHeight: 110)
                         .padding(10)
-                        .background(Color.red.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.red.opacity(0.2), lineWidth: 1))
+                        .background(Color.red.opacity(0.07), in: .soft(Corner.card))
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -170,8 +169,7 @@ struct RoutineDetailView: View {
                         .font(.body)
                         .frame(minHeight: 110)
                         .padding(10)
-                        .background(Color.green.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.green.opacity(0.2), lineWidth: 1))
+                        .background(Color.green.opacity(0.07), in: .soft(Corner.card))
                 }
             }
             .padding(24)
@@ -197,7 +195,7 @@ struct RoutineDetailView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(color.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+        .background(color.opacity(0.08), in: .soft(Corner.panel))
     }
 }
 

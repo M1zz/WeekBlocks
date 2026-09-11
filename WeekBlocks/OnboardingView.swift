@@ -30,6 +30,9 @@ struct OnboardingView: View {
     @State private var picked: Set<UUID> = []
     /// 앞으로 가는 중인가. 새 걸음은 간 쪽에서 들어온다.
     @State private var pageForward = true
+    /// 168시간 막대가 차올랐는가. 첫 장을 볼 때 한 번 자란다.
+    @State private var barDrawn = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private static let lastPage = 2
 
@@ -83,13 +86,17 @@ struct OnboardingView: View {
         VStack(alignment: .leading, spacing: 6) {
             GeometryReader { geo in
                 HStack(spacing: 2) {
-                    band(width: geo.size.width * (56.0 / 168), color: .indigo, label: "잠 56h")
-                    band(width: geo.size.width * (45.0 / 168), color: .blue, label: "일 45h")
-                    band(width: geo.size.width * (67.0 / 168), color: .secondary.opacity(0.25),
+                    band(width: geo.size.width * (barDrawn ? 56.0 / 168 : 0), color: .indigo, label: "잠 56h")
+                    band(width: geo.size.width * (barDrawn ? 45.0 / 168 : 0), color: .blue, label: "일 45h")
+                    band(width: geo.size.width * (barDrawn ? 67.0 / 168 : 0), color: .secondary.opacity(0.25),
                          label: "남는 자리 67h", dark: false)
                 }
             }
             .frame(height: 34)
+            .onAppear {
+                if reduceMotion { barDrawn = true; return }
+                withAnimation(Motion.chart.delay(0.15)) { barDrawn = true }
+            }
 
             Text("예시입니다. 사람마다 다르고, 그 차이를 보는 것이 이 앱이 하는 일입니다.")
                 .font(.caption)
@@ -98,7 +105,7 @@ struct OnboardingView: View {
     }
 
     private func band(width: CGFloat, color: Color, label: LocalizedStringKey, dark: Bool = true) -> some View {
-        RoundedRectangle(cornerRadius: 5)
+        RoundedRectangle.soft(Corner.segment)
             .fill(color.opacity(dark ? 0.85 : 1))
             .frame(width: max(0, width))
             .overlay(
@@ -221,13 +228,14 @@ struct OnboardingView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 9)
             .background(isOn ? Color.accentColor.opacity(0.10) : Color.primary.opacity(0.04),
-                        in: RoundedRectangle(cornerRadius: 8))
+                        in: .soft(Corner.card))
+            // 고른 것에만 테두리를 두른다 — 안 고른 것까지 선을 두르면 고른 것이 안 보인다.
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(isOn ? Color.accentColor.opacity(0.45) : Color.primary.opacity(0.10),
-                            lineWidth: 1)
+                RoundedRectangle.soft(Corner.card)
+                    .strokeBorder(isOn ? Color.accentColor.opacity(0.45) : Color.clear,
+                                  lineWidth: 1)
             )
-            .contentShape(RoundedRectangle(cornerRadius: 8))
+            .contentShape(.soft(Corner.card))
         }
         .buttonStyle(.plain)
         .animation(Motion.hover, value: isOn)
@@ -292,7 +300,7 @@ struct OnboardingView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 8))
+        .background(Color.primary.opacity(0.04), in: .soft(Corner.card))
     }
 
     // MARK: 아래 줄
@@ -487,8 +495,6 @@ struct NextStepBanner: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.accentColor.opacity(0.07), in: RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10)
-            .stroke(Color.accentColor.opacity(0.25), lineWidth: 1))
+        .background(Color.accentColor.opacity(0.08), in: .soft(Corner.card))
     }
 }
