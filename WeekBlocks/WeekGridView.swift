@@ -124,6 +124,8 @@ struct DayColumn: View {
     /// 칩과 칩 **사이**에 떨어뜨렸을 때. (토큰, 놓을 시각, 그 틈의 크기)
     /// 틈보다 큰 것이 들어오면 받는 쪽이 겹침을 알린다 (→ ContentView.dropIntoGap).
     var onDropIntoGap: (String, Double, Double) -> Void = { _, _, _ in }
+    /// 요일 머리를 눌렀을 때 — 그날의 일간으로 (→ ContentView.openDay).
+    var onOpenDay: (() -> Void)? = nil
 
     @State private var isDropTargeted = false
     /// 지금 겨냥한 틈. 그 자리에 파란 선이 선다.
@@ -288,6 +290,11 @@ struct DayColumn: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 2)
+            // 요일 머리를 누르면 그날 하루를 크게 편다 (→ DayScheduleView).
+            .contentShape(Rectangle())
+            .onTapGesture { onOpenDay?() }
+            .pointingCursor(enabled: onOpenDay != nil)
+            .help(String(localized: "\(day.longLabel) 하루 보기"))
 
             // 고정 루틴·유연 쿼터·계획 블록을 시각 순으로 섞어, '요일별 하루' 타임라인과 같은 흐름으로 표시.
             //

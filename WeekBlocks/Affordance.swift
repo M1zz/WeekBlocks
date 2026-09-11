@@ -28,4 +28,15 @@ extension View {
             }
         }
     }
+
+    /// 누르면 다른 자리로 건너가는 것(요일 머리 → 그날 하루) 위에서 손가락 커서.
+    func pointingCursor(enabled: Bool = true) -> some View {
+        onContinuousHover { phase in
+            guard enabled else { return }
+            switch phase {
+            case .active: NSCursor.pointingHand.set()
+            case .ended:  NSCursor.arrow.set()
+            }
+        }
+    }
 }

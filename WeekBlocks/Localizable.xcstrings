@@ -5444,6 +5444,156 @@
           }
         }
       }
+    },
+    "일간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
+          }
+        }
+      }
+    },
+    "주간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        }
+      }
+    },
+    "오늘" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "내일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
+          }
+        }
+      }
+    },
+    "어제" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        }
+      }
+    },
+    "%lld일 후" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %lld days"
+          }
+        }
+      }
+    },
+    "%lld일 전" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days ago"
+          }
+        }
+      }
+    },
+    "오늘로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "일간 (⌘1) · 주간 (⌘2)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day (⌘1) · Week (⌘2)"
+          }
+        }
+      }
+    },
+    "%@ 하루 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View %@"
+          }
+        }
+      }
+    },
+    "%@ — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — Click to view or edit · Drag up or down to move it (15-minute steps) · Right-click for more"
+          }
+        }
+      }
+    },
+    "일간 회고" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily Review"
+          }
+        }
+      }
+    },
+    "주간 회고 열기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Weekly Review"
+          }
+        }
+      }
+    },
+    "이 날은 계획한 블록이 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No blocks were planned for this day"
+          }
+        }
+      }
+    },
+    "아직 오지 않은 날입니다. 끝낸 뒤에 돌아봅니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This day hasn't come yet. Look back once it's done."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

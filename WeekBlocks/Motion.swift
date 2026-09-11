@@ -68,6 +68,10 @@ extension AnyTransition {
     /// 손이 올라갔을 때만 나타나는 작은 단추.
     static let control = AnyTransition.scale(scale: 0.8).combined(with: .opacity)
 
+    /// 한 주에서 한 날로 다가가고 물러난다. 옆으로 넘기는 것(같은 높이의 다른 장)과 달리
+    /// **같은 것을 더 가까이 보는** 움직임이라 제자리에서 커지고 작아진다.
+    static let zoom = AnyTransition.scale(scale: 0.97, anchor: .top).combined(with: .opacity)
+
     /// 옆으로 한 장 넘긴다. **나가는 쪽과 들어오는 쪽이 같은 방향**으로 흘러야
     /// 한 장이 넘어간 것으로 읽힌다. 밀리는 거리는 짧게 — 화면이 통째로 날아다니면 산만하다.
     static func pageSlide(forward: Bool, distance: CGFloat = 28) -> AnyTransition {

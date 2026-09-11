@@ -60,6 +60,16 @@ struct ContentView: View {
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
     private var weekLens: WeekLens { WeekLens(rawValue: weekLensRaw) ?? .plan }
 
+    /// 하루를 볼까, 한 주를 볼까. 마지막으로 보던 쪽으로 다시 켠다.
+    @AppStorage("calendarScope") private var scopeRaw = CalendarScope.week.rawValue
+    private var scope: CalendarScope { CalendarScope(rawValue: scopeRaw) ?? .week }
+    /// 일간에서 보고 있는 요일 (주는 `selectedWeek`).
+    @State private var selectedDay: DayOfWeek = .today
+    /// 마지막으로 날을 어느 쪽으로 넘겼는가 — 새 날은 넘긴 쪽에서 들어온다.
+    @State private var dayForward = true
+    /// 일간 요일 줄에서 고른 칸의 바탕이 옆 칸으로 미끄러져 간다.
+    @Namespace private var dayStripNamespace
+
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
         return allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
@@ -100,7 +110,7 @@ struct ContentView: View {
                     .transition(.banner)
                 }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
-                if showsWeekSummary {
+                if scope == .week, showsWeekSummary {
                     VStack(alignment: .leading, spacing: 10) {
                         metricsRow
                         WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
@@ -115,19 +125,39 @@ struct ContentView: View {
                     .clipped()
                     .padding(-20)
                 }
-                weekLensSection
+                // 하루와 한 주는 겹쳐 세우고 바꾼다. 일간은 한 주에서 한 날을 당겨 크게 편 것이라
+                // 옆으로 넘기지 않고, 제자리에서 다가오고 물러나는 결이다 (→ AnyTransition.zoom).
+                ZStack(alignment: .topLeading) {
+                    switch scope {
+                    case .week:
+                        weekLensSection
+                            .transition(.zoom)
+                    case .day:
+                        daySection
+                            .transition(.zoom)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
                 // 할 일 목록은 한 주를 보는 자리 **아래**에 둔다.
                 // 먼저 이번 주가 어떻게 생겼는지 보고, 그다음 무엇을 끌어다 놓을지 고른다.
                 // (따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
                 //  넣을 카드가 아예 보이지 않았다. 창 ⇧⌘T 는 나란히 놓고 쓰고 싶을 때.)
-                BacklogSection(allItems: backlogItems,
-                               weekStart: selectedWeek,
-                               weekBlocks: weekBlocks,
-                               canPlan: hasFixedRoutines,
-                               showsCategoryFilter: false)
-                .dashboardPanel()
-                routinesSection
+                // 할 일은 주간에서만 — 할 일을 요일에 배치하는 건 주간이 하는 일이다 (일간은 그날의 회고 → daySection).
+                if scope == .week {
+                    BacklogSection(allItems: backlogItems,
+                                   weekStart: selectedWeek,
+                                   weekBlocks: weekBlocks,
+                                   canPlan: hasFixedRoutines,
+                                   showsCategoryFilter: false)
                     .dashboardPanel()
+                    .transition(.disclose)
+                }
+                // 고정 루틴은 한 주의 뼈대라 주간에서만. 일간은 그 하루와 끌어다 놓을 할 일만 둔다.
+                if scope == .week {
+                    routinesSection
+                        .dashboardPanel()
+                        .transition(.disclose)
+                }
                 // 공유받은 일정은 실제로 받은 게 있을 때만 노출한다. (내 일정 공유는 설정에서)
                 if !shareStore.received.isEmpty {
                     ReceivedSchedulesSection()
@@ -147,6 +177,7 @@ struct ContentView: View {
             //    끊겨 올라왔다. 값 자체에 결을 건다 — 어디서 바꾸든(단추·다른 창·다음 실행) 같은 결로 움직인다.
             .animation(Motion.disclose, value: showsWeekSummary)
             .animation(Motion.screen, value: weekLensRaw)
+            .animation(Motion.screen, value: scopeRaw)
         }
         // 대시보드의 바닥. 요일 칸·할 일·루틴이 이 위에 올라간 카드로 읽힌다 (→ Surface.swift).
         .background(Color.canvas)
@@ -354,11 +385,20 @@ struct ContentView: View {
 
     /// 타임라인에 그릴 시간 범위. 수면 숨김이 꺼져 있으면 하루 전체.
     private var timelineWindow: HourWindow {
-        TimelineLayout.visibleWindow(
-            fixedRoutines: routines.filter { $0.kind == .fixed },
-            blocks: weekBlocks,
-            hideSleep: hideSleepInTimeline
-        )
+        guard hideSleepInTimeline else { return .full }
+        let fixed = routines.filter { $0.kind == .fixed }
+        // 하루하루 **실제로 그려진 자리**를 지킨다 — 옮겨 둔 루틴·끼니, 시각 없이 빈 구간에 놓인 블록까지.
+        // 기본 시각만 보고 자르면 그런 것들이 창 밖으로 밀려 요일 칸에만 서 있게 된다.
+        let sleepNames = Set(fixed.filter { $0.isSleepRoutine }.map(\.name))
+        let drawn = DayOfWeek.allCases.flatMap { daySegments(on: $0) }
+            .filter { seg in
+                guard !seg.isGhost else { return false }
+                if case .fixedRoutine(let name) = seg.source { return !sleepNames.contains(name) }
+                return true
+            }
+            .map { ($0.start, $0.end) }
+        return TimelineLayout.visibleWindow(fixedRoutines: fixed, blocks: weekBlocks,
+                                            extraProtected: drawn, hideSleep: true)
     }
 
     /// 루틴 구성이 바뀌면 onChange가 감지하도록 만드는 시그니처(이름·종류·요일).
@@ -372,12 +412,26 @@ struct ContentView: View {
         // 날짜는 **한 줄**로 선다. 두 줄에 32pt로 세워 두었더니 화면 맨 위의 제일 좋은
         // 자리를 늘 날짜가 차지했다 — 정작 봐야 할 것은 그 아래 한 주의 모양이다.
         HStack(spacing: 8) {
-            Button { shiftWeek(by: -1) } label: {
+            // 하루 / 한 주. 날짜 줄 **맨 앞**에 둔다 — 무엇을 보고 있는지가 날짜보다 먼저 읽혀야
+            // 옆의 ‹ › 가 하루를 넘기는지 한 주를 넘기는지 헷갈리지 않는다.
+            Picker("", selection: scopeBinding) {
+                ForEach(CalendarScope.allCases) { s in
+                    Label(s.label, systemImage: s.symbol).tag(s.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .help("일간 (⌘1) · 주간 (⌘2)")
+            .background { scopeShortcuts }
+            .padding(.trailing, 8)
+
+            Button { step(-1) } label: {
                 Image(systemName: "chevron.left").font(.body.weight(.semibold))
             }
             .buttonStyle(.borderless)
 
-            Text(weekRangeString)
+            Text(scope == .day ? dayTitleString : weekRangeString)
                 .font(.system(size: 19, weight: .semibold))
                 .monospacedDigit()
                 .fixedSize()
@@ -385,20 +439,22 @@ struct ContentView: View {
                 // 두 개가 따로 노는 것으로 읽힌다.
                 .contentTransition(.numericText())
 
-            Button { shiftWeek(by: 1) } label: {
+            Button { step(1) } label: {
                 Image(systemName: "chevron.right").font(.body.weight(.semibold))
             }
             .buttonStyle(.borderless)
 
-            Text(weekSubtitle)
+            Text(scope == .day ? daySubtitle : weekSubtitle)
                 .contentTransition(.opacity)
                 .font(.callout.weight(.medium))
-                .foregroundStyle(weekOffset == 0 ? Color.red : .secondary)
+                .foregroundStyle(isAtNow ? Color.red : .secondary)
                 .fixedSize()
                 .padding(.leading, 2)
 
-            if weekOffset != 0 {
-                Button("이번 주로") { shiftWeek(to: .currentWeekStart) }
+            if !isAtNow {
+                Button(scope == .day ? String(localized: "오늘로") : String(localized: "이번 주로")) {
+                    if scope == .day { showToday() } else { shiftWeek(to: .currentWeekStart) }
+                }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                     .transition(.control)
@@ -416,31 +472,249 @@ struct ContentView: View {
                 }
             }
 
-            // 한 주를 보는 두 자리. 날짜 줄에 함께 세운다 —
-            // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
-            Picker("", selection: lensBinding) {
-                ForEach(WeekLens.allCases) { lens in
-                    Label(lens.label, systemImage: lens.symbol).tag(lens.rawValue)
+            // 블록·시간축과 요약은 **한 주를 볼 때만**. 일간은 하루 한 장뿐이라 고를 것이 없다.
+            if scope == .week {
+                // 한 주를 보는 두 자리. 날짜 줄에 함께 세운다 —
+                // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
+                Picker("", selection: lensBinding) {
+                    ForEach(WeekLens.allCases) { lens in
+                        Label(lens.label, systemImage: lens.symbol).tag(lens.rawValue)
+                    }
                 }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .frame(maxWidth: 260)
-            .padding(.leading, 6)
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(maxWidth: 260)
+                .padding(.leading, 6)
+                .transition(.control)
 
-            // 한 주 총량·고정 루틴·남은 자유 시간 요약.
-            // 좋은 숫자지만 **매번 볼 숫자는 아니다** — 한 주에 한 번 확인하면 되는 값이
-            // 화면 맨 위 제일 좋은 자리를 늘 차지하고 있었다. 버튼 뒤로 접고, 접힘 상태를 기억한다.
-            Button {
-                withAnimation(Motion.disclose) { showsWeekSummary.toggle() }
-            } label: {
-                Label(showsWeekSummary ? "요약 접기" : "요약",
-                      systemImage: showsWeekSummary ? "chevron.up" : "chart.bar.xaxis")
-                    .labelStyle(.titleAndIcon)
-                    .contentTransition(.opacity)
+                // 한 주 총량·고정 루틴·남은 자유 시간 요약.
+                // 좋은 숫자지만 **매번 볼 숫자는 아니다** — 한 주에 한 번 확인하면 되는 값이
+                // 화면 맨 위 제일 좋은 자리를 늘 차지하고 있었다. 버튼 뒤로 접고, 접힘 상태를 기억한다.
+                Button {
+                    withAnimation(Motion.disclose) { showsWeekSummary.toggle() }
+                } label: {
+                    Label(showsWeekSummary ? "요약 접기" : "요약",
+                          systemImage: showsWeekSummary ? "chevron.up" : "chart.bar.xaxis")
+                        .labelStyle(.titleAndIcon)
+                        .contentTransition(.opacity)
+                }
+                .buttonStyle(.borderless)
+                .help("한 주 총량 · 고정 루틴 · 남은 자유 시간")
+                .transition(.control)
             }
-            .buttonStyle(.borderless)
-            .help("한 주 총량 · 고정 루틴 · 남은 자유 시간")
+        }
+    }
+
+    // MARK: 일간 · 주간
+
+    /// 세그먼트를 누르거나 ⌘1·⌘2 — 어느 쪽이든 같은 결로 바뀐다.
+    private var scopeBinding: Binding<String> {
+        Binding(
+            get: { scopeRaw },
+            set: { newValue in
+                guard let s = CalendarScope(rawValue: newValue) else { return }
+                setScope(s)
+            }
+        )
+    }
+
+    /// ⌘1 일간 · ⌘2 주간. 세그먼트는 칸마다 단축키를 달 수 없어서 보이지 않는 단추에 건다.
+    private var scopeShortcuts: some View {
+        ZStack {
+            ForEach(CalendarScope.allCases) { s in
+                Button { setScope(s) } label: { EmptyView() }
+                    .keyboardShortcut(s.shortcut, modifiers: .command)
+            }
+        }
+        .opacity(0)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    private func setScope(_ s: CalendarScope) {
+        guard s != scope else { return }
+        withAnimation(Motion.screen) { scopeRaw = s.rawValue }
+    }
+
+    /// 날짜 줄의 ‹ › — 일간이면 하루, 주간이면 한 주.
+    private func step(_ n: Int) {
+        if scope == .day { shiftDay(by: n) } else { shiftWeek(by: n) }
+    }
+
+    /// 주간에서 한 날을 눌러 **그날의 일간으로 들어간다.**
+    private func openDay(_ day: DayOfWeek) {
+        dayForward = day.rawValue >= selectedDay.rawValue
+        withAnimation(Motion.screen) {
+            selectedDay = day
+            scopeRaw = CalendarScope.day.rawValue
+        }
+    }
+
+    /// 같은 주 안의 다른 날로 (일간 위 요일 줄).
+    private func showDay(_ day: DayOfWeek) {
+        guard day != selectedDay else { return }
+        dayForward = day.rawValue > selectedDay.rawValue
+        withAnimation(Motion.screen) { selectedDay = day }
+    }
+
+    /// 하루씩 넘긴다. 월요일 앞·일요일 뒤로 넘어가면 **주도 함께** 넘어간다 —
+    /// 요일만 돌리면 일요일 다음이 같은 주 월요일이 되어 시간이 거꾸로 흐른다.
+    private func shiftDay(by days: Int) {
+        guard let date = Calendar(identifier: .iso8601).date(byAdding: .day, value: days, to: dayDate(selectedDay))
+        else { return }
+        dayForward = days > 0
+        weekForward = days > 0
+        withAnimation(Motion.screen) {
+            selectedWeek = date.weekStart()
+            selectedDay = DayOfWeek.of(date)
+        }
+    }
+
+    private func showToday() {
+        dayForward = dayOffset < 0
+        weekForward = dayForward
+        withAnimation(Motion.screen) {
+            selectedWeek = .currentWeekStart
+            selectedDay = .today
+        }
+    }
+
+    /// 일간의 날짜 ("9월 11일 (금)"). 월·일·요일의 차례와 모양은 로케일에 맡긴다.
+    private var dayTitleString: String {
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("MMMdEEE")
+        return f.string(from: dayDate(selectedDay))
+    }
+
+    /// 보고 있는 날이 오늘에서 며칠 떨어졌는가 (0 = 오늘).
+    private var dayOffset: Int {
+        let cal = Calendar.current
+        return cal.dateComponents([.day], from: cal.startOfDay(for: Date()),
+                                  to: cal.startOfDay(for: dayDate(selectedDay))).day ?? 0
+    }
+
+    private var daySubtitle: String {
+        switch dayOffset {
+        case 0: String(localized: "오늘")
+        case 1: String(localized: "내일")
+        case -1: String(localized: "어제")
+        case let n where n > 0: String(localized: "\(n)일 후")
+        default: String(localized: "\(-dayOffset)일 전")
+        }
+    }
+
+    /// 지금(오늘·이번 주)을 보고 있는가. 아니면 돌아오는 단추가 선다.
+    private var isAtNow: Bool { scope == .day ? dayOffset == 0 : weekOffset == 0 }
+
+    private func dayNumber(_ day: DayOfWeek) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "d"
+        return f.string(from: dayDate(day))
+    }
+
+    /// **하루를 크게 편 자리** (→ DayScheduleView).
+    /// 위에 한 주의 요일 줄을 둔다 — 하루를 보다가 옆 날로 건너가려고 주간까지 돌아가지 않게.
+    private var daySection: some View {
+        let cal = Calendar(identifier: .iso8601)
+        return VStack(alignment: .leading, spacing: 12) {
+            if let notice = conflictNotice {
+                conflictBanner(notice)
+            }
+            dayStrip
+
+            // **반은 하루, 반은 그날의 회고.** 일간은 할 일을 배치하는 자리가 아니다 — 배치는 주간이
+            // 한다. 하루를 크게 펴 보는 까닭은 **그 하루를 돌아보기 위해서**라, 하루 옆에 그날 계획해 둔
+            // 블록마다 했는지를 찍는 칸을 둔다 (→ DayReflectionPanel, 주간 회고와 같은 표시).
+            HStack(alignment: .top, spacing: 14) {
+                ZStack(alignment: .topLeading) {
+                    DayScheduleView(
+                    day: selectedDay,
+                    date: dayDate(selectedDay),
+                    routines: fixedRoutines(on: selectedDay),
+                    blocks: weekBlocks.filter { $0.day == selectedDay },
+                    quotaRoutines: routines.filter { $0.kind == .quota },
+                    hiddenRoutines: hiddenFixedRoutines(on: selectedDay),
+                    occurrences: allOccurrences.filter {
+                        $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                    },
+                    quotaPlacements: allQuotaPlacements.filter {
+                        $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                    },
+                    weekStart: selectedWeek,
+                    window: timelineWindow,
+                    canPlan: hasFixedRoutines,
+                    
+                    onDropBacklog: { token, hour in
+                        dropBacklogItem(token: token, day: selectedDay, atHour: hour)
+                    },
+                    onEditBlock: { block in
+                        blockSheet = BlockSheetContext(day: selectedDay, block: block)
+                    },
+                    onEditRoutine: { routine in
+                        routineDetailSheet = routine
+                    },
+                    onEditRoutineSchedule: { routine in
+                        routineSheet = RoutineSheetContext(routine: routine)
+                    }
+                )
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .dashboardPanel(padding: 14)
+                    // 날이 바뀌면 한 장을 옆으로 넘긴다 — 넘긴 쪽에서 들어온다.
+                    .id("\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
+                    .transition(.pageSlide(forward: dayForward, distance: 40))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+                DayReflectionPanel(
+                    day: selectedDay,
+                    date: dayDate(selectedDay),
+                    blocks: weekBlocks.filter { $0.day == selectedDay },
+                    onOpenWeekly: { showingReflection = true }
+                )
+                .frame(maxHeight: .infinity, alignment: .top)
+                .dashboardPanel(padding: 14)
+                .frame(maxWidth: .infinity)
+                .id("reflection-\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
+                .transition(.opacity)
+            }
+            // 두 판의 키를 긴 쪽에 맞춘다 — 들쭉날쭉하면 한 화면이 아니라 두 조각으로 읽힌다.
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    /// 일간 위의 요일 줄. 누르면 그날로 건너간다. 오늘은 붉게, 보고 있는 날은 채워서.
+    private var dayStrip: some View {
+        HStack(spacing: 6) {
+            ForEach(DayOfWeek.allCases) { day in
+                let selected = day == selectedDay
+                let today = Calendar.current.isDateInToday(dayDate(day))
+                Button { showDay(day) } label: {
+                    VStack(spacing: 1) {
+                        Text(day.shortLabel)
+                            .font(.system(size: 12, weight: .medium))
+                        Text(dayNumber(day))
+                            .font(.system(size: 15, weight: .semibold))
+                            .monospacedDigit()
+                    }
+                    .foregroundStyle(selected ? Color.white : (today ? Color.red : Color.primary))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                    .background {
+                        if selected {
+                            RoundedRectangle.soft(Corner.card)
+                                .fill(today ? Color.red : Color.accentColor)
+                                .matchedGeometryEffect(id: "selectedDay", in: dayStripNamespace)
+                        } else {
+                            RoundedRectangle.soft(Corner.card)
+                                .fill(Color.surface)
+                                .shadow(color: .black.opacity(0.05), radius: 1, y: 0.5)
+                        }
+                    }
+                    .contentShape(RoundedRectangle.soft(Corner.card))
+                }
+                .buttonStyle(.plain)
+                .help(day.longLabel)
+            }
         }
     }
 
@@ -591,11 +865,10 @@ struct ContentView: View {
     /// '요일별 하루' 타임라인이 실제로 배치한 시작 시각 순서대로,
     /// 고정 루틴·유연 쿼터·계획 블록을 한 줄로 섞어 정렬한 '이번 주 계획' 컬럼 항목.
     /// (타임라인의 왼→오른쪽 = 컬럼의 위→아래가 일치하도록.)
-    private func dayPlanItems(on day: DayOfWeek) -> [DayPlanItem] {
+    /// 한 요일의 구간들. **요일 칸·시간축·일간이 모두 같은 입력으로 이것을 그린다.**
+    /// 시간축 줄과 일간은 같은 값을 넘겨 각자 `TimelineLayout.segments`를 부르고, 요일 칸은 여기서 받는다.
+    private func daySegments(on day: DayOfWeek) -> [TimeSegment] {
         let cal = Calendar(identifier: .iso8601)
-        let dayBlocks = weekBlocks.filter { $0.day == day }
-        let fixed = fixedRoutines(on: day)
-        let quota = routines.filter { $0.kind == .quota }.sorted { $0.weeklyHours > $1.weeklyHours }
         let occs = allOccurrences.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
         let placements = allQuotaPlacements.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
 
@@ -606,25 +879,29 @@ struct ContentView: View {
         var quotaHiddenMap: [String: Set<Int>] = [:]
         for p in placements where p.hidden { quotaHiddenMap[p.routineName, default: []].insert(p.sessionIndex) }
 
-        let segs = TimelineLayout.segments(
-            routines: fixed,
-            blocks: dayBlocks,
-            quota: quota,
+        return TimelineLayout.segments(
+            routines: fixedRoutines(on: day),
+            blocks: weekBlocks.filter { $0.day == day },
+            quota: routines.filter { $0.kind == .quota },
             routineStartOverride: startOverride,
             quotaPlacement: quotaPlace,
             quotaHidden: quotaHiddenMap,
             hiddenRoutines: hiddenFixedRoutines(on: day)
         )
+    }
 
-        // 끼니 겹침 판정용: 쿼터를 제외한, 실제로 차지된 구간(고정 루틴·블록 등).
-        let occupiers = segs.filter { !$0.isGhost && !$0.source.isQuota }.map { ($0.start, $0.end) }
-        func overlapsOccupier(_ s: Double, _ e: Double) -> Bool {
-            occupiers.contains { s < $0.1 - 1e-6 && $0.0 < e - 1e-6 }
-        }
+    private func dayPlanItems(on day: DayOfWeek) -> [DayPlanItem] {
+        let dayBlocks = weekBlocks.filter { $0.day == day }
+        let fixed = fixedRoutines(on: day)
+        let quota = routines.filter { $0.kind == .quota }
+        let segs = daySegments(on: day)
 
-        // 타임라인에 '보이는' 조각을 그대로 컬럼 항목으로. 정렬 키 = 그려진 시작 시각(seg.start).
-        // 자정을 넘긴 고정 루틴은 조각마다 따로 → 위·아래 두 번. 겹치는 끼니는 접는다.
-        // 블록은 자정 분할로 중복되지 않게 가장 이른 조각만.
+        // 시간축에 '보이는' 조각을 그대로 칸 항목으로. 정렬 키 = 그려진 시작 시각(seg.start).
+        // 자정을 넘긴 고정 루틴은 조각마다 따로 → 위·아래 두 번. 블록은 자정 분할로 중복되지 않게 가장 이른 조각만.
+        //
+        // ⚠️ **여기서 따로 거르지 않는다.** 예전에는 다른 일정 안의 끼니를 요일 칸에서만 접고,
+        //    시간축은 들어갈 빈 구간이 없는 블록·0분 블록을 안 그려서 화면마다 서 있는 것이 달랐다.
+        //    무엇이 서 있는지는 `TimelineLayout.segments` 하나가 정한다 (유령만 칸에서 뺀다).
         var entries: [(start: Double, rank: Int, item: DayPlanItem)] = []
         var blockStart: [String: Double] = [:]
         for seg in segs where !seg.isGhost {
@@ -635,7 +912,6 @@ struct ContentView: View {
                                                              atHour: seg.start, hours: seg.end - seg.start)))
             case .quotaSession(let name, let index):
                 guard let r = quota.first(where: { $0.name == name }) else { break }
-                if overlapsOccupier(seg.start, seg.end) { break }   // 다른 일정 안의 끼니는 접음
                 entries.append((seg.start, 2, .quotaSession(r, sessionIndex: index, atHour: seg.start)))
             case .planBlock(let blk):
                 let id = String(describing: blk.persistentModelID)
@@ -759,8 +1035,10 @@ struct ContentView: View {
     }
 
     private var dayTimelineSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HourAxis(window: timelineWindow)
+        // 창은 한 번만 잰다 — 일곱 요일의 구간을 다 훑어서 정하는 값이라 줄마다 다시 재면 무겁다.
+        let window = timelineWindow
+        return VStack(alignment: .leading, spacing: 8) {
+            HourAxis(window: window)
 
             VStack(spacing: 4) {
                 ForEach(DayOfWeek.allCases) { day in
@@ -778,7 +1056,7 @@ struct ContentView: View {
                             $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: selectedWeek)
                         },
                         weekStart: selectedWeek,
-                        window: timelineWindow,
+                        window: window,
                         onDropBacklog: { token, hour in
                             dropBacklogItem(token: token, day: day, atHour: hour)
                         },
@@ -796,7 +1074,8 @@ struct ContentView: View {
                         },
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
-                        }
+                        },
+                        onOpenDay: { openDay(day) }
                     )
                     .background {
                         GeometryReader { geo in
@@ -850,7 +1129,8 @@ struct ContentView: View {
                             },
                             onDropIntoGap: { token, start, gap in
                                 dropIntoGap(token: token, day: day, startHour: start, gap: gap)
-                            }
+                            },
+                            onOpenDay: { openDay(day) }
                         )
                         .frame(maxWidth: .infinity, alignment: .top)
                     }
@@ -1071,8 +1351,7 @@ struct ContentView: View {
                 context.insert(QuotaPlacement(routineName: move.name, day: day, weekStartDate: selectedWeek,
                                               sessionIndex: index, startHour: newStart))
             }
-            // 틈보다 크면 다음 일정과 겹친다 — 겹친 끼니는 요일 칸에서 접히므로(→ dayPlanItems) 말없이
-            // 사라진 것처럼 보인다. 계획 블록과 같은 말로 알린다.
+            // 틈보다 크면 다음 일정과 겹친다. 계획 블록과 같은 말로 알린다.
             if let gap, each > gap + 0.01 {
                 withAnimation(Motion.banner) {
                     conflictNotice = String(localized: "‘\(routine.name)’(\(shortHours(each)))이 \(shortHours(gap)) 틈보다 커서 다음 일정과 겹칩니다.")
@@ -1257,6 +1536,33 @@ struct ContentView: View {
 }
 
 /// 한 주를 보는 두 자리. 이름이 아니라 **목적**으로 가른다.
+/// 하루를 볼까, 한 주를 볼까.
+///
+/// ⚠️ rawValue는 @AppStorage("calendarScope")에 저장된다. 화면에 그대로 쓰지 않는다 (→ label).
+enum CalendarScope: String, CaseIterable, Identifiable {
+    case day
+    case week
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .day:  String(localized: "일간")
+        case .week: String(localized: "주간")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .day:  "calendar.day.timeline.left"
+        case .week: "calendar"
+        }
+    }
+
+    /// ⌘1 일간 · ⌘2 주간 — 세그먼트의 왼쪽부터.
+    var shortcut: KeyEquivalent { self == .day ? "1" : "2" }
+}
+
 enum WeekLens: String, CaseIterable, Identifiable {
     /// 무엇을 어느 요일에 할지 정하는 자리 (할 일을 끌어다 놓는 곳).
     /// 요일 칸에 덩어리가 쌓인 모양이라 '블록'이다.

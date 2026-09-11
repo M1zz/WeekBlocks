@@ -1,6 +1,30 @@
 import SwiftUI
 import SwiftData
 
+/// 달성·부분·건너뜀·미회고의 수. 주간 회고와 일간 회고가 같은 셈을 쓴다.
+struct ReflectionStats {
+    var done = 0
+    var partial = 0
+    var skipped = 0
+    var pending = 0
+
+    init(_ blocks: [PlanBlock]) {
+        for b in blocks {
+            switch b.reviewStatus {
+            case .done: done += 1
+            case .partial: partial += 1
+            case .skipped: skipped += 1
+            case nil: pending += 1
+            }
+        }
+    }
+
+    var total: Int { done + partial + skipped + pending }
+
+    /// 넷 중 하나라도 바뀌면 달라지는 값 — 숫자가 굴러가는 결을 거는 데 쓴다.
+    var key: Int { done + partial * 100 + skipped * 10_000 + pending * 1_000_000 }
+}
+
 struct ReflectionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -14,25 +38,23 @@ struct ReflectionView: View {
     private var weekBlocks: [PlanBlock] {
         allBlocks
             .filter { Calendar.current.isDate($0.weekStartDate, inSameDayAs: weekStart) }
-            .sorted { ($0.day.rawValue, $0.timeBand.rawValue) < ($1.day.rawValue, $1.timeBand.rawValue) }
+            .sorted { ($0.day.rawValue, $0.sortHour) < ($1.day.rawValue, $1.sortHour) }
     }
 
-    private var stats: (done: Int, partial: Int, skipped: Int, pending: Int) {
-        var d = 0, p = 0, s = 0, pe = 0
-        for b in weekBlocks {
-            switch b.reviewStatus {
-            case .done: d += 1
-            case .partial: p += 1
-            case .skipped: s += 1
-            case nil: pe += 1
-            }
-        }
-        return (d, p, s, pe)
+    private func blocks(on day: DayOfWeek) -> [PlanBlock] {
+        weekBlocks.filter { $0.day == day }
+    }
+
+    /// 계획이 하나라도 있는 요일만. 빈 요일까지 머리를 세우면 돌아볼 것이 없는 줄이 끼어든다.
+    private var daysWithBlocks: [DayOfWeek] {
+        DayOfWeek.allCases.filter { day in weekBlocks.contains { $0.day == day } }
     }
 
     var body: some View {
+        let stats = ReflectionStats(weekBlocks)
+
         VStack(spacing: 0) {
-            header
+            header(stats)
 
             Divider()
 
@@ -46,12 +68,20 @@ struct ReflectionView: View {
                 .transition(.opacity)
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(weekBlocks) { block in
-                            ReflectionRow(block: block) {
-                                try? context.save()
+                    // 주간 회고는 **일간 회고들을 모은 것**이다 — 요일마다 끊어 그날의 몫을 따로 센다.
+                    // 일간 화면에서 찍은 표시가 여기 그 요일 아래에 그대로 서 있다 (→ DayReflectionPanel).
+                    LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                        ForEach(daysWithBlocks, id: \.self) { day in
+                            Section {
+                                ForEach(blocks(on: day)) { block in
+                                    ReflectionRow(block: block, showsDay: false) {
+                                        try? context.save()
+                                    }
+                                    Divider()
+                                }
+                            } header: {
+                                dayHeader(day)
                             }
-                            Divider()
                         }
                     }
                     .animation(Motion.row, value: weekBlocks.map(\.dragToken))
@@ -70,44 +100,159 @@ struct ReflectionView: View {
         }
     }
 
-    private var header: some View {
+    private func header(_ stats: ReflectionStats) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("주간 회고")
                 .font(.title3.weight(.medium))
 
             HStack(spacing: 10) {
-                statTile(label: "달성", value: stats.done, color: .green)
-                statTile(label: "부분", value: stats.partial, color: .yellow)
-                statTile(label: "건너뜀", value: stats.skipped, color: .red)
-                statTile(label: "미회고", value: stats.pending, color: .secondary)
+                ReflectionStatTile(label: "달성", value: stats.done, color: .green)
+                ReflectionStatTile(label: "부분", value: stats.partial, color: .yellow)
+                ReflectionStatTile(label: "건너뜀", value: stats.skipped, color: .red)
+                ReflectionStatTile(label: "미회고", value: stats.pending, color: .secondary)
             }
             // 한 줄에 표시를 찍으면 위쪽 숫자 넷이 함께 움직인다.
             // 굴러가야 방금 누른 것이 어느 칸에 닿았는지가 보인다.
-            .animation(Motion.number, value: stats.done + stats.partial * 100 + stats.skipped * 10000)
+            .animation(Motion.number, value: stats.key)
         }
         .padding(20)
     }
 
-    private func statTile(label: LocalizedStringKey, value: Int, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
+    /// 요일 머리. 그날 계획 중 몇 개를 해냈는지를 옆에 적는다.
+    private func dayHeader(_ day: DayOfWeek) -> some View {
+        let stats = ReflectionStats(blocks(on: day))
+        return HStack(spacing: 8) {
+            Text(day.longLabel)
+                .font(.subheadline.weight(.semibold))
+            Text(verbatim: "\(stats.done)/\(stats.total)")
+                .font(.caption.weight(.medium))
+                .monospacedDigit()
+                .foregroundStyle(stats.done == stats.total ? Color.green : .secondary)
+                .contentTransition(.numericText())
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 6)
+        .background(.bar)
+        .animation(Motion.number, value: stats.key)
+    }
+}
+
+/// **그날의 회고** — 주간 회고를 하루치로 떼어 일간 옆에 둔다.
+///
+/// 일간에 할 일 목록을 붙여 끌어다 놓게 했더니 주간이 하는 일(요일에 배치하기)과 겹쳤다.
+/// 하루를 크게 펴 보는 까닭은 **그 하루를 돌아보기 위해서**다 — 계획해 둔 블록마다 했는지를
+/// 찍고 한 줄을 남긴다. 같은 표시(`PlanBlock.reviewStatus`·`reviewNote`)가 주간 회고의
+/// 그 요일 아래에 그대로 모인다. 저장하는 자리를 새로 만들지 않았다.
+struct DayReflectionPanel: View {
+    @Environment(\.modelContext) private var context
+
+    let day: DayOfWeek
+    let date: Date
+    /// 그날의 계획 블록.
+    let blocks: [PlanBlock]
+    var onOpenWeekly: () -> Void = {}
+
+    /// 하루가 흐른 차례대로 — 옆의 하루 시간표를 위에서 아래로 읽는 순서와 같다.
+    private var sorted: [PlanBlock] { blocks.sorted { $0.sortHour < $1.sortHour } }
+
+    private var isFuture: Bool {
+        let cal = Calendar.current
+        return cal.startOfDay(for: date) > cal.startOfDay(for: Date())
+    }
+
+    var body: some View {
+        let stats = ReflectionStats(blocks)
+
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("일간 회고")
+                    .font(.headline)
+                Spacer()
+                Button(action: onOpenWeekly) {
+                    Label("주간 회고 열기", systemImage: "checklist")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .buttonStyle(.borderless)
+            }
+
+            HStack(spacing: 6) {
+                ReflectionStatTile(label: "달성", value: stats.done, color: .green, compact: true)
+                ReflectionStatTile(label: "부분", value: stats.partial, color: .yellow, compact: true)
+                ReflectionStatTile(label: "건너뜀", value: stats.skipped, color: .red, compact: true)
+                ReflectionStatTile(label: "미회고", value: stats.pending, color: .secondary, compact: true)
+            }
+            .animation(Motion.number, value: stats.key)
+
+            // 오지 않은 날도 막지는 않는다(미리 건너뛸 줄 아는 날도 있다). 다만 지금 찍는 게
+            // 회고가 아니라는 것은 말해 둔다.
+            if isFuture {
+                Text("아직 오지 않은 날입니다. 끝낸 뒤에 돌아봅니다.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if sorted.isEmpty {
+                VStack(spacing: 6) {
+                    Image(systemName: "tray")
+                        .font(.system(size: 22))
+                        .foregroundStyle(.tertiary)
+                    Text("이 날은 계획한 블록이 없습니다")
+                        .font(.callout.weight(.medium))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 28)
+                .transition(.opacity)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(sorted) { block in
+                        ReflectionRow(block: block, showsDay: false, compact: true) {
+                            try? context.save()
+                        }
+                        if block.persistentModelID != sorted.last?.persistentModelID {
+                            Divider()
+                        }
+                    }
+                }
+                .animation(Motion.row, value: sorted.map(\.dragToken))
+            }
+        }
+    }
+}
+
+struct ReflectionStatTile: View {
+    let label: LocalizedStringKey
+    let value: Int
+    let color: Color
+    /// 일간 옆 반쪽 폭에 들어갈 작은 칸.
+    var compact = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 0 : 2) {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text("\(value)")
-                .font(.title3.weight(.medium))
+                .font(compact ? .headline : .title3.weight(.medium))
                 .foregroundStyle(color)
                 .monospacedDigit()
                 .contentTransition(.numericText())
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.horizontal, compact ? 10 : 12)
+        .padding(.vertical, compact ? 5 : 8)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.card))
+        .background(compact ? Color.primary.opacity(0.04) : Color(nsColor: .controlBackgroundColor),
+                    in: .soft(Corner.card))
     }
 }
 
-private struct ReflectionRow: View {
+struct ReflectionRow: View {
     @Bindable var block: PlanBlock
+    /// 줄 앞에 요일을 적는가. 요일마다 묶어 보여 줄 때(주간 회고의 요일 아래, 일간)는 적지 않는다.
+    var showsDay = true
+    /// 일간 옆 반쪽 폭에 맞춘 촘촘한 줄.
+    var compact = false
     let onChange: () -> Void
 
     @State private var hovering = false
@@ -115,25 +260,35 @@ private struct ReflectionRow: View {
     /// 다 한 것으로 보는가. 줄을 흐리고 제목에 줄을 긋는 기준이다.
     private var isDone: Bool { block.reviewStatus == .done }
 
+    /// 기준·회고 칸이 제목 글줄에 맞춰 들어가는 폭 (동그라미 + 요일).
+    private var detailIndent: CGFloat { showsDay ? 52 : 26 }
+
+    /// 시각이 정해진 블록은 시각을, 아니면 시간대를. 하루 시간표 옆에서는 몇 시였는지가 먼저 읽혀야 한다.
+    private var whenLabel: String {
+        block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: compact ? 6 : 8) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 // **할 일 목록과 같은 자리, 같은 손짓** — 왼쪽 동그라미를 눌러 끝낸다
                 // (→ BacklogView의 '요일에 올린 일'). 세 갈래 상태는 이 동그라미의
                 // 모양으로 드러나므로, 눈으로 읽는 것과 손으로 누르는 것이 한 자리에 있다.
                 checkButton
 
-                Text(block.day.shortLabel)
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 18, alignment: .leading)
+                if showsDay {
+                    Text(block.day.shortLabel)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 18, alignment: .leading)
+                }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(block.title)
-                        .font(.body.weight(.medium))
+                        .font(compact ? .callout.weight(.medium) : .body.weight(.medium))
                         .strikethrough(isDone)
                         .foregroundStyle(isDone ? .secondary : .primary)
-                    Text("\(block.timeBand.shortLabel) · \(String(format: "%.1fh", block.durationHours))")
+                    Text("\(whenLabel) · \(String(format: "%.1fh", block.durationHours))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -152,7 +307,7 @@ private struct ReflectionRow: View {
                 Text("기준: \(block.successCriteria)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .padding(.leading, 52)
+                    .padding(.leading, detailIndent)
             }
 
             if block.reviewStatus != nil {
@@ -166,12 +321,12 @@ private struct ReflectionRow: View {
                 )
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(1...3)
-                .padding(.leading, 52)
+                .padding(.leading, detailIndent)
                 .transition(.disclose)
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
+        .padding(.horizontal, compact ? 4 : 20)
+        .padding(.vertical, compact ? 9 : 14)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         // 표시를 찍으면 회고 칸이 아래로 열리고, 제목에 줄이 그어진다. 한 결로 묶는다.
