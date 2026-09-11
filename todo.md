@@ -4,6 +4,28 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
 ## 완료
+- [x] App Review 5.1.1(iv) 거절 — 권한 창 앞 단추에 '허용'을 세웠다 (2026-09-11)
+      1.1.3(15), 2026-09-10 심사. "A custom message appears before the permission request,
+      and to proceed users press a 'Allow Access' button. Use words like 'Continue' or 'Next'."
+      설정 → 캘린더의 "캘린더 접근 허용 / Allow calendar access" 단추가 누르자마자 시스템
+      권한 창을 띄웠다. **앱 안 단추가 '허용'이면 사람은 이미 허락한 셈이 되어 시스템 창에서도
+      허용으로 떠밀린다** — 애플은 이것을 권한을 주도록 이끄는 것으로 읽는다.
+      기능·목적 문구(`NSCalendarsFullAccessUsageDescription`)는 문제가 아니었다.
+      - 묻기 전(`.notDetermined`/`.writeOnly`): 설명을 **단추보다 먼저** 두고 단추는 **계속 / Continue**
+      - 거부(`.denied`): 다시 청해도 창이 안 뜨므로 **시스템 설정 열기**로 캘린더 권한 화면에 곧장 보낸다.
+        켜지 않아도 다른 기능은 그대로라고 말한다(떠밀지 않는다)
+      - 제한(`.restricted`): 사람이 못 켜니 안내만
+      - 시스템 설정에서 켜고 돌아와도 화면이 '권한 없음'에 멈춰 있던 것 — `CalendarBridge`가
+        앱이 앞으로 올 때마다(`didBecomeActive`) 상태를 다시 읽는다
+      - **다시 안 나오게**: `scripts/check-permission-wording.sh`를 빌드 단계(preBuildScripts)에
+        걸었다. 소스 문자열·문자열 카탈로그에 허용/허락/Allow/Grant/Authorize가 보이면 빌드가 멈춘다.
+        권한과 무관한 자리는 줄 끝 `// permission-wording: ok`
+      - 빌드 번호 14 → **16** (15는 Xcode에서 올려 제출됐고 project.yml엔 반영이 안 됐었다)
+      - [ ] 재제출 전: `tccutil reset Calendar com.devkoan.ScheduleDensityApp` 후 처음 묻는 흐름·거부 흐름 직접 확인
+      - [ ] 심사 메모: "The button shown before the calendar permission request now reads 'Continue',
+            and the explanation appears above it. If access is denied, we show a link to System
+            Settings instead of prompting again."
+
 - [x] 아이폰에서 적은 것이 맥에 몇 분씩 늦게 뜨던 것 (2026-09-03)
       "맥에서 적은 건 아이폰에 바로 뜨는데 아이폰에서 적은 건 맥에서 안 보인다."
       **없어진 것이 아니라 늦게 온 것이었다.** 재어 보니:

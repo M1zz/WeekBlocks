@@ -23,6 +23,7 @@ struct SettingsView: View {
 
     /// 캘린더에서 읽어 올 것을 고르는 자리 (→ CalendarImport.swift).
     @State private var calendars = CalendarBridge.shared
+    @Environment(\.openURL) private var openURL
 
     #if DEBUG
     @State private var primerBusy = false
@@ -323,17 +324,42 @@ struct SettingsView: View {
                 Text("고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } else {
+            } else if calendars.canAsk {
+                // ⚠️ **이 단추에 '허용'이라고 적지 않는다.** 누르면 곧바로 시스템 권한 창이 뜨는데,
+                //    그 앞 단추가 '허용'이면 사람은 앱 안에서 이미 허락한 셈이 되어 시스템 창에서도
+                //    허용 쪽으로 떠밀린다. App Review가 이것 하나로 1.1.3(15)을 돌려보냈다
+                //    (5.1.1(iv), 2026-09-10). 권한 창 앞 단추에 쓸 수 있는 말은 '계속'·'다음'뿐이다.
+                //    빌드 단계의 `scripts/check-permission-wording.sh`가 그 낱말을 막는다.
+                //
+                //    설명이 **단추보다 먼저** 온다 — 무엇을 왜 보는지 읽고 나서 누르게 한다.
+                Text("맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 Button {
                     Task { await calendars.requestAccess() }
                 } label: {
-                    Label("캘린더 접근 허용", systemImage: "calendar.badge.plus")
+                    Label("계속", systemImage: "calendar")
                 }
                 .disabled(calendars.isWorking)
-
-                Text("맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다.")
+            } else if calendars.status == .restricted {
+                // 자녀 보호·기기 관리로 막힌 경우. 사람이 켤 수 없으니 설정으로 보내지 않는다.
+                Text("이 맥에서는 캘린더 접근이 제한되어 있어 일정을 가져올 수 없습니다.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } else {
+                // 거부한 뒤에는 다시 청해도 macOS가 창을 띄우지 않는다. 같은 단추를 세워 두면
+                // 눌러도 아무 일이 없는 단추가 된다 — 켜는 자리로 곧장 보낸다.
+                // 돌아오면 `CalendarBridge`가 상태를 다시 읽어 이 묶음이 저절로 바뀐다.
+                Text("캘린더 접근이 꺼져 있어 일정을 가져올 수 없습니다. 가져오고 싶을 때 시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 '무지개 공방'을 켜면 됩니다. 켜지 않아도 다른 기능은 그대로 쓸 수 있습니다.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    openURL(CalendarBridge.privacySettingsURL)
+                } label: {
+                    Label("시스템 설정 열기", systemImage: "gearshape")
+                }
             }
 
             if let message = calendars.failureMessage {

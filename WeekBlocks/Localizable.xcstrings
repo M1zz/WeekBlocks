@@ -2117,12 +2117,12 @@
         }
       }
     },
-    "맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다.": {
+    "맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Brings the meetings and appointments already in your Mac calendar into your weekly plan. It only reads; it never writes to or changes your calendar."
+            "value": "You can bring the meetings and appointments already in your Mac calendar into your weekly plan. It only reads; it never writes to or changes your calendar. When you continue, macOS will ask about calendar access."
           }
         }
       }
@@ -2812,12 +2812,12 @@
         }
       }
     },
-    "시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 '무지개 공방'을 켜주세요.": {
+    "시스템 설정 열기": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Turn on Rainbow Workshop in System Settings → Privacy & Security → Calendars."
+            "value": "Open System Settings"
           }
         }
       }
@@ -4716,12 +4716,32 @@
         }
       }
     },
-    "캘린더 접근 허용": {
+    "캘린더 접근이 꺼져 있어 일정을 가져올 수 없습니다. 가져오고 싶을 때 시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 '무지개 공방'을 켜면 됩니다. 켜지 않아도 다른 기능은 그대로 쓸 수 있습니다.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allow calendar access"
+            "value": "Calendar access is off, so events can't be imported. If you'd like to import them, turn on Rainbow Workshop in System Settings → Privacy & Security → Calendars. Everything else works without it."
+          }
+        }
+      }
+    },
+    "계속": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "이 맥에서는 캘린더 접근이 제한되어 있어 일정을 가져올 수 없습니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar access is restricted on this Mac, so events can't be imported."
           }
         }
       }

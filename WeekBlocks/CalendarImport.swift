@@ -16,6 +16,7 @@
 //
 
 import Foundation
+import AppKit
 import EventKit
 import SwiftData
 
@@ -34,7 +35,22 @@ final class CalendarBridge {
     /// 막혔을 때 화면에 그대로 보여줄 말. 조용히 실패하면 단추가 고장 난 줄 안다.
     private(set) var failureMessage: String?
 
-    private init() { reloadCalendarsIfAllowed() }
+    /// 시스템 설정의 캘린더 권한 화면. 거부한 뒤에는 앱이 다시 물어도 macOS가 창을 띄우지
+    /// 않으므로, 켜는 자리로 곧장 보낸다.
+    static let privacySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars")!
+
+    @ObservationIgnored private var activationObserver: NSObjectProtocol?
+
+    private init() {
+        reloadCalendarsIfAllowed()
+        // ⚠️ 권한은 **앱 밖(시스템 설정)에서** 바뀐다. 켤 때 한 번만 읽으면 설정에서 켜고
+        //    돌아와도 화면은 계속 '권한 없음'이다. 앱으로 돌아올 때마다 다시 읽는다.
+        activationObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refreshStatus() }
+        }
+    }
 
     /// 읽어 올 캘린더들. 비어 있으면 **아무것도 안 가져온다** — 전부 가져오는 것보다
     /// 아무것도 안 가져오는 쪽이 낫다. 남의 개인 일정이 주간 계획에 쏟아지는 사고를 막는다.
@@ -44,6 +60,10 @@ final class CalendarBridge {
     }
 
     var hasAccess: Bool { status == .fullAccess }
+
+    /// 시스템 창을 띄워 물어볼 수 있는가.
+    /// 쓰기 전용으로 받아 둔 상태도 읽지는 못하므로 여기 넣는다 — 전체 접근을 다시 청하면 창이 뜬다.
+    var canAsk: Bool { status == .notDetermined || status == .writeOnly }
 
     func toggle(_ calendar: EKCalendar) {
         var ids = selectedIDs
@@ -74,11 +94,16 @@ final class CalendarBridge {
         } catch {
             failureMessage = String(localized: "캘린더 권한을 얻지 못했습니다: \(error.localizedDescription)")
         }
+        // 거부했을 때 무엇을 할 수 있는지는 설정 화면이 상태를 보고 직접 말한다
+        // (→ SettingsView.calendarSection). 여기서 한 번 더 말하면 같은 안내가 두 번 선다.
+        refreshStatus()
+    }
+
+    /// 권한 상태를 다시 읽는다. 앱으로 돌아올 때마다 불린다.
+    func refreshStatus() {
         status = EKEventStore.authorizationStatus(for: .event)
         reloadCalendarsIfAllowed()
-        if status == .denied || status == .restricted {
-            failureMessage = String(localized: "시스템 설정 → 개인정보 보호 및 보안 → 캘린더에서 '무지개 공방'을 켜주세요.")
-        }
+        if hasAccess { failureMessage = nil }
     }
 
     func reloadCalendarsIfAllowed() {
