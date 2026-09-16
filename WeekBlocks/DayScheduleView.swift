@@ -42,17 +42,21 @@ struct DayScheduleView: View {
     var onEditRoutine: (Routine) -> Void = { _ in }
     var onEditRoutineSchedule: (Routine) -> Void = { _ in }
 
-    /// 한 시간의 키. 할 일과 나란히 서는 반쪽 폭이라 **쫀쫀하게** — 하루 대부분이 한 화면에
-    /// 들어오고, 30분짜리에도 제목 한 줄이 들어갈 만큼.
-    static let hourHeight: CGFloat = 30
+    /// 한 시간의 키. 알약과 글씨가 숨 쉴 자리가 있어야 말랑하게 읽힌다 —
+    /// 30pt에 눌러 담았더니 30분짜리가 가는 띠가 되어 무엇인지보다 몇 칸인지가 먼저 보였다.
+    static let hourHeight: CGFloat = 46
     /// 왼쪽 시각 글씨가 서는 폭.
-    private static let gutter: CGFloat = 42
+    private static let gutter: CGFloat = 46
+    /// 알약의 폭. 아이콘 하나가 가운데 들어가는 크기.
+    private static let pillWidth: CGFloat = 34
+    /// 한 줄(알약 + 시각·제목)이 차지하는 가장 작은 키. 15분짜리도 이만큼은 선다.
+    private static let minRowHeight: CGFloat = 38
 
     @State private var dragId: String?
     @State private var dragPy: CGFloat = 0
     @State private var hoverId: String?
     @State private var dropTargeted = false
-    /// 일정이 다 드러났는가. 하루가 설 때 위에서부터 채워진다.
+    /// 일정이 다 드러났는가. 하루가 설 때 위에서부터 하나씩 톡톡 선다.
     @State private var drawn = false
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
@@ -86,29 +90,37 @@ struct DayScheduleView: View {
         let overbooked = routines.reduce(0) { $0 + $1.durationHours }
             + blocks.filter { !$0.withinRoutine }.reduce(0) { $0 + $1.durationHours } > 24.0001
 
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             header(free: free, overbooked: overbooked)
             timeline(segs)
         }
         .onAppear {
             if reduceMotion { drawn = true; return }
-            withAnimation(Motion.chart.delay(0.05)) { drawn = true }
+            drawn = true
         }
     }
 
     // MARK: 머리
 
     private func header(free: Double, overbooked: Bool) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
+        HStack(alignment: .center, spacing: 10) {
             Text(day.longLabel)
-                .font(.headline)
+                .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundStyle(isToday ? Color.red : .primary)
-            Text("남은 시간 \(fmtHours(free))h")
-                .font(.subheadline.weight(.medium))
-                .monospacedDigit()
-                .foregroundStyle(overbooked ? .red : .secondary)
-                .contentTransition(.numericText())
-                .animation(Motion.number, value: free)
+            // 남은 시간은 말랑한 알약 하나 — 숫자가 표의 칸이 아니라 한마디로 읽힌다.
+            HStack(spacing: 4) {
+                Image(systemName: overbooked ? "exclamationmark.circle.fill" : "hourglass")
+                    .font(.system(size: 10, weight: .bold))
+                Text("남은 시간 \(fmtHours(free))h")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+            }
+            .foregroundStyle(overbooked ? Color.red : Color.accentColor)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background((overbooked ? Color.red : Color.accentColor).opacity(0.12), in: Capsule())
+            .animation(Motion.number, value: free)
             Spacer()
             // '블록 추가' 단추는 두지 않는다 — 요일에 일을 올리는 건 주간이 하는 일이다.
             // 여기서는 이미 올린 것을 실제로 한 시각으로 옮기는 것까지만 한다.
@@ -119,39 +131,46 @@ struct DayScheduleView: View {
 
     private func timeline(_ segs: [TimeSegment]) -> some View {
         // 나란히 설 칸을 나누는 건 루틴·계획 블록뿐이다. 루틴 안 일정과 다른 일정 위에 겹친
-        // 끼니는 칸을 따로 갖지 않고 얹힌다 — 회사 9시간이 끼니 한 번 때문에 반쪽이 되지 않게.
+        // 끼니는 칸을 따로 갖지 않고 오른쪽에 얹힌다 — 회사 9시간이 끼니 한 번 때문에 반쪽이 되지 않게.
         let laned = segs.filter { !$0.isNested && !$0.isGhost && !$0.isFlexible }
-        let lanes = Self.lanes(laned)
+        let lanes = Self.lanes(laned, minHours: Double(Self.minRowHeight / Self.hourHeight))
+        let order = Dictionary(uniqueKeysWithValues: segs.sorted { $0.start < $1.start }
+            .enumerated().map { ($1.id, $0) })
 
         return GeometryReader { geo in
             let trackWidth = max(40, geo.size.width - Self.gutter)
             ZStack(alignment: .topLeading) {
                 hourGrid(width: geo.size.width)
 
-                ZStack(alignment: .topLeading) {
-                    ForEach(segs) { seg in
-                        if let frame = frame(for: seg, lanes: lanes, laned: laned, trackWidth: trackWidth) {
-                            segmentView(seg, size: frame.size)
-                                .offset(x: Self.gutter + frame.minX,
-                                        y: frame.minY + (seg.id == dragId ? dragPy : 0))
-                                .zIndex(seg.id == dragId ? 3 : (seg.isGhost ? 0 : (seg.isNested || seg.isFlexible ? 2 : 1)))
-                                // 놓는 순간 15분 격자로 붙는 한 걸음만 결을 준다. 끄는 동안에는 손을 바로 따른다.
-                                .animation(seg.id == dragId ? nil : Motion.timeline, value: frame)
-                                .transition(.card)
-                        }
+                // 알약들을 잇는 등뼈. 하루가 한 줄로 흘러간다는 것이 선 하나로 읽힌다.
+                Capsule()
+                    .fill(Color.secondary.opacity(0.12))
+                    .frame(width: 3, height: geo.size.height)
+                    .offset(x: Self.gutter + Self.pillWidth / 2 - 1.5)
+                    .allowsHitTesting(false)
+
+                ForEach(segs) { seg in
+                    if let frame = frame(for: seg, lanes: lanes, laned: laned, trackWidth: trackWidth) {
+                        let i = order[seg.id] ?? 0
+                        segmentView(seg, size: frame.size)
+                            .offset(x: Self.gutter + frame.minX,
+                                    y: frame.minY + (seg.id == dragId ? dragPy : 0))
+                            .zIndex(seg.id == dragId ? 3 : (seg.isGhost ? 0 : (seg.isNested || seg.isFlexible ? 2 : 1)))
+                            // 하루가 설 때 위에서부터 하나씩 톡톡 튀어 오른다.
+                            .scaleEffect(drawn ? 1 : 0.6, anchor: .leading)
+                            .opacity(drawn ? 1 : 0)
+                            .animation(reduceMotion ? nil : Motion.squish.delay(Double(min(i, 16)) * 0.03), value: drawn)
+                            // 놓는 순간 15분 격자로 **통** 붙는다. 끄는 동안에는 손을 바로 따른다.
+                            .animation(seg.id == dragId ? nil : Motion.squish, value: frame)
+                            .transition(.pop)
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                // 하루가 위에서부터 채워진다 — 시간 줄은 먼저 서 있고 일정만 드러난다.
-                .mask(alignment: .top) {
-                    Rectangle().frame(height: drawn ? geo.size.height : 0)
-                }
-                .animation(Motion.card, value: segs.map(\.id))
+                .animation(Motion.squish, value: segs.map(\.id))
 
                 if isToday { nowLine }
             }
         }
-        .frame(height: CGFloat(window.span) * Self.hourHeight)
+        .frame(height: CGFloat(window.span) * Self.hourHeight + Self.minRowHeight / 2)
         .contentShape(Rectangle())
         // 할 일 카드를 하루 위에 바로 떨어뜨린다 — 떨어뜨린 높이가 곧 시작 시각이다.
         .dropDestination(for: String.self) { items, location in
@@ -162,27 +181,31 @@ struct DayScheduleView: View {
             withAnimation(Motion.target) { dropTargeted = targeted && canPlan }
         }
         .overlay {
-            RoundedRectangle.soft(Corner.card)
-                .strokeBorder(Color.accentColor, lineWidth: dropTargeted ? 2 : 0)
+            RoundedRectangle.soft(Corner.panel)
+                .fill(Color.accentColor.opacity(dropTargeted ? 0.05 : 0))
+                .overlay(RoundedRectangle.soft(Corner.panel)
+                    .strokeBorder(Color.accentColor.opacity(0.7),
+                                  style: StrokeStyle(lineWidth: dropTargeted ? 2 : 0, dash: [6, 4])))
                 .padding(-6)
                 .allowsHitTesting(false)
         }
     }
 
-    /// 정시마다 가는 선, 3시간마다 조금 더 진하게. 왼쪽에 시각.
+    /// 정시마다 아주 옅은 선, 3시간마다 시각 글씨를 조금 더 또렷하게.
     private func hourGrid(width: CGFloat) -> some View {
         let lo = Int(window.start.rounded(.up)), hi = Int(window.end.rounded(.down))
         return ZStack(alignment: .topLeading) {
             ForEach(Array(stride(from: lo, through: hi, by: 1)), id: \.self) { h in
                 HStack(spacing: 8) {
                     Text(formatHour(Double(h)))
-                        .font(.system(size: 10))
+                        .font(.system(size: 10, weight: h % 3 == 0 ? .semibold : .regular, design: .rounded))
                         .monospacedDigit()
-                        .foregroundStyle(.tertiary)
-                        .frame(width: Self.gutter - 8, alignment: .trailing)
+                        .foregroundStyle(h % 3 == 0 ? .secondary : .tertiary)
+                        .frame(width: Self.gutter - 10, alignment: .trailing)
                     Rectangle()
-                        .fill(Color.secondary.opacity(h % 3 == 0 ? 0.22 : 0.1))
-                        .frame(height: h % 3 == 0 ? 1 : 0.5)
+                        .fill(Color.secondary.opacity(0.07))
+                        .frame(height: 1)
+                        .padding(.leading, Self.pillWidth + 8)
                 }
                 .offset(y: y(Double(h)) - 6)
             }
@@ -191,7 +214,7 @@ struct DayScheduleView: View {
         .allowsHitTesting(false)
     }
 
-    /// 지금 — 오늘이면 붉은 가로선 하나. 하루 어디까지 왔는지가 이 한 줄로 읽힌다.
+    /// 지금 — 오늘이면 붉은 선 하나와 둥근 시각 알약. 하루 어디까지 왔는지가 이 한 줄로 읽힌다.
     private var nowLine: some View {
         TimelineView(.everyMinute) { ctx in
             let h = DayTimelineRow.hourOfDay(ctx.date)
@@ -199,25 +222,27 @@ struct DayScheduleView: View {
                 if h >= window.start, h <= window.end {
                     HStack(spacing: 0) {
                         Text(formatHour(h))
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white)
                             // 시각 칸이 좁아도 "14:35"가 두 줄로 꺾이지 않게 — 넘치면 왼쪽으로 삐져나간다.
                             .lineLimit(1)
                             .fixedSize()
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 1)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
                             .background(Color.red, in: Capsule())
+                            .shadow(color: .red.opacity(0.3), radius: 3, y: 1)
                             .frame(width: Self.gutter - 4, alignment: .trailing)
                         Circle()
                             .fill(Color.red)
-                            .frame(width: 6, height: 6)
-                            .padding(.leading, 2)
-                        Rectangle()
-                            .fill(Color.red)
-                            .frame(height: 1.5)
+                            .frame(width: 8, height: 8)
+                            .overlay(Circle().strokeBorder(Color.surface, lineWidth: 2))
+                            .padding(.leading, Self.pillWidth / 2 - 2)
+                        Capsule()
+                            .fill(Color.red.opacity(0.7))
+                            .frame(height: 2)
                     }
-                    .offset(y: y(h) - 6)
+                    .offset(y: y(h) - 7)
                     .transition(.opacity)
                 }
             }
@@ -229,108 +254,105 @@ struct DayScheduleView: View {
 
     // MARK: 한 구간
 
+    /// 알약 속 그림. 루틴은 저마다 고른 아이콘, 계획 블록은 제목 첫 글자.
+    private func glyph(for seg: TimeSegment) -> (symbol: String?, letter: String) {
+        let letter = seg.title.trimmingCharacters(in: .whitespaces).first.map { String($0).uppercased() } ?? "•"
+        switch seg.source {
+        case .fixedRoutine(let name):
+            let r = routines.first { $0.name == name } ?? hiddenRoutines.first { $0.name == name }
+            return (r?.iconName, letter)
+        case .quotaSession(let name, _):
+            return (quotaRoutines.first { $0.name == name }?.iconName, letter)
+        default:
+            return (nil, letter)
+        }
+    }
+
+    private func planBlock(_ seg: TimeSegment) -> PlanBlock? {
+        if case .planBlock(let blk) = seg.source { return blk }
+        return nil
+    }
+
     @ViewBuilder
     private func segmentView(_ seg: TimeSegment, size: CGSize) -> some View {
-        let shape = RoundedRectangle.soft(Corner.chip)
         let dragging = seg.id == dragId
         let hovering = hoverId == seg.id
-        // 옮길 수 있는 곳이 가장 넓은 것(계획 블록)은 떠 있다 — 요일 칸·한 주 시간축과 같은 약속.
-        let lifted = seg.isPlanBlock && !seg.isGhost
+        let block = planBlock(seg)
+        let status = block?.reviewStatus
+        let done = status == .done
+        // 넓으면 알약 + 시각·제목 + 동그라미, 좁으면 알약 + 제목, 아주 좁으면 알약만.
+        let showsText = size.width >= Self.pillWidth + 44
+        let showsCheck = block != nil && !seg.isGhost && size.width >= Self.pillWidth + 120
 
-        let title = Text(seg.title)
-            .font(.system(size: 11.5, weight: .semibold))
-            .strikethrough(seg.isGhost, color: seg.color.opacity(0.5))
-        // 넉넉하면 두 줄(제목 / 시각), 좁으면 한 줄에 제목과 시작 시각을 나란히 — 쫀쫀한 키에서도
-        // 30분짜리까지 무엇인지와 몇 시인지가 함께 읽힌다.
-        let tall = size.height >= 38
+        ZStack(alignment: .topTrailing) {
+            HStack(alignment: .top, spacing: 10) {
+                pill(seg, height: size.height, dragging: dragging, hovering: hovering, done: done)
 
-        Group {
-            if tall {
-                VStack(alignment: .leading, spacing: 0) {
-                    title.lineLimit(size.height >= 54 ? 2 : 1)
-                    Text(timeRange(seg))
-                        .font(.system(size: 10))
-                        .monospacedDigit()
-                        .opacity(0.75)
-                        .lineLimit(1)
-                }
-            } else {
-                HStack(spacing: 4) {
-                    title.lineLimit(1)
-                    Spacer(minLength: 2)
-                    if size.width >= 110 {
-                        Text(formatHour(seg.logicalStart))
-                            .font(.system(size: 10))
-                            .monospacedDigit()
-                            .opacity(0.7)
+                if showsText {
+                    VStack(alignment: .leading, spacing: 1) {
+                        if size.width >= Self.pillWidth + 110 {
+                            Text(timeRange(seg))
+                                .font(.system(size: 10.5, weight: .medium, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                        Text(seg.title)
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .strikethrough(done || seg.isGhost, color: .secondary)
+                            .foregroundStyle(done || seg.isGhost ? .secondary : .primary)
+                            .lineLimit(size.height >= 60 ? 2 : 1)
                     }
+                    .padding(.top, 3)
+                    .padding(.trailing, showsCheck ? 30 : 4)
                 }
+                Spacer(minLength: 0)
+            }
+            .frame(width: size.width, height: size.height, alignment: .topLeading)
+            .background(alignment: .topLeading) {
+                // 가리키면 줄 전체가 그 색으로 옅게 물든다 — 무엇을 잡으려는지가 손끝에서 읽힌다.
+                RoundedRectangle.soft(Corner.card)
+                    .fill(seg.color.opacity(hovering || dragging ? 0.09 : 0))
+                    .frame(height: max(Self.minRowHeight, min(size.height, 56)))
+                    .padding(.leading, -5)
+                    .padding(.vertical, -3)
+            }
+            .contentShape(Rectangle())
+            .onHover { hoverId = $0 ? seg.id : (hoverId == seg.id ? nil : hoverId) }
+            .grabCursor(enabled: !seg.isGhost)
+            // 누르기와 끌기를 한 제스처가 맡는다 (→ DayTimelineRow.segmentView 와 같은 까닭).
+            // 동그라미 단추는 이 제스처 **밖**에 둔다 — 안에 두면 눌러도 편집 창이 열린다.
+            .highPriorityGesture(
+                DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                    .onChanged { v in
+                        guard !seg.isGhost, moved(v.translation) else { return }
+                        dragId = seg.id
+                        dragPy = v.translation.height
+                        NSCursor.closedHand.set()
+                    }
+                    .onEnded { v in
+                        defer {
+                            dragId = nil
+                            dragPy = 0
+                        }
+                        guard !seg.isGhost else { return }
+                        guard moved(v.translation) else {
+                            edit(seg)
+                            return
+                        }
+                        actions.move(seg, deltaHours: Double(v.translation.height / Self.hourHeight))
+                    }
+            )
+
+            if showsCheck, let block {
+                checkButton(block, color: seg.color)
+                    .padding(.top, 7)
+                    .padding(.trailing, 2)
             }
         }
-        .padding(.leading, 11)
-        .padding(.trailing, 6)
-        .padding(.vertical, tall ? 3 : 0)
-        .frame(width: size.width, height: size.height, alignment: tall ? .topLeading : .leading)
-        .foregroundStyle(seg.isGhost ? seg.color.opacity(0.55) : seg.color)
-        .background {
-            if seg.isGhost {
-                shape.fill(seg.color.opacity(0.05))
-                shape.strokeBorder(seg.color.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [3, 2]))
-            } else if lifted {
-                ZStack {
-                    shape.fill(Color.surface)
-                    shape.fill(seg.color.opacity(0.2))
-                }
-                .compositingGroup()
-                .shadow(color: seg.color.opacity(dragging || hovering ? 0.34 : 0.22),
-                        radius: dragging ? 8 : (hovering ? 6 : 2.5),
-                        y: dragging ? 4 : (hovering ? 3 : 1.5))
-            } else if seg.isFlexible {
-                // 루틴 위에 얹혀도 글씨가 읽히게 밑에 불투명한 바탕을 깐다. 유연함은 점선이 말한다.
-                shape.fill(Color.surface)
-                shape.fill(seg.color.opacity(hovering ? 0.2 : 0.14))
-                shape.strokeBorder(seg.color.opacity(0.55), style: StrokeStyle(lineWidth: 1, dash: [3, 2]))
-            } else {
-                shape.fill(seg.color.opacity(hovering ? 0.2 : 0.14))
-            }
-        }
-        // 왼쪽 가장자리의 색 막대 — 무슨 일정인지가 색으로 먼저 읽힌다.
-        .overlay(alignment: .leading) {
-            if !seg.isGhost {
-                Capsule()
-                    .fill(seg.color.opacity(0.85))
-                    .frame(width: 3)
-                    .padding(.vertical, 4)
-                    .padding(.leading, 4)
-            }
-        }
-        .offset(y: lifted && hovering && !dragging ? -1 : 0)
-        .contentShape(shape)
-        .onHover { hoverId = $0 ? seg.id : (hoverId == seg.id ? nil : hoverId) }
-        .grabCursor(enabled: !seg.isGhost)
+        .scaleEffect(dragging ? 1.03 : 1, anchor: .leading)
+        .animation(Motion.squish, value: dragging)
         .animation(Motion.hover, value: hovering)
-        // 누르기와 끌기를 한 제스처가 맡는다 (→ DayTimelineRow.segmentView 와 같은 까닭).
-        .highPriorityGesture(
-            DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                .onChanged { v in
-                    guard !seg.isGhost, moved(v.translation) else { return }
-                    dragId = seg.id
-                    dragPy = v.translation.height
-                    NSCursor.closedHand.set()
-                }
-                .onEnded { v in
-                    defer {
-                        dragId = nil
-                        dragPy = 0
-                    }
-                    guard !seg.isGhost else { return }
-                    guard moved(v.translation) else {
-                        edit(seg)
-                        return
-                    }
-                    actions.move(seg, deltaHours: Double(v.translation.height / Self.hourHeight))
-                }
-        )
         .contextMenu {
             if seg.isGhost {
                 Button { actions.restore(seg) } label: {
@@ -360,6 +382,92 @@ struct DayScheduleView: View {
         .help(seg.isGhost
               ? String(localized: "\(seg.title) — 삭제됨 · 우클릭으로 되살리기")
               : String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기"))
+    }
+
+    /// **알약.** 길이가 곧 걸리는 시간이고, 색과 그림이 곧 무엇인지다.
+    @ViewBuilder
+    private func pill(_ seg: TimeSegment, height: CGFloat, dragging: Bool, hovering: Bool, done: Bool) -> some View {
+        let g = glyph(for: seg)
+        let shape = Capsule(style: .continuous)
+        ZStack(alignment: .top) {
+            if seg.isGhost {
+                shape.fill(seg.color.opacity(0.06))
+                shape.strokeBorder(seg.color.opacity(0.4), style: StrokeStyle(lineWidth: 1.2, dash: [3, 3]))
+            } else if seg.isFlexible {
+                // 시간이 유연한 끼니는 옅게 채우고 점선 — 옮겨도 된다는 뜻이 모양에 있다.
+                shape.fill(Color.surface)
+                shape.fill(seg.color.opacity(0.3))
+                shape.strokeBorder(seg.color.opacity(0.75), style: StrokeStyle(lineWidth: 1.2, dash: [3, 2.5]))
+            } else {
+                shape.fill(seg.color.gradient)
+                    .opacity(done ? 0.55 : (seg.isRoutine ? 0.85 : 1))
+            }
+
+            Group {
+                if let symbol = g.symbol {
+                    Image(systemName: symbol)
+                        .font(.system(size: 14, weight: .semibold))
+                        .symbolEffect(.bounce, value: done)
+                } else {
+                    Text(g.letter)
+                        .font(.system(size: 14, weight: .heavy, design: .rounded))
+                        .scaleEffect(done ? 0.9 : 1)
+                }
+            }
+            .foregroundStyle(seg.isGhost || seg.isFlexible ? seg.color : .white)
+            .frame(width: Self.pillWidth, height: Self.pillWidth)
+            .scaleEffect(hovering && !dragging ? 1.12 : 1)
+        }
+        .frame(width: Self.pillWidth, height: max(Self.pillWidth, height))
+        .shadow(color: seg.isGhost ? .clear : seg.color.opacity(dragging ? 0.45 : (hovering ? 0.35 : 0.22)),
+                radius: dragging ? 9 : (hovering ? 6 : 3), y: dragging ? 5 : 2)
+    }
+
+    /// 오른쪽 동그라미 — 누르면 끝낸 것이 되고, 다시 누르면 풀린다 (→ ReflectionRow의 같은 손짓).
+    /// 옆 회고 판과 같은 표시라 어느 쪽에서 눌러도 양쪽이 함께 바뀐다.
+    private func checkButton(_ block: PlanBlock, color: Color) -> some View {
+        let status = block.reviewStatus
+        return Button {
+            Haptic.tick()
+            withAnimation(Motion.squish) {
+                block.reviewStatus = status == nil ? .done : nil
+            }
+            try? context.save()
+        } label: {
+            ZStack {
+                Circle()
+                    .strokeBorder(color.opacity(status == nil ? 0.55 : 0), lineWidth: 1.8)
+                Circle()
+                    .fill(checkTint(status, color))
+                    .scaleEffect(status == nil ? 0.2 : 1)
+                    .opacity(status == nil ? 0 : 1)
+                Image(systemName: checkSymbol(status))
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundStyle(.white)
+                    .scaleEffect(status == nil ? 0.3 : 1)
+                    .opacity(status == nil ? 0 : 1)
+            }
+            .frame(width: 22, height: 22)
+            .contentShape(Circle())
+        }
+        .buttonStyle(.squish)
+        .help(status == nil ? "끝냈다고 표시한다" : "표시를 지운다 (적어 둔 회고는 그대로 남습니다)")
+    }
+
+    private func checkSymbol(_ status: ReviewStatus?) -> String {
+        switch status {
+        case .partial: "circle.lefthalf.filled"
+        case .skipped: "xmark"
+        default: "checkmark"
+        }
+    }
+
+    private func checkTint(_ status: ReviewStatus?, _ color: Color) -> Color {
+        switch status {
+        case .partial: .yellow
+        case .skipped: .red.opacity(0.8)
+        default: color
+        }
     }
 
     private func edit(_ seg: TimeSegment) {
@@ -402,22 +510,22 @@ struct DayScheduleView: View {
     private func frame(for seg: TimeSegment, lanes: [String: Lane], laned: [TimeSegment],
                        trackWidth w: CGFloat) -> CGRect? {
         guard let vis = window.clamp(seg.start, seg.end) else { return nil }
-        let top = y(vis.start) + 1
-        let height = max(14, y(vis.end) - y(vis.start) - 2)
-        let right: CGFloat = 4
+        let top = y(vis.start)
+        // 짧은 일도 알약 하나와 글씨 한 줄은 들어간다. 겹칠 몫은 칸 나누기가 미리 셌다.
+        let height = max(Self.minRowHeight, y(vis.end) - y(vis.start) - 3)
 
         // 루틴 안 일정, 다른 일정 위에 겹친 끼니는 칸을 따로 갖지 않고 오른쪽에 얹는다.
         let overlaysOther = seg.isNested
             || (seg.isFlexible && laned.contains { $0.start < seg.end - 1e-6 && seg.start < $0.end - 1e-6 })
         if overlaysOther {
-            let x = w * 0.4
-            return CGRect(x: x, y: top, width: max(20, w - x - right), height: height)
+            let x = w * 0.45
+            return CGRect(x: x, y: top, width: max(Self.pillWidth, w - x), height: height)
         }
         guard let lane = lanes[seg.id], lane.count > 1 else {
-            return CGRect(x: 0, y: top, width: w - right, height: height)
+            return CGRect(x: 0, y: top, width: w, height: height)
         }
-        let gap: CGFloat = 3
-        let columnWidth = (w - right - gap * CGFloat(lane.count - 1)) / CGFloat(lane.count)
+        let gap: CGFloat = 8
+        let columnWidth = (w - gap * CGFloat(lane.count - 1)) / CGFloat(lane.count)
         return CGRect(x: CGFloat(lane.index) * (columnWidth + gap), y: top, width: columnWidth, height: height)
     }
 
@@ -430,7 +538,9 @@ struct DayScheduleView: View {
     ///
     /// 서로 이어 겹치는 **묶음마다** 칸 수를 따로 센다 — 오전에 둘이 겹쳤다고 오후 일정까지
     /// 반쪽이 되지 않게.
-    static func lanes(_ segs: [TimeSegment]) -> [String: Lane] {
+    /// - Parameter minHours: 짧은 일도 화면에서는 이만큼 차지한다. 시각으로는 안 겹쳐도
+    ///   알약이 겹쳐 보이면 나란히 세운다.
+    static func lanes(_ segs: [TimeSegment], minHours: Double = 0) -> [String: Lane] {
         var result: [String: Lane] = [:]
         var cluster: [(id: String, lane: Int)] = []
         var laneEnds: [Double] = []
@@ -448,15 +558,16 @@ struct DayScheduleView: View {
                 clusterEnd = -Double.infinity
             }
             let lane: Int
+            let end = max(seg.end, seg.start + minHours)
             if let open = laneEnds.firstIndex(where: { $0 <= seg.start + 1e-6 }) {
-                laneEnds[open] = seg.end
+                laneEnds[open] = end
                 lane = open
             } else {
-                laneEnds.append(seg.end)
+                laneEnds.append(end)
                 lane = laneEnds.count - 1
             }
             cluster.append((seg.id, lane))
-            clusterEnd = max(clusterEnd, seg.end)
+            clusterEnd = max(clusterEnd, end)
         }
         flush()
         return result

@@ -223,7 +223,7 @@ private struct ColorPicker: View {
                         }
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.squish)
                 .help(option.name)
             }
         }

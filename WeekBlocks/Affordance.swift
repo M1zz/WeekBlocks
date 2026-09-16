@@ -40,3 +40,54 @@ extension View {
         }
     }
 }
+
+// MARK: - 쫀쫀하게
+
+/// **누르면 눌린다.** 평범한 단추(`.plain`)와 같은 모양에, 누르는 동안 살짝 오므라들었다가
+/// 놓으면 통 튀어 돌아온다. 손가락이 무엇을 눌렀는지를 화면이 받아 준다.
+///
+/// 오므라드는 정도는 크기에 맞춘다 — 같은 비율이면 작은 동그라미는 티가 안 나고
+/// 줄 전체를 감싼 단추는 화면이 출렁인다. 늘 몇 pt만큼만 들어간다.
+struct SquishButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        let pressed = configuration.isPressed
+        return configuration.label
+            .visualEffect { content, proxy in
+                content.scaleEffect(pressed ? Self.pressedScale(for: proxy.size) : 1)
+            }
+            .animation(pressed ? Motion.press : Motion.squish, value: pressed)
+    }
+
+    nonisolated static func pressedScale(for size: CGSize) -> CGFloat {
+        let longest = max(size.width, size.height, 1)
+        return 1 - min(0.12, 5 / longest)
+    }
+}
+
+extension ButtonStyle where Self == SquishButtonStyle {
+    static var squish: SquishButtonStyle { SquishButtonStyle() }
+}
+
+extension View {
+    /// 가리키면 한 뼘 떠오른다. 잡을 수 있는 카드·칩에.
+    func hoverLift(_ hovering: Bool, scale: CGFloat = 1.02) -> some View {
+        scaleEffect(hovering ? scale : 1)
+            .animation(Motion.squish, value: hovering)
+    }
+}
+
+/// **손끝에 오는 딸깍.** 포스 터치 트랙패드에서만 느껴지고, 나머지에서는 아무 일도 없다.
+///
+/// 소리 대신 손이다 — 눈을 떼고 끌어도 15분 격자에 붙었는지, 표시가 찍혔는지가 손에 온다.
+/// 자주 울리면 잡음이 되므로 **무언가가 자리를 잡은 순간**에만 부른다.
+enum Haptic {
+    /// 제자리에 놓였다 — 끌어 옮기기·떨어뜨리기가 끝났을 때.
+    static func snap() {
+        NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
+    }
+
+    /// 상태가 한 칸 바뀌었다 — 체크·표시·고르기.
+    static func tick() {
+        NSHapticFeedbackManager.defaultPerformer.perform(.levelChange, performanceTime: .now)
+    }
+}

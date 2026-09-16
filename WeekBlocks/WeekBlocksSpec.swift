@@ -38,32 +38,49 @@ enum WeekBlocksSpec: LeeoAppSpec {
         )
     }
 
-    /// **파는 것은 '함께 쓰기' 하나다.** 한 번 사면 끝인 비소모성 상품 하나뿐이고,
-    /// 구독이 아니다. 이 한 줄이 "페이월이 필요한가"의 답이고, 여기서
-    /// `paywall`(상품·약관·개인정보 링크)과 `gate`(무엇이 잠기는가)가 따라 나온다.
+    /// **파는 것은 「무지개 공방 Pro」다.** 연간·월간 구독과 평생 이용권, 셋 중 무엇을 사도 같은 Pro다.
     ///
-    /// ⚠️ 잠기는 것은 **적기가 아니라 건너가기**다. 적는 것은 이 앱의 본체라 잠그지
-    ///    않는다 — 그래서 `freeLimits`(몇 개까지 무료)가 비어 있고 `proOnly` 하나만 있다.
-    ///    (→ TodoAccess.swift · MacEntitlement.swift)
+    /// 선은 이렇게 긋는다: **이번 주를 사는 데 필요한 것은 무료, 지난 주들이 쌓여야 보이는 것은 Pro.**
+    /// 주간·일간 계획, 루틴, 할 일, 이번 주 회고, 타이머, 아이폰과 오가기까지 전부 무료다.
+    /// Pro는 회고 추세(→ ReflectionTrendsView)와 다른 주 계획 가져오기(→ WeekCopyView)를 연다.
     ///
-    /// ⚠️ **여기 선언했다고 팔기 시작하는 게 아니다.** 실제로 잠글지는
-    ///    `MacEntitlement.sellsAccess`가 정한다. 상품이 App Store Connect에 서기 전에
-    ///    잠그면 아무도 못 사는 채로 쓰던 사람의 것만 닫힌다.
-    static let monetization = LeeoMonetization.freemium(
-        LeeoPurchaseConfig(
-            productIDs: [syncProductID],
-            gate: LeeoGatePolicy(proOnly: [Gate.sync])
+    /// ⚠️ 예전에 팔려던 것은 '아이폰으로 건너가기'(`legacySyncProductID`)였다. 원래 되던 것을
+    ///    막는 셈이라 뺏는 것으로 읽혀서 **동기화는 무료로 되돌렸다** (→ TodoAccess.swift).
+    ///    그 상품을 산 사람이 있다면 Pro로 인정한다 — `entitlementIDs`에 함께 넣어 둔다.
+    ///
+    /// ⚠️ **여기 선언했다고 팔기 시작하는 게 아니다.** 실제로 파는지는
+    ///    `MacEntitlement.sellsPro`가 정한다. 상품이 App Store Connect에 서기 전에 켜면
+    ///    아무도 못 사는 채로 Pro 기능만 잠긴다.
+    static let monetization = LeeoMonetization.freemiumSubscription(
+        LeeoSubscriptionConfig(
+            productIDs: proProductIDs,
+            // 자체 약관이 없으므로 애플 표준 사용권 계약(EULA)을 건다.
+            // App Store Connect의 '사용권 계약'을 표준으로 두는 것과 짝이다.
+            termsURL: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!,
+            entitlementIDs: Set(proProductIDs + [legacySyncProductID]),
+            gate: LeeoGatePolicy(proOnly: [Gate.trends, Gate.weekCopy])
         )
     )
 
-    /// App Store Connect의 비소모성 상품 ID.
+    /// App Store Connect의 상품 ID.
     /// ⚠️ 콘솔에 만든 것·`WeekBlocks.storekit`에 적은 것과 **글자 하나까지 같아야 한다.**
-    static let syncProductID = "com.devkoan.ScheduleDensityApp.sync"
+    /// 연간·월간은 같은 구독 그룹(「무지개 공방 Pro」)에 넣어야 서로 갈아탈 수 있다.
+    static let proYearlyID = "com.devkoan.ScheduleDensityApp.pro.yearly"
+    static let proLifetimeID = "com.devkoan.ScheduleDensityApp.pro.lifetime"
+    static let proMonthlyID = "com.devkoan.ScheduleDensityApp.pro.monthly"
+
+    /// 페이월에 서는 차례 그대로 — 연간이 먼저, 평생, 월간은 비교 기준이라 마지막.
+    static let proProductIDs = [proYearlyID, proLifetimeID, proMonthlyID]
+
+    /// 예전 '함께 쓰기'(비소모성). 더는 팔지 않지만 산 사람은 Pro다.
+    static let legacySyncProductID = "com.devkoan.ScheduleDensityApp.sync"
 
     /// 게이트 열쇠말. 문자열을 여기저기 흩어 적으면 오타 하나로 조용히 안 잠긴다.
     enum Gate {
-        /// 여기서 적은 것이 아이폰으로 건너가는가.
-        static let sync = "sync"
+        /// 지난 주들의 회고 추세.
+        static let trends = "reflectionTrends"
+        /// 다른 주의 계획을 이번 주에 깔기.
+        static let weekCopy = "weekCopy"
     }
 
     /// **익명 사용 통계를 피드백 허브로 보낸다** (→ Telemetry.swift).

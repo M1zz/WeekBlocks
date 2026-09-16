@@ -323,7 +323,7 @@ struct DayColumn: View {
                             )
                     )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
             .disabled(!canPlan)
             .help(canPlan ? "\(day.longLabel)에 블록 추가" : "고정 루틴을 먼저 추가하세요")
         }
@@ -398,6 +398,7 @@ struct RoutineChip: View {
             .modifier(OptionalDraggable(token: dragToken))
             .onTapGesture(perform: onTap)
             .onHover { hovering = $0 }
+            .hoverLift(hovering && dragToken != nil)
             .grabCursor(enabled: dragToken != nil)
             .animation(Motion.hover, value: hovering)
             .contextMenu {
@@ -510,6 +511,7 @@ struct BlockChip: View {
             .draggable(block.dragToken)
             .onTapGesture(perform: onTap)
             .onHover { hovering = $0 }
+            .hoverLift(hovering)
             // 잡을 수 있다는 것을 손 모양으로 (→ Affordance.swift).
             .grabCursor()
             .animation(Motion.hover, value: hovering)

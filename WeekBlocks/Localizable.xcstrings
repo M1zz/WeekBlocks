@@ -24,6 +24,136 @@
         }
       }
     },
+    "%@ 결제" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay %@"
+          }
+        }
+      }
+    },
+    "%@에 고른 주의 계획을 같은 요일·같은 시각으로 깝니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lays the chosen week’s plan onto %@, on the same days and at the same times."
+          }
+        }
+      }
+    },
+    "%lld번" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld times"
+          }
+        }
+      }
+    },
+    "%lld일 무료로 써 보고, 그 뒤에 결제됩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free for %lld days, then billed."
+          }
+        }
+      }
+    },
+    "/ 년" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ year"
+          }
+        }
+      }
+    },
+    "/ 월" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ month"
+          }
+        }
+      }
+    },
+    "/ 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ day"
+          }
+        }
+      }
+    },
+    "/ 주" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ week"
+          }
+        }
+      }
+    },
+    "Pro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        }
+      }
+    },
+    "Pro 기능입니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a Pro feature"
+          }
+        }
+      }
+    },
+    "Pro 보기 · 연 %@부터" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Pro · from %@ a year"
+          }
+        }
+      }
+    },
+    "Pro로 가져오기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy with Pro"
+          }
+        }
+      }
+    },
+    "Pro로 추세 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See trends with Pro"
+          }
+        }
+      }
+    },
     "— 끝냈으면 체크하세요" : {
       "localizations" : {
         "en" : {
@@ -776,6 +906,552 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "= 100%%, split across %lld steps"
+          }
+        }
+      }
+    },
+    "가져올 주가 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No weeks to copy from"
+          }
+        }
+      }
+    },
+    "같은 Apple 계정이면 양쪽에서 보입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On the same Apple Account, to-dos show up on both."
+          }
+        }
+      }
+    },
+    "개인정보 처리방침" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        }
+      }
+    },
+    "계획·루틴·할 일·이번 주 회고·아이폰과 오가기는 계속 무료입니다. Pro는 지난 주들이 쌓여야 보이는 회고 추세와 다른 주 계획 가져오기를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning, routines, to-dos, this week’s review and iPhone sync stay free. Pro unlocks what only shows up as weeks add up: reflection trends and copying another week’s plan. Changed Macs? Restore brings it back."
+          }
+        }
+      }
+    },
+    "계획을 세운 주가 생기면 여기에서 고를 수 있습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once you have planned a week, you can pick it here."
+          }
+        }
+      }
+    },
+    "구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 같은 요금으로 자동 갱신되며, Apple 계정으로 결제됩니다. 무료 체험 중에 해지하면 요금이 나가지 않습니다. 해지와 관리는 App Store의 계정 설정에서 합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscriptions renew automatically at the same price unless canceled at least 24 hours before the period ends, and are charged to your Apple Account. Cancel during the free trial and you won’t be charged. Manage or cancel in your App Store account settings."
+          }
+        }
+      }
+    },
+    "그 앞 4주와 비교" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs. the 4 weeks before"
+          }
+        }
+      }
+    },
+    "그대로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No change"
+          }
+        }
+      }
+    },
+    "그대로 무료인 것" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still free"
+          }
+        }
+      }
+    },
+    "그동안 찍어 둔 회고 %lld개로 잘 되는 요일과 시간대, 자주 미루는 일을 보여 드립니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your %lld reviews so far show which days and times work for you, and what you keep putting off."
+          }
+        }
+      }
+    },
+    "다른 주 계획 가져오기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Another Week"
+          }
+        }
+      }
+    },
+    "다른 주 계획 가져오기…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Another Week…"
+          }
+        }
+      }
+    },
+    "달마다 결제되고 언제든 해지합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billed monthly. Cancel anytime."
+          }
+        }
+      }
+    },
+    "달성 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ done"
+          }
+        }
+      }
+    },
+    "달성률" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completion"
+          }
+        }
+      }
+    },
+    "두 번 넘게 건너뛴 일이 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing has been skipped more than once."
+          }
+        }
+      }
+    },
+    "매일 돌아보는 데 값을 받지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking back each day is free."
+          }
+        }
+      }
+    },
+    "무료 체험 시작" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Free Trial"
+          }
+        }
+      }
+    },
+    "무지개 공방 Pro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Workshop Pro"
+          }
+        }
+      }
+    },
+    "번번이 미루는 일은 크기가 너무 크거나 시간대가 안 맞는 경우가 많습니다. 단계로 쪼개거나 잘 되는 시간대로 옮겨 보세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Things you keep skipping are often too big or in the wrong time of day. Try splitting them into steps or moving them to a time that works."
+          }
+        }
+      }
+    },
+    "블록 %lld개 · %@" : {
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "블록 %1$lld개 · %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld blocks · %@"
+          }
+        }
+      }
+    },
+    "시간대별" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Time of Day"
+          }
+        }
+      }
+    },
+    "아이폰과 오가기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Sync"
+          }
+        }
+      }
+    },
+    "얼마든지 적고 배치합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write and place as much as you like."
+          }
+        }
+      }
+    },
+    "연간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yearly"
+          }
+        }
+      }
+    },
+    "요금" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pricing"
+          }
+        }
+      }
+    },
+    "요금제를 불러오는 중…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading plans…"
+          }
+        }
+      }
+    },
+    "요일별" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Day"
+          }
+        }
+      }
+    },
+    "월간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly"
+          }
+        }
+      }
+    },
+    "이 주에 깔기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy to This Week"
+          }
+        }
+      }
+    },
+    "이번 주 회고와 타이머" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week’s review and the timer"
+          }
+        }
+      }
+    },
+    "이번 주에 이미 있는 블록 %lld개는 그대로 두고 더합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The %lld blocks already in this week stay; the new ones are added."
+          }
+        }
+      }
+    },
+    "이용약관" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Use"
+          }
+        }
+      }
+    },
+    "자주 건너뛴 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Often Skipped"
+          }
+        }
+      }
+    },
+    "잘 굴러간 주의 계획을 이번 주에 한 번에 깝니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lay a week that went well onto this week in one go."
+          }
+        }
+      }
+    },
+    "주" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        }
+      }
+    },
+    "주간·일간 계획과 루틴, 할 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly and daily plans, routines, to-dos"
+          }
+        }
+      }
+    },
+    "주별 달성률" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completion by Week"
+          }
+        }
+      }
+    },
+    "지금 쓰시는 모든 기능은 무료입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything you use now is free."
+          }
+        }
+      }
+    },
+    "지난 8주의 달성률, 잘 되는 요일과 시간대, 자주 건너뛰는 일을 봅니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See 8 weeks of completion, your best days and times, and what you often skip."
+          }
+        }
+      }
+    },
+    "지난 8주의 회고를 겹쳐 봅니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your last 8 weeks of reviews, side by side"
+          }
+        }
+      }
+    },
+    "지난 주들이 쌓이면 보이는 것을 엽니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlocks what shows up as your weeks add up."
+          }
+        }
+      }
+    },
+    "최근 4주 달성률" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last 4 Weeks"
+          }
+        }
+      }
+    },
+    "추세" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trends"
+          }
+        }
+      }
+    },
+    "추천" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best Value"
+          }
+        }
+      }
+    },
+    "평생" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime"
+          }
+        }
+      }
+    },
+    "한 번 결제로 계속 씁니다. 구독이 아닙니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay once, keep it. Not a subscription."
+          }
+        }
+      }
+    },
+    "해마다 결제되고 언제든 해지합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billed yearly. Cancel anytime."
+          }
+        }
+      }
+    },
+    "회고 추세" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflection Trends"
+          }
+        }
+      }
+    },
+    "회고 추세와 다른 주 계획 가져오기가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflection trends and copying another week are unlocked. They also unlock on your other Macs with the same Apple Account."
+          }
+        }
+      }
+    },
+    "회고를 찍어 두면 잘 되는 요일과 시간대, 자주 미루는 일이 여기에 섭니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark your reviews and this shows which days and times work for you, and what you keep putting off."
+          }
+        }
+      }
+    },
+    "회고를 찍은 블록 중에서 셉니다. 부분 달성은 반으로 칩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counted among reviewed blocks. Partly done counts as half."
+          }
+        }
+      }
+    },
+    "회고한 블록" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reviewed"
+          }
+        }
+      }
+    },
+    "회고한 블록 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld reviewed blocks"
           }
         }
       }

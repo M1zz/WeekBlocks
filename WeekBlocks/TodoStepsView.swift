@@ -261,7 +261,7 @@ struct TodoStepsView: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.squish)
                 }
                 .foregroundStyle(.secondary)
                 .transition(.row)
@@ -427,7 +427,7 @@ private struct StepRow: View {
                     .font(.system(size: 16))
                     .foregroundStyle(item.isCompleted ? .green : (isCurrent ? .orange : Color.secondary))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.title)
@@ -486,13 +486,13 @@ private struct StepRow: View {
                 Button(action: onAddChild) {
                     Image(systemName: "arrow.turn.down.right").font(.system(size: 11))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.squish)
                 .help("하위 단계 추가")
                 .transition(.control)
                 Button(action: onDelete) {
                     Image(systemName: "xmark").font(.system(size: 11))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.squish)
                 .help("삭제")
                 .transition(.control)
             }

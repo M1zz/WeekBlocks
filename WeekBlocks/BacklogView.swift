@@ -37,8 +37,6 @@ struct BacklogSection: View {
     // 이제 **목록 맨 앞에 빈 칸이 하나 생긴다** — 거기 적으면 그게 곧 할 일이다.
     /// 빈 칸이 열려 있는가.
     @State private var isAdding = false
-    /// '적기'가 잠겼을 때 내는 페이월 (→ PaywallView.swift).
-    @State private var showingPaywall = false
     @State private var newTitle = ""
     @FocusState private var addFocused: Bool
     /// 단계(뎁스)를 들여다보는 시트.
@@ -184,18 +182,6 @@ struct BacklogSection: View {
                 .help(canPlan ? "목록 맨 위에 빈 칸을 만든다 (⌘N)"
                               : "고정 루틴을 하나 세우면 할 일을 적을 수 있습니다")
                 .keyboardShortcut("n", modifiers: .command)
-
-                if !TodoAccess.canSync, TodoSharing.hiddenFromOthersCount(allItems) > 0 {
-                    Button {
-                        showingPaywall = true
-                    } label: {
-                        Label("아이폰에 안 감", systemImage: "arrow.left.arrow.right")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(.secondary)
-                    .help(TodoAccess.lockedNote)
-                }
 
                 // '전체 보기'는 제목 바로 옆에 붙인다 — 지금 목록이 **전부가 아니라는 것**을
                 // 제목과 한 호흡에 말해야, 이월된 할 일을 못 보고 지나치지 않는다.
@@ -349,15 +335,6 @@ struct BacklogSection: View {
         }
         .animation(Motion.target, value: isReturnTargeted)
         .task { await reconcileCategories() }
-        .sheet(isPresented: $showingPaywall) {
-            PaywallView()
-        }
-        // 값을 치르면 이 맥에서 적어 둔 것이 아이폰에도 보이게 열리고, 환불되면 도로 닫힌다
-        // (→ TodoSharing.swift). 열 때는 그때부터 올라가는 게 아니라 이미 올라가 있던 것이
-        // 그제서야 보이는 것이라 기다림이 없다.
-        .onChange(of: PurchaseManager.shared.isUnlocked) { _, _ in
-            TodoSharing.reconcileMySharing(in: context)
-        }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
                 .frame(minWidth: 540, minHeight: 560)
@@ -475,7 +452,7 @@ struct BacklogSection: View {
             Button(action: endAdding) {
                 Image(systemName: "xmark").font(.system(size: 11))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
             .foregroundStyle(.secondary)
             .help("닫기 (Esc)")
         }
@@ -530,13 +507,6 @@ struct BacklogSection: View {
     /// 빈 칸을 연다. 분류는 지금 보고 있는 필터를 그대로 따른다 —
     /// '업무'만 보고 있었다면 지금 적는 것도 업무다.
     private func beginAdding() {
-        // 잠긴 기기에서는 적는 자리 대신 **왜 못 적는지**를 연다 (→ TodoAccess.swift).
-        // 못 누르게만 두면 고장으로 읽힌다. 버튼이 여러 곳에 있어서, 들머리 한 곳에서
-        // 막는 것이 새지 않는다.
-        guard TodoAccess.canEdit else {
-            showingPaywall = true
-            return
-        }
         withAnimation(Motion.card) { isAdding = true }
         addFocused = true
     }
@@ -623,7 +593,7 @@ struct BacklogSection: View {
                 .foregroundStyle(.secondary)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
 
             if showsPlaced {
                 let colors = itemColorMap
@@ -637,7 +607,7 @@ struct BacklogSection: View {
                                     .font(.system(size: 14))
                                     .foregroundStyle(.secondary)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.squish)
                             .help("끝냈다고 표시한다")
 
                             Text(item.title)
@@ -670,7 +640,8 @@ struct BacklogSection: View {
     /// 끝냈다고 표시한다. 단계로 쪼갠 일이면 남은 단계까지 함께 닫는 것은
     /// TodoTree가 아는 규칙이라 그쪽에 맡긴다 (여기서 다시 쓰면 규칙이 둘이 된다).
     private func complete(_ item: BacklogItem) {
-        withAnimation(Motion.card) {
+        Haptic.tick()
+        withAnimation(Motion.squish) {
             tree.setCompleted(item, true)
             try? context.save()
         }
@@ -818,7 +789,7 @@ struct FilterChip: View {
             .foregroundStyle(selected ? color : .primary)
             .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.squish)
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
         .animation(Motion.card, value: selected)
@@ -918,7 +889,7 @@ struct BacklogBlock: View {
                                 .lineLimit(1)
                         }
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.squish)
                     .help(steps.currentTitle == nil ? "모든 단계를 마쳤습니다" : "이 단계를 끝내고 다음으로 넘기기")
 
                     // 진행바만 남긴다. 퍼센트와 "3단계 중 2"는 같은 말을 글씨로 되풀이했다.
@@ -968,7 +939,7 @@ struct BacklogBlock: View {
                 Button(action: onDelete) {
                     Image(systemName: "xmark").font(.system(size: 11))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.squish)
                 .foregroundStyle(.secondary)
                 .transition(.control)
             }
@@ -982,6 +953,7 @@ struct BacklogBlock: View {
         .contentShape(.soft(Corner.card))
         .draggable(item.dragToken)
         .onHover { hovering = $0 }
+        .hoverLift(hovering)
         .animation(Motion.hover, value: hovering)
         // 성질이 바뀌면 색이 바뀐다('바로 하면 되는 일'로 표시하는 순간처럼).
         // 툭 갈아 끼우면 무엇이 바뀐 건지 눈이 못 좇는다.
@@ -1394,7 +1366,7 @@ struct AllBacklogRow: View {
             Button(role: .destructive, action: onDelete) {
                 Image(systemName: "xmark").font(.system(size: 12))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
             .foregroundStyle(.secondary)
             .opacity(hovering ? 1 : 0)
         }

@@ -237,7 +237,7 @@ struct OnboardingView: View {
             )
             .contentShape(.soft(Corner.card))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.squish)
         .animation(Motion.hover, value: isOn)
     }
 

@@ -58,8 +58,9 @@ struct SegmentActions {
         case .none:
             return
         }
-        // 놓은 자리에서 15분 격자로 붙는 그 한 걸음. 결이 없으면 손을 뗀 순간 띠가 튄다.
-        withAnimation(Motion.timeline) { try? context.save() }
+        // 놓은 자리에서 15분 격자로 **통** 붙는 그 한 걸음 — 눈에는 출렁임으로, 손끝에는 딸깍으로.
+        Haptic.snap()
+        withAnimation(Motion.squish) { try? context.save() }
     }
 
     /// 구간 하나를 뺀다. 종류별로 다르게 반영된다.
@@ -90,7 +91,8 @@ struct SegmentActions {
         case .none:
             return
         }
-        withAnimation(Motion.card) { try? context.save() }
+        Haptic.tick()
+        withAnimation(Motion.squish) { try? context.save() }
     }
 
     /// 숨긴(유령) 구간을 다시 보이게 한다.
@@ -103,7 +105,8 @@ struct SegmentActions {
         default:
             return
         }
-        withAnimation(Motion.card) { try? context.save() }
+        Haptic.tick()
+        withAnimation(Motion.squish) { try? context.save() }
     }
 
     struct TimerTarget {

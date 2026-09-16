@@ -33,6 +33,13 @@ enum Motion {
     /// 시간 자 위에서 띠가 제자리를 찾아간다 (15분 격자에 붙는 순간).
     static let timeline = Animation.spring(response: 0.3, dampingFraction: 0.9)
 
+    /// **말랑하게.** 살짝 넘쳤다가 제자리로 돌아오는 스프링 — 일간의 알약이 서고, 놓이고,
+    /// 체크될 때. 튕김이 크면 장난감처럼 보이니 한 번 출렁이고 멎을 만큼만.
+    static let squish = Animation.spring(response: 0.42, dampingFraction: 0.68)
+
+    /// 누르는 순간. 오므라드는 쪽은 빠르고 단단하게, 돌아오는 쪽은 `squish`로 출렁인다.
+    static let press = Animation.spring(response: 0.18, dampingFraction: 0.9)
+
     /// 숫자가 바뀐다 (남은 시간·퍼센트). 자릿수가 굴러가는 결.
     static let number = Animation.snappy(duration: 0.25)
 
@@ -52,6 +59,9 @@ enum Motion {
 extension AnyTransition {
     /// 카드가 목록에 끼어들고 빠진다. 오고 가는 결이 같아야 한 장이 들고 난 것으로 읽힌다.
     static let card = AnyTransition.scale(scale: 0.94).combined(with: .opacity)
+
+    /// 톡 튀어나온다 — 새로 놓인 알약, 막 생긴 것. `Motion.squish`와 짝이다.
+    static let pop = AnyTransition.scale(scale: 0.55).combined(with: .opacity)
 
     /// 줄이 위에서 밀려 들어오고 그 자리에서 스러진다.
     static let row = AnyTransition.asymmetric(

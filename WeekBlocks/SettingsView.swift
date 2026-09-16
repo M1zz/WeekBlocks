@@ -242,7 +242,7 @@ struct SettingsView: View {
             // 설정을 열어도 단추가 안 선다 — 설정은 사람이 '사러 오는' 자리다.
             await purchases.refresh()
         }
-        .sheet(isPresented: $showingPaywall) { PaywallView() }
+        .sheet(isPresented: $showingPaywall) { PaywallView(reason: "settings") }
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
             Button("취소", role: .cancel) { }
             Button("다시 받아오기", role: .destructive) {
@@ -393,37 +393,31 @@ struct SettingsView: View {
                 Spacer()
                 // 아직 애플에게 답을 못 받았으면 '무료'라고 단정하지 않는다 —
                 // 산 사람이 첫 실행에서 무료라고 읽으면 그건 거짓말이다.
-                Text(purchases.isKnown ? (isPro ? "프로" : "무료") : "확인 중…")
+                Text(purchases.isKnown ? (isPro ? "Pro" : "무료") : "확인 중…")
                     .foregroundStyle(isPro ? .primary : .secondary)
                     .fontWeight(isPro ? .semibold : .regular)
             }
 
-            // ⚠️ 여기 거는 값은 `canEdit`이 아니라 **`canSync`**다.
-            //    적기는 언제나 무료라 `canEdit`은 늘 참이고, 그걸 걸면 무료 사용자에게도
-            //    영영 '열림'이라고만 말한다 (→ TodoAccess.swift).
+            // 동기화는 값을 받지 않는다고 **적어 둔다.** 한때 이걸 팔려 했던 앱이라,
+            // 말하지 않으면 산 사람만 아이폰에 보이는 줄 안다 (→ TodoAccess.swift).
             HStack {
-                Text("아이폰으로 건너가기")
+                Text("아이폰과 오가기")
                 Spacer()
-                Text(TodoAccess.canSync ? "열림" : "잠김")
+                Text("무료")
                     .foregroundStyle(.secondary)
             }
 
-            // **살 수 있을 때만 단추를 낸다** — 그 판정을 `sellsAccess`가 아니라
-            // **상품이 실제로 불러와졌는가**로 한다.
-            //
-            // 플래그로 가리면 두 쪽 다 틀린다. 켜 두면 콘솔에 상품이 없는 동안 눌러도
-            // 아무 일이 안 나는 단추가 서고, 꺼 두면 개발 빌드에서 구매 흐름을 볼 수가
-            // 없다. 애플이 상품을 내주면 살 수 있는 것이고 아니면 못 사는 것이라,
-            // `product != nil`이 그 사실 자체다.
-            if let product = purchases.product, !isPro {
+            // **살 수 있을 때만 단추를 낸다** — 그 판정을 플래그가 아니라
+            // **상품이 실제로 불러와졌는가**로 한다. 애플이 상품을 내주면 살 수 있는 것이다.
+            if purchases.offersPro, let product = purchases.featuredProduct, !isPro {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Label("Pro 버전 구매 · \(product.displayPrice)", systemImage: "sparkles")
+                    Label("Pro 보기 · 연 \(product.displayPrice)부터", systemImage: "sparkles")
                 }
             }
 
-            if purchases.product != nil || isPro {
+            if purchases.offersPro, !purchases.products.isEmpty || isPro {
                 Button {
                     Task { await purchases.restore() }
                 } label: {
@@ -432,7 +426,7 @@ struct SettingsView: View {
                 .disabled(purchases.isWorking)
             }
 
-            if let message = purchases.failureMessage {
+            if let message = purchases.failureMessage, purchases.offersPro {
                 Text(message)
                     .font(.caption)
                     .foregroundStyle(.orange)
@@ -443,7 +437,8 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         } header: {
-            Text("함께 쓰기")
+            // 팔기 전(출시 빌드)에는 살 것이 없으니 Pro라는 이름을 내걸지 않는다.
+            Text(purchases.offersPro ? "무지개 공방 Pro" : "요금")
         }
         // 사고 나면 단추가 내려가고 문구가 바뀐다. 그 순간이 툭 갈리지 않게.
         .animation(Motion.disclose, value: isPro)
@@ -482,18 +477,17 @@ struct SettingsView: View {
         }
     }
 
-    /// 값을 치렀는가. `sellsAccess`가 꺼진 무료 개방 기간에는 건너가기가 열려 있어도
-    /// 프로가 아니다 (→ MacEntitlement.swift의 `hasPurchased`).
-    private var isPro: Bool { purchases.hasPurchased }
+    /// Pro를 샀는가 (→ MacEntitlement.swift).
+    private var isPro: Bool { purchases.isPro }
 
     private var tierNote: String {
         if isPro {
-            return String(localized: "여기서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
+            return String(localized: "회고 추세와 다른 주 계획 가져오기가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
         }
-        if MacEntitlement.sellsAccess {
-            return String(localized: "적는 데는 아무 지장이 없습니다. 주간 계획·루틴도, 아이폰에서 온 할 일을 보는 것도 무료입니다. 여기서 적은 것이 아이폰으로 건너가는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다.")
+        if purchases.offersPro {
+            return String(localized: "계획·루틴·할 일·이번 주 회고·아이폰과 오가기는 계속 무료입니다. Pro는 지난 주들이 쌓여야 보이는 회고 추세와 다른 주 계획 가져오기를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다.")
         }
-        return String(localized: "지금은 모든 기능이 열려 있습니다. 판매를 시작해도 적는 것은 계속 무료이고, 여기서 적은 것이 아이폰으로 건너가는 것만 프로가 됩니다.")
+        return String(localized: "지금 쓰시는 모든 기능은 무료입니다.")
     }
 
     private func ruleRow(_ field: LocalizedStringKey, _ rule: LocalizedStringKey) -> some View {

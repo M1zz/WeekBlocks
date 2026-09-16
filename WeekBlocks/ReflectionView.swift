@@ -31,6 +31,11 @@ struct ReflectionView: View {
 
     let weekStart: Date
 
+    /// 이번 주를 돌아보는가, 지난 주들을 겹쳐 보는가 (→ ReflectionTrendsView, Pro).
+    enum Tab: Hashable { case week, trends }
+    @State private var tab: Tab = .week
+    @State private var purchases = PurchaseManager.shared
+
     @Query private var allBlocksRaw: [PlanBlock]
     /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
     /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
@@ -58,7 +63,11 @@ struct ReflectionView: View {
 
             Divider()
 
-            if weekBlocks.isEmpty {
+            if tab == .trends, purchases.offersPro {
+                ReflectionTrendsView(weekStart: weekStart, allBlocks: allBlocks)
+                    .frame(maxHeight: .infinity)
+                    .transition(.opacity)
+            } else if weekBlocks.isEmpty {
                 ContentUnavailableView(
                     "이번 주에는 계획된 블록이 없습니다",
                     systemImage: "tray",
@@ -102,18 +111,35 @@ struct ReflectionView: View {
 
     private func header(_ stats: ReflectionStats) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("주간 회고")
-                .font(.title3.weight(.medium))
-
-            HStack(spacing: 10) {
-                ReflectionStatTile(label: "달성", value: stats.done, color: .green)
-                ReflectionStatTile(label: "부분", value: stats.partial, color: .yellow)
-                ReflectionStatTile(label: "건너뜀", value: stats.skipped, color: .red)
-                ReflectionStatTile(label: "미회고", value: stats.pending, color: .secondary)
+            HStack {
+                Text("주간 회고")
+                    .font(.title3.weight(.medium))
+                Spacer()
+                // 추세는 Pro지만 탭은 누구에게나 선다 — 안 산 사람은 들어가서 흐린 제 기록 위의 문을 본다.
+                // 팔기 전(출시 빌드)에는 탭 자체가 없다 (→ PurchaseManager.offersPro).
+                if purchases.offersPro {
+                    Picker("", selection: $tab.animation(Motion.screen)) {
+                        Text("이번 주").tag(Tab.week)
+                        Text("추세").tag(Tab.trends)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .fixedSize()
+                }
             }
-            // 한 줄에 표시를 찍으면 위쪽 숫자 넷이 함께 움직인다.
-            // 굴러가야 방금 누른 것이 어느 칸에 닿았는지가 보인다.
-            .animation(Motion.number, value: stats.key)
+
+            if tab == .week || !purchases.offersPro {
+                HStack(spacing: 10) {
+                    ReflectionStatTile(label: "달성", value: stats.done, color: .green)
+                    ReflectionStatTile(label: "부분", value: stats.partial, color: .yellow)
+                    ReflectionStatTile(label: "건너뜀", value: stats.skipped, color: .red)
+                    ReflectionStatTile(label: "미회고", value: stats.pending, color: .secondary)
+                }
+                // 한 줄에 표시를 찍으면 위쪽 숫자 넷이 함께 움직인다.
+                // 굴러가야 방금 누른 것이 어느 칸에 닿았는지가 보인다.
+                .animation(Motion.number, value: stats.key)
+                .transition(.disclose)
+            }
         }
         .padding(20)
     }
@@ -229,6 +255,9 @@ struct DayReflectionPanel: View {
             }
         }
         .contentShape(Rectangle())
+        // 받을 준비가 되면 판이 살짝 부푼다 — 여기 놓으면 된다는 것이 모양으로 읽힌다.
+        .scaleEffect(dropTargeted ? 1.015 : 1)
+        .animation(Motion.squish, value: dropTargeted)
         // **아래 할 일을 여기 떨어뜨리면 그날의 일이 된다.** 회고할 줄이 하나 늘어나는 것이다.
         // 몇 시에 할지까지 정하려면 왼쪽 하루 위에 떨어뜨린다.
         .dropDestination(for: String.self) { items, _ in
@@ -269,8 +298,9 @@ struct ReflectionStatTile: View {
         .padding(.horizontal, compact ? 10 : 12)
         .padding(.vertical, compact ? 5 : 8)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(compact ? Color.primary.opacity(0.04) : Color(nsColor: .controlBackgroundColor),
-                    in: .soft(Corner.card))
+        // 일간 옆의 작은 칸은 제 색으로 옅게 물든다 — 네 칸이 회색 표가 아니라 색 알약으로 읽힌다.
+        .background(compact ? color.opacity(0.1) : Color(nsColor: .controlBackgroundColor),
+                    in: .soft(compact ? Corner.panel : Corner.card))
     }
 }
 
@@ -366,7 +396,8 @@ struct ReflectionRow: View {
     /// 부분·건너뜀이 찍혀 있을 때 누르면 그것도 풀린다 — 체크박스는 늘 '지금 상태를 끈다'.
     private var checkButton: some View {
         Button {
-            withAnimation(Motion.row) {
+            Haptic.tick()
+            withAnimation(Motion.squish) {
                 block.reviewStatus = block.reviewStatus == nil ? .done : nil
             }
             onChange()
@@ -374,8 +405,11 @@ struct ReflectionRow: View {
             Image(systemName: block.reviewStatus?.systemImage ?? "circle")
                 .font(.system(size: 16))
                 .foregroundStyle(tint(for: block.reviewStatus))
+                .contentTransition(.symbolEffect(.replace))
+                // 찍히는 순간 동그라미가 한 번 통 튄다.
+                .symbolEffect(.bounce, value: block.reviewStatus)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.squish)
         .help(block.reviewStatus == nil ? "끝냈다고 표시한다" : "표시를 지운다 (적어 둔 회고는 그대로 남습니다)")
     }
 
@@ -397,7 +431,8 @@ struct ReflectionRow: View {
     private var stateButtons: some View {
         ForEach(ReviewStatus.allCases) { status in
             Button {
-                withAnimation(Motion.row) {
+                Haptic.tick()
+                withAnimation(Motion.squish) {
                     block.reviewStatus = block.reviewStatus == status ? nil : status
                 }
                 onChange()

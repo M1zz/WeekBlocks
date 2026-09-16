@@ -2,25 +2,23 @@
 //  MacEntitlement.swift
 //  WeekBlocks
 //
-//  **'함께 쓰기'를 샀는가.** 한 번 사면 끝인 비소모성 상품 하나.
+//  **「무지개 공방 Pro」를 샀는가.** 연간·월간 구독이나 평생 이용권, 무엇이든 하나.
 //
-//  이 앱에서 값을 받는 것은 **적기** 하나뿐이다 (→ TodoAccess.swift).
-//  잠겨 있어도 아이폰에서 온 할 일은 그대로 내려와 보이고, 예전에 적어 둔 것도
-//  그대로 있다. 새로 적는 것만 막힌다.
+//  Pro가 여는 것은 **쌓여야 보이는 것**뿐이다 — 지난 주들의 회고 추세, 다른 주 계획 가져오기.
+//  계획하고 적고 돌아보고 아이폰과 오가는 것은 전부 무료다 (→ WeekBlocksSpec.monetization).
 //
-//  ⚠️ **기본값이 '열림'이다.** 상품을 App Store Connect에 만들고 실제로 팔기 전까지는
-//     아무도 살 수 없는데, 그동안 앱이 잠겨 있으면 쓰던 사람이 갑자기 못 적게 된다.
-//     그건 값을 받는 게 아니라 뺏는 것이다. 팔 준비가 끝나면 `sellsAccess`를 켠다.
-//     그 한 줄이 이 정책 전부다.
+//  ⚠️ **팔기 전에는 Pro 기능을 아예 세우지 않는다** (`offersPro`).
+//     무료로 열어 두었다가 나중에 잠그면 그건 새로 파는 게 아니라 뺏는 것이다.
+//     예전에 '아이폰으로 건너가기'를 팔려다 그 자리에서 데었다. 그래서 거꾸로 간다 —
+//     상품이 스토어에 서기 전에는 보이지 않고, 서는 날 잠긴 채로 처음 나타난다.
 //
 //  ⚠️ 권한의 근거는 언제나 `Transaction.currentEntitlements`다. 아래 UserDefaults 값은
 //     화면이 빨리 그려지라고 둔 거울이지 근거가 아니다. 켤 때마다 다시 확인해 덮어쓴다.
 //
-//  ⚠️ **영수증을 읽는 일은 이제 LeeoKit(`LeeoStore`)이 한다.** 상품 로드·구매·복원·
-//     거래 리스너를 앱마다 다시 짜다가 빠뜨리던 것들(다른 기기에서 산 것, 가족 공유,
-//     '구입 요청' 승인분, 환불)이 거기 다 들어 있다. 이 파일에 남은 것은 **정책**뿐이다 —
-//     "지금 팔고 있는가(`sellsAccess`)"와 "모를 때 뭐라고 말할 것인가(`cachedPurchase`)".
-//     파는 상품이 무엇인지는 계약이 정한다 (→ WeekBlocksSpec.swift).
+//  ⚠️ **영수증을 읽는 일은 LeeoKit(`LeeoStore`)이 한다.** 상품 로드·구매·복원·
+//     거래 리스너(다른 기기에서 산 것, 가족 공유, '구입 요청' 승인분, 환불, 구독 만료)가
+//     거기 다 들어 있다. 이 파일에 남은 것은 **정책**뿐이다 —
+//     "지금 팔고 있는가(`sellsPro`)"와 "모를 때 뭐라고 말할 것인가(`cachedPurchase`)".
 //
 
 import Foundation
@@ -30,53 +28,35 @@ import LeeoKit
 
 enum MacEntitlement {
 
-    /// App Store Connect의 비소모성 상품 ID. 근거는 계약 한 곳이다.
-    /// ⚠️ 콘솔·`WeekBlocks.storekit`에 적은 것과 **글자 하나까지 같아야 한다.**
-    static var productID: String { WeekBlocksSpec.syncProductID }
-
-    /// **'아이폰과 함께 쓰기'를 팔기 시작했는가.** false인 동안에는 모두 함께 쓴다.
+    /// **Pro를 팔기 시작했는가.**
     ///
-    /// ⚠️ 파는 것은 **적기가 아니라 건너가기**다. 적는 것은 이 앱의 본체라 잠그지
-    ///    않는다 (→ TodoAccess.swift).
+    /// 개발 빌드에서는 켠다 — `WeekBlocks.storekit`의 가짜 스토어로 페이월과 구매 흐름을
+    /// 끝까지 굴려 볼 수 있어야 한다. 출시 빌드는 App Store Connect에 상품
+    /// (연간·월간 구독, 평생 이용권)을 만들고 **심사에 함께 올리는 판에서** 켠다.
     ///
-    /// ⚠️ **팔 수 있게 되기 전에는 켜지 말 것.** 한 번 켰다가 되돌렸다.
-    ///    상품이 App Store Connect에 아직 없으니 아무도 못 사고, 그러면 모두가
-    ///    `hasPurchased == false`라 **쓰던 사람의 것이 아이폰에서 통째로 사라진다.**
-    ///    (심사 빌드에는 켜져 있어야 하지만, 그건 **아카이브하는 순간**에 켜는 것이지
-    ///     평소 쓰는 빌드에 켜 두는 것이 아니다.)
-    static let sellsAccess = false
-
-    private static let purchasedKey = "mac.sync.purchased"
-
-    /// 적을 수 있는가. 팔기 전에는 모두에게 열려 있다.
-    static var isUnlocked: Bool {
-        guard sellsAccess else { return true }
-        return hasPurchased
+    /// ⚠️ 상품이 콘솔에 없는데 출시 빌드에서 켜면 Pro 기능이 잠긴 채로 서고 아무도 못 산다.
+    static var sellsPro: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
     }
+
+    /// v1.1.3까지 '함께 쓰기'를 비추던 거울. 그때는 아무도 살 수 없었으므로 옮겨 올 값이 없다.
+    /// 새 이름을 쓰는 까닭은 옛 값이 '안 샀다'로 남아 있으면 Pro 구매자에게도 한 번은 틀린 말을 하기 때문이다.
+    private static let purchasedKey = "mac.pro.purchased"
 
     /// 캐시에 적혀 있는 답. **nil은 '안 샀다'가 아니라 '아직 애플에게 안 물어봤다'** 이다.
     ///
     /// `UserDefaults.bool(forKey:)`는 이 둘을 똑같이 false로 돌려준다. 그 차이를 잃으면
     /// 처음 켠 사람에게 — 산 사람이라도 — 잠깐 "무료"라고 **단정해서** 말하게 된다.
-    /// 캐시는 빠르라고 두는 것이지 없는 답을 지어내라고 두는 것이 아니다.
-    ///
-    /// ⚠️ `LeeoStore`도 제 나름의 캐시를 UserDefaults에 둔다. 그건 상품 ID로 이름을 지은
-    ///    LeeoKit 내부 값이라 여기서 읽지 않는다. 이 키는 **'물어봤는가'까지 담는**
-    ///    앱의 거울이고, 그 차이가 화면의 '확인 중…'을 만든다.
     static var cachedPurchase: Bool? {
         UserDefaults.standard.object(forKey: purchasedKey) as? Bool
     }
 
-    /// **값을 치렀는가.** `sellsAccess`와 무관한 영수증의 사실이다.
-    ///
-    /// `isUnlocked`와 갈라 두는 이유: 팔기 전에는 아무도 안 샀는데도 `isUnlocked`가
-    /// true다. 그 값으로 '함께 쓰기'를 판정하면 **무료 기간에 적은 것이 산 것과 똑같이**
-    /// 다른 기기에 열려 버리고, 팔기 시작한 뒤에도 그대로 남는다 (→ TodoSharing.swift의
-    /// `reconcileMySharing`). '적을 수 있는가'와 '나눠 쓸 수 있는가'는 다른 질문이다.
-    ///
-    /// ⚠️ 모를 때는 **안 산 쪽으로 기운다.** 문을 여는 판단이라 모르는 채로 열면 안 된다.
-    ///    대신 *화면에 뭐라고 쓸지*는 이 값만으로 정하지 않는다 — `PurchaseManager.isKnown`을
-    ///    함께 보고, 아직 모르면 '무료'가 아니라 '확인 중'이라고 말한다.
+    /// **Pro인가.** 모를 때는 안 산 쪽으로 기운다 — 문을 여는 판단이라 모르는 채로 열면 안 된다.
+    /// 대신 *화면에 뭐라고 쓸지*는 `PurchaseManager.isKnown`을 함께 보고, 아직 모르면 '확인 중'이라고 말한다.
     static var hasPurchased: Bool { cachedPurchase ?? false }
 
     /// 영수증 확인 결과를 적는다. `PurchaseManager`만 부른다.
@@ -85,58 +65,52 @@ enum MacEntitlement {
     }
 }
 
-/// 영수증을 확인하고 사는 일을 맡는다. 화면은 `isUnlocked`만 본다.
+/// 영수증을 확인하고 사는 일을 맡는다. 화면은 `isPro`·`offersPro`만 본다.
 ///
 /// **속은 전부 `LeeoStore`다.** 이 클래스가 하는 일은 두 가지뿐이다 —
 ///  ① LeeoKit의 값(`ObservableObject`)을 SwiftUI의 `@Observable` 세계로 옮겨 적는 것,
-///  ② 그 값을 **앱의 정책**(`MacEntitlement`)에 통과시켜 `isUnlocked`를 만드는 것.
-///
-/// ⚠️ 화면이 쓰는 이름(`isUnlocked`·`hasPurchased`·`isKnown`·`product`·`isWorking`·
-///    `failureMessage`)은 그대로 두었다. LeeoKit으로 갈아탄 것은 속이지 부르는 자리가 아니다.
+///  ② 그 값을 **앱의 정책**(`MacEntitlement`)에 통과시키는 것.
 @MainActor
 @Observable
 final class PurchaseManager {
     static let shared = PurchaseManager()
 
-    /// 상품 로드·구매·복원·거래 리스너 — 전부 LeeoKit이 맡는다.
-    /// 구성(상품 ID·약관·개인정보 링크)은 계약에서 유도된 것을 그대로 쓴다
-    /// (→ WeekBlocksSpec.monetization).
     @ObservationIgnored let store: LeeoStore
 
-    private(set) var isUnlocked: Bool = MacEntitlement.isUnlocked
-    /// 값을 치렀는가 (→ `MacEntitlement.hasPurchased`).
-    /// 근거는 UserDefaults지만 그건 관찰이 안 되므로, 화면이 볼 수 있게 여기 거울을 하나 둔다.
-    /// 무료 개방 기간에는 `isUnlocked`가 참이어도 이 값은 거짓이다 — 설정의 '프로/무료'는
-    /// 이쪽을 본다.
-    private(set) var hasPurchased: Bool = MacEntitlement.hasPurchased
-    /// **애플에게 물어봐서 답을 받았는가.**
-    /// false면 화면은 '무료'라고 단정하면 안 된다 — 산 사람일 수도 있다.
-    /// 캐시가 이미 있으면 처음부터 참이다(빠르라고 두는 캐시의 값이 여기서 나온다).
+    /// Pro를 샀는가 (→ `MacEntitlement.hasPurchased`).
+    private(set) var isPro: Bool = MacEntitlement.hasPurchased
+    /// **애플에게 물어봐서 답을 받았는가.** false면 화면은 '무료'라고 단정하면 안 된다.
     private(set) var isKnown: Bool = MacEntitlement.cachedPurchase != nil
-    private(set) var product: Product?
+    /// 페이월에 설 상품들. 계약의 차례(연간 → 평생 → 월간)를 따른다.
+    private(set) var products: [Product] = []
     private(set) var isWorking = false
-    /// 사다가 막혔을 때 화면에 그대로 보여줄 말. 조용히 실패하면 사용자는
-    /// 버튼이 고장 난 줄 안다.
+    /// 사다가 막혔을 때 화면에 그대로 보여줄 말. 조용히 실패하면 사용자는 단추가 고장 난 줄 안다.
     private(set) var failureMessage: String?
+
+    /// **Pro 기능을 화면에 세우는가.** 팔고 있거나, 이미 산 사람이면.
+    ///
+    /// 산 사람에게는 판매를 멈춘 뒤에도 계속 보인다 — 값을 치른 것이 사라지면 안 된다.
+    var offersPro: Bool { MacEntitlement.sellsPro || isPro }
+
+    /// 설정 화면에 가격 한 줄을 적을 대표 상품 (연간).
+    var featuredProduct: Product? {
+        products.first { $0.id == WeekBlocksSpec.proYearlyID } ?? products.first
+    }
 
     /// **이번 실행에서 영수증을 실제로 읽었는가.**
     ///
     /// ⚠️ 이 플래그가 서기 전에는 캐시에 아무것도 쓰지 않는다. LeeoStore는 상품을
     ///    불러오는 중에도 값이 바뀌었다고 알려 오는데, 그 알림에 대고 `hasPro`(아직 false)를
-    ///    캐시에 적어 버리면 **처음 켠 구매자가 '무료'로 못박힌다.** '모른다'와 '아니다'를
-    ///    가르는 것이 이 파일의 절반이라 여기서 무너뜨리면 안 된다.
+    ///    캐시에 적어 버리면 **처음 켠 구매자가 '무료'로 못박힌다.**
     @ObservationIgnored private var entitlementsChecked = false
     @ObservationIgnored private var observation: AnyCancellable?
 
     private init() {
-        // 계약이 페이월을 요구하지 않는 모델(.free/.paidUpfront)로 바뀌면 여기서 걸린다.
-        // 파는 것이 없는데 결제 화면이 서 있는 상태를 조용히 두지 않으려는 것이다.
         guard let config = WeekBlocksSpec.paywall else {
             preconditionFailure("계약에 페이월이 없다 — WeekBlocksSpec.monetization을 확인할 것")
         }
         store = LeeoStore(config: config)
 
-        // LeeoStore는 Combine 쪽 관찰(ObservableObject)이라 @Observable 화면이 직접 못 본다.
         // ⚠️ objectWillChange는 값이 바뀌기 **직전**에 온다. 그 자리에서 읽으면 옛 값이므로
         //    다음 차례로 미뤄서 읽는다.
         observation = store.objectWillChange.sink { [weak self] _ in
@@ -147,21 +121,21 @@ final class PurchaseManager {
     /// 영수증을 다시 읽어 권한을 맞춘다. 켤 때마다 부른다.
     func refresh() async {
         await store.refreshEntitlements()
-        await store.loadProducts()
+        if MacEntitlement.sellsPro { await store.loadProducts() }
         entitlementsChecked = true
         pull()
     }
 
-    func purchase() async {
-        if store.products.isEmpty { await store.loadProducts() }
-        guard let product = store.products.first else {
-            failureMessage = String(localized: "상품을 아직 못 불러왔습니다. 잠시 뒤 다시 시도해 주세요.")
-            return
-        }
-        // 성공·취소·승인 대기·실패의 갈래와 거래 끝맺음(`finish`)은 전부 LeeoStore 안에 있다.
-        // 구매 퍼널 이벤트(purchase_started/completed/failed)도 거기서 저절로 나간다.
+    /// 고른 상품을 산다. 성공·취소·승인 대기·실패의 갈래와 퍼널 이벤트는 LeeoStore 안에 있다.
+    func purchase(_ product: Product) async {
         _ = await store.purchase(product)
         entitlementsChecked = true
+        pull()
+    }
+
+    /// 상품을 아직 못 불러왔을 때 페이월이 다시 청한다.
+    func loadProducts() async {
+        await store.loadProducts()
         pull()
     }
 
@@ -172,17 +146,14 @@ final class PurchaseManager {
         pull()
     }
 
-    /// LeeoStore의 값을 앱 정책에 통과시켜 화면이 보는 자리에 옮겨 적는다.
     private func pull() {
         if entitlementsChecked {
             MacEntitlement.setPurchased(store.hasPro)
         }
-        hasPurchased = MacEntitlement.hasPurchased
-        isUnlocked = MacEntitlement.isUnlocked
+        isPro = MacEntitlement.hasPurchased
         isKnown = entitlementsChecked || MacEntitlement.cachedPurchase != nil
-        product = store.products.first
+        products = store.products
         isWorking = store.purchasingProductID != nil || store.isRestoring
-        // 스스로 그만둔 것(취소)에는 LeeoStore가 아무 말도 남기지 않는다 — 할 말이 없으니 조용하다.
         failureMessage = store.lastError
     }
 }

@@ -102,7 +102,7 @@ struct RoutineBlock: View {
                     Button { onEdit() } label: {
                         Image(systemName: "pencil").font(.system(size: 13))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.squish)
                     if routine.kind == .fixed {
                         // 중요한 고정 루틴 — 실수 삭제 방지로 잠금(편집에서만 삭제).
                         Image(systemName: "lock.fill").font(.system(size: 12)).foregroundStyle(.secondary)
@@ -110,7 +110,7 @@ struct RoutineBlock: View {
                         Button(role: .destructive) { onDelete() } label: {
                             Image(systemName: "trash").font(.system(size: 13))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.squish)
                         .foregroundStyle(.red)
                     }
                 } else if routine.kind == .fixed {
@@ -565,7 +565,7 @@ private struct DayToggle: View {
                         .stroke(isOn ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.2), lineWidth: 0.5)
                 )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.squish)
         .animation(Motion.hover, value: isOn)
     }
 }

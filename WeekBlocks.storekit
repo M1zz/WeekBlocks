@@ -3,6 +3,26 @@
   "nonRenewingSubscriptions": [],
   "products": [
     {
+      "displayPrice": "39.99",
+      "familyShareable": false,
+      "internalID": "5214ABC8-8962-4B3E-938D-C0DE64DF3221",
+      "localizations": [
+        {
+          "description": "회고 추세와 다른 주 계획 가져오기를 한 번 결제로 계속 씁니다.",
+          "displayName": "무지개 공방 Pro 평생",
+          "locale": "ko"
+        },
+        {
+          "description": "Reflection trends and copying past weeks, with one payment.",
+          "displayName": "Rainbow Workshop Pro Lifetime",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.pro.lifetime",
+      "referenceName": "Pro 평생",
+      "type": "NonConsumable"
+    },
+    {
       "displayPrice": "4.99",
       "familyShareable": false,
       "internalID": "2D155F32-D51C-48F8-9F8E-150E1F4FE9C7",
@@ -19,7 +39,7 @@
         }
       ],
       "productID": "com.devkoan.ScheduleDensityApp.sync",
-      "referenceName": "함께 쓰기 (이 맥에서 적기)",
+      "referenceName": "함께 쓰기 (판매 중단 · Pro로 인정)",
       "type": "NonConsumable"
     }
   ],
@@ -32,7 +52,74 @@
     "_storefront": "KOR",
     "_storeKitErrors": []
   },
-  "subscriptionGroups": [],
+  "subscriptionGroups": [
+    {
+      "id": "9636BCA4-12FE-4833-B73C-6949C85818F7",
+      "localizations": [],
+      "name": "무지개 공방 Pro",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "14.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "E03B4DAF-B0E1-4DA7-942F-F93DBC01F775",
+          "introductoryOffer": {
+            "internalID": "110F8202-E7F9-4BF7-B4BA-F73FB542EA5A",
+            "numberOfPeriods": 1,
+            "paymentMode": "free",
+            "subscriptionPeriod": "P1W"
+          },
+          "localizations": [
+            {
+              "description": "회고 추세와 다른 주 계획 가져오기를 엽니다.",
+              "displayName": "무지개 공방 Pro 연간",
+              "locale": "ko"
+            },
+            {
+              "description": "Unlocks reflection trends and copying past weeks.",
+              "displayName": "Rainbow Workshop Pro Yearly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.devkoan.ScheduleDensityApp.pro.yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Pro 연간",
+          "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "1.99",
+          "familyShareable": false,
+          "groupNumber": 2,
+          "internalID": "6F4606D7-D202-48C1-9279-33DCCF983E28",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "회고 추세와 다른 주 계획 가져오기를 엽니다.",
+              "displayName": "무지개 공방 Pro 월간",
+              "locale": "ko"
+            },
+            {
+              "description": "Unlocks reflection trends and copying past weeks.",
+              "displayName": "Rainbow Workshop Pro Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.devkoan.ScheduleDensityApp.pro.monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Pro 월간",
+          "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
+        }
+      ]
+    }
+  ],
   "version": {
     "major": 4,
     "minor": 0

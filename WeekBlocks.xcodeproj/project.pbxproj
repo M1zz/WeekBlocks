@@ -47,10 +47,12 @@
 		918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
 		98278046F3F6DA26559B9008 /* Surface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEC8822FA5DD9EE70C20530 /* Surface.swift */; };
+		995871F5986FE5C82D0852D5 /* ReflectionTrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */; };
 		9D5EEDBB4DA71FED5DFA3AE7 /* ScheduleClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AB47D0D95CB6D901FC0D81 /* ScheduleClock.swift */; };
 		9F5A4B6B73214FA1C5C353B4 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD73EF7D52999BFEC85767 /* Motion.swift */; };
 		A14391170989592054428F6E /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 557E8F32612BE4E8BC96E369 /* InfoPlist.xcstrings */; };
 		A2A0A55F465DF4893B6A6A40 /* Affordance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162BD316D362F2B5D760A08 /* Affordance.swift */; };
+		AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */; };
 		AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526E2EF2A25551766D802F91 /* TodoSharing.swift */; };
 		ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */; };
 		B121540A19F0977281258CD9 /* TodoAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB645C90135FC303A3A31FA0 /* TodoAccess.swift */; };
@@ -120,6 +122,7 @@
 		5CC172BAFFE573306711B4CE /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
 		5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BacklogItem+Fragment.swift"; sourceTree = "<group>"; };
 		622A5D436D0F426C007C5246 /* ShareTodoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTodoView.swift; sourceTree = "<group>"; };
+		693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionTrendsView.swift; sourceTree = "<group>"; };
 		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
 		7826FECD3C214B59C8E531EB /* MacEntitlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacEntitlement.swift; sourceTree = "<group>"; };
@@ -143,6 +146,7 @@
 		C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStepsView.swift; sourceTree = "<group>"; };
 		C368657EE69104A4BA70BA52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekCopyView.swift; sourceTree = "<group>"; };
 		CC4A396C6929CB1C576DBA52 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		CD35C8D5A757450762EFDC34 /* TodoTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTips.swift; sourceTree = "<group>"; };
 		D1A6EA88AB7820ECC2A0228E /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
@@ -221,6 +225,7 @@
 				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
 				C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */,
+				693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */,
 				45EF8BFE32D234EF9576302C /* ReflectionView.swift */,
 				0DAA819E703DC5BE377B3688 /* Routine.swift */,
 				9F541E3039606B54D810E610 /* RoutineDetailView.swift */,
@@ -248,6 +253,7 @@
 				FE2891429087F31216F7F774 /* WeekBlocks.entitlements */,
 				77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */,
 				9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */,
+				C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */,
 				87EB398D348B2377FA8540BF /* WeekGridView.swift */,
 			);
 			path = WeekBlocks;
@@ -420,6 +426,7 @@
 				918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */,
 				076A03104420525A517BD699 /* PaywallView.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
+				995871F5986FE5C82D0852D5 /* ReflectionTrendsView.swift in Sources */,
 				33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */,
 				83DE0994DCC6B215222A482D /* Routine.swift in Sources */,
 				E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */,
@@ -446,6 +453,7 @@
 				4AD3E0852C409C709566599A /* TodoTree.swift in Sources */,
 				58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */,
 				D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */,
+				AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */,
 				837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

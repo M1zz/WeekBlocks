@@ -28,6 +28,9 @@ struct ContentView: View {
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: Routine?
     @State private var showingReflection = false
+    /// 다른 주 계획을 보고 있는 주에 깐다 (→ WeekCopyView, Pro).
+    @State private var showingWeekCopy = false
+    @State private var purchases = PurchaseManager.shared
     @State private var showingSettings = false
     @State private var showingSampleAlert = false
     /// 처음 켠 사람에게 앱을 건네는 자리 (→ OnboardingView.swift).
@@ -220,6 +223,14 @@ struct ContentView: View {
                     } label: {
                         Label("캘린더에서 가져오기", systemImage: "calendar.badge.plus")
                     }
+                    // 팔기 전(출시 빌드)에는 세우지 않는다 — 무료로 열었다가 잠그면 뺏는 것이다.
+                    if purchases.offersPro {
+                        Button {
+                            showingWeekCopy = true
+                        } label: {
+                            Label("다른 주 계획 가져오기…", systemImage: "square.on.square")
+                        }
+                    }
                     Divider()
                     Button {
                         routineSheet = RoutineSheetContext(routine: nil)
@@ -286,6 +297,10 @@ struct ContentView: View {
         .sheet(item: $routineSheet) { ctx in
             RoutineEditorView(existing: ctx.routine)
                 .frame(minWidth: 520, minHeight: 480)
+        }
+        .sheet(isPresented: $showingWeekCopy) {
+            WeekCopyView(targetWeek: selectedWeek)
+                .frame(minWidth: 640, minHeight: 520)
         }
         .sheet(isPresented: $showingReflection) {
             ReflectionView(weekStart: selectedWeek)
@@ -553,6 +568,7 @@ struct ContentView: View {
     /// 같은 주 안의 다른 날로 (일간 위 요일 줄).
     private func showDay(_ day: DayOfWeek) {
         guard day != selectedDay else { return }
+        Haptic.tick()
         dayForward = day.rawValue > selectedDay.rawValue
         withAnimation(Motion.screen) { selectedDay = day }
     }
@@ -698,40 +714,79 @@ struct ContentView: View {
         }
     }
 
-    /// 일간 위의 요일 줄. 누르면 그날로 건너간다. 오늘은 붉게, 보고 있는 날은 채워서.
+    /// 일간 위의 요일 줄. 누르면 그날로 건너간다.
+    ///
+    /// 네모 칸 일곱 개를 늘어놓았더니 표의 머리처럼 딱딱했다. 요일 글자 아래 날짜를 동그랗게 세우고,
+    /// 그 아래에 그날 무엇이 있는지 색 구슬을 겹쳐 둔다 — 하루를 열기 전에 어느 날이 붐비는지 보인다.
+    /// 오늘은 붉게, 보고 있는 날은 동그라미가 채워진 채 **통통 미끄러져** 온다.
     private var dayStrip: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             ForEach(DayOfWeek.allCases) { day in
-                let selected = day == selectedDay
-                let today = Calendar.current.isDateInToday(dayDate(day))
-                Button { showDay(day) } label: {
-                    VStack(spacing: 1) {
-                        Text(day.shortLabel)
-                            .font(.system(size: 12, weight: .medium))
-                        Text(dayNumber(day))
-                            .font(.system(size: 15, weight: .semibold))
-                            .monospacedDigit()
-                    }
-                    .foregroundStyle(selected ? Color.white : (today ? Color.red : Color.primary))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 4)
-                    .background {
-                        if selected {
-                            RoundedRectangle.soft(Corner.card)
-                                .fill(today ? Color.red : Color.accentColor)
-                                .matchedGeometryEffect(id: "selectedDay", in: dayStripNamespace)
-                        } else {
-                            RoundedRectangle.soft(Corner.card)
-                                .fill(Color.surface)
-                                .shadow(color: .black.opacity(0.05), radius: 1, y: 0.5)
-                        }
-                    }
-                    .contentShape(RoundedRectangle.soft(Corner.card))
-                }
-                .buttonStyle(.plain)
-                .help(day.longLabel)
+                dayStripCell(day)
             }
         }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 6)
+        .background { DashboardSurface(radius: Corner.panel) }
+        .animation(Motion.squish, value: selectedDay)
+    }
+
+    private func dayStripCell(_ day: DayOfWeek) -> some View {
+        let selected = day == selectedDay
+        let today = Calendar.current.isDateInToday(dayDate(day))
+        let dots = dayDots(on: day)
+        return Button { showDay(day) } label: {
+            VStack(spacing: 4) {
+                Text(day.shortLabel)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(today ? Color.red : .secondary)
+                ZStack {
+                    if selected {
+                        Circle()
+                            .fill(today ? Color.red : Color.accentColor)
+                            .shadow(color: (today ? Color.red : Color.accentColor).opacity(0.35), radius: 5, y: 2)
+                            .matchedGeometryEffect(id: "selectedDay", in: dayStripNamespace)
+                    }
+                    Text(dayNumber(day))
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(selected ? Color.white : (today ? Color.red : Color.primary))
+                }
+                .frame(width: 32, height: 32)
+                // 그날의 일을 색 구슬로. 넷을 넘으면 넷까지만 — 셀 것이 아니라 붐비는지 볼 것이다.
+                HStack(spacing: -3) {
+                    ForEach(Array(dots.enumerated()), id: \.offset) { _, color in
+                        Circle()
+                            .fill(color)
+                            .frame(width: 8, height: 8)
+                            .overlay(Circle().strokeBorder(Color.surface, lineWidth: 1.5))
+                    }
+                }
+                .frame(height: 8)
+                .opacity(dots.isEmpty ? 0 : 1)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
+            .contentShape(RoundedRectangle.soft(Corner.card))
+        }
+        .buttonStyle(.squish)
+        .pointingCursor()
+        .help(day.longLabel)
+    }
+
+    /// 요일 줄에 찍을 색 구슬 — 고정 루틴부터, 그다음 계획 블록. 같은 색은 한 번만, 넷까지.
+    private func dayDots(on day: DayOfWeek) -> [Color] {
+        var colors: [Color] = []
+        var seen: Set<String> = []
+        let routineColors = fixedRoutines(on: day).map { ($0.colorName, $0.displayColor) }
+        let blockColors = weekBlocks.filter { $0.day == day }
+            .map { ($0.concreteVerified ? "accent" : "orange", $0.concreteVerified ? Color.accentColor : Color.orange) }
+        for (key, color) in routineColors + blockColors where !seen.contains(key) {
+            seen.insert(key)
+            colors.append(color)
+            if colors.count == 4 { break }
+        }
+        return colors
     }
 
     private var weekRangeString: String {
@@ -1013,7 +1068,7 @@ struct ContentView: View {
                     conflictNotice = nil
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
             .font(.system(size: 12, weight: .semibold))
             .underline()
             Button {
@@ -1021,7 +1076,7 @@ struct ContentView: View {
             } label: {
                 Image(systemName: "xmark").font(.system(size: 11, weight: .semibold))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.squish)
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 12)
@@ -1257,7 +1312,10 @@ struct ContentView: View {
                     changed = true
                 }
             }
-            if changed { try? context.save() }
+            if changed {
+                Haptic.snap()
+                withAnimation(Motion.squish) { try? context.save() }
+            }
             return
         }
         if token.hasPrefix("routine:") {
@@ -1281,7 +1339,9 @@ struct ContentView: View {
             guard let item = backlogItems.first(where: { $0.dragToken == token }) else { return }
             convertBacklogItem(item, to: day, atHour: atHour)
         }
-        try? context.save()
+        // 놓인 자리에서 톡 튀어나온다 — 손끝의 딸깍과 같은 순간에.
+        Haptic.snap()
+        withAnimation(Motion.squish) { try? context.save() }
     }
 
     /// **칩 사이에 끼워 넣는다 — 순서를 바꾼다는 건 시각을 정한다는 뜻이다.**

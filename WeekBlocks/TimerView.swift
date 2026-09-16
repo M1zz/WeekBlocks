@@ -409,7 +409,7 @@ struct TimerPill: View {
             .padding(.vertical, 4)
             .background(tint.opacity(0.14), in: Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.squish)
         .help("타이머 창 열기 (⇧⌘R)")
     }
 }
