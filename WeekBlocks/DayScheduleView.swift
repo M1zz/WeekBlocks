@@ -202,6 +202,9 @@ struct DayScheduleView: View {
                             .font(.system(size: 10, weight: .semibold))
                             .monospacedDigit()
                             .foregroundStyle(.white)
+                            // 시각 칸이 좁아도 "14:35"가 두 줄로 꺾이지 않게 — 넘치면 왼쪽으로 삐져나간다.
+                            .lineLimit(1)
+                            .fixedSize()
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
                             .background(Color.red, in: Capsule())

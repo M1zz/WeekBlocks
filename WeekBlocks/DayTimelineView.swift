@@ -795,6 +795,8 @@ struct HourAxis: View {
                                     .font(.system(size: 11, weight: .semibold))
                                     .monospacedDigit()
                                     .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .fixedSize()
                                     .padding(.horizontal, 4)
                                     .padding(.vertical, 1)
                                     .background(Color.red, in: Capsule())
