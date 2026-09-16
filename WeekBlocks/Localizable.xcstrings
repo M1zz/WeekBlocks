@@ -2937,6 +2937,16 @@
         }
       }
     },
+    "아래 할 일을 여기로 끌어다 놓으면 이 날에 올라갑니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag a to-do from below to put it on this day."
+          }
+        }
+      }
+    },
     "아래로" : {
       "localizations" : {
         "en" : {

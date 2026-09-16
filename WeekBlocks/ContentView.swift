@@ -142,7 +142,7 @@ struct ContentView: View {
                 // 먼저 이번 주가 어떻게 생겼는지 보고, 그다음 무엇을 끌어다 놓을지 고른다.
                 // (따로 선 창으로만 두었더니, 창을 안 열어 둔 사람에게는 요일 칸에
                 //  넣을 카드가 아예 보이지 않았다. 창 ⇧⌘T 는 나란히 놓고 쓰고 싶을 때.)
-                // 할 일은 주간에서만 — 할 일을 요일에 배치하는 건 주간이 하는 일이다 (일간은 그날의 회고 → daySection).
+                // 일간에서는 그날의 회고 아래에 같은 할 일 목록을 둔다 (→ daySection).
                 if scope == .week {
                     BacklogSection(allItems: backlogItems,
                                    weekStart: selectedWeek,
@@ -622,9 +622,9 @@ struct ContentView: View {
             }
             dayStrip
 
-            // **반은 하루, 반은 그날의 회고.** 일간은 할 일을 배치하는 자리가 아니다 — 배치는 주간이
-            // 한다. 하루를 크게 펴 보는 까닭은 **그 하루를 돌아보기 위해서**라, 하루 옆에 그날 계획해 둔
-            // 블록마다 했는지를 찍는 칸을 둔다 (→ DayReflectionPanel, 주간 회고와 같은 표시).
+            // **반은 하루, 반은 그날의 회고와 아직 안 정한 할 일.** 하루 옆에 그날 계획해 둔 블록마다
+            // 했는지를 찍는 칸을 두고(→ DayReflectionPanel, 주간 회고와 같은 표시), 그 아래에
+            // 요일을 아직 안 정한 할 일을 세워 빈 시간에 바로 끌어다 놓게 한다.
             HStack(alignment: .top, spacing: 14) {
                 ZStack(alignment: .topLeading) {
                     DayScheduleView(
@@ -665,17 +665,33 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 
-                DayReflectionPanel(
-                    day: selectedDay,
-                    date: dayDate(selectedDay),
-                    blocks: weekBlocks.filter { $0.day == selectedDay },
-                    onOpenWeekly: { showingReflection = true }
-                )
-                .frame(maxHeight: .infinity, alignment: .top)
-                .dashboardPanel(padding: 14)
-                .frame(maxWidth: .infinity)
-                .id("reflection-\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
-                .transition(.opacity)
+                // 오른쪽 반: 위에 그날의 회고, 아래에 **아직 요일을 안 정한 할 일**.
+                // 회고만 두었더니 하루를 보다가 빈 시간에 넣을 일을 고르려면 주간으로 돌아가야 했다.
+                // 할 일 카드는 주간과 같은 목록이라, 왼쪽 하루에 끌어다 놓으면 그 높이의 시각에 선다.
+                VStack(alignment: .leading, spacing: 14) {
+                    DayReflectionPanel(
+                        day: selectedDay,
+                        date: dayDate(selectedDay),
+                        blocks: weekBlocks.filter { $0.day == selectedDay },
+                        onOpenWeekly: { showingReflection = true },
+                        canPlan: hasFixedRoutines,
+                        onDropBacklog: { token in
+                            dropBacklogItem(token: token, day: selectedDay)
+                        }
+                    )
+                    .dashboardPanel(padding: 14)
+                    .id("reflection-\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
+                    .transition(.opacity)
+
+                    BacklogSection(allItems: backlogItems,
+                                   weekStart: selectedWeek,
+                                   weekBlocks: weekBlocks,
+                                   canPlan: hasFixedRoutines,
+                                   showsCategoryFilter: false)
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .dashboardPanel(padding: 14)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             // 두 판의 키를 긴 쪽에 맞춘다 — 들쭉날쭉하면 한 화면이 아니라 두 조각으로 읽힌다.
             .fixedSize(horizontal: false, vertical: true)

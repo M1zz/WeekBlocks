@@ -140,8 +140,7 @@ struct ReflectionView: View {
 
 /// **그날의 회고** — 주간 회고를 하루치로 떼어 일간 옆에 둔다.
 ///
-/// 일간에 할 일 목록을 붙여 끌어다 놓게 했더니 주간이 하는 일(요일에 배치하기)과 겹쳤다.
-/// 하루를 크게 펴 보는 까닭은 **그 하루를 돌아보기 위해서**다 — 계획해 둔 블록마다 했는지를
+/// 하루를 크게 펴 보는 까닭 하나는 **그 하루를 돌아보기 위해서**다 — 계획해 둔 블록마다 했는지를
 /// 찍고 한 줄을 남긴다. 같은 표시(`PlanBlock.reviewStatus`·`reviewNote`)가 주간 회고의
 /// 그 요일 아래에 그대로 모인다. 저장하는 자리를 새로 만들지 않았다.
 struct DayReflectionPanel: View {
@@ -152,6 +151,12 @@ struct DayReflectionPanel: View {
     /// 그날의 계획 블록.
     let blocks: [PlanBlock]
     var onOpenWeekly: () -> Void = {}
+    /// 할 일을 받을 수 있는가. 고정 루틴이 없으면 계획할 수 없다 (→ 하루 시간표와 같은 조건).
+    var canPlan: Bool = true
+    /// 할 일 카드를 떨어뜨렸다. 그날에 올린다 — 시각은 정하지 않는다(드래그 토큰).
+    var onDropBacklog: (String) -> Void = { _ in }
+
+    @State private var dropTargeted = false
 
     /// 하루가 흐른 차례대로 — 옆의 하루 시간표를 위에서 아래로 읽는 순서와 같다.
     private var sorted: [PlanBlock] { blocks.sorted { $0.sortHour < $1.sortHour } }
@@ -200,6 +205,11 @@ struct DayReflectionPanel: View {
                     Text("이 날은 계획한 블록이 없습니다")
                         .font(.callout.weight(.medium))
                         .foregroundStyle(.secondary)
+                    if canPlan {
+                        Text("아래 할 일을 여기로 끌어다 놓으면 이 날에 올라갑니다.")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 28)
@@ -217,6 +227,23 @@ struct DayReflectionPanel: View {
                 }
                 .animation(Motion.row, value: sorted.map(\.dragToken))
             }
+        }
+        .contentShape(Rectangle())
+        // **아래 할 일을 여기 떨어뜨리면 그날의 일이 된다.** 회고할 줄이 하나 늘어나는 것이다.
+        // 몇 시에 할지까지 정하려면 왼쪽 하루 위에 떨어뜨린다.
+        .dropDestination(for: String.self) { items, _ in
+            dropTargeted = false
+            guard canPlan, let token = items.first else { return false }
+            onDropBacklog(token)
+            return true
+        } isTargeted: { targeted in
+            withAnimation(Motion.target) { dropTargeted = targeted && canPlan }
+        }
+        .overlay {
+            RoundedRectangle.soft(Corner.card)
+                .strokeBorder(Color.accentColor, lineWidth: dropTargeted ? 2 : 0)
+                .padding(-6)
+                .allowsHitTesting(false)
         }
     }
 }
