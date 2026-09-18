@@ -257,9 +257,18 @@ struct RunningTimerFace: View {
     private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
 
     /// 지금 세고 있는 계획 블록. 루틴을 세는 중이면 nil — 루틴에는 '다음 첫 동작'이 없다.
-    private var timedBlock: PlanBlock? {
-        guard let token = timer.target?.token else { return nil }
-        return PlanBlock.matching(dragToken: token, in: allBlocks)
+    ///
+    /// ⚠️ 계산 프로퍼티로 두면 **초당 네 번** 블록 전체를 훑는다. 이 뷰는 타이머의 `now`(0.5초)를
+    ///    보고 다시 그려지고, 본문 안에서 이 값을 두 번 읽기 때문이다. 찾는 답은 토큰이 바뀌기
+    ///    전까지 같으므로, 바뀔 때만 한 번 찾아 들고 있는다.
+    @State private var timedBlock: PlanBlock?
+
+    private func findTimedBlock() {
+        guard let token = timer.target?.token else {
+            timedBlock = nil
+            return
+        }
+        timedBlock = PlanBlock.matching(dragToken: token, in: allBlocks)
     }
 
     /// 멈추기 전에 한 줄을 받는 중. 담긴 블록이 그 대상이다.
@@ -329,6 +338,8 @@ struct RunningTimerFace: View {
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(Motion.squish, value: timedBlock?.nextAction)
+        .task(id: timer.target?.token) { findTimedBlock() }
+        .onChange(of: allBlocksRaw.count) { _, _ in findTimedBlock() }
         .sheet(item: $closing) { block in
             nextActionSheet(block)
         }

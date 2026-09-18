@@ -17,6 +17,20 @@ enum SegmentSource {
         if case .quotaSession = self { return true }
         return false
     }
+
+    /// **이 조각이 어디서 났는가**를 가리키는 이름.
+    ///
+    /// 자정을 넘긴 잠은 `[23,24]`와 `[0,7]` 두 조각(`id`가 다르다)으로 그려지는데, 둘이 같은
+    /// 출처임을 알 길이 없어 (시각, 제목, 루틴여부) 삼중항으로 더듬던 자리가 있었다 —
+    /// 같은 제목 루틴이 둘이면 조용히 틀렸다. 출처는 이미 여기 있으므로 이름만 붙인다.
+    var key: String {
+        switch self {
+        case .none: "none"
+        case .fixedRoutine(let name): "routine:\(name)"
+        case .planBlock(let block): "block:\(block.dragToken)"
+        case .quotaSession(let name, let index): "quota:\(name):\(index)"
+        }
+    }
 }
 
 /// 타임라인에 실제로 그릴 시간 범위. 기본은 하루 전체(0–24).

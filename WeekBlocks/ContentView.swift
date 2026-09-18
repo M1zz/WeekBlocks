@@ -779,12 +779,7 @@ struct ContentView: View {
             undoManager.undo()
             try? context.save()
         }
-        refreshUndo()
-    }
-
-    private func refreshUndo() {
-        let value = undoManager?.canUndo ?? false
-        if value != canUndo { canUndo = value }
+        // `canUndo` 갱신은 UndoWiring 한 곳이 맡는다 — 되돌리기 알림이 곧바로 따라온다.
     }
 
     /// 내일 이 시각. 일요일 다음은 다음 주 월요일이라 주도 함께 넘어간다.

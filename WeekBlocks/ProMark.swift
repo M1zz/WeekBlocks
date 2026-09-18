@@ -24,6 +24,7 @@
 
 import Foundation
 import SwiftData
+import StoreKit
 
 @Model
 final class ProMark {
@@ -75,18 +76,54 @@ enum ProMarkStore {
         return marks.contains { $0.platformRaw != mine && $0.isValid(at: now) }
     }
 
+    /// **내 영수증을 표로 옮겨 적고, 상대의 표를 읽어 온다.** 두 앱이 같은 규칙을 쓴다.
+    ///
+    /// - Parameters:
+    ///   - hasPro: 내 영수증이 말하는 답. false면 내 표를 지운다 — 해지가 다른 기기에도 닿아야 한다.
+    ///   - entitlementIDs: Pro로 인정하는 상품들. 구독은 끝나는 날을 함께 적는다.
+    /// - Returns: 상대 쪽 표가 살아 있는가.
+    static func sync(hasPro: Bool, entitlementIDs: Set<String>,
+                     defaultProductID: String, in context: ModelContext) async -> Bool {
+        if hasPro {
+            var expiry: Date?
+            var productID = defaultProductID
+            var lifetime = false
+            for await entitlement in Transaction.currentEntitlements {
+                guard case .verified(let transaction) = entitlement,
+                      entitlementIDs.contains(transaction.productID),
+                      transaction.revocationDate == nil else { continue }
+                productID = transaction.productID
+                if let end = transaction.expirationDate {
+                    expiry = max(expiry ?? .distantPast, end)
+                } else {
+                    lifetime = true   // 평생 이용권·옛 1회 구매
+                }
+            }
+            stamp(productID: productID, validUntil: lifetime ? nil : expiry, in: context)
+        } else {
+            clearMine(in: context)
+        }
+        return otherPlatformHasPro(in: context)
+    }
+
     /// 내 표를 적거나 고친다. 같은 앱의 표는 늘 하나만 둔다.
+    ///
+    /// ⚠️ **값이 그대로면 아무것도 쓰지 않는다.** 이 스토어는 CloudKit 미러라, 앱이 앞으로 나올
+    ///    때마다 `updatedAt`만 새로 찍으면 그때마다 레코드 하나가 올라가고 상대 기기에는
+    ///    원격 변경 알림이 간다 — 아무것도 안 바뀌었는데.
     static func stamp(productID: String, validUntil: Date?, in context: ModelContext) {
         let mine = ProMarkPlatform.current
         let marks = ((try? context.fetch(FetchDescriptor<ProMark>())) ?? [])
             .filter { $0.platform == mine }
 
         if let existing = marks.first {
+            let unchanged = existing.productID == productID && existing.validUntil == validUntil
+            // 어쩌다 둘 이상 생겼으면 하나만 남긴다 (두 기기가 같은 순간에 적은 경우).
+            for extra in marks.dropFirst() { context.delete(extra) }
+            guard !unchanged || marks.count > 1 else { return }
             existing.productID = productID
             existing.validUntil = validUntil
             existing.updatedAt = Date()
-            // 어쩌다 둘 이상 생겼으면 하나만 남긴다 (두 기기가 같은 순간에 적은 경우).
-            for extra in marks.dropFirst() { context.delete(extra) }
         } else {
             context.insert(ProMark(platform: mine, productID: productID, validUntil: validUntil))
         }

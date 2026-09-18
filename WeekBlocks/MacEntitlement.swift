@@ -138,29 +138,10 @@ final class PurchaseManager {
     /// ⚠️ 아이폰의 `PurchaseManager.syncCrossPlatformMark`와 **같은 규칙**이다. 자기 표만
     ///    쓰고 지우며, 구독은 끝나는 날을 함께 적는다. 한쪽을 고치면 같이 고칠 것.
     private func syncCrossPlatformMark() async {
-        let context = PlanStore.shared.context
-
-        if store.hasPro {
-            var expiry: Date?
-            var productID = WeekBlocksSpec.proYearlyID
-            var lifetime = false
-            for await entitlement in Transaction.currentEntitlements {
-                guard case .verified(let transaction) = entitlement,
-                      WeekBlocksSpec.proEntitlementIDs.contains(transaction.productID),
-                      transaction.revocationDate == nil else { continue }
-                productID = transaction.productID
-                if let end = transaction.expirationDate {
-                    expiry = max(expiry ?? .distantPast, end)
-                } else {
-                    lifetime = true   // 평생 이용권·옛 '함께 쓰기' 구매
-                }
-            }
-            ProMarkStore.stamp(productID: productID, validUntil: lifetime ? nil : expiry, in: context)
-        } else {
-            ProMarkStore.clearMine(in: context)
-        }
-
-        crossPlatformPro = ProMarkStore.otherPlatformHasPro(in: context)
+        crossPlatformPro = await ProMarkStore.sync(hasPro: store.hasPro,
+                                                   entitlementIDs: WeekBlocksSpec.proEntitlementIDs,
+                                                   defaultProductID: WeekBlocksSpec.proYearlyID,
+                                                   in: PlanStore.shared.context)
     }
 
     /// 아이폰에서 산 것이 살아 있는가.

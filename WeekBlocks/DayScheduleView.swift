@@ -373,8 +373,8 @@ struct DayScheduleView: View {
     private func freeIntervals(excluding dragged: TimeSegment?) -> [(start: Double, end: Double)] {
         let busy = segments
             .filter { !$0.isNested && !$0.isGhost && $0.id != dragged?.id }
-            // 자정을 넘겨 둘로 나뉜 잠은 같은 출처라 둘 다 뺀다.
-            .filter { dragged == nil || !($0.logicalStart == dragged!.logicalStart && $0.title == dragged!.title && $0.isRoutine == dragged!.isRoutine) }
+            // 자정을 넘겨 둘로 나뉜 잠은 같은 출처라 둘 다 뺀다 (→ SegmentSource.key).
+            .filter { dragged == nil || $0.source.key != dragged!.source.key }
             .map { ($0.start, $0.end) }
             .sorted { $0.0 < $1.0 }
         var free: [(start: Double, end: Double)] = []
