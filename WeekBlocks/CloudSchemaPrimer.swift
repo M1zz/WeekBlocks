@@ -23,8 +23,9 @@
 //     Production에서는 애초에 필드가 자동 생성되지 않으므로 소용도 없다.
 //
 //  ⚠️ **모델에 칸을 더할 때마다 여기도 함께 고칠 것.** 안 고치면 이 파일이 있으나 마나다.
-//     지금 채우는 것: BacklogItem·PlanBlock의 옵셔널 전부, 그리고 세 모델
-//     (BacklogItem·PlanBlock·Routine)의 함께 쓰기 칸(isShared·originInstallID).
+//     지금 채우는 것: BacklogItem·PlanBlock의 옵셔널 전부, 세 모델
+//     (BacklogItem·PlanBlock·Routine)의 함께 쓰기 칸(isShared·originInstallID),
+//     그리고 ProMark 타입 자체와 그 옵셔널(validUntil).
 //
 
 #if DEBUG
@@ -85,7 +86,13 @@ enum CloudSchemaPrimer {
         routine.isShared = true
         routine.originInstallID = "schema-sample-install"
 
-        for model in [category as any PersistentModel, item, block, routine] {
+        // 한쪽에서 샀다는 표 (→ ProMark.swift). 이 타입은 Pro를 산 사람만 적으므로, 여기서
+        // 안 만들면 Development 스키마에 타입부터 없다. 끝나는 날은 **이미 지난 날**로 둔다 —
+        // 올라가 있는 25초 사이에 아이폰이 이 표를 보고 Pro를 열면 안 된다.
+        let mark = ProMark(platform: .current, productID: marker,
+                           validUntil: Date(timeIntervalSince1970: 0))
+
+        for model in [category as any PersistentModel, item, block, routine, mark] {
             context.insert(model)
         }
         do {
@@ -99,13 +106,13 @@ enum CloudSchemaPrimer {
 
         // ── 치운다. 스키마는 남는다. ────────────────────────────────────────
         var deleted = 0
-        for model in [category as any PersistentModel, item, block, routine] {
+        for model in [category as any PersistentModel, item, block, routine, mark] {
             context.delete(model)
             deleted += 1
         }
         try? context.save()
 
-        return Report(created: 4, deleted: deleted,
+        return Report(created: 5, deleted: deleted,
                       note: "표본을 올렸다 지웠습니다. 콘솔의 Development 스키마에 칸이 생겼는지 확인한 뒤 Production으로 배포하세요.")
     }
 }
