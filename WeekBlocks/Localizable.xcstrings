@@ -24,136 +24,6 @@
         }
       }
     },
-    "%@ 결제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pay %@"
-          }
-        }
-      }
-    },
-    "%@에 고른 주의 계획을 같은 요일·같은 시각으로 깝니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lays the chosen week’s plan onto %@, on the same days and at the same times."
-          }
-        }
-      }
-    },
-    "%lld번" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld times"
-          }
-        }
-      }
-    },
-    "%lld일 무료로 써 보고, 그 뒤에 결제됩니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Free for %lld days, then billed."
-          }
-        }
-      }
-    },
-    "/ 년" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/ year"
-          }
-        }
-      }
-    },
-    "/ 월" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/ month"
-          }
-        }
-      }
-    },
-    "/ 일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/ day"
-          }
-        }
-      }
-    },
-    "/ 주" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/ week"
-          }
-        }
-      }
-    },
-    "Pro" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pro"
-          }
-        }
-      }
-    },
-    "Pro 기능입니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This is a Pro feature"
-          }
-        }
-      }
-    },
-    "Pro 보기 · 연 %@부터" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "See Pro · from %@ a year"
-          }
-        }
-      }
-    },
-    "Pro로 가져오기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy with Pro"
-          }
-        }
-      }
-    },
-    "Pro로 추세 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "See trends with Pro"
-          }
-        }
-      }
-    },
     "— 끝냈으면 체크하세요" : {
       "localizations" : {
         "en" : {
@@ -194,22 +64,22 @@
         }
       }
     },
+    "‘%@’ 끝내기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finish “%@”"
+          }
+        }
+      }
+    },
     "‘%@’ 아래에 추가" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add under “%@”"
-          }
-        }
-      }
-    },
-    "‘%@’은(는) 요일을 옮길 수 없습니다. 같은 요일 안에서 시각만 옮기고, 요일은 루틴 수정에서 바꿉니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” can’t move to another day. Drag it within the same day to change its time; change its days in Edit Routine."
           }
         }
       }
@@ -226,6 +96,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "‘%1$@’(%2$@)이 %3$@ 틈보다 커서 다음 일정과 겹칩니다."
+          }
+        }
+      }
+    },
+    "‘%@’은(는) 요일을 옮길 수 없습니다. 같은 요일 안에서 시각만 옮기고, 요일은 루틴 수정에서 바꿉니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” can’t move to another day. Drag it within the same day to change its time; change its days in Edit Routine."
           }
         }
       }
@@ -306,6 +186,46 @@
         }
       }
     },
+    "/ 년" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ year"
+          }
+        }
+      }
+    },
+    "/ 월" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ month"
+          }
+        }
+      }
+    },
+    "/ 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ day"
+          }
+        }
+      }
+    },
+    "/ 주" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ week"
+          }
+        }
+      }
+    },
     "%@" : {
       "localizations" : {
         "en" : {
@@ -342,6 +262,16 @@
         }
       }
     },
+    "%@ – %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
     "%@ — %@와 %@시간" : {
       "localizations" : {
         "en" : {
@@ -364,6 +294,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ — click to view and edit · drag to move the time (15-minute steps) · right-click for more"
+          }
+        }
+      }
+    },
+    "%@ — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — Click to view or edit · Drag up or down to move it (15-minute steps) · Right-click for more"
           }
         }
       }
@@ -456,6 +396,16 @@
         }
       }
     },
+    "%@ 결제" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay %@"
+          }
+        }
+      }
+    },
     "%@ 남음" : {
       "localizations" : {
         "en" : {
@@ -498,6 +448,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actually do %@"
+          }
+        }
+      }
+    },
+    "%@ 하루 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View %@"
           }
         }
       }
@@ -554,6 +514,16 @@
         }
       }
     },
+    "%@에 고른 주의 계획을 같은 요일·같은 시각으로 깝니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lays the chosen week’s plan onto %@, on the same days and at the same times."
+          }
+        }
+      }
+    },
     "%@에 끝납니다" : {
       "localizations" : {
         "en" : {
@@ -591,6 +561,7 @@
       }
     },
     "%@에 열기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -616,6 +587,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please fill in %@"
+          }
+        }
+      }
+    },
+    "%@의 계획" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@’s Plan"
           }
         }
       }
@@ -804,6 +785,16 @@
         }
       }
     },
+    "%lld번" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld times"
+          }
+        }
+      }
+    },
     "%lld분" : {
       "localizations" : {
         "en" : {
@@ -836,6 +827,36 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld시간 %2$lld분"
+          }
+        }
+      }
+    },
+    "%lld일 무료로 써 보고, 그 뒤에 결제됩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free for %lld days, then billed."
+          }
+        }
+      }
+    },
+    "%lld일 전" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days ago"
+          }
+        }
+      }
+    },
+    "%lld일 후" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %lld days"
           }
         }
       }
@@ -910,552 +931,6 @@
         }
       }
     },
-    "가져올 주가 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No weeks to copy from"
-          }
-        }
-      }
-    },
-    "같은 Apple 계정이면 양쪽에서 보입니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On the same Apple Account, to-dos show up on both."
-          }
-        }
-      }
-    },
-    "개인정보 처리방침" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy Policy"
-          }
-        }
-      }
-    },
-    "계획·루틴·할 일·이번 주 회고·아이폰과 오가기는 계속 무료입니다. Pro는 지난 주들이 쌓여야 보이는 회고 추세와 다른 주 계획 가져오기를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Planning, routines, to-dos, this week’s review and iPhone sync stay free. Pro unlocks what only shows up as weeks add up: reflection trends and copying another week’s plan. Changed Macs? Restore brings it back."
-          }
-        }
-      }
-    },
-    "계획을 세운 주가 생기면 여기에서 고를 수 있습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Once you have planned a week, you can pick it here."
-          }
-        }
-      }
-    },
-    "구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 같은 요금으로 자동 갱신되며, Apple 계정으로 결제됩니다. 무료 체험 중에 해지하면 요금이 나가지 않습니다. 해지와 관리는 App Store의 계정 설정에서 합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscriptions renew automatically at the same price unless canceled at least 24 hours before the period ends, and are charged to your Apple Account. Cancel during the free trial and you won’t be charged. Manage or cancel in your App Store account settings."
-          }
-        }
-      }
-    },
-    "그 앞 4주와 비교" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vs. the 4 weeks before"
-          }
-        }
-      }
-    },
-    "그대로" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No change"
-          }
-        }
-      }
-    },
-    "그대로 무료인 것" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Still free"
-          }
-        }
-      }
-    },
-    "그동안 찍어 둔 회고 %lld개로 잘 되는 요일과 시간대, 자주 미루는 일을 보여 드립니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your %lld reviews so far show which days and times work for you, and what you keep putting off."
-          }
-        }
-      }
-    },
-    "다른 주 계획 가져오기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy Another Week"
-          }
-        }
-      }
-    },
-    "다른 주 계획 가져오기…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy Another Week…"
-          }
-        }
-      }
-    },
-    "달마다 결제되고 언제든 해지합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Billed monthly. Cancel anytime."
-          }
-        }
-      }
-    },
-    "달성 %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ done"
-          }
-        }
-      }
-    },
-    "달성률" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completion"
-          }
-        }
-      }
-    },
-    "두 번 넘게 건너뛴 일이 없습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing has been skipped more than once."
-          }
-        }
-      }
-    },
-    "매일 돌아보는 데 값을 받지 않습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Looking back each day is free."
-          }
-        }
-      }
-    },
-    "무료 체험 시작" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start Free Trial"
-          }
-        }
-      }
-    },
-    "무지개 공방 Pro" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rainbow Workshop Pro"
-          }
-        }
-      }
-    },
-    "번번이 미루는 일은 크기가 너무 크거나 시간대가 안 맞는 경우가 많습니다. 단계로 쪼개거나 잘 되는 시간대로 옮겨 보세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Things you keep skipping are often too big or in the wrong time of day. Try splitting them into steps or moving them to a time that works."
-          }
-        }
-      }
-    },
-    "블록 %lld개 · %@" : {
-      "localizations" : {
-        "ko" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "블록 %1$lld개 · %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld blocks · %@"
-          }
-        }
-      }
-    },
-    "시간대별" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By Time of Day"
-          }
-        }
-      }
-    },
-    "아이폰과 오가기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone Sync"
-          }
-        }
-      }
-    },
-    "얼마든지 적고 배치합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Write and place as much as you like."
-          }
-        }
-      }
-    },
-    "연간" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yearly"
-          }
-        }
-      }
-    },
-    "요금" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pricing"
-          }
-        }
-      }
-    },
-    "요금제를 불러오는 중…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loading plans…"
-          }
-        }
-      }
-    },
-    "요일별" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By Day"
-          }
-        }
-      }
-    },
-    "월간" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monthly"
-          }
-        }
-      }
-    },
-    "이 주에 깔기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy to This Week"
-          }
-        }
-      }
-    },
-    "이번 주 회고와 타이머" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This week’s review and the timer"
-          }
-        }
-      }
-    },
-    "이번 주에 이미 있는 블록 %lld개는 그대로 두고 더합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The %lld blocks already in this week stay; the new ones are added."
-          }
-        }
-      }
-    },
-    "이용약관" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terms of Use"
-          }
-        }
-      }
-    },
-    "자주 건너뛴 일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Often Skipped"
-          }
-        }
-      }
-    },
-    "잘 굴러간 주의 계획을 이번 주에 한 번에 깝니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lay a week that went well onto this week in one go."
-          }
-        }
-      }
-    },
-    "주" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Week"
-          }
-        }
-      }
-    },
-    "주간·일간 계획과 루틴, 할 일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weekly and daily plans, routines, to-dos"
-          }
-        }
-      }
-    },
-    "주별 달성률" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completion by Week"
-          }
-        }
-      }
-    },
-    "지금 쓰시는 모든 기능은 무료입니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Everything you use now is free."
-          }
-        }
-      }
-    },
-    "지난 8주의 달성률, 잘 되는 요일과 시간대, 자주 건너뛰는 일을 봅니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "See 8 weeks of completion, your best days and times, and what you often skip."
-          }
-        }
-      }
-    },
-    "지난 8주의 회고를 겹쳐 봅니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your last 8 weeks of reviews, side by side"
-          }
-        }
-      }
-    },
-    "지난 주들이 쌓이면 보이는 것을 엽니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlocks what shows up as your weeks add up."
-          }
-        }
-      }
-    },
-    "최근 4주 달성률" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last 4 Weeks"
-          }
-        }
-      }
-    },
-    "추세" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trends"
-          }
-        }
-      }
-    },
-    "추천" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Best Value"
-          }
-        }
-      }
-    },
-    "평생" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lifetime"
-          }
-        }
-      }
-    },
-    "한 번 결제로 계속 씁니다. 구독이 아닙니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pay once, keep it. Not a subscription."
-          }
-        }
-      }
-    },
-    "해마다 결제되고 언제든 해지합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Billed yearly. Cancel anytime."
-          }
-        }
-      }
-    },
-    "회고 추세" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reflection Trends"
-          }
-        }
-      }
-    },
-    "회고 추세와 다른 주 계획 가져오기가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reflection trends and copying another week are unlocked. They also unlock on your other Macs with the same Apple Account."
-          }
-        }
-      }
-    },
-    "회고를 찍어 두면 잘 되는 요일과 시간대, 자주 미루는 일이 여기에 섭니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mark your reviews and this shows which days and times work for you, and what you keep putting off."
-          }
-        }
-      }
-    },
-    "회고를 찍은 블록 중에서 셉니다. 부분 달성은 반으로 칩니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Counted among reviewed blocks. Partly done counts as half."
-          }
-        }
-      }
-    },
-    "회고한 블록" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reviewed"
-          }
-        }
-      }
-    },
-    "회고한 블록 %lld개" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld reviewed blocks"
-          }
-        }
-      }
-    },
     "💡 세 가지를 모두 통과해야 블록을 저장할 수 있습니다." : {
       "localizations" : {
         "en" : {
@@ -1512,6 +987,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "5 characters or more"
+          }
+        }
+      }
+    },
+    "8주 추세·다른 주 계획 가져오기·회고 내보내기·일정 공유가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8-week trends, copying another week, exporting reviews and sharing your schedule are unlocked. They also unlock on your other Macs on the same Apple Account."
           }
         }
       }
@@ -1638,12 +1123,74 @@
         }
       }
     },
+    "Pro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        }
+      }
+    },
+    "Pro 기능입니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a Pro feature"
+          }
+        }
+      }
+    },
     "Pro 버전 구매 · %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Pro · %@"
+          }
+        }
+      }
+    },
+    "Pro 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Pro"
+          }
+        }
+      }
+    },
+    "Pro 보기 · 연 %@부터" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Pro · from %@ a year"
+          }
+        }
+      }
+    },
+    "Pro로 가져오기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy with Pro"
+          }
+        }
+      }
+    },
+    "Pro로 추세 보기" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See trends with Pro"
           }
         }
       }
@@ -1688,6 +1235,16 @@
         }
       }
     },
+    "가져올 주가 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No weeks to copy from"
+          }
+        }
+      }
+    },
     "가져올 캘린더를 먼저 고르세요." : {
       "localizations" : {
         "en" : {
@@ -1699,11 +1256,22 @@
       }
     },
     "값을 받지 않습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Costs nothing."
+          }
+        }
+      }
+    },
+    "같은 Apple 계정이면 양쪽에서 보입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On the same Apple Account, to-dos show up on both."
           }
         }
       }
@@ -1738,6 +1306,16 @@
         }
       }
     },
+    "개수 제한 없이 적고 배치합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write and place as many as you like."
+          }
+        }
+      }
+    },
     "개인" : {
       "comment" : "기본 분류",
       "localizations" : {
@@ -1745,6 +1323,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Personal"
+          }
+        }
+      }
+    },
+    "개인정보 처리방침" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
           }
         }
       }
@@ -1760,16 +1348,6 @@
         }
       }
     },
-    "건너뜀" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skipped"
-          }
-        }
-      }
-    },
     "건너뛰고 다음" : {
       "localizations" : {
         "en" : {
@@ -1780,12 +1358,32 @@
         }
       }
     },
+    "건너뛰고 멈추기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip and Stop"
+          }
+        }
+      }
+    },
     "건너뛰기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skip"
+          }
+        }
+      }
+    },
+    "건너뜀" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
           }
         }
       }
@@ -1821,6 +1419,7 @@
       }
     },
     "계속 내려옵니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1850,12 +1449,43 @@
         }
       }
     },
+    "계획·루틴·할 일·이번 주 회고·아이폰과 오가기는 계속 무료입니다. Pro는 지난 주들이 쌓여야 보이는 회고 추세와 다른 주 계획 가져오기를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning, routines, to-dos, this week’s review and iPhone sync stay free. Pro unlocks what only shows up as weeks add up: reflection trends and copying another week’s plan. Changed Macs? Restore brings it back."
+          }
+        }
+      }
+    },
+    "계획·루틴·할 일·회고·타이머·아이폰과 오가기는 계속 무료이고, 추세도 지난 2주까지는 무료로 보입니다. Pro는 8주 추세와 다른 주 계획 가져오기, 회고 내보내기, 일정 공유를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning, routines, to-dos, reviews, the timer and iPhone sync stay free, and you can see the last 2 weeks of trends for free. Pro unlocks 8-week trends, copying another week, exporting reviews and sharing your schedule. Changed Macs? Restore brings it back."
+          }
+        }
+      }
+    },
     "계획보다 %@ 넘겼습니다" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ over plan"
+          }
+        }
+      }
+    },
+    "계획을 세운 주가 생기면 여기에서 고를 수 있습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once you have planned a week, you can pick it here."
           }
         }
       }
@@ -2010,6 +1640,16 @@
         }
       }
     },
+    "구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 같은 요금으로 자동 갱신되며, Apple 계정으로 결제됩니다. 무료 체험 중에 해지하면 요금이 나가지 않습니다. 해지와 관리는 App Store의 계정 설정에서 합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscriptions renew automatically at the same price unless canceled at least 24 hours before the period ends, and are charged to your Apple Account. Cancel during the free trial and you won’t be charged. Manage or cancel in your App Store account settings."
+          }
+        }
+      }
+    },
     "구매 복원" : {
       "localizations" : {
         "en" : {
@@ -2051,6 +1691,16 @@
         }
       }
     },
+    "그 밖에 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld more"
+          }
+        }
+      }
+    },
     "그 실패를 어떻게 막거나 빠르게 회복할 수 있는가?" : {
       "localizations" : {
         "en" : {
@@ -2061,12 +1711,65 @@
         }
       }
     },
+    "그 앞 4주와 비교" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs. the 4 weeks before"
+          }
+        }
+      }
+    },
+    "그 앞과 비교" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs. before"
+          }
+        }
+      }
+    },
+    "그대로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No change"
+          }
+        }
+      }
+    },
+    "그대로 무료인 것" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still free"
+          }
+        }
+      }
+    },
     "그대로 보입니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stays visible."
+          }
+        }
+      }
+    },
+    "그동안 찍어 둔 회고 %lld개로 잘 되는 요일과 시간대, 자주 미루는 일을 보여 드립니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your %lld reviews so far show which days and times work for you, and what you keep putting off."
           }
         }
       }
@@ -2180,6 +1883,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Turn it off and nothing leaves this device. To have already-sent records deleted, let the developer know."
+          }
+        }
+      }
+    },
+    "끊겼다가 돌아왔을 때 무엇부터 하면 되는지. 비워 두어도 됩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to do first when you come back. You can leave it empty."
           }
         }
       }
@@ -2435,12 +2148,123 @@
         }
       }
     },
+    "내 일정 공유 시작 (Pro)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share My Schedule (Pro)"
+          }
+        }
+      }
+    },
     "내 주간 일정" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "My weekly schedule"
+          }
+        }
+      }
+    },
+    "내 주간 일정을 보기 전용 링크로 보냅니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send your week as a view-only link."
+          }
+        }
+      }
+    },
+    "내보내기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
+          }
+        }
+      }
+    },
+    "내일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
+          }
+        }
+      }
+    },
+    "내일 계획하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan Tomorrow"
+          }
+        }
+      }
+    },
+    "내일 미리 정하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deciding tomorrow tonight"
+          }
+        }
+      }
+    },
+    "내일 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Tomorrow"
+          }
+        }
+      }
+    },
+    "내일 짜기" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan Tomorrow"
+          }
+        }
+      }
+    },
+    "내일은 정해져 있습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow is set"
+          }
+        }
+      }
+    },
+    "내일의 계획" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow’s Plan"
+          }
+        }
+      }
+    },
+    "내일이 아직 비어 있습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow is still empty"
           }
         }
       }
@@ -2516,6 +2340,26 @@
         }
       }
     },
+    "다른 주 계획 가져오기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Another Week"
+          }
+        }
+      }
+    },
+    "다른 주 계획 가져오기…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Another Week…"
+          }
+        }
+      }
+    },
     "다시 받아오기" : {
       "localizations" : {
         "en" : {
@@ -2562,6 +2406,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Next week"
+          }
+        }
+      }
+    },
+    "다음 첫 동작" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next First Action"
           }
         }
       }
@@ -2636,12 +2490,52 @@
         }
       }
     },
+    "달마다 결제되고 언제든 해지합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billed monthly. Cancel anytime."
+          }
+        }
+      }
+    },
     "달성" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "달성 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ done"
+          }
+        }
+      }
+    },
+    "달성 %lld · 부분 %lld · 건너뜀 %lld · 미회고 %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done %1$lld · Partly %2$lld · Skipped %3$lld · Not reviewed %4$lld"
+          }
+        }
+      }
+    },
+    "달성률" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completion"
           }
         }
       }
@@ -2686,6 +2580,16 @@
         }
       }
     },
+    "돌아왔을 때 무엇부터 하면 되나요? 한 줄이면 충분합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What should you do first when you come back? One line is enough."
+          }
+        }
+      }
+    },
     "동기화 오류: %@" : {
       "localizations" : {
         "en" : {
@@ -2696,12 +2600,52 @@
         }
       }
     },
+    "되돌리기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "되돌리기 (⌘Z)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo (⌘Z)"
+          }
+        }
+      }
+    },
     "되살리기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bring it back"
+          }
+        }
+      }
+    },
+    "두 번 넘게 건너뛴 일이 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing has been skipped more than once."
+          }
+        }
+      }
+    },
+    "들어가는 할 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To-dos that fit"
           }
         }
       }
@@ -2826,6 +2770,16 @@
         }
       }
     },
+    "매일 돌아보는 데 값을 받지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking back each day is free."
+          }
+        }
+      }
+    },
     "맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다." : {
       "localizations" : {
         "en" : {
@@ -2886,16 +2840,6 @@
         }
       }
     },
-    "모든 단계가 자리를 잡아야 하는 크기입니다. 자료 모아두기·한 줄 메모처럼 조각에서 닫히는 단계를 하나 만들어두면, 흘려보내던 틈이 이 할 일에 쓰입니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every step here needs a seat of its own. Add one step that closes inside a fragment — gathering the files, jotting a line — and the gaps you were letting slip start going into this to-do."
-          }
-        }
-      }
-    },
     "목" : {
       "comment" : "요일 한 글자",
       "localizations" : {
@@ -2903,6 +2847,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thu"
+          }
+        }
+      }
+    },
+    "모든 단계가 자리를 잡아야 하는 크기입니다. 자료 모아두기·한 줄 메모처럼 조각에서 닫히는 단계를 하나 만들어두면, 흘려보내던 틈이 이 할 일에 쓰입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every step here needs a seat of its own. Add one step that closes inside a fragment — gathering the files, jotting a line — and the gaps you were letting slip start going into this to-do."
           }
         }
       }
@@ -2977,6 +2931,16 @@
         }
       }
     },
+    "무료 체험 시작" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Free Trial"
+          }
+        }
+      }
+    },
     "무엇을 할 것인가?" : {
       "localizations" : {
         "en" : {
@@ -2998,6 +2962,7 @@
       }
     },
     "무엇이든, 얼마든지 적습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3014,6 +2979,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rainbow Workshop"
+          }
+        }
+      }
+    },
+    "무지개 공방 Pro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Workshop Pro"
           }
         }
       }
@@ -3139,12 +3114,32 @@
         }
       }
     },
+    "번번이 미루는 일은 크기가 너무 크거나 시간대가 안 맞는 경우가 많습니다. 단계로 쪼개거나 잘 되는 시간대로 옮겨 보세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Things you keep skipping are often too big or in the wrong time of day. Try splitting them into steps or moving them to a time that works."
+          }
+        }
+      }
+    },
     "보기 전용" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "View-only"
+          }
+        }
+      }
+    },
+    "복사했습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
           }
         }
       }
@@ -3179,12 +3174,48 @@
         }
       }
     },
+    "블록 %lld개 · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld blocks · %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "블록 %1$lld개 · %2$@"
+          }
+        }
+      }
+    },
     "블록으로 보기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Block view"
+          }
+        }
+      }
+    },
+    "빈 시간 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ free"
+          }
+        }
+      }
+    },
+    "빈 시간 %@ · 눌러서 채우기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ free · click to fill"
           }
         }
       }
@@ -3260,6 +3291,7 @@
       }
     },
     "상품을 아직 못 불러왔습니다. 잠시 뒤 다시 시도해 주세요." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3482,6 +3514,16 @@
         }
       }
     },
+    "시간대별" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Time of Day"
+          }
+        }
+      }
+    },
     "시간을 안 잡은 줄이라 조각에 들어갑니다." : {
       "localizations" : {
         "en" : {
@@ -3653,7 +3695,18 @@
         }
       }
     },
+    "아이폰과 오가기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Sync"
+          }
+        }
+      }
+    },
     "아이폰에 안 감" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3664,6 +3717,7 @@
       }
     },
     "아이폰에서 온 할 일 보기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3674,6 +3728,7 @@
       }
     },
     "아이폰으로 건너가기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3689,6 +3744,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No steps yet."
+          }
+        }
+      }
+    },
+    "아직 오지 않은 날입니다. 끝낸 뒤에 돌아봅니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This day hasn't come yet. Look back once it's done."
           }
         }
       }
@@ -3813,12 +3878,43 @@
         }
       }
     },
+    "어제" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        }
+      }
+    },
+    "어제의 계획" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday’s Plan"
+          }
+        }
+      }
+    },
     "언제 할지 다 정했습니다." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Everything has a day."
+          }
+        }
+      }
+    },
+    "얼마든지 적고 배치합니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write and place as much as you like."
           }
         }
       }
@@ -3834,6 +3930,16 @@
         }
       }
     },
+    "여기 놓으면 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop here for %@"
+          }
+        }
+      }
+    },
     "여기 없는 것을 직접 적기" : {
       "localizations" : {
         "en" : {
@@ -3845,6 +3951,7 @@
       }
     },
     "여기서 적은 것은 아직 아이폰에 안 갑니다" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3855,6 +3962,7 @@
       }
     },
     "여기서 적은 것이 아이폰에도 보입니다. 예전에 적어 둔 것도 함께 열립니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3865,6 +3973,7 @@
       }
     },
     "여기서 적은 할 일이 아이폰에도 보입니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3875,11 +3984,22 @@
       }
     },
     "여기서 적은 할 일이 아이폰에도 보입니다. 같은 Apple 계정의 다른 맥에서도 열립니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "To-dos you write here show up on your iPhone. They open on any other Mac on the same Apple Account too."
+          }
+        }
+      }
+    },
+    "여기서부터" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick up here"
           }
         }
       }
@@ -3904,7 +4024,18 @@
         }
       }
     },
+    "연간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yearly"
+          }
+        }
+      }
+    },
     "열기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3915,6 +4046,7 @@
       }
     },
     "열림" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3931,6 +4063,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couldn't verify the receipt. Try again in a moment."
+          }
+        }
+      }
+    },
+    "예: 3번 예제부터 다시 돌려보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. run example 3 again"
           }
         }
       }
@@ -3986,11 +4128,62 @@
       }
     },
     "예전에 적어 둔 것" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "What you wrote before"
+          }
+        }
+      }
+    },
+    "오늘" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "오늘로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "오늘은 그만 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide for today"
+          }
+        }
+      }
+    },
+    "오늘의 계획" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today’s Plan"
+          }
+        }
+      }
+    },
+    "오늘의 첫 걸음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today’s first step"
           }
         }
       }
@@ -4031,6 +4224,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "요금" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pricing"
+          }
+        }
+      }
+    },
+    "요금제를 불러오는 중…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading plans…"
           }
         }
       }
@@ -4096,6 +4309,16 @@
         }
       }
     },
+    "요일별" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Day"
+          }
+        }
+      }
+    },
     "요일별 하루" : {
       "localizations" : {
         "en" : {
@@ -4154,6 +4377,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mon, Wed, Fri, 1 hour from 07:30"
+          }
+        }
+      }
+    },
+    "월간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly"
           }
         }
       }
@@ -4248,6 +4481,16 @@
         }
       }
     },
+    "이 날은 계획한 블록이 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No blocks were planned for this day"
+          }
+        }
+      }
+    },
     "이 단계, 이대로 괜찮을까요" : {
       "localizations" : {
         "en" : {
@@ -4309,6 +4552,7 @@
       }
     },
     "이 맥에서 적기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4348,6 +4592,26 @@
         }
       }
     },
+    "이 시간에 들어가는 할 일이 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No to-dos fit this gap."
+          }
+        }
+      }
+    },
+    "이 시간에 새 블록…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Block Here…"
+          }
+        }
+      }
+    },
     "이 안내를 더 보지 않기" : {
       "localizations" : {
         "en" : {
@@ -4369,6 +4633,16 @@
         }
       }
     },
+    "이 주에 깔기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy to This Week"
+          }
+        }
+      }
+    },
     "이 할 일을 이루는 단계를 '되어야 하는 순서대로' 적어보세요.\n단계들은 전체 %@를 N분의 1로 나눠 갖습니다." : {
       "localizations" : {
         "en" : {
@@ -4385,6 +4659,27 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This isn't a to-do, it's where your fragments leak away. Kept as a step, it only inflates your progress bar."
+          }
+        }
+      }
+    },
+    "이번 주" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week"
+          }
+        }
+      }
+    },
+    "일" : {
+      "comment" : "요일 한 글자",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
           }
         }
       }
@@ -4430,16 +4725,6 @@
         }
       }
     },
-    "이번 주" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This week"
-          }
-        }
-      }
-    },
     "이번 주 %@에서 빼기" : {
       "localizations" : {
         "en" : {
@@ -4450,12 +4735,43 @@
         }
       }
     },
+    "이번 주 회고를 글로 복사합니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copies this week’s review as text"
+          }
+        }
+      }
+    },
+    "이번 주 회고와 타이머" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week’s review and the timer"
+          }
+        }
+      }
+    },
     "이번 주로" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This week"
+          }
+        }
+      }
+    },
+    "이번 주에 이미 있는 블록 %lld개는 그대로 두고 더합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The %lld blocks already in this week stay; the new ones are added."
           }
         }
       }
@@ -4486,6 +4802,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Resume"
+          }
+        }
+      }
+    },
+    "이용약관" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Use"
           }
         }
       }
@@ -4530,17 +4856,6 @@
         }
       }
     },
-    "일" : {
-      "comment" : "요일 한 글자",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sun"
-          }
-        }
-      }
-    },
     "일 · 학교" : {
       "localizations" : {
         "en" : {
@@ -4567,6 +4882,37 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ a day on average"
+          }
+        }
+      }
+    },
+    "일간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
+          }
+        }
+      }
+    },
+    "일간 (⌘1) · 주간 (⌘2)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day (⌘1) · Week (⌘2)"
+          }
+        }
+      }
+    },
+    "일간 회고" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily Review"
           }
         }
       }
@@ -4641,6 +4987,46 @@
         }
       }
     },
+    "자주 건너뛴 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Often Skipped"
+          }
+        }
+      }
+    },
+    "잘 굴러간 주의 계획을 이번 주에 한 번에 깝니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lay a week that went well onto this week in one go."
+          }
+        }
+      }
+    },
+    "잘 되는 요일과 시간대, 번번이 미루는 일까지. 무료로는 지난 2주가 보입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your best days and times, and what you keep putting off. The last 2 weeks are free."
+          }
+        }
+      }
+    },
+    "잘 되는 요일과 시간대, 번번이 미루는 일은 몇 주가 쌓여야 보입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your best days and times, and what you keep putting off, only show up as weeks add up."
+          }
+        }
+      }
+    },
     "잠" : {
       "comment" : "기본 루틴 이름",
       "localizations" : {
@@ -4693,6 +5079,7 @@
       }
     },
     "잠김" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4722,6 +5109,16 @@
         }
       }
     },
+    "저녁에 내일을 닫고, 아침에 첫 걸음 하나를 봅니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close tomorrow in the evening, see one first step in the morning."
+          }
+        }
+      }
+    },
     "저장" : {
       "localizations" : {
         "en" : {
@@ -4732,7 +5129,18 @@
         }
       }
     },
+    "적고 멈추기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save and Stop"
+          }
+        }
+      }
+    },
     "적는 데는 아무 지장이 없습니다. 아이폰에서 적은 것도 계속 내려옵니다. 열면 지금까지 적어 둔 것까지 함께 보입니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4743,6 +5151,7 @@
       }
     },
     "적는 데는 아무 지장이 없습니다. 주간 계획·루틴도, 아이폰에서 온 할 일을 보는 것도 무료입니다. 여기서 적은 것이 아이폰으로 건너가는 것만 프로입니다. 기기를 바꿨다면 복원으로 되찾습니다 — 다시 사지 않아도 됩니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4889,6 +5298,16 @@
         }
       }
     },
+    "주" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        }
+      }
+    },
     "주 (h)" : {
       "localizations" : {
         "en" : {
@@ -4945,6 +5364,16 @@
         }
       }
     },
+    "주간" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        }
+      }
+    },
     "주간 계획" : {
       "localizations" : {
         "en" : {
@@ -4956,6 +5385,7 @@
       }
     },
     "주간 계획과 루틴" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5015,6 +5445,16 @@
         }
       }
     },
+    "주간 회고 열기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Weekly Review"
+          }
+        }
+      }
+    },
     "주간 회고 정리" : {
       "comment" : "샘플 할 일",
       "localizations" : {
@@ -5022,6 +5462,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Write up the weekly review"
+          }
+        }
+      }
+    },
+    "주간·일간 계획과 루틴, 할 일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly and daily plans, routines, to-dos"
           }
         }
       }
@@ -5043,6 +5493,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "At the weekend, use Review to look back at whether you lived the week you planned. That's what you build next week from."
+          }
+        }
+      }
+    },
+    "주별 달성률" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completion by Week"
           }
         }
       }
@@ -5107,12 +5567,42 @@
         }
       }
     },
+    "지금 시작" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Now"
+          }
+        }
+      }
+    },
+    "지금 쓰시는 모든 기능은 무료입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything you use now is free."
+          }
+        }
+      }
+    },
     "지금 일정으로 업데이트" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update to the current schedule"
+          }
+        }
+      }
+    },
+    "지금 정해 두면 아침에 고를 일이 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decide now and there is nothing to choose in the morning"
           }
         }
       }
@@ -5148,6 +5638,7 @@
       }
     },
     "지금도 되는 것" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5178,6 +5669,7 @@
       }
     },
     "지금은 모든 기능이 열려 있습니다. 판매를 시작해도 적는 것은 계속 무료이고, 여기서 적은 것이 아이폰으로 건너가는 것만 프로가 됩니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5197,12 +5689,54 @@
         }
       }
     },
+    "지난 %lld주까지 넓혀 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See all %lld weeks"
+          }
+        }
+      }
+    },
+    "지난 8주의 달성률, 잘 되는 요일과 시간대, 자주 건너뛰는 일을 봅니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See 8 weeks of completion, your best days and times, and what you often skip."
+          }
+        }
+      }
+    },
+    "지난 8주의 회고를 겹쳐 봅니다" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your last 8 weeks of reviews, side by side"
+          }
+        }
+      }
+    },
     "지난 주" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last week"
+          }
+        }
+      }
+    },
+    "지난 주들이 쌓이면 보이는 것을 엽니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlocks what shows up as your weeks add up."
           }
         }
       }
@@ -5327,6 +5861,16 @@
         }
       }
     },
+    "첫 걸음 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First step %@"
+          }
+        }
+      }
+    },
     "초과" : {
       "localizations" : {
         "en" : {
@@ -5347,12 +5891,53 @@
         }
       }
     },
+    "최근 4주 달성률" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last 4 Weeks"
+          }
+        }
+      }
+    },
+    "최근 달성률" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent completion"
+          }
+        }
+      }
+    },
     "추가" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
+          }
+        }
+      }
+    },
+    "추세" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trends"
+          }
+        }
+      }
+    },
+    "추천" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best Value"
           }
         }
       }
@@ -5579,6 +6164,16 @@
         }
       }
     },
+    "평생" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime"
+          }
+        }
+      }
+    },
     "평일 09:00부터 9시간" : {
       "localizations" : {
         "en" : {
@@ -5620,6 +6215,7 @@
       }
     },
     "프로" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5740,7 +6336,18 @@
         }
       }
     },
+    "한 번 결제로 계속 씁니다. 구독이 아닙니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay once, keep it. Not a subscription."
+          }
+        }
+      }
+    },
     "한 번 사면 끝입니다. 구독이 아니고, 같은 Apple 계정의 다른 맥에서도 열립니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5816,6 +6423,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Walks through building a week again from the start: fixed routines → to-dos → placing them on days."
+          }
+        }
+      }
+    },
+    "한 주의 회고를 글로 복사해 노트나 보고서에 붙입니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy a week’s review as text for your notes or a report."
           }
         }
       }
@@ -5971,6 +6588,7 @@
       }
     },
     "함께 쓰기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5996,6 +6614,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pick only the ones that apply. They're just examples, and picking none is fine.\nYou can change the hours, days and names afterwards."
+          }
+        }
+      }
+    },
+    "해마다 결제되고 언제든 해지합니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billed yearly. Cancel anytime."
           }
         }
       }
@@ -6091,12 +6719,105 @@
         }
       }
     },
+    "회고 내보내기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export reviews"
+          }
+        }
+      }
+    },
     "회고 완료 · %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Review done · %@"
+          }
+        }
+      }
+    },
+    "회고 추세" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflection Trends"
+          }
+        }
+      }
+    },
+    "회고 추세 8주" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 weeks of trends"
+          }
+        }
+      }
+    },
+    "회고 추세와 다른 주 계획 가져오기가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflection trends and copying another week are unlocked. They also unlock on your other Macs with the same Apple Account."
+          }
+        }
+      }
+    },
+    "회고를 찍어 두면 잘 되는 요일과 시간대, 자주 미루는 일이 여기에 섭니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark your reviews and this shows which days and times work for you, and what you keep putting off."
+          }
+        }
+      }
+    },
+    "회고를 찍은 블록 중에서 셉니다. 부분 달성은 반으로 칩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counted among reviewed blocks. Partly done counts as half."
+          }
+        }
+      }
+    },
+    "회고와 타이머, 다음 첫 동작" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reviews, the timer and next first actions"
+          }
+        }
+      }
+    },
+    "회고한 블록" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reviewed"
+          }
+        }
+      }
+    },
+    "회고한 블록 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld reviewed blocks"
           }
         }
       }
@@ -6127,156 +6848,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something that happens inside time you've already secured, like a work meeting. It doesn't spend any extra free time, and it's drawn on top of the routine in the timeline."
-          }
-        }
-      }
-    },
-    "일간" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Day"
-          }
-        }
-      }
-    },
-    "주간" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Week"
-          }
-        }
-      }
-    },
-    "오늘" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Today"
-          }
-        }
-      }
-    },
-    "내일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tomorrow"
-          }
-        }
-      }
-    },
-    "어제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yesterday"
-          }
-        }
-      }
-    },
-    "%lld일 후" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In %lld days"
-          }
-        }
-      }
-    },
-    "%lld일 전" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld days ago"
-          }
-        }
-      }
-    },
-    "오늘로" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Today"
-          }
-        }
-      }
-    },
-    "일간 (⌘1) · 주간 (⌘2)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Day (⌘1) · Week (⌘2)"
-          }
-        }
-      }
-    },
-    "%@ 하루 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View %@"
-          }
-        }
-      }
-    },
-    "%@ — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ — Click to view or edit · Drag up or down to move it (15-minute steps) · Right-click for more"
-          }
-        }
-      }
-    },
-    "일간 회고" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daily Review"
-          }
-        }
-      }
-    },
-    "주간 회고 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Weekly Review"
-          }
-        }
-      }
-    },
-    "이 날은 계획한 블록이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No blocks were planned for this day"
-          }
-        }
-      }
-    },
-    "아직 오지 않은 날입니다. 끝낸 뒤에 돌아봅니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This day hasn't come yet. Look back once it's done."
           }
         }
       }

@@ -47,6 +47,18 @@ final class PlanBlock {
     /// 비어 있으면 이 기능이 생기기 전에 만든 것이고, 그때는 내 것으로 본다.
     var originInstallID: String = ""
 
+    /// **다음 첫 동작.** 이 일을 멈출 때 "돌아오면 무엇부터 하면 되는지"를 한 줄로 남긴다.
+    ///
+    /// 끊긴 일로 돌아올 때 가장 비싼 것은 시간이 아니라 **다시 올라오는 일**이다 — 어디까지
+    /// 했는지, 무엇부터 손대야 하는지를 기억에서 다시 지어내야 한다. 그 한 줄을 멈추는 사람이
+    /// 적어 두면(그때가 가장 잘 아는 때다) 돌아온 사람은 읽기만 하면 된다 (→ TimerView).
+    ///
+    /// ⚠️ **CloudKit 스키마가 늘어나는 필드다.** 옵셔널이라 기존 레코드는 그대로 열리지만,
+    ///    ① iOS '욕망의 무지개'에도 **같이** 넣어야 하고(한쪽만 알면 다른 쪽이 못 읽는다),
+    ///    ② 출시 전에 Development → Production 스키마 배포를 해야 한다
+    ///       (→ CloudSchemaPrimer.swift가 이 칸에 표본 값을 채워 올린다).
+    var nextAction: String? = nil
+
     // Review (populated after the day passes)
     var reviewStatusRaw: String? = nil
     var reviewNote: String? = nil

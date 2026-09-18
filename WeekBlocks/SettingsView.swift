@@ -482,10 +482,10 @@ struct SettingsView: View {
 
     private var tierNote: String {
         if isPro {
-            return String(localized: "회고 추세와 다른 주 계획 가져오기가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
+            return String(localized: "8주 추세·다른 주 계획 가져오기·회고 내보내기·일정 공유가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
         }
         if purchases.offersPro {
-            return String(localized: "계획·루틴·할 일·이번 주 회고·아이폰과 오가기는 계속 무료입니다. Pro는 지난 주들이 쌓여야 보이는 회고 추세와 다른 주 계획 가져오기를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다.")
+            return String(localized: "계획·루틴·할 일·회고·타이머·아이폰과 오가기는 계속 무료이고, 추세도 지난 2주까지는 무료로 보입니다. Pro는 8주 추세와 다른 주 계획 가져오기, 회고 내보내기, 일정 공유를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다.")
         }
         return String(localized: "지금 쓰시는 모든 기능은 무료입니다.")
     }

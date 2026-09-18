@@ -3,6 +3,11 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
+    /// 창의 되돌리기 관리자. 모델 컨텍스트에 물려 두면 옮기기·지우기·체크가 전부 ⌘Z로 돌아온다.
+    @Environment(\.undoManager) private var undoManager
+    @State private var canUndo = false
+    /// 일간 시간표의 알약을 오른쪽 판(오늘의 계획·할 일)으로 끌어낼 때 쓰는 받는 자리들.
+    @State private var dayZones = DayDragZones()
     @Environment(\.openWindow) private var openWindow
     @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routinesRaw: [Routine]
     /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
@@ -184,9 +189,21 @@ struct ContentView: View {
         }
         // 대시보드의 바닥. 요일 칸·할 일·루틴이 이 위에 올라간 카드로 읽힌다 (→ Surface.swift).
         .background(Color.canvas)
+        .modifier(UndoWiring(context: context, undoManager: undoManager, canUndo: $canUndo))
         .frame(minWidth: 980, minHeight: 700)
         .navigationTitle("무지개 공방")
         .toolbar {
+            ToolbarItemGroup(placement: .navigation) {
+                // **되돌리기.** 끌어 옮기고, 지우고, 체크한 것을 한 걸음씩 되돌린다.
+                // 편집 메뉴의 ⌘Z와 같은 관리자라 어느 쪽으로 눌러도 같은 한 걸음이다.
+                Button {
+                    undo()
+                } label: {
+                    Label("되돌리기", systemImage: "arrow.uturn.backward")
+                }
+                .disabled(!canUndo)
+                .help("되돌리기 (⌘Z)")
+            }
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {
                     openWindow(id: WeekBlocksWindow.timer)
@@ -285,7 +302,9 @@ struct ContentView: View {
                 suggestedBand: TimelineLayout.suggestedBand(
                     routines: fixedRoutines(on: ctx.day),
                     blocks: weekBlocks.filter { $0.day == ctx.day }
-                )
+                ),
+                initialStartHour: ctx.startHour,
+                initialDuration: ctx.duration
             )
             .frame(minWidth: 520, minHeight: 540)
         }
@@ -636,6 +655,20 @@ struct ContentView: View {
             if let notice = conflictNotice {
                 conflictBanner(notice)
             }
+            // 저녁엔 내일을 닫고, 아침엔 첫 걸음 하나만 (→ PreDecision.swift).
+            TimelineView(.everyMinute) { ctx in
+                PreDecisionBanner(
+                    now: ctx.date,
+                    todayBlocks: blocks(on: Date()),
+                    tomorrowBlocks: blocks(on: tomorrow),
+                    isViewingToday: dayOffset == 0,
+                    onStart: { block in
+                        TaskTimer.shared.start(block: block)
+                        openWindow(id: WeekBlocksWindow.timer)
+                    },
+                    onOpenTomorrow: { shiftDay(by: 1) }
+                )
+            }
             dayStrip
 
             // **반은 하루, 반은 그날의 회고와 아직 안 정한 할 일.** 하루 옆에 그날 계획해 둔 블록마다
@@ -671,6 +704,24 @@ struct ContentView: View {
                     },
                     onEditRoutineSchedule: { routine in
                         routineSheet = RoutineSheetContext(routine: routine)
+                    },
+                    candidates: gapCandidates,
+                    onAddBlock: { hour, hours in
+                        blockSheet = BlockSheetContext(day: selectedDay, block: nil,
+                                                       startHour: hour, duration: hours)
+                    },
+                    zones: dayZones,
+                    onReturnToBacklog: { block in
+                        BacklogSection.returnToBacklog(block, allItems: backlogItems,
+                                                       weekStart: selectedWeek, context: context)
+                    },
+                    onClearTime: { block in
+                        // 시각만 무른다. 그날의 계획에는 남고, 시간표에서는 시간대 자리로 돌아간다.
+                        Haptic.snap()
+                        withAnimation(Motion.squish) {
+                            block.startHour = -1
+                            try? context.save()
+                        }
                     }
                 )
                     .frame(maxHeight: .infinity, alignment: .top)
@@ -680,6 +731,8 @@ struct ContentView: View {
                     .transition(.pageSlide(forward: dayForward, distance: 40))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                // 알약을 끄는 동안에는 시간표 판이 오른쪽 판들 위로 — 끌려 나간 알약이 가려지지 않게.
+                .zIndex(dayZones.isDragging ? 10 : 0)
 
                 // 오른쪽 반: 위에 그날의 회고, 아래에 **아직 요일을 안 정한 할 일**.
                 // 회고만 두었더니 하루를 보다가 빈 시간에 넣을 일을 고르려면 주간으로 돌아가야 했다.
@@ -693,9 +746,11 @@ struct ContentView: View {
                         canPlan: hasFixedRoutines,
                         onDropBacklog: { token in
                             dropBacklogItem(token: token, day: selectedDay)
-                        }
+                        },
+                        externallyTargeted: dayZones.hovering == .plan
                     )
                     .dashboardPanel(padding: 14)
+                    .reportGlobalFrame { dayZones.planFrame = $0 }
                     .id("reflection-\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
                     .transition(.opacity)
 
@@ -703,15 +758,58 @@ struct ContentView: View {
                                    weekStart: selectedWeek,
                                    weekBlocks: weekBlocks,
                                    canPlan: hasFixedRoutines,
+                                   externallyTargeted: dayZones.hovering == .backlog,
                                    showsCategoryFilter: false)
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
+                    .reportGlobalFrame { dayZones.backlogFrame = $0 }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             // 두 판의 키를 긴 쪽에 맞춘다 — 들쭉날쭉하면 한 화면이 아니라 두 조각으로 읽힌다.
             .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    /// 한 걸음 되돌린다. 화면이 툭 바뀌지 않게 결을 붙이고, 되돌린 것도 곧바로 저장한다.
+    private func undo() {
+        guard let undoManager, undoManager.canUndo else { return }
+        Haptic.tick()
+        withAnimation(Motion.squish) {
+            undoManager.undo()
+            try? context.save()
+        }
+        refreshUndo()
+    }
+
+    private func refreshUndo() {
+        let value = undoManager?.canUndo ?? false
+        if value != canUndo { canUndo = value }
+    }
+
+    /// 내일 이 시각. 일요일 다음은 다음 주 월요일이라 주도 함께 넘어간다.
+    private var tomorrow: Date {
+        Calendar(identifier: .iso8601).date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    }
+
+    /// 그 **날짜**의 계획 블록 — 주가 넘어가도 따라간다 (내일이 다음 주 월요일일 수 있다).
+    private func blocks(on date: Date) -> [PlanBlock] {
+        let cal = Calendar(identifier: .iso8601)
+        let week = date.weekStart()
+        let day = DayOfWeek.of(date)
+        return allBlocks
+            .filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: week) }
+            .sorted { $0.sortHour < $1.sortHour }
+    }
+
+    /// 일간의 빈 시간에 넣을 수 있는 할 일 — 끝내지 않았고 이 주 어느 요일에도 안 올린 최상위 할 일.
+    /// 시간은 단계까지 합친 전체다 (→ BacklogSection의 같은 규칙).
+    private var gapCandidates: [GapCandidate] {
+        let tree = TodoTree(backlogItems)
+        let placed = Set(weekBlocks.map { $0.title.components(separatedBy: " · ").first ?? $0.title })
+        return tree.roots
+            .filter { !$0.isCompleted && !placed.contains($0.title) }
+            .map { GapCandidate(token: $0.dragToken, title: $0.title, hours: tree.totalHours(of: $0)) }
     }
 
     /// 일간 위의 요일 줄. 누르면 그날로 건너간다.
@@ -753,17 +851,22 @@ struct ContentView: View {
                         .foregroundStyle(selected ? Color.white : (today ? Color.red : Color.primary))
                 }
                 .frame(width: 32, height: 32)
-                // 그날의 일을 색 구슬로. 넷을 넘으면 넷까지만 — 셀 것이 아니라 붐비는지 볼 것이다.
-                HStack(spacing: -3) {
-                    ForEach(Array(dots.enumerated()), id: \.offset) { _, color in
-                        Circle()
-                            .fill(color)
-                            .frame(width: 8, height: 8)
-                            .overlay(Circle().strokeBorder(Color.surface, lineWidth: 1.5))
+                // 그날의 계획 블록을 점으로 — 채운 점은 끝낸 것, 빈 점은 아직 안 한 것.
+                HStack(spacing: 3) {
+                    ForEach(Array(dots.enumerated()), id: \.offset) { _, filled in
+                        ZStack {
+                            Circle()
+                                .strokeBorder(Color.accentColor.opacity(0.6), lineWidth: 1.2)
+                            Circle()
+                                .fill(Color.accentColor)
+                                .scaleEffect(filled ? 1 : 0.1)
+                                .opacity(filled ? 1 : 0)
+                        }
+                        .frame(width: 6, height: 6)
                     }
                 }
-                .frame(height: 8)
-                .opacity(dots.isEmpty ? 0 : 1)
+                .frame(height: 6)
+                .animation(Motion.squish, value: dots)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 4)
@@ -774,19 +877,21 @@ struct ContentView: View {
         .help(day.longLabel)
     }
 
-    /// 요일 줄에 찍을 색 구슬 — 고정 루틴부터, 그다음 계획 블록. 같은 색은 한 번만, 넷까지.
-    private func dayDots(on day: DayOfWeek) -> [Color] {
-        var colors: [Color] = []
-        var seen: Set<String> = []
-        let routineColors = fixedRoutines(on: day).map { ($0.colorName, $0.displayColor) }
-        let blockColors = weekBlocks.filter { $0.day == day }
-            .map { ($0.concreteVerified ? "accent" : "orange", $0.concreteVerified ? Color.accentColor : Color.orange) }
-        for (key, color) in routineColors + blockColors where !seen.contains(key) {
-            seen.insert(key)
-            colors.append(color)
-            if colors.count == 4 { break }
-        }
-        return colors
+    /// 요일 줄에 찍을 점 — **그날의 계획 블록만.** true는 끝낸 것(채운 점), false는 아직(빈 점).
+    ///
+    /// 처음엔 고정 루틴 색까지 찍었는데, 잠·끼니·회사는 날마다 있어서 이레 내내 같은 구슬이 서
+    /// 아무 말도 하지 않았다. 요일마다 달라지는 계획만 찍으면 "이 날은 할 일이 있다/없다"와
+    /// "얼마나 해냈다"가 함께 읽힌다.
+    ///
+    /// 넷을 넘으면 점은 넷에 두고 **채운 비율**을 맞춘다 — 여덟 개 중 넷을 끝냈으면 넷 중 둘이 찬다.
+    private func dayDots(on day: DayOfWeek) -> [Bool] {
+        let blocks = weekBlocks.filter { $0.day == day }
+        let total = blocks.count
+        guard total > 0 else { return [] }
+        let done = blocks.filter { $0.reviewStatus == .done }.count
+        let slots = min(4, total)
+        let filled = total <= 4 ? done : Int((Double(done) / Double(total) * 4).rounded())
+        return (0..<slots).map { $0 < filled }
     }
 
     private var weekRangeString: String {
@@ -1673,6 +1778,9 @@ struct BlockSheetContext: Identifiable {
     let id = UUID()
     let day: DayOfWeek
     let block: PlanBlock?
+    /// 일간의 빈 시간에서 열었을 때 — 그 시각·길이로 새 블록을 채워 둔다.
+    var startHour: Double? = nil
+    var duration: Double? = nil
 }
 
 struct RoutineSheetContext: Identifiable {
@@ -1787,3 +1895,33 @@ struct WeekBarChart: View {
     }
 }
 
+
+
+/// **모델 컨텍스트에 이 창의 되돌리기 관리자를 물린다.** 이것 하나로 SwiftData의 모든 변경
+/// (옮기기·지우기·체크)이 되돌리기 목록에 쌓이고, 편집 메뉴의 ⌘Z도 같은 목록을 쓴다.
+/// 툴바 단추가 켜지고 꺼질 수 있게 목록이 바뀔 때마다 `canUndo`를 맞춘다.
+private struct UndoWiring: ViewModifier {
+    let context: ModelContext
+    let undoManager: UndoManager?
+    @Binding var canUndo: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .onAppear { attach(undoManager) }
+            .onChange(of: undoManager) { _, manager in attach(manager) }
+            .onReceive(NotificationCenter.default.publisher(for: .NSUndoManagerDidCloseUndoGroup)) { _ in refresh() }
+            .onReceive(NotificationCenter.default.publisher(for: .NSUndoManagerDidUndoChange)) { _ in refresh() }
+            .onReceive(NotificationCenter.default.publisher(for: .NSUndoManagerDidRedoChange)) { _ in refresh() }
+            .onReceive(NotificationCenter.default.publisher(for: .NSUndoManagerCheckpoint)) { _ in refresh() }
+    }
+
+    private func attach(_ manager: UndoManager?) {
+        context.undoManager = manager
+        refresh()
+    }
+
+    private func refresh() {
+        let value = undoManager?.canUndo ?? false
+        if value != canUndo { canUndo = value }
+    }
+}

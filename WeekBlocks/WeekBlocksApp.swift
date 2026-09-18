@@ -79,6 +79,9 @@ struct WeekBlocksApp: App {
         // "윈도우" 메뉴(및 Dock 아이콘 클릭)로 다시 열 수 있다. (App Store 심사 Guideline 4 대응)
         Window("무지개 공방", id: WeekBlocksWindow.main) {
             ContentView()
+                // **둥근 서체.** 알약·동그라미와 글씨가 같은 결이어야 말랑하게 읽힌다.
+                // 서체를 따로 고른 글씨(`design:` 지정)는 그대로 둔다.
+                .fontDesign(.rounded)
                 .leeoSatisfactionCheck(WeekBlocksSpec.self)
                 // 다른 앱에서 공유한 할 일 받기. 공유 익스텐션은 SwiftData에 직접 못 쓰고
                 // App Group에 쌓아만 두므로, 앱이 켜지고 앞으로 나올 때 그 상자를 비운다.
@@ -123,6 +126,7 @@ struct WeekBlocksApp: App {
         // 적는 일과 한 주를 짜는 일은 손이 오가는 방향이 달라서, 나란히 놓고 쓸 수 있어야 한다.
         Window("할 일", id: WeekBlocksWindow.todos) {
             TodoWindowView()
+                .fontDesign(.rounded)
         }
         .modelContainer(container)
         .defaultSize(width: 560, height: 620)
@@ -133,6 +137,7 @@ struct WeekBlocksApp: App {
         // 한 주를 짜는 창과 따로 세운다 — 계획을 보는 동안에도 옆에 띄워 둘 수 있어야 한다.
         Window("타이머", id: WeekBlocksWindow.timer) {
             TimerWindowView()
+                .fontDesign(.rounded)
         }
         .modelContainer(container)
         .defaultSize(width: 400, height: 500)

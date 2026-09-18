@@ -70,7 +70,7 @@ extension ButtonStyle where Self == SquishButtonStyle {
 
 extension View {
     /// 가리키면 한 뼘 떠오른다. 잡을 수 있는 카드·칩에.
-    func hoverLift(_ hovering: Bool, scale: CGFloat = 1.02) -> some View {
+    func hoverLift(_ hovering: Bool, scale: CGFloat = 1.01) -> some View {
         scaleEffect(hovering ? scale : 1)
             .animation(Motion.squish, value: hovering)
     }

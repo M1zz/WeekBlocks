@@ -18,8 +18,12 @@ import Charts
 
 /// 추세의 셈. 화면과 떼어 둔다 — 같은 숫자를 다른 자리(요약·알림)에서 다시 셀 일이 생긴다.
 enum ReflectionTrends {
-    /// 몇 주를 거슬러 보는가.
+    /// 몇 주를 거슬러 보는가 (Pro).
     static let weekCount = 8
+    /// **무료로 보이는 주 수.** 두 주면 "지난주보다 나아졌나"는 알 수 있다 — 값을 치르기 전에
+    /// 이 화면이 무엇을 해 주는지 알 만큼은 열어 둔다. 쌓여야 보이는 것(요일·시간대·자주 미루는 일)은
+    /// 그다음이다.
+    static let freeWeekCount = 2
 
     struct Week: Identifiable {
         let start: Date
@@ -59,10 +63,10 @@ enum ReflectionTrends {
         return score / Double(reviewed.count)
     }
 
-    /// `ending` 주까지 거슬러 `weekCount`주. 오래된 주가 앞이다.
-    static func weekStarts(ending: Date) -> [Date] {
+    /// `ending` 주까지 거슬러 `count`주. 오래된 주가 앞이다.
+    static func weekStarts(ending: Date, count: Int = weekCount) -> [Date] {
         let cal = Calendar(identifier: .iso8601)
-        return (0..<weekCount).reversed().compactMap {
+        return (0..<max(1, count)).reversed().compactMap {
             cal.date(byAdding: .weekOfYear, value: -$0, to: ending)
         }
     }
@@ -75,9 +79,9 @@ enum ReflectionTrends {
         }
     }
 
-    static func weeks(_ all: [PlanBlock], ending: Date) -> [Week] {
+    static func weeks(_ all: [PlanBlock], ending: Date, count: Int = weekCount) -> [Week] {
         let cal = Calendar(identifier: .iso8601)
-        let starts = weekStarts(ending: ending)
+        let starts = weekStarts(ending: ending, count: count)
         let inRange = blocks(all, in: starts)
         return starts.map { start in
             let mine = inRange.filter { cal.isDate($0.weekStartDate, inSameDayAs: start) }
@@ -127,61 +131,51 @@ struct ReflectionTrendsView: View {
     @State private var purchases = PurchaseManager.shared
     @State private var showingPaywall = false
 
-    private var weeks: [ReflectionTrends.Week] { ReflectionTrends.weeks(allBlocks, ending: weekStart) }
+    /// 무료는 2주, Pro는 8주.
+    private var weekCount: Int {
+        purchases.isPro ? ReflectionTrends.weekCount : ReflectionTrends.freeWeekCount
+    }
+
+    private var weeks: [ReflectionTrends.Week] {
+        ReflectionTrends.weeks(allBlocks, ending: weekStart, count: weekCount)
+    }
     private var rangeBlocks: [PlanBlock] {
-        ReflectionTrends.blocks(allBlocks, in: ReflectionTrends.weekStarts(ending: weekStart))
+        ReflectionTrends.blocks(allBlocks, in: ReflectionTrends.weekStarts(ending: weekStart, count: weekCount))
     }
 
     var body: some View {
-        Group {
-            if purchases.isPro {
-                content
-            } else {
-                locked
+        content
+            .sheet(isPresented: $showingPaywall) {
+                PaywallView(reason: WeekBlocksSpec.Gate.trends)
             }
-        }
-        .sheet(isPresented: $showingPaywall) {
-            PaywallView(reason: WeekBlocksSpec.Gate.trends)
-        }
     }
 
-    // MARK: 잠김
-
-    /// 안 산 사람에게는 **자기 숫자 하나**를 먼저 보여 준다 — 무엇을 사는지가 남의 예시가
-    /// 아니라 제 기록으로 읽혀야 한다. 나머지는 흐리게 깔고 그 위에 문을 둔다.
-    private var locked: some View {
-        let reviewed = rangeBlocks.filter { $0.reviewStatus != nil }.count
-        return ZStack {
-            content
-                .blur(radius: 7)
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
-
-            VStack(spacing: 10) {
-                Image(systemName: "chart.bar.xaxis")
-                    .font(.system(size: 26))
-                    .foregroundStyle(.tint)
-                Text("지난 8주의 회고를 겹쳐 봅니다")
-                    .font(.headline)
-                Text(reviewed > 0
-                     ? String(localized: "그동안 찍어 둔 회고 \(reviewed)개로 잘 되는 요일과 시간대, 자주 미루는 일을 보여 드립니다.")
-                     : String(localized: "회고를 찍어 두면 잘 되는 요일과 시간대, 자주 미루는 일이 여기에 섭니다."))
-                    .font(.callout)
+    /// 안 산 사람에게 여는 자리와 잠그는 자리를 가르는 한 줄.
+    ///
+    /// **무료로도 지난 2주는 그대로 보인다** — 숫자가 제 것이어야 살지 말지를 정할 수 있다.
+    /// 잠그는 것은 여러 주가 쌓여야 비로소 말이 되는 것들이다: 8주 추세, 요일·시간대의 결,
+    /// 번번이 미루는 일.
+    private var proBanner: some View {
+        HStack(spacing: 10) {
+            GlyphBadge(symbol: "sparkles", color: .accentColor, size: 26)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("지난 \(ReflectionTrends.weekCount)주까지 넓혀 보기")
+                    .font(.system(size: 14, weight: .semibold))
+                Text("잘 되는 요일과 시간대, 번번이 미루는 일은 몇 주가 쌓여야 보입니다.")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                Button {
-                    showingPaywall = true
-                } label: {
-                    Label("Pro로 추세 보기", systemImage: "sparkles")
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 4)
             }
-            .padding(22)
-            .frame(maxWidth: 360)
-            .background(.regularMaterial, in: .soft(Corner.panel))
+            Spacer(minLength: 8)
+            Button {
+                showingPaywall = true
+            } label: {
+                Label("Pro 보기", systemImage: "sparkles")
+            }
+            .buttonStyle(.borderedProminent)
         }
+        .padding(12)
+        .background(Color.accentColor.opacity(0.09), in: .soft(Corner.card))
+        .overlay(RoundedRectangle.soft(Corner.card).strokeBorder(Color.accentColor.opacity(0.25), lineWidth: 1))
     }
 
     // MARK: 추세
@@ -193,26 +187,31 @@ struct ReflectionTrendsView: View {
             VStack(alignment: .leading, spacing: 18) {
                 summary(weeks)
                 weeklyChart(weeks)
-                HStack(alignment: .top, spacing: 14) {
-                    shareCard(title: "요일별", shares: ReflectionTrends.byDay(blocks))
-                    shareCard(title: "시간대별", shares: ReflectionTrends.byBand(blocks))
+                if purchases.isPro {
+                    HStack(alignment: .top, spacing: 14) {
+                        shareCard(title: "요일별", shares: ReflectionTrends.byDay(blocks))
+                        shareCard(title: "시간대별", shares: ReflectionTrends.byBand(blocks))
+                    }
+                    skippedCard(ReflectionTrends.mostSkipped(blocks))
+                } else {
+                    proBanner
                 }
-                skippedCard(ReflectionTrends.mostSkipped(blocks))
             }
             .padding(20)
         }
     }
 
-    /// 최근 4주와 그 앞 4주를 견준다. 한 주는 들쭉날쭉해서 방향이 안 읽힌다.
+    /// 앞뒤 절반을 견준다. 한 주는 들쭉날쭉해서 방향이 안 읽힌다 (8주면 4주씩, 2주면 1주씩).
     private func summary(_ weeks: [ReflectionTrends.Week]) -> some View {
-        let recent = ReflectionTrends.rate(rangeBlocksIn(weeks.suffix(4)))
-        let earlier = ReflectionTrends.rate(rangeBlocksIn(weeks.prefix(max(0, weeks.count - 4))))
+        let half = max(1, weeks.count / 2)
+        let recent = ReflectionTrends.rate(rangeBlocksIn(weeks.suffix(half)))
+        let earlier = ReflectionTrends.rate(rangeBlocksIn(weeks.prefix(max(0, weeks.count - half))))
         let reviewed = weeks.reduce(0) { $0 + $1.reviewed }
         let planned = weeks.reduce(0) { $0 + $1.planned }
 
         return HStack(spacing: 10) {
-            tile(label: "최근 4주 달성률", value: recent.map(percent) ?? "–", color: .green)
-            tile(label: "그 앞 4주와 비교", value: delta(recent, earlier), color: deltaColor(recent, earlier))
+            tile(label: "최근 달성률", value: recent.map(percent) ?? "–", color: .green)
+            tile(label: "그 앞과 비교", value: delta(recent, earlier), color: deltaColor(recent, earlier))
             tile(label: "회고한 블록", value: "\(reviewed)/\(planned)", color: .secondary)
         }
     }

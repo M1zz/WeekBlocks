@@ -9,6 +9,9 @@
 //  그리고 전부 **연속 곡률**(`.continuous`)로 그린다 — 원호를 이어 붙인 모서리는 직선과
 //  만나는 자리가 꺾여 보이는데, 연속 곡률은 애플 기본 앱의 카드처럼 부드럽게 흘러 들어간다.
 //
+//  2026-09-17: 일간을 알약 타임라인으로 바꾸면서 앱 전체를 한 단계 더 말랑하게 올렸다
+//  (8·10·12·16·22). 글씨도 둥근 서체로 간다 (→ WeekBlocksApp의 `.fontDesign(.rounded)`).
+//
 //  ⚠️ 새 모서리에 숫자를 직접 쓰지 않는다. 가장 가까운 급을 쓴다 — 급을 하나씩 늘리면
 //     다시 흩어진다.
 //  ⚠️ 높이가 곧 둥글기인 것(진행 막대·배지·왼쪽 색 막대)은 급이 아니라 `Capsule()`이다.
@@ -19,15 +22,15 @@ import SwiftUI
 
 enum Corner {
     /// 시간축 위의 조각 막대 (높이 20pt 안팎).
-    static let segment: CGFloat = 6
+    static let segment: CGFloat = 8
     /// 시간축 한 줄의 바탕.
-    static let track: CGFloat = 8
+    static let track: CGFloat = 10
     /// 요일 칸 안의 칩, 작은 행·단추.
-    static let chip: CGFloat = 10
+    static let chip: CGFloat = 12
     /// 할 일 카드·루틴 카드·입력 칸·안내 상자.
-    static let card: CGFloat = 14
+    static let card: CGFloat = 16
     /// 요일 칸·요약 카드처럼 다른 것을 담는 판.
-    static let panel: CGFloat = 18
+    static let panel: CGFloat = 22
 }
 
 extension Shape where Self == RoundedRectangle {

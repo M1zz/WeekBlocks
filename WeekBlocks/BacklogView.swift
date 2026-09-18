@@ -11,6 +11,8 @@ struct BacklogSection: View {
     var weekBlocks: [PlanBlock] = []
     /// 고정 루틴이 확보돼 있을 때만 할 일을 작성할 수 있다.
     var canPlan: Bool = true
+    /// 일간 시간표에서 알약을 끌어 이 위에 올려 둔 중인가 (→ DayDragZones). 받는 테두리를 세운다.
+    var externallyTargeted: Bool = false
     /// 분류 버튼 줄(전체·업무·개인…)을 보여줄 것인가.
     /// 주간 화면에서는 끈다 — 거기서 할 일은 **요일 칸으로 끌어다 놓을 카드**일 뿐이라
     /// 거르는 도구가 앞에 서면 계획을 짜는 손을 방해한다. 거르는 일은 할 일 창에서 한다.
@@ -281,6 +283,9 @@ struct BacklogSection: View {
                             onAdvance: { advance(item) },
                             onRewind: { rewind(item) },
                             onEditSteps: { stepsSheetItem = item },
+                            // 카드를 누르면 그 할 일을 들여다보는 자리가 열린다 (→ TodoStepsView).
+                            onOpen: { stepsSheetItem = item },
+                            onComplete: { complete(item) },
                             // 단계까지 통째로 지운다.
                             onDelete: {
                                 withAnimation(Motion.card) {
@@ -317,7 +322,7 @@ struct BacklogSection: View {
         // 찾아 지우고 할 일이 도로 서기를 기다려야 했다. 끌어 올렸으면 끌어 내릴 수도
         // 있어야 한다 — 같은 손짓의 반대 방향이다.
         .background {
-            if isReturnTargeted {
+            if isReturnTargeted || externallyTargeted {
                 RoundedRectangle.soft(Corner.panel)
                     .fill(Color.accentColor.opacity(0.08))
                     .overlay(RoundedRectangle.soft(Corner.panel)
@@ -334,6 +339,7 @@ struct BacklogSection: View {
             isReturnTargeted = hovering
         }
         .animation(Motion.target, value: isReturnTargeted)
+        .animation(Motion.squish, value: externallyTargeted)
         .task { await reconcileCategories() }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
@@ -371,7 +377,8 @@ struct BacklogSection: View {
             count: tree.leafCount(of: item),
             number: tree.currentStepNumber(of: item),
             totalHours: tree.totalHours(of: item),
-            canRewind: tree.lastDoneStep(of: item) != nil
+            canRewind: tree.lastDoneStep(of: item) != nil,
+            remaining: tree.leaves(of: item).filter { !$0.isCompleted }.count
         )
     }
 
@@ -436,10 +443,11 @@ struct BacklogSection: View {
     /// 받는 것은 이름 하나뿐이다. 분류는 위에서 고른 버튼을 따라가고,
     /// 시간·단계는 나중에 카드에서 고친다. 적는 순간에 정할 것을 늘리면 적기를 그만두게 된다.
     private var newTodoCard: some View {
-        HStack(spacing: 7) {
-            Capsule()
-                .fill(draftTint)
-                .frame(width: 3)
+        HStack(alignment: .top, spacing: 9) {
+            // 옆 카드의 진행 동그라미와 같은 자리에 빈 점선 고리 — 아직 적는 중이다.
+            Circle()
+                .strokeBorder(draftTint.opacity(0.6), style: StrokeStyle(lineWidth: 2, dash: [3, 3]))
+                .frame(width: 30, height: 30)
 
             TextField("할 일", text: $newTitle)
                 .textFieldStyle(.plain)
@@ -448,6 +456,7 @@ struct BacklogSection: View {
                 // Enter를 쳐도 되지만 안 쳐도 된다 — 다른 곳을 누르면 그대로 담긴다.
                 .onSubmit { commitDraft(keepOpen: true) }
                 .onExitCommand { endAdding() }
+                .padding(.top, 6)
 
             Button(action: endAdding) {
                 Image(systemName: "xmark").font(.system(size: 11))
@@ -456,12 +465,13 @@ struct BacklogSection: View {
             .foregroundStyle(.secondary)
             .help("닫기 (Esc)")
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(draftTint.opacity(0.10), in: .soft(Corner.card))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity, minHeight: BacklogBlock.cardHeight, maxHeight: BacklogBlock.cardHeight,
+               alignment: .topLeading)
+        .background(draftTint.opacity(0.10), in: .soft(Corner.panel))
         .overlay(
-            RoundedRectangle.soft(Corner.card)
+            RoundedRectangle.soft(Corner.panel)
                 .strokeBorder(draftTint.opacity(0.55),
                               style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
         )
@@ -486,7 +496,14 @@ struct BacklogSection: View {
     private func returnToBacklog(token: String) -> Bool {
         guard token.hasPrefix("block:"),
               let block = PlanBlock.matching(dragToken: token, in: weekBlocks) else { return false }
+        Self.returnToBacklog(block, allItems: allItems, weekStart: weekStart, context: context)
+        return true
+    }
 
+    /// 블록을 할 일 목록으로 되돌린다 — 목록에 그 할 일이 없으면 새로 세우고 블록은 지운다.
+    /// 요일 칸에서 끌어 내릴 때와 일간 시간표에서 끌어 올 때가 같은 규칙을 쓴다.
+    static func returnToBacklog(_ block: PlanBlock, allItems: [BacklogItem], weekStart: Date,
+                                context: ModelContext) {
         // 단계를 올린 블록은 "할 일 · 단계" 꼴이다. 앞머리가 할 일의 이름이다.
         let root = block.title.components(separatedBy: " · ").first ?? block.title
         if !allItems.contains(where: { $0.title == root }) {
@@ -497,11 +514,11 @@ struct BacklogSection: View {
             TodoSharing.stamp(item)
             context.insert(item)
         }
-        withAnimation(Motion.card) {
+        Haptic.snap()
+        withAnimation(Motion.squish) {
             context.delete(block)
             try? context.save()
         }
-        return true
     }
 
     /// 빈 칸을 연다. 분류는 지금 보고 있는 필터를 그대로 따른다 —
@@ -811,6 +828,8 @@ struct BacklogBlock: View {
         let number: Int?
         let totalHours: Double
         let canRewind: Bool
+        /// 아직 안 끝낸 단계 수. 1이면 다음 누름이 마지막이다.
+        var remaining: Int = 0
     }
 
     let item: BacklogItem
@@ -829,12 +848,44 @@ struct BacklogBlock: View {
     var onRewind: () -> Void = { }
     /// 단계 시트 열기.
     var onEditSteps: () -> Void = { }
+    /// 카드를 눌렀다 — 상세(할 일을 들여다보는 시트)를 연다.
+    var onOpen: () -> Void = { }
+    /// 안 쪼갠 일을 끝냈다.
+    var onComplete: () -> Void = { }
     let onDelete: () -> Void
     let onSetCategory: (String?) -> Void
     /// '바로 하면 되는 일' 표시를 켜고 끈다.
     var onToggleNow: () -> Void = { }
 
     @State private var hovering = false
+    /// 방금 끝냄을 눌렀다. 고리가 꽉 차고 체크가 서는 것을 **보여 준 뒤에** 카드를 내린다 —
+    /// 누르자마자 사라지면 무엇을 눌렀는지 눈이 따라가지 못한다.
+    @State private var finishing = false
+
+    /// 앞 동그라미를 눌렀다. 쪼갠 일은 지금 단계를 끝내고, 안 쪼갠 일은 통째로 끝낸다.
+    /// 마지막 한 번(카드가 목록에서 내려가는 누름)은 꽉 찬 체크를 잠깐 보여 준 뒤에 내린다.
+    private func checkProgress() {
+        if let steps {
+            guard steps.currentTitle != nil else { return }
+            guard steps.remaining <= 1 else {
+                onAdvance()
+                return
+            }
+        }
+        withAnimation(Motion.squish) { finishing = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            if steps != nil { onAdvance() } else { onComplete() }
+        }
+    }
+
+    /// 카드 동그라미에 설 분류 아이콘. 분류가 없으면 nil — 첫 글자가 선다.
+    private var categoryIcon: String? {
+        guard let id = item.categoryID else { return nil }
+        return categories.first { $0.uuid == id }?.iconName
+    }
+
+    /// 할 일 카드 한 장의 키. 두 줄 제목 + 지금 단계 한 줄 + 시간 줄이 들어간다.
+    static let cardHeight: CGFloat = 96
 
     /// '바로 하면 되는 일'의 색. iOS와 같은 연두다.
     static let nowGreen = Color(hue: 0.26, saturation: 0.72, brightness: 0.66)
@@ -860,15 +911,25 @@ struct BacklogBlock: View {
     }
 
     var body: some View {
-        HStack(spacing: 7) {
-            Capsule()
-                .fill(tint)
-                .frame(width: 3)
+        HStack(alignment: .top, spacing: 9) {
+            // **누르면 진행이 차는 동그라미.** 고리가 곧 진행도다 — 단계로 쪼갠 일은 누를 때마다
+            // 지금 단계를 끝내고, 안 쪼갠 일은 한 번에 끝난다. 안에는 분류 아이콘('바로 하면
+            // 되는 일'은 번개)이 서 있다가 가리키면 누르면 무엇이 되는지로 바뀐다.
+            ProgressCheck(progress: finishing ? 1 : (steps?.progress ?? 0),
+                          color: (lane == .now || isFragment) ? Self.nowGreen : tint,
+                          symbol: (lane == .now || isFragment) ? "bolt.fill" : categoryIcon,
+                          title: item.title,
+                          stepped: steps != nil,
+                          action: checkProgress)
+                .disabled(finishing)
+                .help(steps.map { $0.currentTitle.map { String(localized: "‘\($0)’ 끝내기") } ?? String(localized: "모든 단계를 마쳤습니다") }
+                      ?? String(localized: "끝냈다고 표시한다"))
 
             VStack(alignment: .leading, spacing: 3) {
+                // 제목은 늘 두 줄 자리를 잡는다 — 한 줄짜리와 두 줄짜리 카드의 키가 같아야 한다.
                 Text(item.title)
-                    .font(.system(size: 14, weight: .medium))
-                    .lineLimit(2)
+                    .font(.system(size: 14, weight: .semibold))
+                    .lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -891,13 +952,11 @@ struct BacklogBlock: View {
                     }
                     .buttonStyle(.squish)
                     .help(steps.currentTitle == nil ? "모든 단계를 마쳤습니다" : "이 단계를 끝내고 다음으로 넘기기")
-
-                    // 진행바만 남긴다. 퍼센트와 "3단계 중 2"는 같은 말을 글씨로 되풀이했다.
-                    ProgressView(value: steps.progress)
-                        .tint(steps.progress >= 1 ? .green : tint)
-                        .frame(maxWidth: 110)
-                        .animation(Motion.number, value: steps.progress)
+                    // 진행 막대는 뗐다 — 앞 동그라미의 고리가 같은 것을 말한다.
                 }
+
+                // 남는 키는 제목과 아래 줄 사이에 둔다. 아래 줄(시간·요일)은 늘 카드 바닥에 붙는다.
+                Spacer(minLength: 0)
 
                 // 카드 아래 줄은 '얼마짜리인가'와 곁다리 표시만. 시간은 칩 하나로 말한다 —
                 // 단계가 있으면 이 카드를 끌어다 놓을 때 잡히는 건 전체 시간이라 그걸 쓴다.
@@ -906,11 +965,6 @@ struct BacklogBlock: View {
                 // 한 줄에 글씨가 넷씩 붙으면 정작 읽어야 할 시간·요일이 묻힌다.
                 // 무슨 분류인지 확인하고 바꾸는 자리는 카드 오른쪽 클릭 메뉴다.
                 HStack(spacing: 6) {
-                    if (lane == .now || isFragment), steps == nil {
-                        Image(systemName: "bolt.circle")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Self.nowGreen)
-                    }
                     Text(formatDuration(steps?.totalHours ?? item.durationHours))
                         .font(.system(size: 13, weight: .medium))
                         .monospacedDigit()
@@ -934,27 +988,59 @@ struct BacklogBlock: View {
                     Spacer(minLength: 0)
                 }
             }
-
+        }
+        .padding(.leading, 8)
+        .padding(.trailing, 10)
+        .padding(.vertical, 9)
+        // **카드 키는 모두 같다.** 제목 길이·단계 유무로 들쭉날쭉하면 격자가 아니라 쌓아 둔 쪽지로 읽힌다.
+        .frame(maxWidth: .infinity, minHeight: Self.cardHeight, maxHeight: Self.cardHeight, alignment: .topLeading)
+        .background(laneBackground, in: .soft(Corner.panel))
+        // 갈래(지금·잔일·계획)는 바탕색과 왼쪽 동그라미가 이미 말한다. 테두리는 가리킬 때만 선다.
+        .overlay(RoundedRectangle.soft(Corner.panel).strokeBorder(laneBorder.opacity(hovering ? 1 : 0), lineWidth: 1))
+        // 가리키면 **들어 올린 카드**처럼 그림자가 깔린다 — 집어서 끌 수 있다는 넛지.
+        .background {
+            RoundedRectangle.soft(Corner.panel)
+                .fill(Color.surface)
+                .shadow(color: .black.opacity(hovering ? 0.08 : 0), radius: hovering ? 3 : 0, y: hovering ? 1.5 : 0)
+        }
+        // 지우기는 모서리에 **얹는다.** 줄 안에 세웠더니 가리키는 순간 제목 폭이 줄어
+        // 글자가 '…'로 잘렸다가 손을 떼면 돌아왔다. 얹으면 글씨는 제자리에 그대로다.
+        .overlay(alignment: .topTrailing) {
             if hovering {
                 Button(action: onDelete) {
-                    Image(systemName: "xmark").font(.system(size: 11))
+                    Image(systemName: "xmark")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 18, height: 18)
+                        .background(Color.surface, in: Circle())
+                        .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
                 }
                 .buttonStyle(.squish)
-                .foregroundStyle(.secondary)
-                .transition(.control)
+                .offset(x: 6, y: -6)
+                .transition(.pop)
+                .help("삭제")
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(laneBackground, in: .soft(Corner.card))
-        // 갈래(지금·잔일·계획)는 바탕색과 왼쪽 막대가 이미 말한다. 테두리는 가리킬 때만 선다.
-        .overlay(RoundedRectangle.soft(Corner.card).strokeBorder(laneBorder.opacity(hovering ? 1 : 0), lineWidth: 1))
-        .contentShape(.soft(Corner.card))
-        .draggable(item.dragToken)
+        .contentShape(.soft(Corner.panel))
+        // **손에 들려 가는 모습은 작은 알약 하나다** (→ DragPreviewCard). 카드를 통째로 찍어
+        // 들고 다니면 무엇을 들었는지보다 덩어리가 먼저 보인다.
+        //
+        // ⚠️ 한때 `onDrag`로 바꿔 '집어 올리는 순간'을 잡아 원래 카드를 흐리게 했다가 되돌렸다.
+        //    끌기가 시작되는 자리는 잡히지만, **놓을 때 끌던 그림이 목록 쪽으로 도로 내려갔다가**
+        //    새 알약이 시간표에 서는 것처럼 보였다. 놓는 순간이 깨끗한 쪽이 낫다.
+        //
+        // 끌기를 안쪽에, 누르기를 바깥에 둔다 — 순서가 뒤집히면 누르는 동안 끌기가 시작되지 못한다.
+        .draggable(item.dragToken) {
+            DragPreviewCard(title: item.title,
+                            hours: steps?.totalHours ?? item.durationHours,
+                            color: (lane == .now || isFragment) ? Self.nowGreen : tint,
+                            symbol: (lane == .now || isFragment) ? "bolt.fill" : categoryIcon)
+        }
+        .onTapGesture(perform: onOpen)
         .onHover { hovering = $0 }
+        .grabCursor()
         .hoverLift(hovering)
-        .animation(Motion.hover, value: hovering)
+        .animation(Motion.squish, value: hovering)
         // 성질이 바뀌면 색이 바뀐다('바로 하면 되는 일'로 표시하는 순간처럼).
         // 툭 갈아 끼우면 무엇이 바뀐 건지 눈이 못 좇는다.
         .animation(Motion.card, value: laneBackground)

@@ -10,14 +10,10 @@ struct RoutineRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(routine.displayColor.opacity(0.18))
-                    .frame(width: 32, height: 32)
-                Image(systemName: routine.iconName)
-                    .foregroundStyle(routine.displayColor)
-                    .font(.system(size: 16))
-            }
+            GlyphBadge(symbol: routine.iconName, title: routine.name, color: routine.displayColor,
+                       size: 32, style: routine.kind == .quota ? .dashed : .filled)
+                .scaleEffect(hovering ? 1.04 : 1)
+                .animation(Motion.squish, value: hovering)
             VStack(alignment: .leading, spacing: 2) {
                 Text(routine.name)
                     .font(.body.weight(.medium))
@@ -68,10 +64,11 @@ struct RoutineRow: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle.soft(Corner.card))
-        .overlay(RoundedRectangle.soft(Corner.card).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
+        .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle.soft(Corner.panel))
+        .overlay(RoundedRectangle.soft(Corner.panel).stroke(Color.secondary.opacity(0.12), lineWidth: 0.5))
         .draggable("routine:\(routine.name)")
         .onHover { hovering = $0 }
+        .hoverLift(hovering, scale: 1.01)
         .animation(Motion.hover, value: hovering)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) { onEdit() }
@@ -89,11 +86,11 @@ struct RoutineBlock: View {
     var body: some View {
         let color = routine.displayColor
         VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 6) {
-                Image(systemName: routine.iconName)
-                    .font(.system(size: 14))
-                    .foregroundStyle(color)
-                    .frame(width: 16)
+            HStack(spacing: 8) {
+                GlyphBadge(symbol: routine.iconName, title: routine.name, color: color,
+                           size: 26, style: routine.kind == .quota ? .dashed : .filled)
+                    .scaleEffect(hovering ? 1.04 : 1)
+                    .animation(Motion.squish, value: hovering)
                 Text(routine.name)
                     .font(.system(size: 15, weight: .semibold))
                     .lineLimit(1)
@@ -137,14 +134,15 @@ struct RoutineBlock: View {
             .monospacedDigit()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(color.opacity(hovering ? 0.16 : 0.10), in: .soft(Corner.card))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(color.opacity(hovering ? 0.14 : 0.08), in: .soft(Corner.panel))
         // 색 채움이 곧 경계다. 테두리는 가리킬 때만 선다.
-        .overlay(RoundedRectangle.soft(Corner.card).strokeBorder(color.opacity(hovering ? 0.4 : 0), lineWidth: 1))
-        .contentShape(.soft(Corner.card))
+        .overlay(RoundedRectangle.soft(Corner.panel).strokeBorder(color.opacity(hovering ? 0.35 : 0), lineWidth: 1))
+        .contentShape(.soft(Corner.panel))
         .draggable("routine:\(routine.name)")
         .onHover { hovering = $0 }
+        .hoverLift(hovering)
         .animation(Motion.hover, value: hovering)
         .onTapGesture(count: 2) { onEdit() }
         .help(routine.scheduleDescription)

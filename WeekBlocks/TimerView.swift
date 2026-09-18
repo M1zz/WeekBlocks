@@ -249,7 +249,22 @@ private struct SlotRow: View {
 
 /// 일정 기준을 벗어나 '지금부터' 세는 중. 늦게 시작했거나 계획에 없는 일을 할 때.
 struct RunningTimerFace: View {
+    @Environment(\.modelContext) private var context
     @State private var timer = TaskTimer.shared
+
+    @Query private var allBlocksRaw: [PlanBlock]
+    /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
+    private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
+
+    /// 지금 세고 있는 계획 블록. 루틴을 세는 중이면 nil — 루틴에는 '다음 첫 동작'이 없다.
+    private var timedBlock: PlanBlock? {
+        guard let token = timer.target?.token else { return nil }
+        return PlanBlock.matching(dragToken: token, in: allBlocks)
+    }
+
+    /// 멈추기 전에 한 줄을 받는 중. 담긴 블록이 그 대상이다.
+    @State private var closing: PlanBlock?
+    @State private var draft = ""
 
     private var tint: Color {
         if timer.isOvertime { return .red }
@@ -259,6 +274,29 @@ struct RunningTimerFace: View {
     var body: some View {
         VStack(spacing: 18) {
             header
+
+            // 끊겼다가 돌아왔을 때 — 지난번에 남긴 한 줄이 먼저 선다.
+            if let note = timedBlock?.nextAction, !note.isEmpty {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "arrow.turn.down.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(tint)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("여기서부터")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                        Text(note)
+                            .font(.system(size: 13, weight: .medium))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 9)
+                .background(tint.opacity(0.1), in: .soft(Corner.card))
+                .padding(.horizontal, 16)
+                .transition(.pop)
+            }
 
             ZStack {
                 // 다 쓴 만큼 고리가 채워진다. 초과해도 두 바퀴 돌지 않는다.
@@ -290,6 +328,10 @@ struct RunningTimerFace: View {
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .animation(Motion.squish, value: timedBlock?.nextAction)
+        .sheet(item: $closing) { block in
+            nextActionSheet(block)
+        }
     }
 
     private var header: some View {
@@ -326,6 +368,48 @@ struct RunningTimerFace: View {
         }
     }
 
+    /// 멈추기 전에 한 줄을 받는 작은 창. **건너뛸 수 있어야 한다** — 물어보는 것이 벽이 되면
+    /// 사람은 타이머를 안 쓰게 된다. 적든 안 적든 멈추는 것은 똑같이 된다.
+    private func nextActionSheet(_ block: PlanBlock) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("다음 첫 동작")
+                    .font(.title3.weight(.semibold))
+                Text("돌아왔을 때 무엇부터 하면 되나요? 한 줄이면 충분합니다.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            TextField("", text: $draft, prompt: Text("예: 3번 예제부터 다시 돌려보기"), axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+                .lineLimit(2...4)
+                .onSubmit { finishClosing(block, save: true) }
+
+            HStack {
+                Button("건너뛰고 멈추기") { finishClosing(block, save: false) }
+                    .keyboardShortcut(.cancelAction)
+                Spacer()
+                Button("적고 멈추기") { finishClosing(block, save: true) }
+                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding(20)
+        .frame(width: 380)
+    }
+
+    private func finishClosing(_ block: PlanBlock, save: Bool) {
+        if save {
+            let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+            block.nextAction = text.isEmpty ? nil : text
+            try? context.save()
+        }
+        closing = nil
+        draft = ""
+        Haptic.tick()
+        timer.stop()
+    }
+
     private var controls: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
@@ -339,7 +423,13 @@ struct RunningTimerFace: View {
                 .controlSize(.large)
 
                 Button {
-                    timer.stop()
+                    // 계획 블록을 세다 멈추는 순간이 **가장 잘 아는 때**다. 여기서 한 줄을 받는다.
+                    if let block = timedBlock {
+                        draft = block.nextAction ?? ""
+                        closing = block
+                    } else {
+                        timer.stop()
+                    }
                 } label: {
                     Label("일정 기준으로", systemImage: "arrow.uturn.backward")
                         .frame(maxWidth: .infinity)

@@ -73,6 +73,8 @@ enum CloudSchemaPrimer {
         // 캘린더 가져오기가 더한 칸 (→ CalendarImport.swift). 이 줄이 없으면 이 필드는
         // 실제로 캘린더를 가져와 본 사람의 기기에서만 생긴다.
         block.calendarEventID = "schema-sample-event"
+        // 멈출 때 남기는 '다음 첫 동작' 칸 (→ PlanBlock.nextAction).
+        block.nextAction = "schema-sample-next"
         // 계획·루틴에도 걸린 함께 쓰기 칸 (→ TodoSharing.swift).
         block.isShared = true
         block.originInstallID = "schema-sample-install"

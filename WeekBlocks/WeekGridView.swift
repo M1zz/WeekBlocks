@@ -128,6 +128,10 @@ struct DayColumn: View {
     var onOpenDay: (() -> Void)? = nil
 
     @State private var isDropTargeted = false
+    /// 요일 머리를 가리키는 중. 누르면 그날로 들어간다는 것을 동그라미가 부풀어 말한다.
+    @State private var headerHovering = false
+    /// 방금 놓인 칩. 한 번 부풀었다 내려앉는다 (→ LandingTracker).
+    @State private var landing = LandingTracker()
     /// 지금 겨냥한 틈. 그 자리에 파란 선이 선다.
     @State private var targetedGap: Int?
 
@@ -168,14 +172,21 @@ struct DayColumn: View {
                 if let now, index == cut { nowMarker(now) }
                 gapZone(at: index)
                 chip(for: item)
-                    .transition(.card)
+                    .transition(.pop)
+                    .landingBounce(landing.landed == item.id)
             }
             if let now, cut == items.count { nowMarker(now) }
             gapZone(at: items.count)
         }
         // 요일 칸은 @Query가 스스로 갈아 끼우는 자리다 — 무엇이 서 있는지가 바뀌었을 때만
         // 결이 붙게 값으로 건다. (분이 흘러 '지금' 선만 내려가는 것에는 반응하지 않는다)
-        .animation(Motion.card, value: items.map(\.id))
+        .animation(Motion.squish, value: items.map(\.id))
+        // 새로 놓인 칩 하나가 그 자리에서 한 번 출렁인다.
+        .onChange(of: items.map(\.id)) { _, ids in
+            guard landing.update(ids) else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { landing.clear() }
+        }
+        .onAppear { _ = landing.update(items.map(\.id)) }
     }
 
     /// **칩과 칩 사이에 끼워 넣는 자리.**
@@ -252,15 +263,23 @@ struct DayColumn: View {
 
     /// 지금 이 순간의 자리. 시각을 함께 적어 '요일별 하루'의 붉은 선과 같은 값임을 알린다.
     private func nowMarker(_ hour: Double) -> some View {
-        HStack(spacing: 4) {
-            Circle().fill(Color.red).frame(width: 5, height: 5)
-            Rectangle().fill(Color.red.opacity(0.7)).frame(height: 1)
+        HStack(spacing: 0) {
+            Circle()
+                .fill(Color.red)
+                .frame(width: 8, height: 8)
+                .overlay(Circle().strokeBorder(Color.surface, lineWidth: 2))
+            Capsule().fill(Color.red.opacity(0.7)).frame(height: 2)
             Text(formatHour(hour))
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 10, weight: .bold))
                 .monospacedDigit()
-                .foregroundStyle(Color.red)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 5)
+                .padding(.vertical, 1)
+                .background(Color.red, in: Capsule())
         }
-        .padding(.vertical, 1)
+        .padding(.vertical, 2)
         .transition(.opacity)
         .accessibilityLabel("지금 \(formatHour(hour))")
     }
@@ -273,21 +292,28 @@ struct DayColumn: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            VStack(spacing: 1) {
+            VStack(spacing: 3) {
                 Text(day.shortLabel)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(isToday ? Color.red : .secondary)
                 Text(dayNumber)
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.system(size: 17, weight: .bold))
                     .monospacedDigit()
                     .foregroundStyle(isToday ? .white : .primary)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 32, height: 32)
                     .background {
                         if isToday {
-                            Circle().fill(Color.red)
+                            Circle()
+                                .fill(Color.red)
+                                .shadow(color: .red.opacity(0.35), radius: 5, y: 2)
+                        } else if headerHovering, onOpenDay != nil {
+                            Circle().fill(Color.primary.opacity(0.06))
                         }
                     }
+                    .scaleEffect(headerHovering && onOpenDay != nil ? 1.04 : 1)
             }
+            .onHover { headerHovering = $0 }
+            .animation(Motion.squish, value: headerHovering)
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 2)
             // 요일 머리를 누르면 그날 하루를 크게 편다 (→ DayScheduleView).
@@ -314,14 +340,15 @@ struct DayColumn: View {
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 28)
+                    .frame(height: 30)
                     .background(
-                        RoundedRectangle.soft(Corner.chip)
+                        Capsule()
                             .strokeBorder(
-                                Color.secondary.opacity(0.25),
-                                style: StrokeStyle(lineWidth: 0.5, dash: [3, 3])
+                                Color.secondary.opacity(0.3),
+                                style: StrokeStyle(lineWidth: 1, dash: [4, 3])
                             )
                     )
+                    .contentShape(Capsule())
             }
             .buttonStyle(.squish)
             .disabled(!canPlan)
@@ -341,6 +368,9 @@ struct DayColumn: View {
                     .strokeBorder(Color.accentColor.opacity(0.6), lineWidth: 1.5)
             }
         }
+        // 받을 준비가 되면 칸이 살짝 부푼다.
+        .scaleEffect(isDropTargeted ? 1.01 : 1)
+        .animation(Motion.squish, value: isDropTargeted)
         .dropDestination(for: String.self) { items, _ in
             guard canPlan, let token = items.first else { return false }
             onDropBacklog(token)
@@ -393,7 +423,7 @@ struct RoutineChip: View {
         // 누르면 상세. 요일·시각 수정은 우클릭 메뉴로 간다.
         // (손을 올리면 뜨던 '수정' 단추는 뗐다 — 좁은 칸에서 제목을 가리고, 끌려고 잡는 자리와 겹쳤다.)
         chipBody
-            .contentShape(.soft(Corner.chip))
+            .contentShape(.soft(Corner.card))
             // 끌기를 탭보다 안쪽에 둔다 — 순서가 뒤집히면 누르는 동안 끌기가 시작되지 못한다 (→ BlockChip).
             .modifier(OptionalDraggable(token: dragToken))
             .onTapGesture(perform: onTap)
@@ -420,19 +450,20 @@ struct RoutineChip: View {
 
     private var chipBody: some View {
         let color = routine.displayColor
-        return HStack(spacing: 6) {
-                Image(systemName: routine.iconName)
-                    .font(.system(size: 13))
-                    .foregroundStyle(color)
-                    .frame(width: 14)
+        return HStack(spacing: 7) {
+                // 일간의 알약과 같은 표시 — 색 동그라미 안의 흰 아이콘. 쿼터(끼니)는 점선.
+                GlyphBadge(symbol: routine.iconName, title: routine.name, color: color,
+                           size: 22, style: isQuota ? .dashed : .filled)
+                    .scaleEffect(hovering ? 1.04 : 1)
 
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text(routine.name)
                         .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                     Text(subtitle)
-                        .font(.system(size: 11))
-                        .opacity(0.7)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.secondary)
                     // 지금 하고 있는 것이면 남은 시간이 한 줄 더 선다. 좁은 칸에서 눌리지 않게 제 줄로.
                     TimerBadge(token: token, tint: color, slot: currentSlot)
                 }
@@ -444,18 +475,12 @@ struct RoutineChip: View {
                 // 잡힌다는 건 손 모양 커서가, 쿼터의 유연함은 점선 테두리가 말한다.
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(color.opacity(isQuota ? (hovering ? 0.12 : 0.07) : (hovering ? 0.20 : 0.14)),
-                        in: .soft(Corner.chip))
-            // 테두리는 **유연한 시간(쿼터)에만** 긋는다 — 점선이 '자리를 옮길 수 있다'는 뜻이다.
-            // 고정 루틴은 채움만으로 가려지고, 선까지 두르면 요일 칸 안이 선으로 빽빽해진다.
-            .overlay(
-                RoundedRectangle.soft(Corner.chip)
-                    .strokeBorder(color.opacity(isQuota ? (hovering ? 0.55 : 0.4) : (hovering ? 0.35 : 0)),
-                                  style: isQuota ? StrokeStyle(lineWidth: 1, dash: [3, 2]) : StrokeStyle(lineWidth: 1))
-            )
-            .foregroundStyle(color)
+            .padding(.leading, 5)
+            .padding(.trailing, 8)
+            .padding(.vertical, 5)
+            // 칸에 붙은 옅은 색면. 유연함은 동그라미의 점선이 말하므로 칩에는 선을 긋지 않는다.
+            .background(color.opacity(isQuota ? (hovering ? 0.11 : 0.06) : (hovering ? 0.16 : 0.1)),
+                        in: .soft(Corner.card))
     }
 }
 
@@ -502,7 +527,7 @@ struct BlockChip: View {
         // 칩 전체를 탭 제스처로 연다 — 누르면 곧 편집기다.
         // (손을 올리면 뜨던 '수정' 단추는 뗐다 — 누르는 것과 같은 일을 두 번 말했다.)
         chipBody
-            .contentShape(.soft(Corner.chip))
+            .contentShape(.soft(Corner.card))
             // 다른 요일로 끌어 옮기기 — 드롭 대상(DayColumn)에서 요일을 바꾼다.
             //
             // ⚠️ 순서가 중요하다. `.onTapGesture`를 먼저 붙이면 탭이 안쪽(우선순위 높은)
@@ -536,21 +561,31 @@ struct BlockChip: View {
             // 있어서 그 줄은 자기 위아래를 되풀이할 뿐이었다. 길이는 어디에도 안 적혀
             // 있으니 이 자리에서만 알 수 있다.
             VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    if let status = block.reviewStatus {
-                        Image(systemName: status.systemImage)
-                            .font(.system(size: 11))
-                            .foregroundStyle(reviewTint(status))
+                HStack(alignment: .center, spacing: 7) {
+                    // 첫 글자 동그라미. 회고를 찍었으면 그 표시가 동그라미 자리를 차지한다.
+                    ZStack {
+                        if let status = block.reviewStatus {
+                            GlyphBadge(symbol: status == .done ? "checkmark" : status.systemImage,
+                                       color: reviewTint(status), size: 22)
+                                .transition(.pop)
+                        } else {
+                            GlyphBadge(title: block.title, color: palette.fg, size: 22)
+                                .transition(.pop)
+                        }
                     }
+                    .scaleEffect(hovering ? 1.04 : 1)
+                    .animation(Motion.squish, value: block.reviewStatus)
                     Text(block.title)
                         .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(block.reviewStatus == .done ? .secondary : .primary)
+                        .strikethrough(block.reviewStatus == .done, color: .secondary)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 4)
                     Text(shortHours(block.durationHours))
-                        .font(.system(size: 11))
+                        .font(.system(size: 11, weight: .medium))
                         .monospacedDigit()
-                        .opacity(0.7)
+                        .foregroundStyle(.secondary)
                         .layoutPriority(1)
                 }
 
@@ -558,7 +593,8 @@ struct BlockChip: View {
                 TimerBadge(token: block.dragToken, tint: palette.fg, slot: currentSlot)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 8)
+            .padding(.leading, 5)
+            .padding(.trailing, 8)
             .padding(.vertical, 5)
             // **옮길 수 있는 것은 떠 있다.** 요일 칸에서 끌어 옮길 수 있는 건 계획 블록뿐이라,
             // 이것만 흰 바탕 위에 색을 얹고 그림자를 깔아 칸에서 들어 올린다. 루틴 칩은 칸에
@@ -566,8 +602,8 @@ struct BlockChip: View {
             // 손이 올라가면 한 뼘 더 뜬다(집어 들기 직전).
             .background {
                 ZStack {
-                    RoundedRectangle.soft(Corner.chip).fill(Color.surface)
-                    RoundedRectangle.soft(Corner.chip).fill(palette.bg)
+                    RoundedRectangle.soft(Corner.card).fill(Color.surface)
+                    RoundedRectangle.soft(Corner.card).fill(palette.bg.opacity(0.6))
                 }
                 .compositingGroup()
                 .shadow(color: palette.fg.opacity(hovering ? 0.32 : 0.22),
@@ -575,8 +611,8 @@ struct BlockChip: View {
             }
             // 검증됐는지는 채움 색(파랑·주황)이 이미 말한다. 테두리는 가리킬 때만 선다.
             .overlay(
-                RoundedRectangle.soft(Corner.chip)
-                    .strokeBorder(palette.stroke.opacity(hovering ? 1 : 0), lineWidth: 1.2)
+                RoundedRectangle.soft(Corner.card)
+                    .strokeBorder(palette.stroke.opacity(hovering ? 0.8 : 0), lineWidth: 1.2)
             )
             .foregroundStyle(palette.fg)
             .offset(y: hovering ? -1 : 0)

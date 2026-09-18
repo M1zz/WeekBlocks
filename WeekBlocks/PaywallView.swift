@@ -48,10 +48,14 @@ struct PaywallView: View {
                 Text("사면 열리는 것")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
-                row("chart.bar.xaxis", "회고 추세",
-                    "지난 8주의 달성률, 잘 되는 요일과 시간대, 자주 건너뛰는 일을 봅니다.")
+                row("chart.bar.xaxis", "회고 추세 8주",
+                    "잘 되는 요일과 시간대, 번번이 미루는 일까지. 무료로는 지난 2주가 보입니다.")
                 row("square.on.square", "다른 주 계획 가져오기",
                     "잘 굴러간 주의 계획을 이번 주에 한 번에 깝니다.")
+                row("doc.on.doc", "회고 내보내기",
+                    "한 주의 회고를 글로 복사해 노트나 보고서에 붙입니다.")
+                row("person.crop.circle.badge.plus", "내 일정 공유",
+                    "내 주간 일정을 보기 전용 링크로 보냅니다.")
             }
             .padding(.bottom, 18)
 
@@ -59,8 +63,9 @@ struct PaywallView: View {
                 Text("그대로 무료인 것")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
-                row("calendar", "주간·일간 계획과 루틴, 할 일", "얼마든지 적고 배치합니다.")
-                row("checklist", "이번 주 회고와 타이머", "매일 돌아보는 데 값을 받지 않습니다.")
+                row("calendar", "주간·일간 계획과 루틴, 할 일", "개수 제한 없이 적고 배치합니다.")
+                row("checklist", "회고와 타이머, 다음 첫 동작", "매일 돌아보는 데 값을 받지 않습니다.")
+                row("sunrise", "내일 미리 정하기", "저녁에 내일을 닫고, 아침에 첫 걸음 하나를 봅니다.")
                 row("iphone", "아이폰과 오가기", "같은 Apple 계정이면 양쪽에서 보입니다.")
             }
             .padding(.bottom, 20)

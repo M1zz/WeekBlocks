@@ -58,7 +58,11 @@ enum WeekBlocksSpec: LeeoAppSpec {
             // App Store Connect의 '사용권 계약'을 표준으로 두는 것과 짝이다.
             termsURL: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!,
             entitlementIDs: Set(proProductIDs + [legacySyncProductID]),
-            gate: LeeoGatePolicy(proOnly: [Gate.trends, Gate.weekCopy])
+            gate: LeeoGatePolicy(
+                // 무료로도 **써 보고 알 만큼**은 연다: 지난 2주 추세는 그냥 보인다.
+                // 여기 적힌 것은 '쌓여야 보이는 것'과 '남에게 내보내는 것'뿐이다.
+                freeLimits: [Gate.trendWeeks: ReflectionTrends.freeWeekCount],
+                proOnly: [Gate.trends, Gate.weekCopy, Gate.share, Gate.export])
         )
     )
 
@@ -81,6 +85,12 @@ enum WeekBlocksSpec: LeeoAppSpec {
         static let trends = "reflectionTrends"
         /// 다른 주의 계획을 이번 주에 깔기.
         static let weekCopy = "weekCopy"
+        /// 추세를 몇 주까지 거슬러 보는가 (무료는 2주).
+        static let trendWeeks = "trendWeeks"
+        /// 내 일정을 남에게 보기 전용 링크로 공유하기.
+        static let share = "share"
+        /// 회고를 밖으로 내보내기 (복사·저장).
+        static let export = "export"
     }
 
     /// **익명 사용 통계를 피드백 허브로 보낸다** (→ Telemetry.swift).

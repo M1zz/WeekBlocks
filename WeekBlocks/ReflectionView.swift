@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AppKit
 
 /// 달성·부분·건너뜀·미회고의 수. 주간 회고와 일간 회고가 같은 셈을 쓴다.
 struct ReflectionStats {
@@ -35,6 +36,9 @@ struct ReflectionView: View {
     enum Tab: Hashable { case week, trends }
     @State private var tab: Tab = .week
     @State private var purchases = PurchaseManager.shared
+    @State private var showingPaywall = false
+    /// 방금 복사했다. 단추 글씨가 잠깐 바뀐다 — 조용히 끝나면 눌린 줄도 모른다.
+    @State private var copied = false
 
     @Query private var allBlocksRaw: [PlanBlock]
     /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
@@ -107,6 +111,9 @@ struct ReflectionView: View {
             }
             .padding(20)
         }
+        .sheet(isPresented: $showingPaywall) {
+            PaywallView(reason: WeekBlocksSpec.Gate.export)
+        }
     }
 
     private func header(_ stats: ReflectionStats) -> some View {
@@ -125,6 +132,19 @@ struct ReflectionView: View {
                     .pickerStyle(.segmented)
                     .labelsHidden()
                     .fixedSize()
+
+                    // 밖으로 내보내는 일은 Pro. 적어 둔 것을 보는 데는 값을 받지 않는다.
+                    Button {
+                        if purchases.isPro { copyWeek() } else { showingPaywall = true }
+                    } label: {
+                        Label(copied ? "복사했습니다" : "내보내기",
+                              systemImage: copied ? "checkmark" : (purchases.isPro ? "doc.on.doc" : "sparkles"))
+                            .font(.system(size: 12, weight: .medium))
+                            .contentTransition(.symbolEffect(.replace))
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(weekBlocks.isEmpty)
+                    .help(purchases.isPro ? "이번 주 회고를 글로 복사합니다" : "Pro 기능입니다")
                 }
             }
 
@@ -142,6 +162,44 @@ struct ReflectionView: View {
             }
         }
         .padding(20)
+    }
+
+    /// **이번 주 회고를 글로 복사한다** (Pro). 붙여넣을 곳은 사람마다 다르다 — 노션, 메모,
+    /// 주간 보고. 그래서 앱이 고른 서식이 아니라 어디에나 붙는 평범한 글로 낸다.
+    private func copyWeek() {
+        var lines: [String] = []
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("MMMd")
+        let end = Calendar(identifier: .iso8601).date(byAdding: .day, value: 6, to: weekStart) ?? weekStart
+        lines.append("# \(f.string(from: weekStart)) – \(f.string(from: end))")
+        let stats = ReflectionStats(weekBlocks)
+        lines.append(String(localized: "달성 \(stats.done) · 부분 \(stats.partial) · 건너뜀 \(stats.skipped) · 미회고 \(stats.pending)"))
+        for day in daysWithBlocks {
+            lines.append("")
+            lines.append("## \(day.longLabel)")
+            for block in blocks(on: day) {
+                let mark: String
+                switch block.reviewStatus {
+                case .done: mark = "[x]"
+                case .partial: mark = "[~]"
+                case .skipped: mark = "[-]"
+                case nil: mark = "[ ]"
+                }
+                let when = block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
+                lines.append("- \(mark) \(when) \(block.title) (\(shortHours(block.durationHours)))")
+                if let note = block.reviewNote, !note.isEmpty { lines.append("      \(note)") }
+                if let next = block.nextAction, !next.isEmpty {
+                    lines.append("      → \(next)")
+                }
+            }
+        }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(lines.joined(separator: "\n"), forType: .string)
+        Haptic.tick()
+        withAnimation(Motion.squish) { copied = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+            withAnimation(Motion.squish) { copied = false }
+        }
     }
 
     /// 요일 머리. 그날 계획 중 몇 개를 해냈는지를 옆에 적는다.
@@ -183,6 +241,9 @@ struct DayReflectionPanel: View {
     var onDropBacklog: (String) -> Void = { _ in }
 
     @State private var dropTargeted = false
+    /// 일간 시간표에서 알약을 끌어 이 위에 올려 둔 중인가 (→ DayDragZones).
+    var externallyTargeted: Bool = false
+    private var targeted: Bool { dropTargeted || externallyTargeted }
 
     /// 하루가 흐른 차례대로 — 옆의 하루 시간표를 위에서 아래로 읽는 순서와 같다.
     private var sorted: [PlanBlock] { blocks.sorted { $0.sortHour < $1.sortHour } }
@@ -192,28 +253,41 @@ struct DayReflectionPanel: View {
         return cal.startOfDay(for: date) > cal.startOfDay(for: Date())
     }
 
+    /// 판의 이름. '일간 회고'는 무엇을 하는 칸인지 한 번에 안 읽혔다 — 여기 서는 것은
+    /// 그날 **하기로 한 계획**이고, 한 것을 체크하는 자리다. 아래의 '할 일'(아직 날을 안 정한 것)과
+    /// 헷갈리지 않게 '계획'이라 부른다.
+    private var panelTitle: String {
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return String(localized: "오늘의 계획") }
+        if cal.isDateInTomorrow(date) { return String(localized: "내일의 계획") }
+        if cal.isDateInYesterday(date) { return String(localized: "어제의 계획") }
+        return String(localized: "\(day.longLabel)의 계획")
+    }
+
     var body: some View {
         let stats = ReflectionStats(blocks)
 
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("일간 회고")
+            HStack(alignment: .center, spacing: 8) {
+                Text(panelTitle)
                     .font(.headline)
-                Spacer()
+                    .contentTransition(.opacity)
+                // 달성·부분·건너뜀·남은 것을 **제목 옆 작은 뱃지**로. 네 칸짜리 숫자판은
+                // 오늘 할 일보다 먼저 눈에 들어올 만큼 컸다. 셀 것이 없는 뱃지는 흐리게 둔다.
+                HStack(spacing: 4) {
+                    StatBadge(symbol: "checkmark.circle.fill", value: stats.done, color: .green, label: "달성")
+                    StatBadge(symbol: "circle.lefthalf.filled", value: stats.partial, color: .yellow, label: "부분")
+                    StatBadge(symbol: "xmark.circle.fill", value: stats.skipped, color: .red, label: "건너뜀")
+                    StatBadge(symbol: "circle.dashed", value: stats.pending, color: .secondary, label: "미회고")
+                }
+                .animation(Motion.number, value: stats.key)
+                Spacer(minLength: 4)
                 Button(action: onOpenWeekly) {
                     Label("주간 회고 열기", systemImage: "checklist")
                         .font(.system(size: 12, weight: .medium))
                 }
                 .buttonStyle(.borderless)
             }
-
-            HStack(spacing: 6) {
-                ReflectionStatTile(label: "달성", value: stats.done, color: .green, compact: true)
-                ReflectionStatTile(label: "부분", value: stats.partial, color: .yellow, compact: true)
-                ReflectionStatTile(label: "건너뜀", value: stats.skipped, color: .red, compact: true)
-                ReflectionStatTile(label: "미회고", value: stats.pending, color: .secondary, compact: true)
-            }
-            .animation(Motion.number, value: stats.key)
 
             // 오지 않은 날도 막지는 않는다(미리 건너뛸 줄 아는 날도 있다). 다만 지금 찍는 게
             // 회고가 아니라는 것은 말해 둔다.
@@ -256,8 +330,8 @@ struct DayReflectionPanel: View {
         }
         .contentShape(Rectangle())
         // 받을 준비가 되면 판이 살짝 부푼다 — 여기 놓으면 된다는 것이 모양으로 읽힌다.
-        .scaleEffect(dropTargeted ? 1.015 : 1)
-        .animation(Motion.squish, value: dropTargeted)
+        .scaleEffect(targeted ? 1.008 : 1)
+        .animation(Motion.squish, value: targeted)
         // **아래 할 일을 여기 떨어뜨리면 그날의 일이 된다.** 회고할 줄이 하나 늘어나는 것이다.
         // 몇 시에 할지까지 정하려면 왼쪽 하루 위에 떨어뜨린다.
         .dropDestination(for: String.self) { items, _ in
@@ -270,10 +344,36 @@ struct DayReflectionPanel: View {
         }
         .overlay {
             RoundedRectangle.soft(Corner.card)
-                .strokeBorder(Color.accentColor, lineWidth: dropTargeted ? 2 : 0)
+                .strokeBorder(Color.accentColor, lineWidth: targeted ? 2 : 0)
                 .padding(-6)
                 .allowsHitTesting(false)
         }
+    }
+}
+
+/// 제목 옆에 붙는 작은 수 뱃지 — 기호 하나와 숫자 하나.
+struct StatBadge: View {
+    let symbol: String
+    let value: Int
+    let color: Color
+    let label: LocalizedStringKey
+
+    var body: some View {
+        HStack(spacing: 3) {
+            Image(systemName: symbol)
+                .font(.system(size: 10, weight: .semibold))
+                .symbolEffect(.bounce, value: value)
+            Text("\(value)")
+                .font(.system(size: 11, weight: .semibold))
+                .monospacedDigit()
+                .contentTransition(.numericText())
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(color.opacity(0.12), in: Capsule())
+        .opacity(value == 0 ? 0.45 : 1)
+        .help(Text(label))
     }
 }
 
@@ -298,9 +398,8 @@ struct ReflectionStatTile: View {
         .padding(.horizontal, compact ? 10 : 12)
         .padding(.vertical, compact ? 5 : 8)
         .frame(maxWidth: .infinity, alignment: .leading)
-        // 일간 옆의 작은 칸은 제 색으로 옅게 물든다 — 네 칸이 회색 표가 아니라 색 알약으로 읽힌다.
-        .background(compact ? color.opacity(0.1) : Color(nsColor: .controlBackgroundColor),
-                    in: .soft(compact ? Corner.panel : Corner.card))
+        // 칸마다 제 색으로 옅게 물든다 — 네 칸이 회색 표가 아니라 색 알약으로 읽힌다.
+        .background(color.opacity(0.1), in: .soft(Corner.panel))
     }
 }
 
@@ -318,7 +417,7 @@ struct ReflectionRow: View {
     private var isDone: Bool { block.reviewStatus == .done }
 
     /// 기준·회고 칸이 제목 글줄에 맞춰 들어가는 폭 (동그라미 + 요일).
-    private var detailIndent: CGFloat { showsDay ? 52 : 26 }
+    private var detailIndent: CGFloat { (showsDay ? 28 : 0) + (compact ? 30 : 32) }
 
     /// 시각이 정해진 블록은 시각을, 아니면 시간대를. 하루 시간표 옆에서는 몇 시였는지가 먼저 읽혀야 한다.
     private var whenLabel: String {
@@ -327,7 +426,7 @@ struct ReflectionRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: compact ? 6 : 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
+            HStack(alignment: .center, spacing: 10) {
                 // **할 일 목록과 같은 자리, 같은 손짓** — 왼쪽 동그라미를 눌러 끝낸다
                 // (→ BacklogView의 '요일에 올린 일'). 세 갈래 상태는 이 동그라미의
                 // 모양으로 드러나므로, 눈으로 읽는 것과 손으로 누르는 것이 한 자리에 있다.
@@ -342,7 +441,7 @@ struct ReflectionRow: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(block.title)
-                        .font(compact ? .callout.weight(.medium) : .body.weight(.medium))
+                        .font(compact ? .callout.weight(.semibold) : .body.weight(.semibold))
                         .strikethrough(isDone)
                         .foregroundStyle(isDone ? .secondary : .primary)
                     Text("\(whenLabel) · \(String(format: "%.1fh", block.durationHours))")
@@ -358,6 +457,20 @@ struct ReflectionRow: View {
                 stateMenu
                     .opacity(hovering ? 1 : 0)
                     .scaleEffect(hovering ? 1 : 0.8)
+            }
+
+            // 멈출 때 남겨 둔 한 줄 — 돌아왔을 때 여기서부터 (→ PlanBlock.nextAction).
+            if let next = block.nextAction, !next.isEmpty {
+                HStack(alignment: .firstTextBaseline, spacing: 5) {
+                    Image(systemName: "arrow.turn.down.right")
+                        .font(.system(size: 10, weight: .semibold))
+                    Text(next)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.leading, detailIndent)
+                .transition(.disclose)
             }
 
             if !block.successCriteria.isEmpty {
@@ -394,22 +507,12 @@ struct ReflectionRow: View {
 
     /// 누르면 끝낸 것이 되고, 다시 누르면 도로 안 본 것이 된다.
     /// 부분·건너뜀이 찍혀 있을 때 누르면 그것도 풀린다 — 체크박스는 늘 '지금 상태를 끈다'.
+    /// 일간 알약 옆의 동그라미와 같은 모양·같은 손맛이다 (→ SoftCheck).
     private var checkButton: some View {
-        Button {
-            Haptic.tick()
-            withAnimation(Motion.squish) {
-                block.reviewStatus = block.reviewStatus == nil ? .done : nil
-            }
+        SoftCheck(status: block.reviewStatus, color: .green, size: compact ? 20 : 22) {
+            block.reviewStatus = block.reviewStatus == nil ? .done : nil
             onChange()
-        } label: {
-            Image(systemName: block.reviewStatus?.systemImage ?? "circle")
-                .font(.system(size: 16))
-                .foregroundStyle(tint(for: block.reviewStatus))
-                .contentTransition(.symbolEffect(.replace))
-                // 찍히는 순간 동그라미가 한 번 통 튄다.
-                .symbolEffect(.bounce, value: block.reviewStatus)
         }
-        .buttonStyle(.squish)
         .help(block.reviewStatus == nil ? "끝냈다고 표시한다" : "표시를 지운다 (적어 둔 회고는 그대로 남습니다)")
     }
 
@@ -449,15 +552,6 @@ struct ReflectionRow: View {
                 withAnimation(Motion.row) { block.reviewStatus = nil }
                 onChange()
             }
-        }
-    }
-
-    private func tint(for status: ReviewStatus?) -> Color {
-        switch status {
-        case .done: return .green
-        case .partial: return .yellow
-        case .skipped: return .red
-        case nil: return .secondary.opacity(0.5)
         }
     }
 }

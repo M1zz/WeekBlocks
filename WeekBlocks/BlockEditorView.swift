@@ -19,6 +19,10 @@ struct BlockEditorView: View {
     let weekStart: Date
     /// 새 블록일 때 고정 루틴을 피해 자동 배정할 시간대.
     var suggestedBand: TimeBand = .evening
+    /// 새 블록을 **이 시각에** 세운다 — 일간의 빈 시간을 눌러 열었을 때. nil이면 시간대로만 둔다.
+    var initialStartHour: Double? = nil
+    /// 새 블록의 처음 길이 — 빈 시간의 길이. 두 시간을 넘으면 기본값(2시간)을 둔다.
+    var initialDuration: Double? = nil
 
     @State private var title: String = ""
     @State private var timeBand: TimeBand = .evening
@@ -26,6 +30,8 @@ struct BlockEditorView: View {
     @State private var successCriteria: String = ""
     @State private var deliverable: String = ""
 
+    /// 돌아왔을 때 무엇부터 할지 (→ PlanBlock.nextAction).
+    @State private var nextAction: String = ""
     @State private var withinRoutine: Bool = false
     @State private var startHour: Double = 9
 
@@ -122,6 +128,19 @@ struct BlockEditorView: View {
                             .foregroundStyle(.secondary)
                     }
 
+                    // 돌아왔을 때 다시 올라오는 값을 줄이는 한 줄 (→ PlanBlock.nextAction).
+                    // 보통은 타이머를 멈출 때 적지만, 미리 적어 둘 수도 있어야 한다.
+                    Section {
+                        TextField("", text: $nextAction, prompt: Text("예: 3번 예제부터 다시 돌려보기"), axis: .vertical)
+                            .lineLimit(1...3)
+                    } header: {
+                        Text("다음 첫 동작")
+                    } footer: {
+                        Text("끊겼다가 돌아왔을 때 무엇부터 하면 되는지. 비워 두어도 됩니다.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
                     if hasCheckedOnce {
                         Section {
                             resultView
@@ -140,7 +159,10 @@ struct BlockEditorView: View {
             footerBar
         }
         .onAppear {
-            if existing == nil { timeBand = suggestedBand }
+            if existing == nil {
+                timeBand = initialStartHour.map(TimeBand.containing) ?? suggestedBand
+                if let d = initialDuration { durationHours = min(2, max(0.25, (d * 4).rounded(.down) / 4)) }
+            }
             loadExisting()
             // 일반 블록은 처음부터 구체성 피드백을 실시간 표시 (별도 '구체성 체크' 버튼 없이).
             if !withinRoutine {
@@ -302,6 +324,7 @@ struct BlockEditorView: View {
         durationHours = existing.durationHours
         successCriteria = existing.successCriteria
         deliverable = existing.deliverable
+        nextAction = existing.nextAction ?? ""
         withinRoutine = existing.withinRoutine
         if existing.startHour >= 0 { startHour = existing.startHour }
         // 일반 블록만 즉시 구체성 표시
@@ -316,6 +339,7 @@ struct BlockEditorView: View {
         let t = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let sc = successCriteria.trimmingCharacters(in: .whitespacesAndNewlines)
         let dv = deliverable.trimmingCharacters(in: .whitespacesAndNewlines)
+        let na = nextAction.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let existing {
             existing.title = t
@@ -323,6 +347,7 @@ struct BlockEditorView: View {
             existing.durationHours = durationHours
             existing.successCriteria = withinRoutine ? "" : sc
             existing.deliverable = withinRoutine ? "" : dv
+            existing.nextAction = na.isEmpty ? nil : na
             existing.day = day
             existing.weekStartDate = weekStart
             existing.withinRoutine = withinRoutine
@@ -339,8 +364,9 @@ struct BlockEditorView: View {
                 weekStartDate: weekStart,
                 concreteVerified: !withinRoutine,
                 withinRoutine: withinRoutine,
-                startHour: withinRoutine ? startHour : -1
+                startHour: withinRoutine ? startHour : (initialStartHour ?? -1)
             )
+            block.nextAction = na.isEmpty ? nil : na
             context.insert(block)
             Telemetry.record(.planBlockAdded)
         }

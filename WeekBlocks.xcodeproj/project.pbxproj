@@ -35,6 +35,7 @@
 		73CB0B2619F0AE4E5130903F /* SegmentActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A9E5AA931F9F6D41838D03 /* SegmentActions.swift */; };
 		7750BEAC0768CD61182505EE /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B8983B46095E5A0B4F39CE60 /* InfoPlist.xcstrings */; };
 		7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC172BAFFE573306711B4CE /* PlanBlock.swift */; };
+		7D757422C991FA2C9B300591 /* PreDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8A8D7902B2D88193F5F44 /* PreDecision.swift */; };
 		7EE825830848CC825A252ABD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */; };
 		7F70D1C2183A69BB4642EE6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90641A10CE63E76FFACFD63E /* Assets.xcassets */; };
 		7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295B1036D16FB52A4E7D0C74 /* BacklogView.swift */; };
@@ -46,6 +47,7 @@
 		885ED0917CD0F523548B558B /* TaskTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */; };
 		918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
+		9352E18F875064FA72C9D0D6 /* Soft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10227076947BFE4B02E2B004 /* Soft.swift */; };
 		98278046F3F6DA26559B9008 /* Surface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEC8822FA5DD9EE70C20530 /* Surface.swift */; };
 		995871F5986FE5C82D0852D5 /* ReflectionTrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */; };
 		9D5EEDBB4DA71FED5DFA3AE7 /* ScheduleClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AB47D0D95CB6D901FC0D81 /* ScheduleClock.swift */; };
@@ -99,6 +101,7 @@
 /* Begin PBXFileReference section */
 		0B332338ED7B9E880F7FBE51 /* Corner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corner.swift; sourceTree = "<group>"; };
 		0DAA819E703DC5BE377B3688 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
+		10227076947BFE4B02E2B004 /* Soft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Soft.swift; sourceTree = "<group>"; };
 		1162BD316D362F2B5D760A08 /* Affordance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Affordance.swift; sourceTree = "<group>"; };
 		1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoShareIntake.swift; sourceTree = "<group>"; };
 		2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSchemaPrimer.swift; sourceTree = "<group>"; };
@@ -159,6 +162,7 @@
 		F3EF66EAB632EF007258912A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F9A9E5AA931F9F6D41838D03 /* SegmentActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentActions.swift; sourceTree = "<group>"; };
 		FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTree.swift; sourceTree = "<group>"; };
+		FAB8A8D7902B2D88193F5F44 /* PreDecision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreDecision.swift; sourceTree = "<group>"; };
 		FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogItem.swift; sourceTree = "<group>"; };
 		FE2891429087F31216F7F774 /* WeekBlocks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeekBlocks.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -224,6 +228,7 @@
 				D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */,
 				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
+				FAB8A8D7902B2D88193F5F44 /* PreDecision.swift */,
 				C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */,
 				693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */,
 				45EF8BFE32D234EF9576302C /* ReflectionView.swift */,
@@ -236,6 +241,7 @@
 				F9A9E5AA931F9F6D41838D03 /* SegmentActions.swift */,
 				5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */,
 				30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */,
+				10227076947BFE4B02E2B004 /* Soft.swift */,
 				50CC675B4E440CD50573C3A4 /* Stores.swift */,
 				4AEC8822FA5DD9EE70C20530 /* Surface.swift */,
 				DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */,
@@ -426,6 +432,7 @@
 				918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */,
 				076A03104420525A517BD699 /* PaywallView.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
+				7D757422C991FA2C9B300591 /* PreDecision.swift in Sources */,
 				995871F5986FE5C82D0852D5 /* ReflectionTrendsView.swift in Sources */,
 				33F063FE824A134E22151E31 /* ReflectionView.swift in Sources */,
 				83DE0994DCC6B215222A482D /* Routine.swift in Sources */,
@@ -437,6 +444,7 @@
 				73CB0B2619F0AE4E5130903F /* SegmentActions.swift in Sources */,
 				7EE825830848CC825A252ABD /* SettingsView.swift in Sources */,
 				92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */,
+				9352E18F875064FA72C9D0D6 /* Soft.swift in Sources */,
 				032C842F55D754CDF99B7CEF /* Stores.swift in Sources */,
 				98278046F3F6DA26559B9008 /* Surface.swift in Sources */,
 				885ED0917CD0F523548B558B /* TaskTimer.swift in Sources */,

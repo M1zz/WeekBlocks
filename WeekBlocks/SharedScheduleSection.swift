@@ -130,6 +130,8 @@ struct ScheduleShareSettingsSection: View {
 
     @State private var store = ScheduleShareStore.shared
     @State private var showingShareNotice = false
+    @State private var purchases = PurchaseManager.shared
+    @State private var showingPaywall = false
 
     var body: some View {
         Section {
@@ -159,6 +161,14 @@ struct ScheduleShareSettingsSection: View {
                 } label: {
                     Label("공유 중지", systemImage: "person.crop.circle.badge.xmark")
                 }
+            } else if purchases.offersPro, !purchases.isPro {
+                // **남에게 내보내는 일은 Pro다.** 내 계획을 세우고 사는 데는 값을 받지 않는다 —
+                // 값을 받는 자리는 '쌓인 것'과 '밖으로 나가는 것' 둘뿐이다 (→ WeekBlocksSpec).
+                Button {
+                    showingPaywall = true
+                } label: {
+                    Label("내 일정 공유 시작 (Pro)", systemImage: "sparkles")
+                }
             } else {
                 Button {
                     showingShareNotice = true
@@ -185,6 +195,9 @@ struct ScheduleShareSettingsSection: View {
             }
         }
         .task { await store.refresh() }
+        .sheet(isPresented: $showingPaywall) {
+            PaywallView(reason: WeekBlocksSpec.Gate.share)
+        }
     }
 }
 

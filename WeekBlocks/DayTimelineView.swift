@@ -400,6 +400,8 @@ struct DayTimelineRow: View {
     @State private var dragPx: CGFloat = 0
     /// 카드를 이 줄 위로 끌고 와 있는가. 받을 자리라는 것을 테두리로 말한다.
     @State private var dropTargeted = false
+    /// 요일 글자를 가리키는 중. 누르면 그날로 들어간다는 것을 동그라미가 부풀어 말한다.
+    @State private var labelHovering = false
     /// 손이 올라가 있는 구간. 누를 수 있다는 것을 밝기로 말한다.
     @State private var hoverId: String? = nil
     /// 띠가 다 그려졌는가. 줄이 처음 설 때(보는 자리를 바꾸거나 주를 넘길 때) 왼쪽에서부터 차오른다.
@@ -460,16 +462,29 @@ struct DayTimelineRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            VStack(spacing: 0) {
+            HStack(spacing: 5) {
                 Text(day.shortLabel)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(isToday ? Color.red : .secondary)
+                    .frame(width: 14)
                 Text(dayNumber)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 13, weight: .bold))
                     .monospacedDigit()
-                    .foregroundStyle(isToday ? Color.red : .primary)
+                    .foregroundStyle(isToday ? .white : .primary)
+                    .frame(width: 26, height: 26)
+                    .background {
+                        if isToday {
+                            Circle().fill(Color.red)
+                                .shadow(color: .red.opacity(0.3), radius: 4, y: 1.5)
+                        } else if labelHovering {
+                            Circle().fill(Color.primary.opacity(0.07))
+                        }
+                    }
+                    .scaleEffect(labelHovering ? 1.04 : 1)
             }
-            .frame(width: 30)
+            .frame(width: 48)
+            .onHover { labelHovering = $0 }
+            .animation(Motion.squish, value: labelHovering)
             // 요일을 누르면 그날 하루를 크게 편다 (→ DayScheduleView).
             .contentShape(Rectangle())
             .onTapGesture(perform: onOpenDay)
@@ -479,8 +494,8 @@ struct DayTimelineRow: View {
             GeometryReader { geo in
                 let w = geo.size.width
                 ZStack(alignment: .leading) {
-                    RoundedRectangle.soft(Corner.track)
-                        .fill(Color.primary.opacity(0.05))
+                    Capsule(style: .continuous)
+                        .fill(Color.primary.opacity(0.045))
 
                     // 시간 격자 — 3시간마다 굵은 선으로 시간대를 더 잘게 구분.
                     ForEach(window.gridHours, id: \.self) { h in
@@ -504,9 +519,9 @@ struct DayTimelineRow: View {
                                     // 놓는 순간 15분 격자로 붙는 그 한 걸음만 결을 준다.
                                     // **끄는 동안에는 결을 안 건다** — 손보다 늦게 따라오면
                                     // 띠가 손가락에 매달린 것처럼 찐득해진다.
-                                    .animation(seg.id == dragId ? nil : Motion.timeline, value: x)
-                                    .animation(seg.id == dragId ? nil : Motion.timeline, value: segW)
-                                    .transition(.card)
+                                    .animation(seg.id == dragId ? nil : Motion.squish, value: x)
+                                    .animation(seg.id == dragId ? nil : Motion.squish, value: segW)
+                                    .transition(.pop)
                             }
                         }
                     }
@@ -517,7 +532,7 @@ struct DayTimelineRow: View {
                         Rectangle().frame(width: drawn ? w : 0)
                     }
                     // 계획을 지우거나 되살리면 띠가 스러지고 돋는다.
-                    .animation(Motion.card, value: segments.map(\.id))
+                    .animation(Motion.squish, value: segments.map(\.id))
 
                     // 지금 — 오늘 줄에만, 모든 구간 위에 붉은 선 하나.
                     // 하루 어디까지 왔는지가 이 한 줄로 읽힌다.
@@ -526,11 +541,19 @@ struct DayTimelineRow: View {
                             let h = Self.hourOfDay(ctx.date)
                             ZStack(alignment: .leading) {
                                 if h >= window.start, h <= window.end {
-                                    Rectangle()
-                                        .fill(Color.red)
-                                        .frame(width: 1.5)
-                                        .offset(x: window.x(h, width: w) - 0.75)
-                                        .transition(.opacity)
+                                    ZStack(alignment: .top) {
+                                        Capsule()
+                                            .fill(Color.red)
+                                            .frame(width: 2)
+                                        Circle()
+                                            .fill(Color.red)
+                                            .frame(width: 7, height: 7)
+                                            .overlay(Circle().strokeBorder(Color.surface, lineWidth: 1.5))
+                                            .offset(y: -1)
+                                    }
+                                    .frame(width: 7)
+                                    .offset(x: window.x(h, width: w) - 3.5)
+                                    .transition(.opacity)
                                 }
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -539,14 +562,17 @@ struct DayTimelineRow: View {
                         .zIndex(2)
                     }
                 }
-                .clipShape(RoundedRectangle.soft(Corner.track))
+                .clipShape(Capsule(style: .continuous))
                 .overlay {
                     // 받을 자리 표시. 카드가 올라와 있는 동안에만 테두리가 선다.
                     // 다른 줄에서 계획 블록을 끌고 와도 같은 테두리로 "여기 놓으면 이 요일"이라고 말한다.
-                    RoundedRectangle.soft(Corner.track)
+                    Capsule(style: .continuous)
                         .strokeBorder(Color.accentColor, lineWidth: (dropTargeted || isDayDropTarget) ? 2 : 0)
                         .animation(Motion.target, value: dropTargeted || isDayDropTarget)
                 }
+                // 받을 준비가 되면 줄이 살짝 부푼다.
+                .scaleEffect(y: (dropTargeted || isDayDropTarget) ? 1.05 : 1)
+                .animation(Motion.squish, value: dropTargeted || isDayDropTarget)
                 // 자 위에 바로 떨어뜨린다 — 떨어뜨린 가로 위치가 곧 시작 시각이다.
                 .dropDestination(for: String.self) { items, location in
                     guard let token = items.first else { return false }
@@ -556,7 +582,7 @@ struct DayTimelineRow: View {
                     withAnimation(Motion.target) { dropTargeted = targeted }
                 }
             }
-            .frame(height: 28)
+            .frame(height: 30)
             .onAppear {
                 // 요일 순서대로 조금씩 늦게 — 일곱 줄이 위에서부터 차례로 그려진다.
                 if reduceMotion { drawn = true; return }
@@ -564,10 +590,13 @@ struct DayTimelineRow: View {
             }
 
             Text("남은 시간 \(fmtHours(freeHours))h")
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 12, weight: .semibold))
                 .monospacedDigit()
-                .foregroundStyle(isOverbooked ? .red : .secondary)
-                .frame(width: 96, alignment: .trailing)
+                .foregroundStyle(isOverbooked ? Color.red : Color.accentColor)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background((isOverbooked ? Color.red : Color.accentColor).opacity(0.1), in: Capsule())
+                .frame(width: 110, alignment: .trailing)
                 // 띠 하나를 옮기면 이 숫자가 함께 움직인다. 자릿수가 굴러가야
                 // 방금 한 손짓이 어디에 닿았는지가 눈에 붙는다.
                 .contentTransition(.numericText())
@@ -577,8 +606,10 @@ struct DayTimelineRow: View {
 
     @ViewBuilder
     private func segmentView(_ seg: TimeSegment, width: CGFloat, rowWidth: CGFloat) -> some View {
-        let shape = RoundedRectangle.soft(Corner.segment)
+        // 띠 끝이 둥글다 — 줄 키보다 짧은 조각도 네모가 아니라 콩알로 선다.
+        let shape = RoundedRectangle(cornerRadius: min(12, width / 2), style: .continuous)
         let dragging = seg.id == dragId
+        let hovering = hoverId == seg.id
         let ghost = seg.isGhost
         ZStack {
             if ghost {
@@ -595,7 +626,7 @@ struct DayTimelineRow: View {
                 shape.fill(seg.color.opacity(0.95))
                 shape.strokeBorder(Color.white.opacity(0.85), lineWidth: 1)
             } else {
-                shape.fill(seg.color.opacity(0.85))
+                shape.fill(seg.color.gradient.opacity(0.9))
             }
         }
         // **옮길 수 있는 것은 떠 있다.** 계획 블록은 시각도 요일도 옮길 수 있어 그림자를 깔아
@@ -610,19 +641,21 @@ struct DayTimelineRow: View {
         .overlay(alignment: .leading) {
             if width > 18 {
                 Text(seg.title)
-                    .font(.system(size: 11, weight: seg.isNested ? .semibold : .medium))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(ghost ? seg.color.opacity(0.55) : (seg.isFlexible ? seg.color : Color.white))
                     .strikethrough(ghost, color: seg.color.opacity(0.5))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .padding(.horizontal, 3)
+                    .padding(.horizontal, min(8, width * 0.12))
                     .frame(width: width, alignment: .leading)
             }
         }
-        .shadow(color: dragging ? .black.opacity(0.25) : .clear, radius: dragging ? 4 : 0, y: dragging ? 1 : 0)
-        // 손이 올라가면 살짝 밝아진다. 색칠한 띠가 '누를 수 있는 것'으로 읽히도록.
-        .brightness(hoverId == seg.id && !ghost ? 0.06 : 0)
-        .animation(Motion.hover, value: hoverId == seg.id)
+        .shadow(color: dragging ? seg.color.opacity(0.45) : .clear, radius: dragging ? 6 : 0, y: dragging ? 2 : 0)
+        // 손이 올라가면 살짝 밝아지고 통통해진다. 끄는 동안에는 한 뼘 들린다.
+        .brightness(hovering && !ghost ? 0.06 : 0)
+        .scaleEffect(x: 1, y: dragging ? 1.08 : (hovering && !ghost ? 1.04 : 1))
+        .animation(Motion.squish, value: hovering)
+        .animation(Motion.squish, value: dragging)
         .contentShape(Rectangle())
         .onHover { hoverId = $0 ? seg.id : (hoverId == seg.id ? nil : hoverId) }
         // 잡을 수 있는 띠 위에서는 손 모양이 된다 (→ Affordance.swift).
@@ -774,7 +807,7 @@ struct HourAxis: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Spacer().frame(width: 30)
+            Spacer().frame(width: 48)
             GeometryReader { geo in
                 let w = geo.size.width
                 ZStack(alignment: .leading) {
@@ -810,7 +843,7 @@ struct HourAxis: View {
                 }
             }
             .frame(height: 14)
-            Spacer().frame(width: 96)
+            Spacer().frame(width: 110)
         }
     }
 }
