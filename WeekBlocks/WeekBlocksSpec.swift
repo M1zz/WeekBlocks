@@ -79,6 +79,10 @@ enum WeekBlocksSpec: LeeoAppSpec {
     /// 예전 '함께 쓰기'(비소모성). 더는 팔지 않지만 산 사람은 Pro다.
     static let legacySyncProductID = "com.devkoan.ScheduleDensityApp.sync"
 
+    /// 이 중 하나라도 있으면 Pro다. 아이폰에 남길 표를 만들 때도 이 목록으로 고른다
+    /// (→ ProMark.swift, MacEntitlement.syncCrossPlatformMark).
+    static let proEntitlementIDs = Set(proProductIDs + [legacySyncProductID])
+
     /// 게이트 열쇠말. 문자열을 여기저기 흩어 적으면 오타 하나로 조용히 안 잠긴다.
     enum Gate {
         /// 지난 주들의 회고 추세.

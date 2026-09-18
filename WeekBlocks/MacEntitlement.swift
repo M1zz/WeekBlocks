@@ -123,8 +123,48 @@ final class PurchaseManager {
         await store.refreshEntitlements()
         if MacEntitlement.sellsPro { await store.loadProducts() }
         entitlementsChecked = true
+        await syncCrossPlatformMark()
         pull()
     }
+
+    // MARK: - 한쪽에서 사면 양쪽이 (→ ProMark.swift)
+
+    /// **내 영수증을 아이폰이 읽을 수 있는 표로 옮겨 적고, 아이폰이 적어 둔 표를 읽는다.**
+    ///
+    /// 두 앱은 App Store에서 서로 다른 앱이라 영수증이 건너가지 않는다. 그런데 두 앱을 다
+    /// 쓰는 사람에게 두 번 받는 것은 팔기 전에 이미 잃는 장사다. 같은 iCloud를 쓰므로
+    /// 산 쪽이 표를 하나 남기면 다른 쪽이 그것을 보고 연다.
+    ///
+    /// ⚠️ 아이폰의 `PurchaseManager.syncCrossPlatformMark`와 **같은 규칙**이다. 자기 표만
+    ///    쓰고 지우며, 구독은 끝나는 날을 함께 적는다. 한쪽을 고치면 같이 고칠 것.
+    private func syncCrossPlatformMark() async {
+        let context = PlanStore.shared.context
+
+        if store.hasPro {
+            var expiry: Date?
+            var productID = WeekBlocksSpec.proYearlyID
+            var lifetime = false
+            for await entitlement in Transaction.currentEntitlements {
+                guard case .verified(let transaction) = entitlement,
+                      WeekBlocksSpec.proEntitlementIDs.contains(transaction.productID),
+                      transaction.revocationDate == nil else { continue }
+                productID = transaction.productID
+                if let end = transaction.expirationDate {
+                    expiry = max(expiry ?? .distantPast, end)
+                } else {
+                    lifetime = true   // 평생 이용권·옛 '함께 쓰기' 구매
+                }
+            }
+            ProMarkStore.stamp(productID: productID, validUntil: lifetime ? nil : expiry, in: context)
+        } else {
+            ProMarkStore.clearMine(in: context)
+        }
+
+        crossPlatformPro = ProMarkStore.otherPlatformHasPro(in: context)
+    }
+
+    /// 아이폰에서 산 것이 살아 있는가.
+    @ObservationIgnored private var crossPlatformPro = false
 
     /// 고른 상품을 산다. 성공·취소·승인 대기·실패의 갈래와 퍼널 이벤트는 LeeoStore 안에 있다.
     func purchase(_ product: Product) async {
@@ -148,7 +188,8 @@ final class PurchaseManager {
 
     private func pull() {
         if entitlementsChecked {
-            MacEntitlement.setPurchased(store.hasPro)
+            // 아이폰에서 산 표가 살아 있으면 그것도 권한이다 (→ syncCrossPlatformMark).
+            MacEntitlement.setPurchased(store.hasPro || crossPlatformPro)
         }
         isPro = MacEntitlement.hasPurchased
         isKnown = entitlementsChecked || MacEntitlement.cachedPurchase != nil

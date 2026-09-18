@@ -63,8 +63,11 @@ final class PlanStore {
 
     static let containerID = "iCloud.com.devkoan.ScheduleDensity"
     /// 이 앱이 iCloud로 오가는 전부. **한 스토어에 여섯 타입**이 함께 산다.
+    /// ⚠️ `ProMark`는 일곱 번째 타입이다 — "한쪽에서 샀다"는 표 (→ ProMark.swift).
+    ///    아이폰 스토어의 같은 목록과 **글자 하나까지 같아야 한다.**
     static let schema = Schema([Routine.self, PlanBlock.self, BacklogItem.self,
-                                RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self])
+                                RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self,
+                                ProMark.self])
 
     let container: ModelContainer
     var context: ModelContext { container.mainContext }
