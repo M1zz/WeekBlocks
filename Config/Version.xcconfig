@@ -19,7 +19,7 @@
 //      1.1.2(1)  → "must contain a higher version than [11]"  (2026-09-08)
 
 // 사람이 읽는 버전 (App Store 에 보이는 번호)
-MARKETING_VERSION = 1.1.4
+MARKETING_VERSION = 1.1.5
 
 // 빌드 번호 — 업로드마다 올린다 (1.1.4(19) 업로드됨)
 CURRENT_PROJECT_VERSION = 20
