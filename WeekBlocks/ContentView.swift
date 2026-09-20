@@ -752,6 +752,7 @@ struct ContentView: View {
                         day: selectedDay,
                         date: dayDate(selectedDay),
                         blocks: weekBlocks.filter { $0.day == selectedDay },
+                        routineNames: routineNames,
                         onOpenWeekly: { showingReflection = true },
                         canPlan: hasFixedRoutines,
                         onDropBacklog: { token in
@@ -856,6 +857,17 @@ struct ContentView: View {
                         .foregroundStyle(selected ? Color.white : (today ? Color.red : Color.primary))
                 }
                 .frame(width: 32, height: 32)
+                // 지난 날인데 안 찍은 것이 남았다. 그 요일을 열기 전에 알아야 한다.
+                .overlay(alignment: .topTrailing) {
+                    if hasUnreviewed(on: day) {
+                        Circle()
+                            .fill(Color.orange)
+                            .frame(width: 7, height: 7)
+                            .overlay(Circle().strokeBorder(Color(nsColor: .windowBackgroundColor), lineWidth: 1.5))
+                            .offset(x: 2, y: -1)
+                            .transition(.pop)
+                    }
+                }
                 // 그날의 계획 블록을 점으로 — 채운 점은 끝낸 것, 빈 점은 아직 안 한 것.
                 HStack(spacing: 3) {
                     ForEach(Array(dots.enumerated()), id: \.offset) { _, filled in
@@ -889,8 +901,24 @@ struct ContentView: View {
     /// "얼마나 해냈다"가 함께 읽힌다.
     ///
     /// 넷을 넘으면 점은 넷에 두고 **채운 비율**을 맞춘다 — 여덟 개 중 넷을 끝냈으면 넷 중 둘이 찬다.
+    /// 루틴 이름. 이 이름으로 선 계획 블록은 점검하지 않는다 (→ PlanBlock.isRoutineKind).
+    private var routineNames: Set<String> { Set(routines.map(\.name)) }
+
+    /// 그 요일에 **점검해야 하는** 계획 블록.
+    private func reviewableBlocks(on day: DayOfWeek) -> [PlanBlock] {
+        weekBlocks.filter { $0.day == day && !$0.isRoutineKind(routineNames) }
+    }
+
+    /// 지나간 날인데 아직 안 찍은 것이 남았는가 — 요일 줄에 점으로 세운다.
+    private func hasUnreviewed(on day: DayOfWeek) -> Bool {
+        weekBlocks.contains {
+            $0.day == day && $0.isUnreviewedPast(weekStart: selectedWeek, routineNames: routineNames)
+        }
+    }
+
     private func dayDots(on day: DayOfWeek) -> [Bool] {
-        let blocks = weekBlocks.filter { $0.day == day }
+        // 루틴은 세지 않는다. 수면·끼니까지 구슬이 되면 어느 날이 밀렸는지가 안 읽힌다.
+        let blocks = reviewableBlocks(on: day)
         let total = blocks.count
         guard total > 0 else { return [] }
         let done = blocks.filter { $0.reviewStatus == .done }.count

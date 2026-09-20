@@ -138,3 +138,33 @@ extension PlanBlock {
         return blocks.first { $0.dragToken == token }
     }
 }
+
+
+// MARK: - 점검하는 줄과 아닌 줄
+
+extension PlanBlock {
+    /// **루틴에서 온 줄인가.**
+    ///
+    /// 루틴은 '했는지'를 묻지 않는다. 수면·끼니·출근은 달성하는 것이 아니라 지켜지는 것이고,
+    /// 그것까지 체크 줄에 세우면 정작 돌아봐야 할 것이 그 사이에 묻힌다.
+    ///
+    /// 둘 중 하나면 루틴으로 본다.
+    /// - `withinRoutine` — '기존 루틴 시간 안에서 진행'으로 적어 둔 것.
+    /// - 제목이 루틴 이름과 같은 것 — 루틴을 요일에 끌어 올리면 그 **이름 그대로** 계획 블록이
+    ///   된다 (→ ContentView.dropBacklogItem의 `routine:` 갈래).
+    ///
+    /// ⚠️ 모델에 표시를 더하지 않고 **이름으로 가린다.** 필드를 늘리면 같은 CloudKit 그릇을 쓰는
+    ///    아이폰 '욕망의 무지개'까지 스키마가 걸린다. 이름이 겹치는 일은 드물고, 겹쳐도 잃는 것은
+    ///    '점검 줄에서 빠진다'뿐이다.
+    func isRoutineKind(_ routineNames: Set<String>) -> Bool {
+        withinRoutine || routineNames.contains(title)
+    }
+
+    /// 지나간 날인데 아직 안 찍은 줄인가. 오지 않은 날은 세지 않는다 — 나무랄 수 없다.
+    func isUnreviewedPast(weekStart: Date, routineNames: Set<String>, now: Date = Date()) -> Bool {
+        guard reviewStatus == nil, !isRoutineKind(routineNames) else { return false }
+        let cal = Calendar(identifier: .iso8601)
+        guard let d = cal.date(byAdding: .day, value: day.rawValue, to: weekStart) else { return false }
+        return cal.startOfDay(for: d) < cal.startOfDay(for: now)
+    }
+}

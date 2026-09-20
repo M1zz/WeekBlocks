@@ -2763,6 +2763,16 @@
         }
       }
     },
+    "루틴입니다 — 했는지 묻지 않습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A routine — it doesn’t ask whether you did it"
+          }
+        }
+      }
+    },
     "링크·자료를 펼쳐만 둡니다. 본 작업의 시동 비용을 여기서 미리 냅니다." : {
       "localizations" : {
         "en" : {
@@ -2869,6 +2879,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "There are no calendars on this Mac."
+          }
+        }
+      }
+    },
+    "먼저 찍을 것" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark these first"
           }
         }
       }
@@ -3738,6 +3758,16 @@
         }
       }
     },
+    "아래 요일에도 같은 줄이 있습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The same rows also sit under their own day"
+          }
+        }
+      }
+    },
     "아래 할 일을 여기로 끌어다 놓으면 이 날에 올라갑니다." : {
       "localizations" : {
         "en" : {
@@ -3837,6 +3867,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not filled in yet"
+          }
+        }
+      }
+    },
+    "아직 안 찍은 것 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld not marked yet"
           }
         }
       }
@@ -5862,6 +5902,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your last 8 weeks of reviews, side by side"
+          }
+        }
+      }
+    },
+    "지난 날입니다 — 했는지 찍어 주세요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This day has passed — mark what you did"
           }
         }
       }

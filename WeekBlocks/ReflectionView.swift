@@ -44,6 +44,12 @@ struct ReflectionView: View {
     /// 잠긴 기기에서 만든 남의 것은 안 그린다 (→ TodoSharing.swift).
     /// **거르는 자리는 여기 하나뿐이다** — 화면마다 조건을 따로 쓰면 어딘가는 새어 보인다.
     private var allBlocks: [PlanBlock] { allBlocksRaw.filter(TodoSharing.isVisible) }
+
+    /// 루틴 이름. 이 이름으로 선 블록은 점검하지 않는다 (→ PlanBlock.isRoutineKind).
+    @Query(sort: [SortDescriptor(\Routine.sortIndex)]) private var routinesRaw: [Routine]
+    private var routineNames: Set<String> {
+        Set(routinesRaw.filter(TodoSharing.isVisible).map(\.name))
+    }
     private var weekBlocks: [PlanBlock] {
         allBlocks
             .filter { Calendar.current.isDate($0.weekStartDate, inSameDayAs: weekStart) }
@@ -54,13 +60,23 @@ struct ReflectionView: View {
         weekBlocks.filter { $0.day == day }
     }
 
+    /// 점검해야 하는 줄들. 숫자 넷은 이것만 센다.
+    private var reviewableBlocks: [PlanBlock] {
+        weekBlocks.filter { !$0.isRoutineKind(routineNames) }
+    }
+
+    /// **아직 안 찍은 것.** 지나간 날만 센다.
+    private var unreviewed: [PlanBlock] {
+        weekBlocks.filter { $0.isUnreviewedPast(weekStart: weekStart, routineNames: routineNames) }
+    }
+
     /// 계획이 하나라도 있는 요일만. 빈 요일까지 머리를 세우면 돌아볼 것이 없는 줄이 끼어든다.
     private var daysWithBlocks: [DayOfWeek] {
         DayOfWeek.allCases.filter { day in weekBlocks.contains { $0.day == day } }
     }
 
     var body: some View {
-        let stats = ReflectionStats(weekBlocks)
+        let stats = ReflectionStats(reviewableBlocks)
 
         VStack(spacing: 0) {
             header(stats)
@@ -84,10 +100,27 @@ struct ReflectionView: View {
                     // 주간 회고는 **일간 회고들을 모은 것**이다 — 요일마다 끊어 그날의 몫을 따로 센다.
                     // 일간 화면에서 찍은 표시가 여기 그 요일 아래에 그대로 서 있다 (→ DayReflectionPanel).
                     LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                        // **밀린 것부터.** 주간 회고를 여는 까닭은 대개 안 찍은 것을 찍기
+                        // 위해서다. 요일 일곱 개를 훑어 빈 동그라미를 찾게 두지 않는다.
+                        // 같은 줄이 아래 제 요일에도 서 있다 — 여기는 처리하는 자리, 아래는 기록이다.
+                        if !unreviewed.isEmpty {
+                            Section {
+                                ForEach(unreviewed) { block in
+                                    ReflectionRow(block: block, showsDay: true) {
+                                        try? context.save()
+                                    }
+                                    Divider()
+                                }
+                            } header: {
+                                unreviewedHeader
+                            }
+                        }
+
                         ForEach(daysWithBlocks, id: \.self) { day in
                             Section {
                                 ForEach(blocks(on: day)) { block in
-                                    ReflectionRow(block: block, showsDay: false) {
+                                    ReflectionRow(block: block, showsDay: false,
+                                                  reviewable: !block.isRoutineKind(routineNames)) {
                                         try? context.save()
                                     }
                                     Divider()
@@ -172,7 +205,7 @@ struct ReflectionView: View {
         f.setLocalizedDateFormatFromTemplate("MMMd")
         let end = Calendar(identifier: .iso8601).date(byAdding: .day, value: 6, to: weekStart) ?? weekStart
         lines.append("# \(f.string(from: weekStart)) – \(f.string(from: end))")
-        let stats = ReflectionStats(weekBlocks)
+        let stats = ReflectionStats(reviewableBlocks)
         lines.append(String(localized: "달성 \(stats.done) · 부분 \(stats.partial) · 건너뜀 \(stats.skipped) · 미회고 \(stats.pending)"))
         for day in daysWithBlocks {
             lines.append("")
@@ -203,8 +236,32 @@ struct ReflectionView: View {
     }
 
     /// 요일 머리. 그날 계획 중 몇 개를 해냈는지를 옆에 적는다.
+    /// 밀린 것들의 머리. 요일 머리와 같은 자리에 서되 색으로 갈린다.
+    private var unreviewedHeader: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .font(.system(size: 12, weight: .bold))
+            Text("먼저 찍을 것")
+                .font(.subheadline.weight(.semibold))
+            Text(verbatim: "\(unreviewed.count)")
+                .font(.caption.weight(.medium))
+                .monospacedDigit()
+                .contentTransition(.numericText())
+            Spacer()
+            Text("아래 요일에도 같은 줄이 있습니다")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .foregroundStyle(.orange)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 6)
+        .background(.bar)
+        .animation(Motion.number, value: unreviewed.count)
+    }
+
     private func dayHeader(_ day: DayOfWeek) -> some View {
-        let stats = ReflectionStats(blocks(on: day))
+        // 루틴은 세지 않는다 — '3/8'의 8에 수면·끼니가 들어가면 달성률이 흐려진다.
+        let stats = ReflectionStats(blocks(on: day).filter { !$0.isRoutineKind(routineNames) })
         return HStack(spacing: 8) {
             Text(day.longLabel)
                 .font(.subheadline.weight(.semibold))
@@ -234,6 +291,8 @@ struct DayReflectionPanel: View {
     let date: Date
     /// 그날의 계획 블록.
     let blocks: [PlanBlock]
+    /// 그 주에 서 있는 루틴들의 이름. 이 이름으로 선 블록은 루틴에서 온 것으로 본다.
+    var routineNames: Set<String> = []
     var onOpenWeekly: () -> Void = {}
     /// 할 일을 받을 수 있는가. 고정 루틴이 없으면 계획할 수 없다 (→ 하루 시간표와 같은 조건).
     var canPlan: Bool = true
@@ -247,6 +306,20 @@ struct DayReflectionPanel: View {
 
     /// 하루가 흐른 차례대로 — 옆의 하루 시간표를 위에서 아래로 읽는 순서와 같다.
     private var sorted: [PlanBlock] { blocks.sorted { $0.sortHour < $1.sortHour } }
+
+    /// **점검해야 하는 줄들.** 뱃지의 셈도 이것만 본다 —
+    /// 루틴이 섞이면 '미회고 5개'가 사실은 아무것도 안 밀린 날일 수 있다.
+    private var reviewable: [PlanBlock] { sorted.filter { !$0.isRoutineKind(routineNames) } }
+
+    private var isPast: Bool {
+        let cal = Calendar.current
+        return cal.startOfDay(for: date) < cal.startOfDay(for: Date())
+    }
+
+    /// 지난 날인데 아직 안 찍은 것.
+    private var unreviewed: [PlanBlock] {
+        isPast ? reviewable.filter { $0.reviewStatus == nil } : []
+    }
 
     private var isFuture: Bool {
         let cal = Calendar.current
@@ -265,7 +338,7 @@ struct DayReflectionPanel: View {
     }
 
     var body: some View {
-        let stats = ReflectionStats(blocks)
+        let stats = ReflectionStats(reviewable)
 
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 8) {
@@ -297,6 +370,25 @@ struct DayReflectionPanel: View {
                     .foregroundStyle(.secondary)
             }
 
+            // **지난 날인데 안 찍은 것은 판 위에 세운다.** 뱃지의 숫자 하나로는 밀린 줄 모른다.
+            if !unreviewed.isEmpty {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .font(.system(size: 12, weight: .bold))
+                    Text("아직 안 찍은 것 \(unreviewed.count)개")
+                        .font(.callout.weight(.semibold))
+                    Spacer(minLength: 8)
+                    Text("지난 날입니다 — 했는지 찍어 주세요")
+                        .font(.caption)
+                        .lineLimit(1)
+                }
+                .foregroundStyle(.orange)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(Color.orange.opacity(0.12), in: .soft(Corner.chip))
+                .transition(.disclose)
+            }
+
             if sorted.isEmpty {
                 VStack(spacing: 6) {
                     Image(systemName: "tray")
@@ -317,7 +409,8 @@ struct DayReflectionPanel: View {
             } else {
                 VStack(spacing: 0) {
                     ForEach(sorted) { block in
-                        ReflectionRow(block: block, showsDay: false, compact: true) {
+                        ReflectionRow(block: block, showsDay: false, compact: true,
+                                      reviewable: !block.isRoutineKind(routineNames)) {
                             try? context.save()
                         }
                         if block.persistentModelID != sorted.last?.persistentModelID {
@@ -409,6 +502,8 @@ struct ReflectionRow: View {
     var showsDay = true
     /// 일간 옆 반쪽 폭에 맞춘 촘촘한 줄.
     var compact = false
+    /// 점검하는 줄인가. 루틴에서 온 것은 '했는지'를 묻지 않는다 (→ PlanBlock.isRoutineKind).
+    var reviewable = true
     let onChange: () -> Void
 
     @State private var hovering = false
@@ -430,7 +525,7 @@ struct ReflectionRow: View {
                 // **할 일 목록과 같은 자리, 같은 손짓** — 왼쪽 동그라미를 눌러 끝낸다
                 // (→ BacklogView의 '요일에 올린 일'). 세 갈래 상태는 이 동그라미의
                 // 모양으로 드러나므로, 눈으로 읽는 것과 손으로 누르는 것이 한 자리에 있다.
-                checkButton
+                if reviewable { checkButton } else { routineMark }
 
                 if showsDay {
                     Text(block.day.shortLabel)
@@ -454,9 +549,11 @@ struct ReflectionRow: View {
                 // 부분·건너뜀은 자주 쓰는 손짓이 아니다. 늘 세워 두면 '끝냄' 하나를
                 // 누르러 온 사람이 셋 중에 고르는 일이 되므로, 가리키기 전에는 숨긴다.
                 // (마우스를 안 쓰는 사람을 위해 줄 전체에 같은 메뉴를 우클릭으로도 단다.)
-                stateMenu
-                    .opacity(hovering ? 1 : 0)
-                    .scaleEffect(hovering ? 1 : 0.8)
+                if reviewable {
+                    stateMenu
+                        .opacity(hovering ? 1 : 0)
+                        .scaleEffect(hovering ? 1 : 0.8)
+                }
             }
 
             // 멈출 때 남겨 둔 한 줄 — 돌아왔을 때 여기서부터 (→ PlanBlock.nextAction).
@@ -502,7 +599,16 @@ struct ReflectionRow: View {
         // 표시를 찍으면 회고 칸이 아래로 열리고, 제목에 줄이 그어진다. 한 결로 묶는다.
         .animation(Motion.row, value: block.reviewStatus)
         .animation(Motion.hover, value: hovering)
-        .contextMenu { stateButtons }
+        .contextMenu { if reviewable { stateButtons } }
+    }
+
+    /// 루틴 줄의 표시. 체크 동그라미 자리를 비워 두면 줄이 어긋나므로 같은 크기로 세운다.
+    private var routineMark: some View {
+        Image(systemName: "repeat")
+            .font(.system(size: compact ? 10 : 11, weight: .bold))
+            .foregroundStyle(.tertiary)
+            .frame(width: compact ? 20 : 22, height: compact ? 20 : 22)
+            .help("루틴입니다 — 했는지 묻지 않습니다")
     }
 
     /// 누르면 끝낸 것이 되고, 다시 누르면 도로 안 본 것이 된다.
