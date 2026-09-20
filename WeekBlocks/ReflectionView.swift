@@ -84,7 +84,8 @@ struct ReflectionView: View {
             Divider()
 
             if tab == .trends, purchases.offersPro {
-                ReflectionTrendsView(weekStart: weekStart, allBlocks: allBlocks)
+                ReflectionTrendsView(weekStart: weekStart, allBlocks: allBlocks,
+                                     routineNames: routineNames)
                     .frame(maxHeight: .infinity)
                     .transition(.opacity)
             } else if weekBlocks.isEmpty {
@@ -212,11 +213,16 @@ struct ReflectionView: View {
             lines.append("## \(day.longLabel)")
             for block in blocks(on: day) {
                 let mark: String
-                switch block.reviewStatus {
-                case .done: mark = "[x]"
-                case .partial: mark = "[~]"
-                case .skipped: mark = "[-]"
-                case nil: mark = "[ ]"
+                // 루틴은 안 찍는 줄이다. `[ ]`로 내보내면 붙여넣은 글에서 '안 한 일'로 읽힌다.
+                if block.isRoutineKind(routineNames) {
+                    mark = "[↻]"
+                } else {
+                    switch block.reviewStatus {
+                    case .done: mark = "[x]"
+                    case .partial: mark = "[~]"
+                    case .skipped: mark = "[-]"
+                    case nil: mark = "[ ]"
+                    }
                 }
                 let when = block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
                 lines.append("- \(mark) \(when) \(block.title) (\(shortHours(block.durationHours)))")

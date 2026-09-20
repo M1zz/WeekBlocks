@@ -71,18 +71,27 @@ enum ReflectionTrends {
         }
     }
 
-    /// 그 주들에 속한 블록. 캘린더에서 가져온 회의는 뺀다 — 내가 짠 계획이 아니다.
-    static func blocks(_ all: [PlanBlock], in starts: [Date]) -> [PlanBlock] {
+    /// 그 주들에 속한 블록.
+    ///
+    /// **내가 짠 계획만 센다.** 캘린더에서 가져온 회의는 예전부터 뺐고, 루틴에서 온 줄도 뺀다
+    /// (→ PlanBlock.isRoutineKind). 수면·끼니는 '해냈는가'를 묻는 대상이 아니라서 애초에
+    /// 회고를 찍지 않는데, 그것까지 '계획 N개'에 들어가면 요일별·시간대별 몫이 통째로 밀린다.
+    /// 예전에 찍어 둔 루틴 회고가 남아 있으면 달성률까지 끌어간다.
+    static func blocks(_ all: [PlanBlock], in starts: [Date],
+                       routineNames: Set<String> = []) -> [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
         return all.filter { b in
-            b.calendarEventID == nil && starts.contains { cal.isDate($0, inSameDayAs: b.weekStartDate) }
+            b.calendarEventID == nil
+                && !b.isRoutineKind(routineNames)
+                && starts.contains { cal.isDate($0, inSameDayAs: b.weekStartDate) }
         }
     }
 
-    static func weeks(_ all: [PlanBlock], ending: Date, count: Int = weekCount) -> [Week] {
+    static func weeks(_ all: [PlanBlock], ending: Date, count: Int = weekCount,
+                      routineNames: Set<String> = []) -> [Week] {
         let cal = Calendar(identifier: .iso8601)
         let starts = weekStarts(ending: ending, count: count)
-        let inRange = blocks(all, in: starts)
+        let inRange = blocks(all, in: starts, routineNames: routineNames)
         return starts.map { start in
             let mine = inRange.filter { cal.isDate($0.weekStartDate, inSameDayAs: start) }
             return Week(start: start, planned: mine.count,
@@ -127,6 +136,8 @@ struct ReflectionTrendsView: View {
     /// 보고 있는 주. 여기까지 거슬러 센다.
     let weekStart: Date
     let allBlocks: [PlanBlock]
+    /// 루틴 이름. 이 이름으로 선 블록은 추세에서 뺀다 (→ ReflectionTrends.blocks).
+    var routineNames: Set<String> = []
 
     @State private var purchases = PurchaseManager.shared
     @State private var showingPaywall = false
@@ -137,10 +148,13 @@ struct ReflectionTrendsView: View {
     }
 
     private var weeks: [ReflectionTrends.Week] {
-        ReflectionTrends.weeks(allBlocks, ending: weekStart, count: weekCount)
+        ReflectionTrends.weeks(allBlocks, ending: weekStart, count: weekCount,
+                               routineNames: routineNames)
     }
     private var rangeBlocks: [PlanBlock] {
-        ReflectionTrends.blocks(allBlocks, in: ReflectionTrends.weekStarts(ending: weekStart, count: weekCount))
+        ReflectionTrends.blocks(allBlocks,
+                                in: ReflectionTrends.weekStarts(ending: weekStart, count: weekCount),
+                                routineNames: routineNames)
     }
 
     var body: some View {
@@ -217,7 +231,7 @@ struct ReflectionTrendsView: View {
     }
 
     private func rangeBlocksIn<S: Sequence>(_ weeks: S) -> [PlanBlock] where S.Element == ReflectionTrends.Week {
-        ReflectionTrends.blocks(allBlocks, in: weeks.map(\.start))
+        ReflectionTrends.blocks(allBlocks, in: weeks.map(\.start), routineNames: routineNames)
     }
 
     private func weeklyChart(_ weeks: [ReflectionTrends.Week]) -> some View {

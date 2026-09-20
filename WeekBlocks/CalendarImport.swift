@@ -247,10 +247,16 @@ final class CalendarBridge {
     }
 
     /// 사람이 이 블록에 무언가를 보탰는가. 보탰으면 캘린더가 사라져도 지우지 않는다.
+    ///
+    /// ⚠️ 예전에는 편집창이 성공 기준·산출물을 **채워야만** 저장을 열어 줘서, 한 번 손댄
+    ///    블록은 반드시 여기 걸렸다. 그 조건을 푼 뒤로는 비워 둔 채 저장할 수 있으므로,
+    ///    사람이 적을 수 있는 칸을 빠짐없이 본다. 못 보면 손댄 블록이 '안 손댄 것'으로
+    ///    읽혀 지울 후보로 올라간다 (지우기 전에 묻기는 하지만, 이름만 보고 판단해야 한다).
     private static func wasTouchedByPerson(_ block: PlanBlock) -> Bool {
         block.concreteVerified
             || !block.successCriteria.isEmpty
             || !block.deliverable.isEmpty
+            || !(block.nextAction ?? "").isEmpty
             || block.reviewStatus != nil
     }
 
