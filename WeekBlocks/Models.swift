@@ -67,6 +67,17 @@ enum TimeBand: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// 시각을 안 정해 둔 것을 정하기로 했을 때, 처음 세워 둘 시각.
+    /// 시간대 한가운데가 아니라 **사람이 실제로 그 시간대에 일을 시작하는 때**로 둔다.
+    var defaultStartHour: Double {
+        switch self {
+        case .morning: 9
+        case .afternoon: 14
+        case .evening: 19
+        case .night: 23
+        }
+    }
+
     /// 그 시각이 속한 시간대. 시각을 옮기면 시간대도 따라와야 칩의 부제가 거짓말을 하지 않는다.
     static func containing(_ startHour: Double) -> TimeBand {
         switch startHour {

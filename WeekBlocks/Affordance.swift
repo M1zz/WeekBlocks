@@ -31,10 +31,16 @@ extension View {
 
     /// 누르면 다른 자리로 건너가는 것(요일 머리 → 그날 하루) 위에서 손가락 커서.
     func pointingCursor(enabled: Bool = true) -> some View {
+        hoverCursor(.pointingHand, enabled: enabled)
+    }
+
+    /// 손이 올라오면 이 커서로 — 끌어 옮기는 몸통, 늘였다 줄이는 양끝처럼
+    /// **무엇을 할 수 있는 자리인지 손 모양이 먼저 말하는** 곳에 쓴다.
+    func hoverCursor(_ cursor: NSCursor, enabled: Bool = true) -> some View {
         onContinuousHover { phase in
             guard enabled else { return }
             switch phase {
-            case .active: NSCursor.pointingHand.set()
+            case .active: cursor.set()
             case .ended:  NSCursor.arrow.set()
             }
         }

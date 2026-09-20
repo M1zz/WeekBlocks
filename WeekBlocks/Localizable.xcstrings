@@ -137,6 +137,7 @@
       }
     },
     "'구체성 검사'를 눌러 주세요" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -268,6 +269,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "%@ – %@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ – %@ · %@"
           }
         }
       }
@@ -510,6 +521,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@h/week"
+          }
+        }
+      }
+    },
+    "%@만" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "just %@"
           }
         }
       }
@@ -931,7 +952,18 @@
         }
       }
     },
+    "💡 세 가지를 다 통과한 블록만 또렷한 색으로 섭니다. 비워 두어도 저장되고, 그때는 시간표에서 주황색 '구체성 미검증'으로 남습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💡 Blocks that pass all three stand in full colour. You can save without them — the block then stays orange, marked as not checked."
+          }
+        }
+      }
+    },
     "💡 세 가지를 모두 통과해야 블록을 저장할 수 있습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1691,6 +1723,16 @@
         }
       }
     },
+    "구체성 통과" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concrete enough"
+          }
+        }
+      }
+    },
     "그 밖에 %lld개" : {
       "localizations" : {
         "en" : {
@@ -2068,6 +2110,16 @@
         }
       }
     },
+    "남은 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ left"
+          }
+        }
+      }
+    },
     "남은 시간" : {
       "localizations" : {
         "en" : {
@@ -2114,6 +2166,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Free time left"
+          }
+        }
+      }
+    },
+    "남은 전부" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All that’s left"
           }
         }
       }
@@ -2641,6 +2703,7 @@
       }
     },
     "들어가는 할 일" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2826,6 +2889,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paused"
+          }
+        }
+      }
+    },
+    "몇 시에 할지 정하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set a time of day"
           }
         }
       }
@@ -3391,6 +3464,16 @@
         }
       }
     },
+    "성공 기준 · 산출물 · 다음 첫 동작 — 비워 두어도 저장됩니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Success test · deliverable · first move next time — you can leave these empty"
+          }
+        }
+      }
+    },
     "성공 기준에 \"%@\" 같은 모호한 표현이 있습니다. 측정 가능한 문장으로 적어 주세요." : {
       "localizations" : {
         "en" : {
@@ -3748,12 +3831,32 @@
         }
       }
     },
+    "아직 덜 적었습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not filled in yet"
+          }
+        }
+      }
+    },
     "아직 오지 않은 날입니다. 끝낸 뒤에 돌아봅니다." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This day hasn't come yet. Look back once it's done."
+          }
+        }
+      }
+    },
+    "아직 요일을 안 정한 할 일이 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing is waiting for a day."
           }
         }
       }
@@ -3854,6 +3957,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "It fetches everything from iCloud the next time you open the app."
+          }
+        }
+      }
+    },
+    "양끝을 끌어 시각을 맞춥니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag either end to adjust"
           }
         }
       }
@@ -4402,6 +4515,7 @@
       }
     },
     "위 검사에서 걸린 것을 고쳐 주세요" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4593,6 +4707,7 @@
       }
     },
     "이 시간에 들어가는 할 일이 없습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4987,6 +5102,16 @@
         }
       }
     },
+    "자세히 정하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go into detail"
+          }
+        }
+      }
+    },
     "자주 건너뛴 일" : {
       "localizations" : {
         "en" : {
@@ -5085,6 +5210,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Locked"
+          }
+        }
+      }
+    },
+    "잡은 시간 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ selected"
           }
         }
       }
@@ -5527,6 +5662,16 @@
         }
       }
     },
+    "지금" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now"
+          }
+        }
+      }
+    },
     "지금 %@" : {
       "localizations" : {
         "en" : {
@@ -5837,6 +5982,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "One thing before you split it"
+          }
+        }
+      }
+    },
+    "찾는 할 일이 없습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No to-do by that name."
           }
         }
       }
@@ -6467,6 +6622,16 @@
         }
       }
     },
+    "할 일 그대로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As long as it is"
+          }
+        }
+      }
+    },
     "할 일 목록으로 끌어 내리면 날짜가 무릅니다." : {
       "localizations" : {
         "en" : {
@@ -6513,6 +6678,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open the To-dos window (⇧⌘T)"
+          }
+        }
+      }
+    },
+    "할 일 찾기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find a to-do"
           }
         }
       }

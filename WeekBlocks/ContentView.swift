@@ -304,7 +304,8 @@ struct ContentView: View {
                     blocks: weekBlocks.filter { $0.day == ctx.day }
                 ),
                 initialStartHour: ctx.startHour,
-                initialDuration: ctx.duration
+                initialDuration: ctx.duration,
+                initialDurationIsExplicit: ctx.durationIsExplicit
             )
             .frame(minWidth: 520, minHeight: 540)
         }
@@ -709,6 +710,15 @@ struct ContentView: View {
                     onAddBlock: { hour, hours in
                         blockSheet = BlockSheetContext(day: selectedDay, block: nil,
                                                        startHour: hour, duration: hours)
+                    },
+                    onFillGap: { token, hour, duration in
+                        dropBacklogItem(token: token, day: selectedDay, atHour: hour, duration: duration)
+                    },
+                    onDrawBlock: { hour, hours in
+                        // 손으로 그은 길이다 — 두 시간으로 깎지 않는다.
+                        blockSheet = BlockSheetContext(day: selectedDay, block: nil,
+                                                       startHour: hour, duration: hours,
+                                                       durationIsExplicit: true)
                     },
                     zones: dayZones,
                     onReturnToBacklog: { block in
@@ -1394,7 +1404,9 @@ struct ContentView: View {
 
     /// 요일 칸(블록으로 보기)과 시간 자(시간축으로 보기)가 함께 쓰는 받는 자리.
     /// - Parameter atHour: 자 위에 떨어뜨렸을 때의 시작 시각. 요일 칸에서는 nil(시간대만 정한다).
-    private func dropBacklogItem(token: String, day: DayOfWeek, atHour: Double? = nil) {
+    /// - Parameter duration: 채우기 판에서 **길이까지 정했을 때**. nil이면 할 일·블록 제 길이를 쓴다.
+    private func dropBacklogItem(token: String, day: DayOfWeek, atHour: Double? = nil,
+                                 duration: Double? = nil) {
         if let move = RoutineDragToken(token) {
             moveRoutine(move, to: day, startHour: atHour, gap: nil)
             return
@@ -1404,6 +1416,10 @@ struct ContentView: View {
             guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
             var changed = false
             if blk.day != day { blk.day = day; changed = true }
+            if let duration, abs(blk.durationHours - duration) > 1e-6 {
+                blk.durationHours = duration
+                changed = true
+            }
             if let hour = atHour {
                 let start = clampStart(hour, duration: blk.durationHours)
                 if blk.startHour != start {
@@ -1421,12 +1437,12 @@ struct ContentView: View {
         if token.hasPrefix("routine:") {
             let name = String(token.dropFirst("routine:".count))
             guard let routine = routines.first(where: { $0.name == name }) else { return }
-            let duration = routine.kind == .fixed ? routine.durationHours : 1
-            let start = atHour.map { clampStart($0, duration: duration) }
+            let hours = duration ?? (routine.kind == .fixed ? routine.durationHours : 1)
+            let start = atHour.map { clampStart($0, duration: hours) }
             let block = PlanBlock(
                 day: day,
                 timeBand: timeBand(for: start ?? (routine.kind == .fixed ? routine.startHour : 12)),
-                durationHours: duration,
+                durationHours: hours,
                 title: routine.name,
                 successCriteria: "",
                 deliverable: "",
@@ -1437,7 +1453,7 @@ struct ContentView: View {
             context.insert(block)
         } else {
             guard let item = backlogItems.first(where: { $0.dragToken == token }) else { return }
-            convertBacklogItem(item, to: day, atHour: atHour)
+            convertBacklogItem(item, to: day, atHour: atHour, duration: duration)
         }
         // 놓인 자리에서 톡 튀어나온다 — 손끝의 딸깍과 같은 순간에.
         Haptic.snap()
@@ -1556,7 +1572,9 @@ struct ContentView: View {
     ///    같은 스토어를 쓰는 이상 어느 한쪽만 지우면 안 된다. **다시 지우지 말 것.**
     ///
     /// 단계로 쪼갠 할 일은 지금 할 단계 하나만 올린다. 남은 단계가 여전히 할 일이기 때문이다.
-    private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek, atHour: Double? = nil) {
+    /// - Parameter duration: 채우기 판에서 정한 길이. nil이면 할 일(또는 지금 단계) 제 길이를 쓴다.
+    private func convertBacklogItem(_ item: BacklogItem, to day: DayOfWeek, atHour: Double? = nil,
+                                    duration: Double? = nil) {
         let tree = TodoTree(backlogItems)
         let step = tree.hasChildren(item) ? tree.currentStep(of: item) : nil
         let title = step.map { "\(item.title) · \($0.title)" } ?? item.title
@@ -1565,6 +1583,7 @@ struct ContentView: View {
         // 같은 주·같은 요일에 이미 올라가 있으면 블록을 새로 만들지 않는다.
         // 다만 자 위에서 시각까지 정해 다시 떨어뜨린 것이라면, 그건 "옮기겠다"는 뜻이다.
         if let existing = weekBlocks.first(where: { $0.day == day && $0.title == title }) {
+            if let duration { existing.durationHours = duration }
             if let hour = atHour {
                 let start = clampStart(hour, duration: existing.durationHours)
                 existing.startHour = start
@@ -1574,16 +1593,16 @@ struct ContentView: View {
             return
         }
 
-        let duration = step?.durationHours ?? item.durationHours
+        let hours = duration ?? (step?.durationHours ?? item.durationHours)
         // 자 위에 놓았으면 그 시각이 곧 시작이다. 요일 칸에 놓았으면 빈 시간대를 골라 준다.
-        let start = atHour.map { clampStart($0, duration: duration) }
+        let start = atHour.map { clampStart($0, duration: hours) }
         let block = PlanBlock(
             day: day,
             timeBand: start.map { timeBand(for: $0) } ?? TimelineLayout.suggestedBand(
                 routines: fixedRoutines(on: day),
                 blocks: weekBlocks.filter { $0.day == day }
             ),
-            durationHours: duration,
+            durationHours: hours,
             title: title,
             successCriteria: "",
             deliverable: "",
@@ -1776,6 +1795,9 @@ struct BlockSheetContext: Identifiable {
     /// 일간의 빈 시간에서 열었을 때 — 그 시각·길이로 새 블록을 채워 둔다.
     var startHour: Double? = nil
     var duration: Double? = nil
+    /// 길이를 **사람이 직접 그었는가** (빈 시간을 위아래로 훑어서).
+    /// 빈 시간을 그냥 누른 것이면 그 길이는 제안일 뿐이라 두 시간으로 깎인다.
+    var durationIsExplicit: Bool = false
 }
 
 struct RoutineSheetContext: Identifiable {

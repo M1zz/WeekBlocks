@@ -23,6 +23,9 @@ struct BlockEditorView: View {
     var initialStartHour: Double? = nil
     /// 새 블록의 처음 길이 — 빈 시간의 길이. 두 시간을 넘으면 기본값(2시간)을 둔다.
     var initialDuration: Double? = nil
+    /// 그 길이를 **사람이 직접 그었는가** — 빈 시간을 위아래로 훑어 범위를 그린 경우.
+    /// 그때는 깎지 않는다. 다섯 시간 빈자리를 누른 것과 세 시간을 그은 것은 다른 말이다.
+    var initialDurationIsExplicit: Bool = false
 
     @State private var title: String = ""
     @State private var timeBand: TimeBand = .evening
@@ -34,8 +37,21 @@ struct BlockEditorView: View {
     @State private var nextAction: String = ""
     @State private var withinRoutine: Bool = false
     @State private var startHour: Double = 9
+    /// **몇 시에 하는지 정해 둔 블록인가.**
+    ///
+    /// 예전에는 '루틴 안 일정'만 정확한 시각을 가졌고, 나머지는 시간대(아침·오후·…)만 물었다.
+    /// 그러나 하루 시간표가 생긴 뒤로 보통 블록도 시각을 갖는다 — 빈 시간을 훑어 그리거나,
+    /// 할 일 카드를 자 위에 떨어뜨리면 그 높이가 곧 시작 시각이다. 그런데도 이 창은 시간대만
+    /// 보여 주었고, **저장할 때 그 시각을 -1로 지웠다.** 14시에 세워 둔 블록을 열어 제목만
+    /// 고쳐도 시각이 날아갔다. 이제 시각이 있는 블록은 시각을 보여 주고 그대로 지킨다.
+    ///
+    /// 끄면 "그날 하긴 하는데 몇 시인지는 안 정함"이 된다 (`startHour = -1`).
+    /// 하루 시간표에서 알약을 계획 판으로 끌어내는 것(→ ContentView.onClearTime)과 같은 상태다.
+    @State private var hasExactTime: Bool = false
 
-    @State private var hasCheckedOnce: Bool = false
+    /// '자세히 정하기'를 펼쳐 두었는가. **기본은 접힘.**
+    /// 이미 적어 둔 것이 있는 블록을 열 때만 펴서, 적힌 글이 접힌 채 숨지 않게 한다.
+    @State private var showsDetail: Bool = false
     @State private var issues: [ConcretenessIssue] = []
 
     /// startHour(Double) ↔ Date 브리지 — 시:분 DatePicker용.
@@ -62,7 +78,7 @@ struct BlockEditorView: View {
             Form {
                 Section("활동") {
                     TextField("무엇을 할 것인가?", text: $title, prompt: Text("예: Swift Combine 학습"))
-                        .onChange(of: title) { if hasCheckedOnce { revalidate() } }
+                        .onChange(of: title) { revalidate() }
                 }
 
                 Section {
@@ -76,7 +92,11 @@ struct BlockEditorView: View {
                 }
 
                 Section("시간") {
-                    if withinRoutine {
+                    // 루틴 안 일정은 늘 시각을 갖는다 — 회의는 '오후 어딘가'에 있지 않다.
+                    if !withinRoutine {
+                        Toggle("몇 시에 할지 정하기", isOn: $hasExactTime)
+                    }
+                    if withinRoutine || hasExactTime {
                         HStack {
                             Text("시작")
                             Spacer()
@@ -103,47 +123,27 @@ struct BlockEditorView: View {
                     }
                 }
 
+                // **고급 질문은 접어 둔다.**
+                //
+                // 계획을 세우는 손이 가장 자주 하는 일은 '무엇을 몇 시에'까지다. 성공 기준·
+                // 산출물·다음 첫 동작은 그 일을 벼릴 때 쓰는 것이지, 블록 하나 세울 때마다
+                // 통과해야 하는 관문이 아니다 — 애초에 할 일 카드를 끌어다 놓아 만든 블록은
+                // 이 셋을 묻지도 않는다(→ ContentView.convertBacklogItem). 편집창만 강요하는
+                // 바람에 같은 블록이 만드는 길에 따라 다른 잣대를 받고 있었다.
+                //
+                // 비워 둔 채 저장하면 그 블록은 '구체성 미검증'으로 서고(주황색, → DayTimelineView),
+                // 나중에 눌러서 다듬으면 된다. 막는 대신 표시한다.
                 if !withinRoutine {
                     Section {
-                        TextField("", text: $successCriteria, prompt: Text("예: sink/assign 차이를 노트에 정리하고 예제 실행 성공"), axis: .vertical)
-                            .lineLimit(2...4)
-                            .onChange(of: successCriteria) { if hasCheckedOnce { revalidate() } }
-                    } header: {
-                        Text("성공 기준")
-                    } footer: {
-                        Text("측정 가능한 문장으로 적어 주세요. \"열심히 한다\", \"잘 한다\"는 통과되지 않습니다.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Section {
-                        TextField("", text: $deliverable, prompt: Text("예: 정리 노트 1장 + 동작하는 예제 1개"), axis: .vertical)
-                            .lineLimit(1...3)
-                            .onChange(of: deliverable) { if hasCheckedOnce { revalidate() } }
-                    } header: {
-                        Text("산출물")
-                    } footer: {
-                        Text("끝났을 때 손에 남는 것.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    // 돌아왔을 때 다시 올라오는 값을 줄이는 한 줄 (→ PlanBlock.nextAction).
-                    // 보통은 타이머를 멈출 때 적지만, 미리 적어 둘 수도 있어야 한다.
-                    Section {
-                        TextField("", text: $nextAction, prompt: Text("예: 3번 예제부터 다시 돌려보기"), axis: .vertical)
-                            .lineLimit(1...3)
-                    } header: {
-                        Text("다음 첫 동작")
-                    } footer: {
-                        Text("끊겼다가 돌아왔을 때 무엇부터 하면 되는지. 비워 두어도 됩니다.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    if hasCheckedOnce {
-                        Section {
-                            resultView
+                        DisclosureGroup(isExpanded: $showsDetail) {
+                            detailFields
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("자세히 정하기")
+                                Text(detailSummary)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
@@ -151,24 +151,32 @@ struct BlockEditorView: View {
             .formStyle(.grouped)
             // '루틴 안'을 켜면 묻는 칸이 통째로 달라진다. 구체성 판정도 적는 대로 바뀐다.
             .animation(Motion.disclose, value: withinRoutine)
-            .animation(Motion.disclose, value: hasCheckedOnce)
+            .animation(Motion.disclose, value: hasExactTime)
+            .animation(Motion.disclose, value: showsDetail)
             .animation(Motion.row, value: issues.map(\.message))
 
             Divider()
 
             footerBar
         }
+        // 시각을 정하기로 켰는데 아직 아무 시각도 없으면, 고른 시간대가 시작하는 때로 세운다.
+        // 00:00이 뜨면 사람이 거기서부터 스무 번을 눌러야 한다.
+        .onChange(of: hasExactTime) { _, on in
+            guard on, existing?.startHour ?? -1 < 0, initialStartHour == nil else { return }
+            startHour = timeBand.defaultStartHour
+        }
         .onAppear {
             if existing == nil {
                 timeBand = initialStartHour.map(TimeBand.containing) ?? suggestedBand
-                if let d = initialDuration { durationHours = min(2, max(0.25, (d * 4).rounded(.down) / 4)) }
+                // 빈 시간을 훑거나 눌러서 왔으면 그 시각이 이미 정해진 것이다.
+                if let h = initialStartHour { startHour = h; hasExactTime = true }
+                if let d = initialDuration {
+                    let snapped = max(0.25, (d * 4).rounded(.down) / 4)
+                    durationHours = initialDurationIsExplicit ? snapped : min(2, snapped)
+                }
             }
             loadExisting()
-            // 일반 블록은 처음부터 구체성 피드백을 실시간 표시 (별도 '구체성 체크' 버튼 없이).
-            if !withinRoutine {
-                hasCheckedOnce = true
-                revalidate()
-            }
+            revalidate()
         }
     }
 
@@ -188,6 +196,61 @@ struct BlockEditorView: View {
             Spacer()
         }
         .padding(20)
+    }
+
+    /// 접어 둔 고급 질문들. 세울 때 통과해야 하는 관문이 아니라, 벼릴 때 쓰는 자리다.
+    private var detailFields: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            detailField("성공 기준",
+                        footer: "측정 가능한 문장으로 적어 주세요. \"열심히 한다\", \"잘 한다\"는 통과되지 않습니다.") {
+                TextField("", text: $successCriteria,
+                          prompt: Text("예: sink/assign 차이를 노트에 정리하고 예제 실행 성공"), axis: .vertical)
+                    .lineLimit(2...4)
+                    .onChange(of: successCriteria) { revalidate() }
+            }
+            detailField("산출물", footer: "끝났을 때 손에 남는 것.") {
+                TextField("", text: $deliverable,
+                          prompt: Text("예: 정리 노트 1장 + 동작하는 예제 1개"), axis: .vertical)
+                    .lineLimit(1...3)
+                    .onChange(of: deliverable) { revalidate() }
+            }
+            // 돌아왔을 때 다시 올라오는 값을 줄이는 한 줄 (→ PlanBlock.nextAction).
+            // 보통은 타이머를 멈출 때 적지만, 미리 적어 둘 수도 있어야 한다.
+            detailField("다음 첫 동작", footer: "끊겼다가 돌아왔을 때 무엇부터 하면 되는지. 비워 두어도 됩니다.") {
+                TextField("", text: $nextAction, prompt: Text("예: 3번 예제부터 다시 돌려보기"), axis: .vertical)
+                    .lineLimit(1...3)
+            }
+            // 아무것도 안 적었는데 "아직 추상적입니다"를 들이미는 것은 나무라는 것이다.
+            // 적기 시작한 뒤부터 본다.
+            if hasDetail { resultView }
+        }
+        .padding(.top, 6)
+    }
+
+    private func detailField<Content: View>(_ title: LocalizedStringKey, footer: LocalizedStringKey,
+                                            @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.callout.weight(.medium))
+            content()
+            Text(footer).font(.caption).foregroundStyle(.secondary)
+        }
+    }
+
+    /// 고급 칸에 무언가 적었는가.
+    private var hasDetail: Bool {
+        !successCriteria.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || !deliverable.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || !nextAction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// 접어 둔 채로도 안에 무엇이 있는지 한 줄로 말한다.
+    private var detailSummary: String {
+        guard hasDetail else {
+            return String(localized: "성공 기준 · 산출물 · 다음 첫 동작 — 비워 두어도 저장됩니다")
+        }
+        return issues.isEmpty
+            ? String(localized: "구체성 통과")
+            : String(localized: "아직 덜 적었습니다")
     }
 
     private var resultView: some View {
@@ -268,11 +331,12 @@ struct BlockEditorView: View {
     }
 
     /// 저장하려면 아직 해야 하는 것. 비어 있으면 저장할 수 있다.
+    ///
+    /// 예전에는 성공 기준·산출물까지 통과해야 저장이 열렸다. 그런데 정작 할 일 카드를
+    /// 끌어다 놓아 만든 블록은 그 셋 없이도 서 있었다 — 같은 블록에 두 잣대였다.
+    /// 이제 막지 않고 **'구체성 미검증'으로 표시**한다 (→ save()의 concreteVerified).
     private var missing: [String] {
         if title.trimmingCharacters(in: .whitespaces).isEmpty { return [String(localized: "제목을 적어 주세요")] }
-        if withinRoutine { return [] }
-        if !hasCheckedOnce { return [String(localized: "'구체성 검사'를 눌러 주세요")] }
-        if !issues.isEmpty { return [String(localized: "위 검사에서 걸린 것을 고쳐 주세요")] }
         return []
     }
 
@@ -301,12 +365,11 @@ struct BlockEditorView: View {
 
     // MARK: logic
 
+    /// 시각을 정해 둔 블록인가. 루틴 안 일정은 늘 그렇다.
+    private var keepsExactTime: Bool { withinRoutine || hasExactTime }
+
     private var canSave: Bool {
-        if withinRoutine {
-            // 루틴 안 일정은 구체성 검사 없이 제목만 있으면 저장.
-            return !title.trimmingCharacters(in: .whitespaces).isEmpty
-        }
-        return hasCheckedOnce && issues.isEmpty
+        !title.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     private func revalidate() {
@@ -326,12 +389,11 @@ struct BlockEditorView: View {
         deliverable = existing.deliverable
         nextAction = existing.nextAction ?? ""
         withinRoutine = existing.withinRoutine
+        hasExactTime = existing.withinRoutine || existing.startHour >= 0
         if existing.startHour >= 0 { startHour = existing.startHour }
-        // 일반 블록만 즉시 구체성 표시
-        if !withinRoutine {
-            hasCheckedOnce = true
-            revalidate()
-        }
+        // 이미 적어 둔 것이 있으면 펴 둔다 — 접힌 칸 안에 글이 숨어 있으면 지운 줄 안다.
+        showsDetail = hasDetail
+        revalidate()
     }
 
     private func save() {
@@ -340,10 +402,13 @@ struct BlockEditorView: View {
         let sc = successCriteria.trimmingCharacters(in: .whitespacesAndNewlines)
         let dv = deliverable.trimmingCharacters(in: .whitespacesAndNewlines)
         let na = nextAction.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 막지 않는 대신 표시로 남긴다. 세 가지를 다 통과한 블록만 또렷한 색으로 서고,
+        // 비워 둔 것은 주황색 '구체성 미검증'이 되어 나중에 다듬으라고 말한다.
+        let verified = !withinRoutine
+            && ConcretenessChecker.validate(title: t, successCriteria: sc, deliverable: dv).isEmpty
 
         if let existing {
             existing.title = t
-            existing.timeBand = timeBand
             existing.durationHours = durationHours
             existing.successCriteria = withinRoutine ? "" : sc
             existing.deliverable = withinRoutine ? "" : dv
@@ -351,20 +416,24 @@ struct BlockEditorView: View {
             existing.day = day
             existing.weekStartDate = weekStart
             existing.withinRoutine = withinRoutine
-            existing.startHour = withinRoutine ? startHour : -1
-            existing.concreteVerified = !withinRoutine
+            // ⚠️ 한때 `withinRoutine ? startHour : -1` 이었다. 자 위에 세워 둔 보통 블록을
+            //    열어 제목만 고쳐도 시각이 -1로 지워졌다. 시각을 가진 블록은 시각을 지킨다.
+            existing.startHour = keepsExactTime ? startHour : -1
+            // 시각이 있으면 시간대는 거기서 따라 나온다 — 둘이 어긋나면 칩의 부제가 거짓말을 한다.
+            existing.timeBand = keepsExactTime ? TimeBand.containing(startHour) : timeBand
+            existing.concreteVerified = verified
         } else {
             let block = PlanBlock(
                 day: day,
-                timeBand: timeBand,
+                timeBand: keepsExactTime ? TimeBand.containing(startHour) : timeBand,
                 durationHours: durationHours,
                 title: t,
                 successCriteria: withinRoutine ? "" : sc,
                 deliverable: withinRoutine ? "" : dv,
                 weekStartDate: weekStart,
-                concreteVerified: !withinRoutine,
+                concreteVerified: verified,
                 withinRoutine: withinRoutine,
-                startHour: withinRoutine ? startHour : (initialStartHour ?? -1)
+                startHour: keepsExactTime ? startHour : -1
             )
             block.nextAction = na.isEmpty ? nil : na
             context.insert(block)

@@ -44,8 +44,17 @@ struct DayScheduleView: View {
     var onEditRoutineSchedule: (Routine) -> Void = { _ in }
     /// 빈 시간을 눌러 고를 수 있는 할 일 — 아직 요일을 안 정한 것.
     var candidates: [GapCandidate] = []
-    /// 빈 시간에 새 블록을 세운다. (시작 시각, 빈 시간 길이)
+    /// 빈 시간에 새 블록을 세운다. (시작 시각, 빈 시간 길이 — **제안**이라 두 시간으로 깎인다)
     var onAddBlock: (Double, Double) -> Void = { _, _ in }
+    /// 채우기 판에서 할 일을 골랐다. (드래그 토큰, 시작 시각, 정한 길이 — nil이면 할 일 제 길이)
+    ///
+    /// 끌어다 놓는 길(`onDropBacklog`)과 달리 **길이를 여기서 정할 수 있다.**
+    /// 다섯 시간 빈자리에 두 시간짜리를 "오늘은 한 시간만" 넣는 일이 실제로 잦다.
+    var onFillGap: (String, Double, Double?) -> Void = { _, _, _ in }
+    /// 빈 시간을 위아래로 훑어 범위를 그렸다. (시작 시각, 그린 길이)
+    ///
+    /// 사람이 손으로 그은 길이라 **그대로 쓴다** — `onAddBlock`처럼 깎지 않는다.
+    var onDrawBlock: (Double, Double) -> Void = { _, _ in }
     /// 시간표 **밖**의 받는 자리들 (오늘의 계획 판·할 일 목록). 계획 블록을 끌어 그 위에 놓을 수 있다.
     var zones: DayDragZones? = nil
     /// 블록을 할 일 목록에 놓았다 — 날짜를 무른다.
@@ -66,6 +75,9 @@ struct DayScheduleView: View {
     ///    일이 화면에서는 09:09까지 뻗어** 다음 일정과 겹친 것으로 계산됐고, 겹치면 나란히
     ///    세우는 규칙에 걸려 둘이 반쪽씩 갈라졌다. 키를 줄이고, 나란히 세울지는 **시각만 보고** 정한다.
     private static let minRowHeight: CGFloat = 22
+    /// 하루 시간표 안의 자. 손잡이를 끌 때 손이 몇 시에 있는지 이 자로 잰다 —
+    /// 손잡이마다 제 칸 기준으로 재면 칸이 움직이는 동안 기준도 같이 흔들린다.
+    private static let trackSpace = "dayTrack"
 
     @State private var dragId: String?
     @State private var dragPy: CGFloat = 0
@@ -80,6 +92,20 @@ struct DayScheduleView: View {
     /// 가리키고 있는 빈 시간, 눌러서 열어 둔 빈 시간.
     @State private var hoverGap: String?
     @State private var openGap: String?
+    /// 빈 시간을 훑어 범위를 그리는 중.
+    @State private var scrub: GapScrub?
+    /// 훑어 **잡아 둔** 시간. 손을 떼어도 남아서 양끝을 다시 끌 수 있다 (→ GapSelection).
+    @State private var selection: GapSelection?
+    /// 잡아 둔 시간을 통째로 옮기는 중 — 끌기 시작할 때의 시작 시각.
+    @State private var moveOrigin: Double?
+    /// 채우기 판의 찾는 말. 하나 넣어 판이 다시 열려도 남는다 — 같은 말로 이어서 고른다.
+    @State private var gapSearch = ""
+    /// 하나 넣은 뒤 **이 시각을 품은 빈 시간**에서 판을 다시 연다.
+    ///
+    /// 빈 시간은 알약이 하나 들어서는 순간 둘로 갈라지고 이름(`Connector.id`)이 바뀐다.
+    /// 열어 둔 이름만 붙들고 있으면 판이 툭 닫혀서, 다섯 시간을 셋으로 채우려면 세 번 열어야 했다.
+    /// 이름 대신 **시각**을 붙들었다가 새로 그려진 빈 시간에서 그 시각을 찾아 다시 연다.
+    @State private var reopenGapAt: Double?
     /// 방금 놓인 알약. 한 번 부풀었다 내려앉는다 (→ LandingTracker).
     @State private var landing = LandingTracker()
     /// 일정이 다 드러났는가. 하루가 설 때 위에서부터 하나씩 톡톡 선다.
@@ -124,6 +150,8 @@ struct DayScheduleView: View {
             if reduceMotion { drawn = true; return }
             drawn = true
         }
+        // 다른 날로 넘어가면 잡아 둔 시간은 놓는다 — 그 빈자리의 경계였다.
+        .onChange(of: date) { _, _ in selection = nil; openGap = nil }
     }
 
     // MARK: 머리
@@ -205,11 +233,28 @@ struct DayScheduleView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { landing.clear() }
                 }
                 .onAppear { _ = landing.update(segs.map(\.id)) }
+                // **연달아 채우기.** 하나 넣으면 빈 시간이 둘로 갈라지고 이름이 바뀐다.
+                // 붙들어 둔 시각(→ reopenGapAt)을 품은 새 빈 시간을 찾아 판을 도로 연다.
+                // 방금 닫힌 팝오버와 한 판에 겹치면 둘 다 안 뜨므로 한 박자 뒤에 연다.
+                .onChange(of: segs.map(\.id)) { _, _ in
+                    guard let at = reopenGapAt else { return }
+                    reopenGapAt = nil
+                    guard let next = conns.first(where: {
+                        at >= $0.startHour - 1e-6 && at < $0.endHour - 1e-6 && $0.hours >= 0.25
+                    }) else { return }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { openGap = next.id }
+                }
 
                 if isToday { nowLine }
+
+                selectionLayer(trackWidth: trackWidth,
+                               trackHeight: CGFloat(window.span) * Self.hourHeight)
             }
+            .coordinateSpace(.named(Self.trackSpace))
         }
         .frame(height: CGFloat(window.span) * Self.hourHeight + Self.minRowHeight / 2)
+        // 잡아 둔 시간은 Esc 로 놓는다.
+        .onExitCommand { if selection != nil { selection = nil; moveOrigin = nil } }
         .contentShape(Rectangle())
         // 할 일 카드를 하루 위에 바로 떨어뜨린다 — 떨어뜨린 높이가 곧 시작 시각이다.
         // 끄는 동안 손이 어디에 있는지 알아야 그 빈 시간을 밝힐 수 있어서, 위치를 계속 알려 주는
@@ -256,6 +301,40 @@ struct DayScheduleView: View {
             if hours < 2 { return .gap }          // 2시간 미만 — 선 + 옅은 글씨
             return .open                          // 2시간 이상 — 점선 + 또렷한 글씨: 쓸 수 있는 큰 자리
         }
+    }
+
+    /// **빈 시간을 훑어 그리는 중의 범위.**
+    ///
+    /// 붙잡은 곳(`anchor`)에서 지금 손이 있는 곳(`current`)까지 — 위로 올려 그어도 되게
+    /// 두 시각을 그때그때 앞뒤로 세운다. 15분 격자에 붙이는 것은 손을 움직이는 쪽에서 한다.
+    struct GapScrub {
+        let gapId: String
+        let anchor: Double
+        var current: Double
+
+        var start: Double { min(anchor, current) }
+        var end: Double { max(anchor, current) }
+        var hours: Double { end - start }
+        /// 한 칸(15분)도 안 그었으면 그린 것으로 치지 않는다 — 그건 누른 것이다.
+        var isDrawn: Bool { hours >= 0.25 - 1e-6 }
+    }
+
+    /// **훑어 잡아 둔 시간.**
+    ///
+    /// 손을 떼는 즉시 편집창을 열어 버리면 그은 범위를 다시 볼 수가 없다. 그래서 그은 자리가
+    /// 그대로 남고, 위·아래 끝을 끌어 시각을 다듬고, 가운데를 끌어 통째로 옮긴 다음
+    /// 그때 무엇을 넣을지 고른다 — 캘린더에서 빈 칸을 훑어 일정을 잡는 것과 같은 결이다.
+    struct GapSelection {
+        let gapId: String
+        /// 이 빈자리의 경계. 잡은 시간은 여기서 못 벗어난다 — 앞뒤 일정 위로 넘치지 않는다.
+        let low: Double
+        let high: Double
+        var start: Double
+        var end: Double
+
+        var hours: Double { max(0, end - start) }
+        /// 가장 짧은 한 칸. 양끝이 이보다 가까워지지 않는다.
+        static let minHours = 0.25
     }
 
     /// 등뼈 위에 서는 일정 사이의 빈자리를 찾는다.
@@ -461,6 +540,30 @@ struct DayScheduleView: View {
                     .transition(.opacity)
             }
 
+            // 훑어 그은 만큼이 밝아진다 — 몇 시부터 몇 시까지를 손이 그리는 동안 읽는다.
+            if let sc = scrub, sc.gapId == c.id, sc.isDrawn {
+                let top = y(sc.start)
+                RoundedRectangle.soft(Corner.card)
+                    .fill(Color.accentColor.opacity(0.16))
+                    .overlay(RoundedRectangle.soft(Corner.card)
+                        .strokeBorder(Color.accentColor.opacity(0.55), lineWidth: 1.5))
+                    .frame(width: trackWidth, height: max(8, y(sc.end) - top))
+                    .offset(x: Self.gutter - 4, y: top)
+
+                Text("\(formatHour(sc.start)) – \(formatHour(sc.end)) · \(formatDuration(sc.hours))")
+                    .font(.system(size: 10.5, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .fixedSize()
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 2)
+                    .background(Color.accentColor.opacity(0.14), in: Capsule())
+                    .offset(x: Self.gutter + Self.pillWidth + 10,
+                            y: top + max(0, y(sc.end) - top) / 2 - 9)
+                    .contentTransition(.numericText())
+            }
+
             Group {
                 if c.size == .open && !glowing {
                     // 큰 빈자리는 점선 — 꽉 찬 선보다 '비어 있음'이 먼저 읽힌다.
@@ -498,32 +601,223 @@ struct DayScheduleView: View {
         .allowsHitTesting(false)
 
         // 누르는 자리 — 빈 시간 전체. 선 아래 깔려 알약보다 뒤에 있다.
-        if canPlan, c.hours >= 0.25, height >= 16, !isPast {
+        //
+        // 여기서 할 수 있는 일은 둘이다.
+        //  - **누르면** 채우기 판이 열린다 (→ GapFillPopover).
+        //  - **위아래로 훑으면** 그은 만큼이 밝아지고, 손을 떼면 그 시각·그 길이로 새 블록을 세운다.
+        //    다섯 시간 빈자리에서 "두 시간만 떼어 쓰겠다"를 말하는 가장 짧은 길이다.
+        //
+        // ⚠️ **이미 흘러간 빈 시간도 막지 않는다.** 한때 `!isPast`로 걸어 두었는데,
+        //    정작 할 일 카드를 끌어다 놓는 길(→ DayDropDelegate)은 지난 시각을 받고 있었다.
+        //    같은 자리가 끌면 되고 누르면 안 되는 셈이었다. 무엇보다 지난 시간에 적는 일이
+        //    실제로 있다 — 오전에 한 것을 점심에 적어 두고 그날의 계획에서 체크한다.
+        //    지나간 자리는 흐리게 그려서 '계획'이 아니라는 것만 눈으로 말한다.
+        if canPlan, c.hours >= 0.25, height >= 16 {
             Color.clear
                 .frame(width: trackWidth, height: height)
                 .contentShape(Rectangle())
                 .offset(x: Self.gutter, y: c.top)
                 .onHover { hoverGap = $0 ? c.id : (hoverGap == c.id ? nil : hoverGap) }
                 .pointingCursor()
-                .onTapGesture { openGap = c.id }
+                .onTapGesture {
+                    // 잡아 둔 시간이 있으면 먼저 놓는다 — 빈 자리를 누르는 건 '그만두기'다.
+                    if selection != nil { selection = nil; moveOrigin = nil; return }
+                    gapSearch = ""
+                    openGap = c.id
+                }
+                .gesture(
+                    DragGesture(minimumDistance: 4, coordinateSpace: .named(Self.trackSpace))
+                        .onChanged { v in
+                            let at = gapHour(v.location.y, in: c)
+                            if scrub?.gapId == c.id {
+                                if scrub?.current != at { Haptic.tick() }
+                                scrub?.current = at
+                            } else {
+                                openGap = nil
+                                selection = nil
+                                scrub = GapScrub(gapId: c.id,
+                                                 anchor: gapHour(v.startLocation.y, in: c),
+                                                 current: at)
+                            }
+                        }
+                        .onEnded { _ in
+                            guard let s = scrub, s.gapId == c.id else { return }
+                            scrub = nil
+                            // 한 칸도 못 그었으면 훑은 게 아니라 누른 것이다 — 판을 연다.
+                            guard s.isDrawn else { gapSearch = ""; openGap = c.id; return }
+                            Haptic.snap()
+                            // 편집창을 바로 열지 않는다. 그은 자리를 남겨 두고 양끝을 다듬게 한다.
+                            gapSearch = ""
+                            moveOrigin = nil
+                            selection = GapSelection(gapId: c.id,
+                                                     low: gapLow(c), high: gapHigh(c),
+                                                     start: s.start, end: s.end)
+                        }
+                )
                 .popover(isPresented: Binding(get: { openGap == c.id },
-                                              set: { if !$0 { openGap = nil } }),
+                                              set: { if !$0 { openGap = nil; reopenGapAt = nil } }),
                          arrowEdge: .trailing) {
                     GapFillPopover(startHour: max(c.startHour, window.start), hours: c.hours,
-                                   candidates: candidates) { token, hour in
+                                   candidates: candidates, search: $gapSearch,
+                                   nowHour: now) { token, hour, length in
+                        // 판은 닫지 않는다. 알약이 하나 서면 빈 시간이 갈라지므로, 그 **뒤쪽**을
+                        // 품은 새 빈 시간에서 판을 도로 연다 (→ reopenGapAt).
                         openGap = nil
-                        onDropBacklog(token, hour)
+                        reopenGapAt = hour + (length ?? duration(of: token) ?? 0) + 1e-3
+                        onFillGap(token, hour, length)
                     } onAddBlock: { hour, hours in
                         openGap = nil
+                        reopenGapAt = nil
                         onAddBlock(hour, hours)
                     }
                 }
         }
     }
 
+    // MARK: 잡아 둔 시간
+
+    private enum SelectionEdge { case top, bottom }
+
+    /// 잡아 둔 시간 — 몸통, 양끝 손잡이, 그리고 무엇을 넣을지 고르는 판.
+    @ViewBuilder
+    private func selectionLayer(trackWidth: CGFloat, trackHeight: CGFloat) -> some View {
+        if let sel = selection {
+            let top = y(sel.start)
+            let height = max(16, y(sel.end) - top)
+
+            // 몸통 — 끌면 통째로 옮긴다.
+            RoundedRectangle.soft(Corner.card)
+                .fill(Color.accentColor.opacity(0.18))
+                .overlay(RoundedRectangle.soft(Corner.card)
+                    .strokeBorder(Color.accentColor.opacity(0.7), lineWidth: 1.5))
+                .frame(width: trackWidth, height: height)
+                .offset(x: Self.gutter - 4, y: top)
+                .hoverCursor(.openHand)
+                .gesture(moveGesture(sel))
+                .zIndex(18)
+
+            Text("\(formatHour(sel.start)) – \(formatHour(sel.end)) · \(formatDuration(sel.hours))")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.accentColor)
+                .monospacedDigit()
+                .lineLimit(1)
+                .fixedSize()
+                .contentTransition(.numericText())
+                .offset(x: Self.gutter + 6, y: top + max(0, height / 2 - 8))
+                .allowsHitTesting(false)
+                .zIndex(19)
+
+            selectionHandle(sel, edge: .top, trackWidth: trackWidth, atY: top, span: height)
+            selectionHandle(sel, edge: .bottom, trackWidth: trackWidth, atY: top + height, span: height)
+
+            selectionPanel(top: top, trackHeight: trackHeight, trackWidth: trackWidth, sel: sel)
+        }
+    }
+
+    /// 위·아래 끝의 손잡이. 잡는 자리는 보이는 것보다 넉넉하게 둔다 —
+    /// 5pt 막대를 정확히 짚게 하면 늘리려다 몸통을 끌어 옮기게 된다.
+    private func selectionHandle(_ sel: GapSelection, edge: SelectionEdge,
+                                 trackWidth: CGFloat, atY: CGFloat, span: CGFloat) -> some View {
+        // 15분짜리를 잡으면 칸이 12pt다. 손잡이 두 개가 넉넉하게 겹쳐 아래쪽 하나만 잡히던 것을,
+        // 잡는 자리를 칸 절반으로 줄여 위·아래를 갈라 준다.
+        let grab: CGFloat = min(11, max(4, span / 2))
+        return Capsule()
+            .fill(Color.accentColor)
+            .frame(width: 42, height: 5)
+            .shadow(color: .black.opacity(0.18), radius: 2, y: 1)
+            .frame(width: trackWidth, height: grab * 2)
+            .contentShape(Rectangle())
+            .offset(x: Self.gutter - 4, y: atY - grab)
+            .hoverCursor(.resizeUpDown)
+            .gesture(edgeGesture(sel, edge: edge))
+            .zIndex(19)
+    }
+
+    /// 무엇을 넣을지 고르는 판. **팝오버가 아니라 시간표 위에 얹은 카드다** —
+    /// 팝오버였다면 손잡이를 짚는 첫 클릭이 판을 닫는 데 쓰여 양끝을 못 끈다.
+    private func selectionPanel(top: CGFloat, trackHeight: CGFloat,
+                                trackWidth: CGFloat, sel: GapSelection) -> some View {
+        // 알약 오른쪽에 세우되, 오른쪽 판을 덮을 만큼 넘치면 왼쪽으로 당긴다.
+        let width: CGFloat = 300
+        let x = min(Self.gutter + Self.pillWidth + 14, max(0, trackWidth + Self.gutter - width))
+        return GapFillPopover(
+            startHour: sel.start, hours: sel.hours,
+            candidates: candidates, search: $gapSearch,
+            adjustable: false,
+            onPick: { token, hour, length in
+                selection = nil
+                onFillGap(token, hour, length)
+            },
+            onAddBlock: { hour, hours in
+                selection = nil
+                onDrawBlock(hour, hours)
+            },
+            onCancel: { selection = nil })
+        .background(.regularMaterial, in: .soft(Corner.panel))
+        .overlay(RoundedRectangle.soft(Corner.panel)
+            .strokeBorder(Color.primary.opacity(0.1), lineWidth: 1))
+        .shadow(color: .black.opacity(0.22), radius: 14, y: 6)
+        // 판이 하루 밖으로 흘러내리지 않게 위아래로 가둔다.
+        .offset(x: x, y: min(max(0, top - 8), max(0, trackHeight - 340)))
+        .zIndex(30)
+    }
+
+    /// 한쪽 끝을 끈다. 반대쪽 끝은 그 자리에 있고, 둘은 15분보다 가까워지지 않는다.
+    private func edgeGesture(_ sel: GapSelection, edge: SelectionEdge) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .named(Self.trackSpace))
+            .onChanged { v in
+                guard var s = selection, s.gapId == sel.gapId else { return }
+                let at = min(max(trackHour(v.location.y), s.low), s.high)
+                switch edge {
+                case .top:    s.start = min(at, s.end - GapSelection.minHours)
+                case .bottom: s.end = max(at, s.start + GapSelection.minHours)
+                }
+                guard s.start != selection?.start || s.end != selection?.end else { return }
+                Haptic.tick()
+                selection = s
+            }
+            .onEnded { _ in Haptic.snap() }
+    }
+
+    /// 몸통을 끌어 통째로 옮긴다. 길이는 그대로, 빈자리 밖으로는 안 나간다.
+    private func moveGesture(_ sel: GapSelection) -> some Gesture {
+        DragGesture(minimumDistance: 2, coordinateSpace: .named(Self.trackSpace))
+            .onChanged { v in
+                guard var s = selection, s.gapId == sel.gapId else { return }
+                let origin = moveOrigin ?? s.start
+                if moveOrigin == nil { moveOrigin = s.start }
+                let delta = (Double(v.translation.height / Self.hourHeight) * 4).rounded() / 4
+                let span = s.hours
+                let start = min(max(origin + delta, s.low), max(s.low, s.high - span))
+                guard start != s.start else { return }
+                Haptic.tick()
+                s.start = start
+                s.end = start + span
+                selection = s
+            }
+            .onEnded { _ in moveOrigin = nil; Haptic.snap() }
+    }
+
+    /// 빈자리의 앞머리·끝 (15분 격자). 잡은 시간은 이 사이를 못 벗어난다.
+    private func gapLow(_ c: Connector) -> Double { (max(c.startHour, window.start) * 4).rounded(.up) / 4 }
+    private func gapHigh(_ c: Connector) -> Double { (min(c.endHour, window.end) * 4).rounded(.down) / 4 }
+
+    /// 하루 시간표의 자 위 높이 → 시각. 15분 격자에 붙이고, 그 빈 시간 밖으로는 못 나간다.
+    private func gapHour(_ y: CGFloat, in c: Connector) -> Double {
+        let low = gapLow(c), high = gapHigh(c)
+        return min(max(trackHour(y), low), max(low, high))
+    }
+
+    /// 하루 시간표의 자 위 높이 → 15분 격자에 붙인 시각.
+    private func trackHour(_ y: CGFloat) -> Double {
+        let raw = window.start + Double(y / Self.hourHeight)
+        return (raw * 4).rounded() / 4
+    }
+
     @ViewBuilder
     private func gapLabel(_ c: Connector, height: CGFloat, aimed: Bool, hovered: Bool, isPast: Bool) -> some View {
-        let showsLabel = aimed || (c.size != .sliver && height >= 30) || (hovered && height >= 20)
+        let scrubbing = scrub?.gapId == c.id && scrub?.isDrawn == true
+        let showsLabel = !scrubbing && (aimed || (c.size != .sliver && height >= 30) || (hovered && height >= 20))
         if showsLabel {
             let text: String = {
                 if aimed, let dropY {
@@ -540,7 +834,9 @@ struct DayScheduleView: View {
                 .padding(.horizontal, aimed || hovered ? 7 : 0)
                 .padding(.vertical, aimed || hovered ? 2 : 0)
                 .background(Color.accentColor.opacity(aimed || hovered ? 0.12 : 0), in: Capsule())
-                .opacity(isPast && !aimed ? 0.45 : 1)
+                // 지나간 자리는 흐리다. 다만 손이 그 위에 올라와 있으면 또렷하게 —
+                // 채울 수 있는 자리라고 말해 놓고 글씨가 흐리면 누를 수 있는 줄 모른다.
+                .opacity(isPast && !aimed && !hovered ? 0.45 : 1)
                 .offset(x: Self.gutter + Self.pillWidth + 10,
                         y: aimed ? max(c.top, min(c.bottom - 18, (dropY ?? 0) - 9)) : c.top + height / 2 - 8)
                 .contentTransition(.numericText())
@@ -979,85 +1275,345 @@ struct GapCandidate: Identifiable {
     var id: String { token }
 }
 
-/// **빈 시간을 누르면 뜨는 작은 창.** 그 길이에 들어가는 할 일을 긴 것부터 — 빈자리를 가장
-/// 알차게 채우는 것이 위에 온다. 맞는 게 없으면 새 블록을 그 시각에 바로 세운다.
+/// **빈 시간을 누르면 뜨는 채우기 판.**
+///
+/// 예전에는 "그 길이에 들어가는 할 일 여섯 개" 목록뿐이었다. 고르면 무조건 빈자리 맨 앞에
+/// 꽂히고 판이 닫혔다. 다섯 시간을 세 가지로 채우려면 열고 닫기를 세 번 했고, "세 시부터",
+/// "오늘은 한 시간만"을 말할 자리가 아예 없었다. 그래서 판이 세 가지를 더 맡는다.
+///
+/// - **시작 시각**: 빈자리 안에서 15분씩 앞뒤로. 남은 시간이 그때그때 다시 세어진다.
+/// - **길이**: 할 일 제 길이를 그대로 쓰거나, 30분·1시간·…·남은 전부 중에서 고른다.
+/// - **찾기**: 목록을 여섯 개로 자르지 않는다. 말로 좁힌다.
+///
+/// 고르고 나면 판은 **넣은 것 바로 뒤의 빈 시간에서 다시 열린다**
+/// (→ DayScheduleView.reopenGapAt). 남은 시간이 줄어드는 걸 보며 이어서 채운다.
 struct GapFillPopover: View {
     let startHour: Double
     let hours: Double
     let candidates: [GapCandidate]
-    let onPick: (String, Double) -> Void
+    /// 찾는 말. 판이 다시 열려도 남아 있어야 같은 말로 이어 고를 수 있다 — 바깥이 들고 있다.
+    @Binding var search: String
+    /// 지금 몇 시인가. 오늘이 아니면 nil — 이 빈자리 안에 들면 '지금' 단추가 선다.
+    var nowHour: Double? = nil
+    /// 시작·길이를 **이 판에서** 정할 수 있는가.
+    ///
+    /// 훑어 잡아 둔 시간에서 열린 판은 false다. 그 자리는 화면의 손잡이로 정하는데,
+    /// 판에도 같은 눈금을 두면 어느 쪽이 참인지 둘이 다툰다.
+    var adjustable: Bool = true
+    /// (드래그 토큰, 시작 시각, 정한 길이 — nil이면 할 일 제 길이)
+    let onPick: (String, Double, Double?) -> Void
     let onAddBlock: (Double, Double) -> Void
+    /// 잡아 둔 시간을 놓는다. 손잡이로 잡은 판에만 있다.
+    var onCancel: (() -> Void)? = nil
 
-    private var fitting: [GapCandidate] {
-        candidates
-            .filter { $0.hours <= hours + 1e-6 }
-            .sorted { $0.hours != $1.hours ? $0.hours > $1.hours : $0.title < $1.title }
-            .prefix(6)
-            .map { $0 }
+    /// 15분 격자에 맞춘 빈자리의 앞머리·끝.
+    private var gapStart: Double { (startHour * 4).rounded(.up) / 4 }
+    private var gapEnd: Double { startHour + hours }
+    /// 시작 시각을 여기보다 뒤로는 못 민다 — 15분은 남아야 무엇이든 들어간다.
+    private var lastStart: Double { max(gapStart, ((gapEnd - 0.25) * 4).rounded(.down) / 4) }
+
+    /// 사람이 민 시작 시각. nil이면 빈자리 앞머리 그대로다.
+    ///
+    /// `@State private var start = 0`으로 두고 `onAppear`에서 제자리를 찾게 했더니 판이 뜨는
+    /// 첫 그림에서 시각과 '남은 시간'이 한 번 튀었다. 기본값은 들고 있지 않고 그때그때 센다.
+    @State private var startOverride: Double?
+    /// 사람이 정한 길이. nil이면 "할 일 그대로".
+    @State private var length: Double?
+
+    private var start: Double { min(max(startOverride ?? gapStart, gapStart), lastStart) }
+
+    /// 15분 격자에 올린 '지금'. 이 빈자리 안에 들 때만 값이 있다.
+    ///
+    /// 앞머리와 같은 칸이면 내놓지 않는다 — 이미 거기 서 있는데 단추를 두면 눌러도 아무 일이 없다.
+    private var snappedNow: Double? {
+        guard let n = nowHour else { return nil }
+        let at = (n * 4).rounded(.up) / 4
+        guard at > gapStart + 1e-6, at <= lastStart + 1e-6 else { return nil }
+        return at
     }
 
-    /// 15분 격자에 맞춘 시작 시각.
-    private var snappedStart: Double { (startHour * 4).rounded(.up) / 4 }
+    /// 고른 시작 시각부터 빈자리 끝까지 — 여기 들어가는 만큼만 넣을 수 있다.
+    private var available: Double { max(0, (gapEnd - start) * 4).rounded(.down) / 4 }
+
+    /// 길이 단추들. 빈자리에 들어가는 것만 세우고, 마지막은 늘 '남은 전부'.
+    private var lengthChoices: [Double] {
+        var v = [0.5, 1, 1.5, 2, 3].filter { $0 <= available - 0.25 + 1e-6 }
+        if available >= 0.25 { v.append(available) }
+        return v
+    }
+
+    private var shown: [GapCandidate] {
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        return candidates
+            .filter { q.isEmpty || $0.title.lowercased().contains(q) }
+            // 들어가는 것이 먼저, 그 안에서는 빈자리를 알차게 메우는 긴 것부터.
+            .sorted {
+                let lhsFits = $0.hours <= available + 1e-6
+                let rhsFits = $1.hours <= available + 1e-6
+                if lhsFits != rhsFits { return lhsFits }
+                if $0.hours != $1.hours { return $0.hours > $1.hours }
+                return $0.title < $1.title
+            }
+    }
+
+    /// 실제로 넣을 길이. nil이면 할 일 제 길이를 그대로 쓴다.
+    ///
+    /// 길이를 안 정했어도 **통째로는 안 들어가는 할 일**은 남은 만큼만 떼어 넣는다 —
+    /// 다섯 시간짜리를 두 시간 빈자리에서 아예 못 고르게 두는 것보다, 두 시간을 떼는 게 낫다.
+    private func pickLength(_ item: GapCandidate) -> Double? {
+        // 훑어 잡은 시간은 **그 길이가 곧 뜻**이다 — 30분짜리를 두 시간 자리에 잡았으면
+        // 두 시간을 쓰겠다는 말이다. 할 일 제 길이로 되돌리지 않는다.
+        if !adjustable { return available }
+        if let length { return min(length, available) }
+        return item.hours > available + 1e-6 ? available : nil
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("빈 시간 \(formatDuration(hours))")
-                    .font(.headline)
-                Text("\(formatHour(snappedStart)) – \(formatHour(startHour + hours))")
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
+            heading
 
-            if fitting.isEmpty {
-                Text("이 시간에 들어가는 할 일이 없습니다.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("들어가는 할 일")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                VStack(spacing: 2) {
-                    ForEach(fitting) { item in
-                        Button {
-                            onPick(item.token, snappedStart)
-                        } label: {
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .strokeBorder(Color.accentColor.opacity(0.6), lineWidth: 1.5)
-                                    .frame(width: 14, height: 14)
-                                Text(item.title)
-                                    .font(.callout.weight(.medium))
-                                    .lineLimit(1)
-                                Spacer(minLength: 8)
-                                Text(formatDuration(item.hours))
-                                    .font(.caption)
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 6)
-                            .background(Color.primary.opacity(0.04), in: .soft(Corner.chip))
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.squish)
-                    }
-                }
+            if adjustable, available >= 0.25 {
+                startRow
+                lengthRow
             }
 
             Divider()
 
-            Button {
-                onAddBlock(snappedStart, hours)
-            } label: {
-                Label("이 시간에 새 블록…", systemImage: "plus.circle.fill")
-                    .font(.callout.weight(.medium))
+            // 몇 개 안 되면 찾을 것도 없다. 다만 찾던 말이 남아 있으면 칸도 남겨야 한다 —
+            // 하나씩 넣다 보면 후보가 줄어드는데, 그때 칸만 사라지면 목록이 말없이 걸러진 채 남는다.
+            if candidates.count > 6 || !search.isEmpty {
+                TextField("할 일 찾기", text: $search)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.callout)
             }
-            .buttonStyle(.borderless)
+
+            list
+
+            Divider()
+
+            HStack(spacing: 10) {
+                Button {
+                    onAddBlock(start, available)
+                } label: {
+                    Label("이 시간에 새 블록…", systemImage: "plus.circle.fill")
+                        .font(.callout.weight(.medium))
+                }
+                .buttonStyle(.borderless)
+                .disabled(available < 0.25)
+
+                if let onCancel {
+                    Spacer(minLength: 4)
+                    Button("취소", action: onCancel)
+                        .buttonStyle(.borderless)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
         .padding(14)
-        .frame(width: 280)
+        .frame(width: 300)
+        // 판이 다른 빈 시간에서 다시 열렸다 — 앞서 민 시각과 정한 길이는 그 빈자리의 것이었다.
+        .onChange(of: startHour) { _, _ in startOverride = nil; length = nil }
+    }
+
+    // MARK: 머리
+
+    private var heading: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            // 빈자리를 누른 판과 훑어 잡은 판은 말이 다르다. 앞엣것은 '비어 있는 만큼'이고
+            // 뒤엣것은 '내가 떼어 낸 만큼'이라, 같은 이름으로 부르면 어느 쪽인지 흐려진다.
+            Text(adjustable
+                 ? String(localized: "빈 시간 \(formatDuration(hours))")
+                 : String(localized: "잡은 시간 \(formatDuration(hours))"))
+                .font(.headline)
+                .contentTransition(.numericText())
+            Text("\(formatHour(gapStart)) – \(formatHour(gapEnd))")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .contentTransition(.numericText())
+            if !adjustable {
+                Text("양끝을 끌어 시각을 맞춥니다")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+    }
+
+    /// 시작 시각 — 15분씩 앞뒤로. 오른쪽에 그 시각부터 남는 시간을 같이 적는다.
+    private var startRow: some View {
+        HStack(spacing: 6) {
+            Text("시작")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 26, alignment: .leading)
+
+            stepButton("chevron.left", enabled: start > gapStart + 1e-6) {
+                let at = max(gapStart, ((start - 0.25) * 4).rounded() / 4)
+                startOverride = at
+                clampLength(after: at)
+            }
+            Text(formatHour(start))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .contentTransition(.numericText())
+                .frame(minWidth: 52)
+            stepButton("chevron.right", enabled: start < lastStart - 1e-6) {
+                let at = min(lastStart, ((start + 0.25) * 4).rounded() / 4)
+                startOverride = at
+                clampLength(after: at)
+            }
+
+            if let n = snappedNow {
+                Button {
+                    Haptic.tick()
+                    startOverride = n
+                    clampLength(after: n)
+                } label: {
+                    Text("지금")
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(Color.accentColor.opacity(0.12), in: Capsule())
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.squish)
+                .disabled(abs(start - n) < 1e-6)
+                .opacity(abs(start - n) < 1e-6 ? 0.4 : 1)
+            }
+
+            Spacer(minLength: 4)
+
+            Text("남은 \(formatDuration(available))")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .contentTransition(.numericText())
+        }
+        .animation(Motion.number, value: start)
+    }
+
+    /// 길이 — '할 일 그대로'가 기본이고, 필요할 때만 사람이 정한다.
+    private var lengthRow: some View {
+        HStack(spacing: 6) {
+            Text("길이")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 26, alignment: .leading)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 5) {
+                    lengthChip(nil, label: String(localized: "할 일 그대로"))
+                    ForEach(lengthChoices, id: \.self) { v in
+                        lengthChip(v, label: v == available && v > 0.5
+                                   ? String(localized: "남은 전부")
+                                   : formatDuration(v))
+                    }
+                }
+                .padding(.vertical, 1)
+            }
+        }
+    }
+
+    private func lengthChip(_ value: Double?, label: String) -> some View {
+        let on = length == value
+        return Button {
+            Haptic.tick()
+            withAnimation(Motion.squish) { length = value }
+        } label: {
+            Text(label)
+                .font(.caption.weight(on ? .semibold : .regular))
+                .foregroundStyle(on ? Color.white : Color.primary)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(on ? Color.accentColor : Color.primary.opacity(0.06), in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.squish)
+    }
+
+    private func stepButton(_ icon: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button {
+            Haptic.tick()
+            action()
+        } label: {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 20, height: 20)
+                .background(Color.primary.opacity(0.06), in: Circle())
+                .contentShape(Circle())
+        }
+        .buttonStyle(.squish)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.35)
+    }
+
+    // MARK: 목록
+
+    @ViewBuilder
+    private var list: some View {
+        if shown.isEmpty {
+            Text(search.isEmpty
+                 ? String(localized: "아직 요일을 안 정한 할 일이 없습니다.")
+                 : String(localized: "찾는 할 일이 없습니다."))
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 4)
+        } else {
+            ScrollView {
+                VStack(spacing: 2) {
+                    ForEach(shown) { item in
+                        row(item)
+                    }
+                }
+            }
+            // 여섯 줄쯤에서 자른다 — 판이 화면을 넘지 않으면서 훑기에는 넉넉하다.
+            .frame(maxHeight: 196)
+            .scrollBounceBehavior(.basedOnSize)
+        }
+    }
+
+    private func row(_ item: GapCandidate) -> some View {
+        let placed = pickLength(item) ?? item.hours
+        // 제 길이대로 다 못 들어간 것 — 몇 시간'만' 떼어 넣는다고 말해 준다.
+        let clipped = placed < item.hours - 1e-6
+
+        return Button {
+            onPick(item.token, start, pickLength(item))
+        } label: {
+            HStack(spacing: 8) {
+                Circle()
+                    .strokeBorder(Color.accentColor.opacity(0.6), lineWidth: 1.5)
+                    .frame(width: 14, height: 14)
+                Text(item.title)
+                    .font(.callout.weight(.medium))
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                Text(clipped
+                     ? String(localized: "\(formatDuration(placed))만")
+                     : formatDuration(placed))
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(clipped ? Color.accentColor : .secondary)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(Color.primary.opacity(0.04), in: .soft(Corner.chip))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.squish)
+        .disabled(available < 0.25)
+    }
+
+    /// 시작 시각을 뒤로 밀어 정해 둔 길이가 안 들어가게 되면, 남은 만큼으로 줄인다.
+    /// (`available`은 방금 적은 `startOverride`를 되읽으므로, 새 시각을 그대로 받아서 센다.)
+    private func clampLength(after newStart: Double) {
+        guard let l = length else { return }
+        let room = max(0, (gapEnd - newStart) * 4).rounded(.down) / 4
+        guard l > room + 1e-6 else { return }
+        length = room >= 0.25 ? room : nil
     }
 }
 
