@@ -86,7 +86,34 @@ enum Telemetry {
     @MainActor
     static func reportSnapshot() {
         guard isEnabled else { return }
-        reporter.reportInBackground(metrics: metrics())
+        var payload = metrics()
+        payload.merge(entitlementMetrics()) { _, new in new }
+        reporter.reportInBackground(metrics: payload)
+    }
+
+    /// 이 설치가 Pro 를 샀는가. **팔기 시작한 뒤에만** 나간다.
+    ///
+    /// 허브(FeedbackHubViewer)가 유료·무료 고객을 가르는 근거다. 규약 이름은
+    /// `flag.isPaid` 이고, 이 앱은 결제 말고 열리는 길이 없으므로 접근 권한도 같은
+    /// 값이다 — 그래서 한 비트만 보낸다. 체험·무상 제도가 없으니 `flag.isTrial`·
+    /// `flag.isComped` 는 안 보낸다. 없는 것을 0 으로 보내면 "체험자가 0명"이 되어
+    /// 제도가 없다는 사실과 구분되지 않는다.
+    ///
+    /// **두 경우에는 한 줄도 안 보낸다. 둘 다 0 과 다른 말이기 때문이다:**
+    ///
+    /// - 아직 안 팔 때(`sellsPro == false`). 0 을 보내면 허브는 "아무도 안 샀다"로
+    ///   읽는데 진실은 "살 수가 없다"다. 전환율이 0% 로 찍히고, 그 숫자를 보고
+    ///   가격이나 문구를 고치게 된다.
+    /// - 영수증을 아직 안 물어봤을 때(`cachedPurchase == nil`). 그건 0 이 아니라
+    ///   **모름**이다 — `MacEntitlement.cachedPurchase` 가 세 상태인 까닭이 그것이고,
+    ///   허브도 안 온 값을 0 이 아니라 모름으로 센다.
+    ///
+    /// ⚠️ 나가는 것은 0/1 한 비트뿐이다. 결제 수단·영수증·금액은 앱이 아예 모르고,
+    ///    `docs/privacy.html` 이 그렇게 적혀 있다. 더 보내게 되면 그 글도 같이 고친다.
+    private static func entitlementMetrics() -> [String: Double] {
+        guard MacEntitlement.sellsPro,
+              let purchased = MacEntitlement.cachedPurchase else { return [:] }
+        return ["flag.isPaid": purchased ? 1 : 0]
     }
 
     /// 스냅샷에 실을 앱 고유 숫자. **내용은 안 담고 개수만 담는다** —
