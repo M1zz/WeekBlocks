@@ -211,22 +211,58 @@ struct TodoTree {
         if value { Telemetry.record(.todoCompleted) }
     }
 
-    /// 조상들의 완료 상태를 자식 기준으로 다시 계산한다.
+    /// **이 항목과 조상들의** 완료 상태를 자식 기준으로 다시 계산한다.
     /// (자식이 전부 끝났으면 부모도 완료, 하나라도 남았으면 부모는 미완료)
+    ///
+    /// ⚠️ 시작점 **자신도 다시 센다 — 단, 자식이 있을 때만.** 잎은 사람이 직접 찍은 값이
+    ///    참이라, 자식 기준으로 덮으면 방금 찍은 체크가 도로 풀린다.
+    ///
+    /// ⚠️ 한때 조상만 세고 시작점은 건너뛰었다. `setCompleted` 에서 부를 때는 맞았지만
+    ///    (그 항목은 방금 직접 찍은 것이므로), **자식이 바뀐 자리**에서 부를 때 틀렸다:
+    ///    남은 단계를 지우면 `rollUp(from: parent)` 가 그 부모를 안 세서 자식이 전부
+    ///    끝났는데도 부모는 미완료로 남았다. 카드는 '모든 단계 완료'라고 말하는데 할 일
+    ///    목록에서는 안 내려가던 것이 그것이다. 반대로 끝낸 일에 단계를 새로 붙이면
+    ///    (`applyTemplate`) 부모가 완료인 채로 남아 **할 일이 목록에서 사라진 채 미완의
+    ///    단계를 품고 있었다.**
     ///
     /// 시간은 건드리지 않는다 — 부모의 시간은 저장된 값이 아니라 자식들의 합으로
     /// 그때그때 계산되기 때문이다 (→ totalHours).
     func rollUp(from item: BacklogItem, now: Date = Date()) {
-        var current = item
+        var current: BacklogItem? = item
         var depth = 0
-        while let parent = parentByToken[current.dragToken], depth < Self.maxDepth {
-            let kids = children(of: parent)
-            let allDone = !kids.isEmpty && kids.allSatisfy(\.isCompleted)
-            parent.isCompleted = allDone
-            parent.completedAt = allDone ? (parent.completedAt ?? now) : nil
-            current = parent
+        while let node = current, depth < Self.maxDepth {
+            let kids = children(of: node)
+            if !kids.isEmpty {
+                let allDone = kids.allSatisfy(\.isCompleted)
+                node.isCompleted = allDone
+                node.completedAt = allDone ? (node.completedAt ?? now) : nil
+            }
+            current = parentByToken[node.dragToken]
             depth += 1
         }
+    }
+
+    /// **어긋난 완료 상태를 한 번에 맞춘다.** 고친 것이 있으면 true.
+    ///
+    /// 위의 경계가 어긋나 있던 동안 만들어진 항목들이 이미 그릇에 남아 있다.
+    /// 고친 규칙은 그 항목을 다시 건드릴 때에야 도는데, '모든 단계 완료'로 보이는 할 일은
+    /// 손댈 일이 없으니 영영 목록에 남는다. 그래서 목록이 설 때 한 번 훑어 맞춘다.
+    @discardableResult
+    func reconcile(now: Date = Date()) -> Bool {
+        var changed = false
+        func walk(_ node: BacklogItem, depth: Int) {
+            guard depth < Self.maxDepth else { return }
+            let kids = children(of: node)
+            guard !kids.isEmpty else { return }
+            for kid in kids { walk(kid, depth: depth + 1) }
+            let allDone = kids.allSatisfy(\.isCompleted)
+            guard node.isCompleted != allDone else { return }
+            node.isCompleted = allDone
+            node.completedAt = allDone ? (node.completedAt ?? now) : nil
+            changed = true
+        }
+        for root in roots { walk(root, depth: 0) }
+        return changed
     }
 
     // MARK: - 속성 정하기

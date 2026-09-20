@@ -341,6 +341,7 @@ struct BacklogSection: View {
         .animation(Motion.target, value: isReturnTargeted)
         .animation(Motion.squish, value: externallyTargeted)
         .task { await reconcileCategories() }
+        .task { await reconcileStepStates() }
         .sheet(isPresented: $showingComposer) {
             BacklogComposerView(weekStart: weekStart)
                 .frame(minWidth: 540, minHeight: 560)
@@ -692,6 +693,21 @@ struct BacklogSection: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
         .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.card))
+    }
+
+    /// **'모든 단계 완료'인데 목록에 남아 있는 할 일을 맞춘다.**
+    ///
+    /// `TodoTree.rollUp` 이 시작점 자신을 안 세던 동안, 남은 단계를 지운 할 일은 자식이 전부
+    /// 끝났는데도 부모가 미완료로 남았다. 규칙은 고쳤지만 이미 어긋난 것은 다시 손대기 전에는
+    /// 안 돌아온다 — 정작 그런 할 일은 더 손댈 것이 없어서 손이 안 간다. 그래서 목록이 설 때
+    /// 한 번 훑는다. 고칠 게 없으면 아무것도 쓰지 않는다.
+    private func reconcileStepStates() async {
+        // 옆의 카테고리 맞추기와 같은 이유로 기다린다 — CloudKit 이 단계를 다 내려받기 전에
+        // 세면 **아직 안 온 단계**가 없는 것으로 보여, 끝난 단계만 있는 할 일을 완료로
+        // 찍어 버린다. (뒤늦게 와도 다음 rollUp 에서 도로 풀리지만, 그 사이 목록에서 사라진다.)
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        guard tree.reconcile() else { return }
+        try? context.save()
     }
 
     private func reconcileCategories() async {
