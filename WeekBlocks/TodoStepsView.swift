@@ -8,13 +8,14 @@
 //  기본은 N분의 1이고, 한 단계를 직접 조정하면 나머지가 남은 몫을 다시 나눠
 //  합계는 언제나 100%가 된다. 계산은 TodoTree.swift(iOS와 공유하는 순수 로직)에 있다.
 //
-//  화면은 '라벨 먼저'다 — 적을 때 고른 라벨을 크게 보여준다. 조언은 화면에 깔지 않고
-//  전부 TipKit으로 낸다 (→ TodoTips.swift). 필요한 때 한 번 뜨고, 닫으면 다시 안 뜬다.
+//  **조언을 띄우지 않는다.** 한때 "쪼개기 전에 한 가지"·구성 조언·지금 단계 경고를 TipKit으로
+//  냈는데, 단계를 적으러 온 창에 읽을 글이 먼저 서서 창이 복잡해 보였다. 판단 자체는
+//  TodoSplitAdvisor 에 그대로 있고(아이폰과 같이 쓰는 파일이라 지우지 않는다), 이 창에서만 안 그린다.
+//  쪼개기 도우미도 **사람이 부를 때만** 펼친다.
 //
 
 import SwiftUI
 import SwiftData
-import TipKit
 
 struct TodoStepsView: View {
     /// 100%에 해당하는 최상위 할 일.
@@ -32,19 +33,13 @@ struct TodoStepsView: View {
     /// 새 단계의 라벨. nil이면 '자동' — 형제들과 N분의 1로 나눠 갖는다.
     /// 새 단계의 속성. 백로그의 빈 줄과 같은 키를 써서, 어디서 적든 지난번 값이 따라온다.
     @FocusState private var focused: Bool
+    /// 쪼개기 도우미(기본 뼈대)를 펼쳤는가. 기본은 접힘 — 부를 때만 선다.
+    @State private var showsHelper = false
 
     private var tree: TodoTree { TodoTree(allItems) }
 
     private var rows: [(item: BacklogItem, depth: Int)] {
         Array(tree.flattened(from: root).dropFirst())
-    }
-
-    /// 구성 전체에 대한 조언 (조각 시간 연구 기반).
-    private var hints: [SplitHint] {
-        let tree = self.tree
-        let leaves = tree.hasChildren(root) ? tree.leaves(of: root) : []
-        return TodoSplitAdvisor.hints(rootTitle: root.title,
-                                      steps: leaves.map { ($0.title, $0.durationHours, $0.fragmentPick) })
     }
 
     var body: some View {
@@ -56,41 +51,41 @@ struct TodoStepsView: View {
             if rows.isEmpty {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("아직 단계가 없습니다.")
-                                .font(.callout.weight(.medium))
-                            Text("이 할 일을 이루는 단계를 '되어야 하는 순서대로' 적어보세요.\n단계들은 전체 \(formatDuration(tree.totalHours(of: root)))를 N분의 1로 나눠 갖습니다.")
-                                .font(.caption)
+                        HStack(spacing: 10) {
+                            Text("아직 단계가 없습니다. 아래에 적어 보세요.")
+                                .font(.body)
                                 .foregroundStyle(.secondary)
-                        }
-
-                        Divider()
-
-                        HStack {
-                            Label("쪼개기 도우미", systemImage: "wand.and.stars")
-                                .font(.callout.weight(.semibold))
                             Spacer()
-                            Button("이 뼈대로 4단계 만들기", action: applyTemplate)
-                                .buttonStyle(.borderedProminent)
-                        }
-
-                        ForEach(Array(TodoSplitAdvisor.template(for: root.title).enumerated()), id: \.offset) { _, step in
-                            VStack(alignment: .leading, spacing: 5) {
-                                HStack(spacing: 10) {
-                                    Text(step.title)
-                                        .font(.system(size: 14))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                                Text(step.note)
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(.secondary)
+                            // 부를 때만 펼친다. 처음부터 뼈대 네 줄과 설명이 깔려 있으면
+                            // 한 줄 적으러 온 창이 설문지처럼 보인다.
+                            Button {
+                                withAnimation(Motion.disclose) { showsHelper.toggle() }
+                            } label: {
+                                Label(showsHelper ? "도우미 접기" : "쪼개기 도우미…",
+                                      systemImage: "wand.and.stars")
+                                    .font(.body)
                             }
-                            .padding(.vertical, 3)
+                            .buttonStyle(.borderless)
                         }
 
-                        if let hint = topHint, SplitHintTip(hint: hint).shouldDisplay {
-                            Divider()
-                            TipView(SplitHintTip(hint: hint))
+                        if showsHelper {
+                            VStack(alignment: .leading, spacing: 10) {
+                                ForEach(Array(TodoSplitAdvisor.template(for: root.title).enumerated()), id: \.offset) { _, step in
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(step.title)
+                                            .font(.body)
+                                        Text(step.note)
+                                            .font(.body)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Button("이 뼈대로 4단계 만들기", action: applyTemplate)
+                                    .buttonStyle(.borderedProminent)
+                                    .padding(.top, 4)
+                            }
+                            .padding(14)
+                            .background(Color.primary.opacity(0.04), in: .soft(Corner.chip))
+                            .transition(.disclose)
                         }
                     }
                     .padding(20)
@@ -98,25 +93,19 @@ struct TodoStepsView: View {
                 .transition(.opacity)
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            Text("단계")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.bottom, 4)
+                    // **쪼갠다는 것이 모양으로 보이게.** 맨 위에 할 일(줄기)이 서고, 단계들이
+                    // 그 아래로 가지를 친다(├ └). 들여쓰기만 있을 때는 단계가 할 일과 나란한
+                    // 다른 줄들로 읽혀서 '하나를 나눈 것'이라는 느낌이 안 났다.
+                    // 줄 사이 간격은 0 — 가지 선이 줄과 줄 사이에서 끊기지 않게.
+                    let branches = Self.branches(for: rows.map(\.depth))
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        trunkRow
 
-                        // 단계에 무엇을 정해 주면 되는지 여기서 한 번만 설명한다.
-                        if ShareSplitTip().shouldDisplay {
-                            TipView(ShareSplitTip()).padding(.bottom, 6)
-                        }
-
-                        ForEach(rows, id: \.item.id) { row in
+                        ForEach(Array(rows.enumerated()), id: \.element.item.id) { index, row in
                             StepRow(
                                 item: row.item,
                                 depth: row.depth,
+                                branch: branches[index],
                                 isCurrent: row.item.dragToken == tree.currentStep(of: root)?.dragToken,
                                 hasChildren: tree.hasChildren(row.item),
                                 progress: tree.progress(of: row.item),
@@ -131,10 +120,6 @@ struct TodoStepsView: View {
                             .transition(.row)
                         }
 
-                        if let hint = topHint, SplitHintTip(hint: hint).shouldDisplay {
-                            Divider().padding(.vertical, 8)
-                            TipView(SplitHintTip(hint: hint))
-                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 12)
@@ -152,11 +137,52 @@ struct TodoStepsView: View {
         .animation(Motion.screen, value: rows.isEmpty)
     }
 
+    // MARK: - 줄기 (쪼개진 할 일 자신)
+
+    /// 목록 맨 위의 할 일 — 가지들이 여기서 뻗어 나간다.
+    private var trunkRow: some View {
+        let count = tree.leafCount(of: root)
+        return HStack(spacing: 10) {
+            Image(systemName: "square.stack.3d.up.fill")
+                .font(.body)
+                .foregroundStyle(Color.accentColor)
+                .frame(width: StepBranch.column)
+            Text(root.title)
+                .font(.body.weight(.semibold))
+                .lineLimit(2)
+            Spacer()
+            Text("하위 \(count)개 · \(formatDuration(tree.totalHours(of: root)))")
+                .font(.body)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(Color.accentColor.opacity(0.07), in: .soft(Corner.chip))
+    }
+
+    /// 줄마다 어떤 가지를 그릴지. 깊이 목록(1부터)만 보고 정한다.
+    /// - 제 가지: 형제가 아래에 더 있으면 ├, 마지막이면 └.
+    /// - 위 칸들: 그 깊이의 조상 아래에 형제가 더 남아 있으면 세로줄(│)을 이어 긋는다.
+    static func branches(for depths: [Int]) -> [StepBranch] {
+        func continues(at level: Int, after index: Int) -> Bool {
+            for j in (index + 1)..<depths.count {
+                if depths[j] < level { return false }
+                if depths[j] == level { return true }
+            }
+            return false
+        }
+        return depths.indices.map { i in
+            let d = depths[i]
+            let guides = (1..<max(1, d)).map { continues(at: $0, after: i) }
+            return StepBranch(guides: guides, isLast: !continues(at: d, after: i))
+        }
+    }
+
     // MARK: - 헤더
 
     private var header: some View {
         let progress = tree.progress(of: root)
-        let stepCount = tree.hasChildren(root) ? tree.leafCount(of: root) : 0
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
@@ -199,23 +225,10 @@ struct TodoStepsView: View {
                 .tint(progress >= 1 ? .green : .accentColor)
                 .animation(Motion.number, value: progress)
 
-            // 지금 할 단계에 경고가 있으면 그것만 팁으로. (다른 줄에는 안 깐다)
-            if let step = tree.currentStep(of: root),
-               !tree.hasChildren(step),
-               let warning = TodoSplitAdvisor.advice(title: step.title,
-                                                     durationHours: step.durationHours,
-                                                     pick: step.fragmentPick).warning {
-                TipView(StepWarningTip(warning: warning))
-            }
-
-            // 이 일 전체가 몇 시간인가 = 100%. 단계들은 이 시간을 나눠 갖는다.
+            // 이 일 전체가 몇 시간인가. 안 쪼갠 일은 여기서 고른다.
             HStack(spacing: 8) {
                 totalHoursMenu
-                Text(stepCount > 0 ? "= 100%, 단계 \(stepCount)개가 나눠 가짐" : "= 100%")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
                 Spacer()
-
             }
         }
         .padding(20)
@@ -223,28 +236,71 @@ struct TodoStepsView: View {
         .animation(Motion.row, value: progress)
     }
 
-    /// 이 일 전체에 걸리는 시간. 고르는 게 아니라 **단계들의 합**이다 —
-    /// 단계를 더하거나 속성을 바꾸면 여기 숫자가 따라 움직인다.
+    /// 이 일 전체에 걸리는 시간.
+    ///
+    /// - **안 쪼갠 일**: 이 시간이 곧 그 일의 시간이다 — 눌러서 고른다. 새 할 일은 30분으로
+    ///   태어나는데(`TodoTree.defaultStepHours`), 예전엔 여기 글자로만 서 있어서 바꿀 길이 없었다.
+    /// - **쪼갠 일**: 단계들의 합이다(→ TodoTree.totalHours). 여기서 바꾸면 무엇을 얼마나 줄일지
+    ///   모르므로, 글자로 두고 단계마다 고치라고 말한다.
+    @ViewBuilder
     private var totalHoursMenu: some View {
-        HStack(spacing: 5) {
-            Image(systemName: "sum").font(.system(size: 13))
-            Text("다 하면 \(formatDuration(tree.totalHours(of: root)))")
-                .font(.system(size: 14, weight: .semibold))
-                .monospacedDigit()
+        let total = tree.totalHours(of: root)
+        if tree.hasChildren(root) {
+            HStack(spacing: 5) {
+                Image(systemName: "sum").font(.body)
+                Text("다 하면 \(formatDuration(total))")
+                    .font(.body.weight(.semibold))
+                    .monospacedDigit()
+            }
+            .foregroundStyle(.secondary)
+            .fixedSize()
+            .help(String(localized: "단계 시간의 합 — 단계마다 시간을 고치면 따라 바뀝니다"))
+        } else {
+            Menu {
+                ForEach(hourChoices, id: \.self) { h in
+                    Button {
+                        setHours(root, h)
+                    } label: {
+                        if abs(h - root.durationHours) < 0.001 {
+                            Label(formatDuration(h), systemImage: "checkmark")
+                        } else {
+                            Text(formatDuration(h))
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "clock").font(.body)
+                    Text("다 하면 \(formatDuration(total))")
+                        .font(.body.weight(.semibold))
+                        .monospacedDigit()
+                    Image(systemName: "chevron.down")
+                        .font(.body)
+                        .imageScale(.small)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.accentColor.opacity(0.1), in: Capsule())
+                .foregroundStyle(Color.accentColor)
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .help(String(localized: "이 할 일에 걸리는 시간 고르기"))
         }
-        .foregroundStyle(.secondary)
-        .fixedSize()
     }
 
-
-    // MARK: - 조언 (전부 TipKit)
-
-    /// 구성 전체에 대한 조언 중 지금 가장 중요한 하나만 팁으로 낸다.
-    /// 경고가 있으면 경고를, 없으면 잘 쪼갰다는 확인을. 닫으면 그 종류는 다시 안 뜬다.
-    private var topHint: SplitHint? {
-        let all = hints
-        return all.first { $0.tone == .caution } ?? all.first
+    /// 고를 수 있는 시간들. 지금 값이 목록에 없으면(다른 곳에서 1시간 45분처럼 적었으면) 그것도 넣는다 —
+    /// 안 넣으면 메뉴를 열었을 때 지금 값에 체크가 없어서 무엇이 골라져 있는지 모른다.
+    private static let baseHourChoices: [Double] = [0.25, 0.5, 1, 1.5, 2, 3, 4, 6, 8]
+    private var hourChoices: [Double] {
+        let now = root.durationHours
+        guard now > 0, !Self.baseHourChoices.contains(where: { abs($0 - now) < 0.001 }) else {
+            return Self.baseHourChoices
+        }
+        return (Self.baseHourChoices + [now]).sorted()
     }
+
 
     // MARK: - 추가 입력 줄
 
@@ -381,9 +437,40 @@ struct TodoStepsView: View {
 
 // MARK: - 단계 한 줄
 
+/// 한 줄의 가지 모양. `guides[k]` = k+1 번째 깊이의 세로줄을 이어 그을지.
+struct StepBranch {
+    var guides: [Bool]
+    var isLast: Bool
+    /// 깊이 한 칸의 폭. 줄기의 아이콘 칸과 같아서 첫 가지가 줄기 아이콘 바로 아래서 뻗는다.
+    static let column: CGFloat = 22
+}
+
+/// ├ 또는 └ — 위에서 내려온 줄이 가운데서 오른쪽으로 꺾인다. 마지막이 아니면 아래로도 잇는다.
+private struct BranchElbow: Shape {
+    let isLast: Bool
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: r.midX, y: r.minY))
+        p.addLine(to: CGPoint(x: r.midX, y: isLast ? r.midY : r.maxY))
+        p.move(to: CGPoint(x: r.midX, y: r.midY))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.midY))
+        return p
+    }
+}
+
+private struct BranchGuide: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: r.midX, y: r.minY))
+        p.addLine(to: CGPoint(x: r.midX, y: r.maxY))
+        return p
+    }
+}
+
 private struct StepRow: View {
     let item: BacklogItem
     let depth: Int
+    let branch: StepBranch
     let isCurrent: Bool
     let hasChildren: Bool
     let progress: Double
@@ -410,16 +497,44 @@ private struct StepRow: View {
                 set: { onHours(max(0.25, min(12, $0))) })
     }
 
-    var body: some View {
-        HStack(spacing: 8) {
-            if depth > 1 {
-                Rectangle()
-                    .fill(Color.secondary.opacity(0.25))
-                    .frame(width: 1)
-                    .padding(.leading, CGFloat(depth - 2) * 16)
-                    .padding(.vertical, 3)
-            }
+    private static let line = StrokeStyle(lineWidth: 1.5, lineCap: .round)
 
+    var body: some View {
+        HStack(spacing: 0) {
+            // 가지 — 위 칸들의 세로줄, 그리고 제 칸의 ├/└.
+            ForEach(Array(branch.guides.enumerated()), id: \.offset) { _, on in
+                BranchGuide()
+                    .stroke(Color.secondary.opacity(on ? 0.35 : 0), style: Self.line)
+                    .frame(width: StepBranch.column)
+            }
+            BranchElbow(isLast: branch.isLast)
+                .stroke(Color.secondary.opacity(0.35), style: Self.line)
+                .frame(width: StepBranch.column)
+
+            content
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(isCurrent ? Color.orange.opacity(0.08) : Color.clear,
+                            in: .soft(Corner.chip))
+                .padding(.vertical, 1)
+        }
+        .padding(.horizontal, 8)
+        .fixedSize(horizontal: false, vertical: true)
+        .onHover { hovering = $0 }
+        .animation(Motion.hover, value: hovering)
+        // 차례가 이 줄로 넘어오면 바탕색이 켜진다. 툭 갈리면 어느 줄로 넘어왔는지 놓친다.
+        .animation(Motion.row, value: isCurrent)
+        .contextMenu {
+            Button("하위 단계 추가", action: onAddChild)
+            Button("위로", action: onMoveUp)
+            Button("아래로", action: onMoveDown)
+            Divider()
+            Button("삭제", role: .destructive, action: onDelete)
+        }
+    }
+
+    private var content: some View {
+        HStack(spacing: 8) {
             Button(action: onToggle) {
                 Image(systemName: item.isCompleted
                       ? "checkmark.circle.fill"
@@ -430,13 +545,24 @@ private struct StepRow: View {
             .buttonStyle(.squish)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(item.title)
-                    .font(.system(size: 13, weight: isCurrent ? .semibold : .regular))
-                    .strikethrough(item.isCompleted)
-                    .foregroundStyle(item.isCompleted ? Color.secondary : Color.primary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 6) {
+                    Text(item.title)
+                        .font(.body.weight(isCurrent ? .semibold : .regular))
+                        .strikethrough(item.isCompleted)
+                        .foregroundStyle(item.isCompleted ? Color.secondary : Color.primary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    // 지금 할 차례 — 기호만으로는 안 읽혀서 말로 붙인다.
+                    if isCurrent {
+                        Text("지금")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.orange)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 1)
+                            .background(Capsule().fill(Color.orange.opacity(0.15)))
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 if hasChildren {
                     ProgressView(value: progress)
@@ -496,21 +622,6 @@ private struct StepRow: View {
                 .help("삭제")
                 .transition(.control)
             }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
-        .background(isCurrent ? Color.orange.opacity(0.08) : Color.clear,
-                    in: .soft(Corner.chip))
-        .onHover { hovering = $0 }
-        .animation(Motion.hover, value: hovering)
-        // 차례가 이 줄로 넘어오면 바탕색이 켜진다. 툭 갈리면 어느 줄로 넘어왔는지 놓친다.
-        .animation(Motion.row, value: isCurrent)
-        .contextMenu {
-            Button("하위 단계 추가", action: onAddChild)
-            Button("위로", action: onMoveUp)
-            Button("아래로", action: onMoveDown)
-            Divider()
-            Button("삭제", role: .destructive, action: onDelete)
         }
     }
 }
