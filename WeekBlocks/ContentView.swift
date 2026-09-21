@@ -31,7 +31,7 @@ struct ContentView: View {
     @State private var pendingRemovals: [PlanBlock] = []
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
-    @State private var routineDetailSheet: Routine?
+    @State private var routineDetailSheet: RoutineDetailContext?
     @State private var showingReflection = false
     /// 다른 주 계획을 보고 있는 주에 깐다 (→ WeekCopyView, Pro).
     @State private var showingWeekCopy = false
@@ -305,9 +305,10 @@ struct ContentView: View {
                 ),
                 initialStartHour: ctx.startHour,
                 initialDuration: ctx.duration,
-                initialDurationIsExplicit: ctx.durationIsExplicit
+                initialDurationIsExplicit: ctx.durationIsExplicit,
+                initialWithinRoutine: ctx.withinRoutine
             )
-            .frame(minWidth: 520, minHeight: 540)
+            // 크기는 창이 정한다 — 새 블록은 제목 한 줄짜리라 작고, 펼치면 커진다.
         }
         .sheet(isPresented: $onboarding.isPresented) {
             OnboardingView(onWriteMyOwn: {
@@ -326,8 +327,8 @@ struct ContentView: View {
             ReflectionView(weekStart: selectedWeek)
                 .frame(minWidth: 640, minHeight: 600)
         }
-        .sheet(item: $routineDetailSheet) { routine in
-            RoutineDetailView(routine: routine)
+        .sheet(item: $routineDetailSheet) { ctx in
+            RoutineDetailView(routine: ctx.routine, dayAction: ctx.dayAction)
                 .frame(minWidth: 560, minHeight: 520)
         }
         .sheet(isPresented: $showingSettings) {
@@ -700,8 +701,8 @@ struct ContentView: View {
                     onEditBlock: { block in
                         blockSheet = BlockSheetContext(day: selectedDay, block: block)
                     },
-                    onEditRoutine: { routine in
-                        routineDetailSheet = routine
+                    onEditRoutine: { routine, action in
+                        routineDetailSheet = RoutineDetailContext(routine: routine, dayAction: action)
                     },
                     onEditRoutineSchedule: { routine in
                         routineSheet = RoutineSheetContext(routine: routine)
@@ -719,6 +720,13 @@ struct ContentView: View {
                         blockSheet = BlockSheetContext(day: selectedDay, block: nil,
                                                        startHour: hour, duration: hours,
                                                        durationIsExplicit: true)
+                    },
+                    // 루틴 띠 안에 겹쳐 세운다 — 회사 시간 안의 회의. 자유 시간은 안 깎인다.
+                    onAddWithinRoutine: { hour, hours in
+                        blockSheet = BlockSheetContext(day: selectedDay, block: nil,
+                                                       startHour: hour, duration: hours,
+                                                       durationIsExplicit: true,
+                                                       withinRoutine: true)
                     },
                     zones: dayZones,
                     onReturnToBacklog: { block in
@@ -1278,8 +1286,8 @@ struct ContentView: View {
                         onEditBlock: { block in
                             blockSheet = BlockSheetContext(day: day, block: block)
                         },
-                        onEditRoutine: { routine in
-                            routineDetailSheet = routine
+                        onEditRoutine: { routine, action in
+                            routineDetailSheet = RoutineDetailContext(routine: routine, dayAction: action)
                         },
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
@@ -1328,7 +1336,7 @@ struct ContentView: View {
                             blockSheet = BlockSheetContext(day: day, block: block)
                         },
                         onEditRoutine: { routine in
-                            routineDetailSheet = routine
+                            routineDetailSheet = RoutineDetailContext(routine: routine)
                         },
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
@@ -1826,6 +1834,15 @@ struct BlockSheetContext: Identifiable {
     /// 길이를 **사람이 직접 그었는가** (빈 시간을 위아래로 훑어서).
     /// 빈 시간을 그냥 누른 것이면 그 길이는 제안일 뿐이라 두 시간으로 깎인다.
     var durationIsExplicit: Bool = false
+    /// 루틴 시간 **안**의 일정으로 연다 — 일간에서 루틴 띠의 `+`로 왔을 때 (회의 등).
+    var withinRoutine: Bool = false
+}
+
+/// 루틴 상세를 여는 까닭. 자 위의 한 칸에서 열었으면 그 칸을 지우는 손짓이 함께 온다.
+struct RoutineDetailContext: Identifiable {
+    let id = UUID()
+    let routine: Routine
+    var dayAction: RoutineDayAction? = nil
 }
 
 struct RoutineSheetContext: Identifiable {

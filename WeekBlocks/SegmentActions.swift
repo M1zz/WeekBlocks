@@ -24,16 +24,25 @@ struct SegmentActions {
     /// 이 요일·주의 끼니 위치 저장처.
     let quotaPlacements: [QuotaPlacement]
 
+    /// **이만큼 끌면 몇 시에 놓이는가.** 15분 격자에 붙이고 하루 밖으로 나가지 않게 가둔다.
+    ///
+    /// 끄는 동안 보여 주는 시각과 손을 뗐을 때 적히는 시각은 **같은 셈에서 나와야** 한다.
+    /// 두 자리에서 따로 재던 때는 화면이 14:15을 가리키고 14:30에 놓여서, 원하는 시각에
+    /// 세우려면 놓아 보고 다시 끄는 일을 몇 번씩 반복해야 했다.
+    static func landingHour(_ seg: TimeSegment, deltaHours: Double) -> Double {
+        let snapped = ((seg.logicalStart + deltaHours) / 0.25).rounded() * 0.25
+        // 고정 루틴(수면 등)은 자정을 넘겨도 되므로 시작만 하루 범위로, 나머지는 길이만큼 여유를 둬 자정 넘김 방지.
+        let maxStart: Double
+        if case .fixedRoutine = seg.source { maxStart = 23.75 } else { maxStart = max(0, 24 - seg.logicalDuration) }
+        return min(max(snapped, 0), maxStart)
+    }
+
     /// 끌기를 마친 구간의 새 시작 시각을 원본 모델에 적는다 (15분 스냅).
     /// - Parameter newDay: 다른 요일로 옮겼다면 그 요일. 계획 블록에만 적용된다.
     func move(_ seg: TimeSegment, deltaHours: Double, toDay newDay: DayOfWeek? = nil) {
         // 단순 클릭은 무시. 다만 요일만 바꾼(시각은 안 움직인) 드래그는 살려야 한다.
         guard abs(deltaHours) > 0.001 || newDay != nil else { return }
-        var newStart = ((seg.logicalStart + deltaHours) / 0.25).rounded() * 0.25
-        // 고정 루틴(수면 등)은 자정을 넘겨도 되므로 시작만 하루 범위로, 나머지는 길이만큼 여유를 둬 자정 넘김 방지.
-        let maxStart: Double
-        if case .fixedRoutine = seg.source { maxStart = 23.75 } else { maxStart = max(0, 24 - seg.logicalDuration) }
-        newStart = min(max(newStart, 0), maxStart)
+        let newStart = Self.landingHour(seg, deltaHours: deltaHours)
 
         switch seg.source {
         case .fixedRoutine(let name):
@@ -156,10 +165,21 @@ extension TimeSegment {
         }
     }
 
-    func deleteLabel(on day: DayOfWeek) -> String {
+    /// - Parameter isToday: 보고 있는 날이 오늘인가. 하루만 펴 놓고 보는 자리(일간)에서는
+    ///   "이번 주 월요일에서 빼기"보다 **"오늘만 빼기"**가 무슨 일이 일어나는지를 바로 말한다.
+    ///   루틴을 하루만 뺀 것인지 루틴 자체를 지운 것인지는 되돌릴 수 있느냐가 걸린 물음이라,
+    ///   글자가 한 번에 안 읽히면 사람은 아예 안 누른다.
+    func deleteLabel(on day: DayOfWeek, isToday: Bool = false) -> String {
         switch source {
-        case .fixedRoutine: String(localized: "이번 주 \(day.longLabel)에서 빼기")
-        case .quotaSession: String(localized: "이 끼니 빼기 (이번 주 \(day.shortLabel))")
+        case .fixedRoutine:
+            isToday ? String(localized: "오늘만 빼기 (루틴은 그대로)")
+                    : String(localized: "이번 주 \(day.longLabel)에서 빼기")
+        // 끼니는 **삭제**라고 부른다. 계획 블록과 같은 말이어야 같은 손짓인 줄 안다 —
+        // "빼기"라고 적어 두었더니 지우는 단추를 따로 찾았다. 루틴 정의(다른 날의 끼니)는
+        // 그대로라서 뒤에 붙은 괄호가 그 범위를 말한다.
+        case .quotaSession:
+            isToday ? String(localized: "이 끼니 삭제 (오늘만)")
+                    : String(localized: "이 끼니 삭제 (이번 주 \(day.shortLabel)만)")
         case .planBlock:    String(localized: "이 계획 삭제")
         case .none:         String(localized: "삭제")
         }

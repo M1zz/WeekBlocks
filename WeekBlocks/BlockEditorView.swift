@@ -26,6 +26,10 @@ struct BlockEditorView: View {
     /// 그 길이를 **사람이 직접 그었는가** — 빈 시간을 위아래로 훑어 범위를 그린 경우.
     /// 그때는 깎지 않는다. 다섯 시간 빈자리를 누른 것과 세 시간을 그은 것은 다른 말이다.
     var initialDurationIsExplicit: Bool = false
+    /// **이미 확보된 루틴 시간 안의 일정으로 연다** — 일간에서 루틴 띠의 `+`로 왔을 때.
+    /// 회사 시간 안의 회의는 자유 시간을 더 쓰지 않는다. 창을 열자마자 그 뜻이 켜져 있어야
+    /// 사람이 토글을 다시 찾아 켤 일이 없다.
+    var initialWithinRoutine: Bool = false
 
     @State private var title: String = ""
     @State private var timeBand: TimeBand = .evening
@@ -52,6 +56,9 @@ struct BlockEditorView: View {
     /// '자세히 정하기'를 펼쳐 두었는가. **기본은 접힘.**
     /// 이미 적어 둔 것이 있는 블록을 열 때만 펴서, 적힌 글이 접힌 채 숨지 않게 한다.
     @State private var showsDetail: Bool = false
+    /// 새 블록에서 **제목 말고 다른 것도 정하러** 펼쳤는가. 기본은 접힘 — 제목 한 줄만 묻는다.
+    @State private var showsMore: Bool = false
+    @FocusState private var titleFocused: Bool
     @State private var issues: [ConcretenessIssue] = []
 
     /// startHour(Double) ↔ Date 브리지 — 시:분 DatePicker용.
@@ -69,15 +76,112 @@ struct BlockEditorView: View {
         )
     }
 
+    /// **새 블록은 제목 한 줄이면 된다.**
+    ///
+    /// 빈 시간을 훑어서 왔으면 요일·시각·길이는 이미 정해져 있다. 그런데 창은 "활동 / 무엇을
+    /// 할 것인가?"부터 루틴 안 토글, 시각 토글, 길이, 자세히 정하기까지 한 벌을 다 펼쳐 놓아서,
+    /// 제목 하나 적으려고 연 창이 설문지처럼 보였다. 이미 정해진 것은 한 줄로 **말해 주고**,
+    /// 고치고 싶을 때만 그 줄을 눌러 펼친다. 적고 ⏎ 치면 끝.
+    private var isCompact: Bool { existing == nil && !showsMore }
+
     var body: some View {
+        Group {
+            if isCompact { compactBody } else { fullBody }
+        }
+        .animation(Motion.disclose, value: showsMore)
+        // 시각을 정하기로 켰는데 아직 아무 시각도 없으면, 고른 시간대가 시작하는 때로 세운다.
+        // 00:00이 뜨면 사람이 거기서부터 스무 번을 눌러야 한다.
+        .onChange(of: hasExactTime) { _, on in
+            guard on, existing?.startHour ?? -1 < 0, initialStartHour == nil else { return }
+            startHour = timeBand.defaultStartHour
+        }
+        // ⚠️ 바깥(body)에 둔다. 펼친 창에만 붙여 두면 접힌 창에서는 안 불려서,
+        //    훑어 그은 시각·길이 대신 09:00 · 2시간이 떴다.
+        .onAppear {
+            if existing == nil {
+                timeBand = initialStartHour.map(TimeBand.containing) ?? suggestedBand
+                // 루틴 띠 오른쪽 절반을 훑어서 왔다 — 루틴 시간 안의 일정이다.
+                withinRoutine = initialWithinRoutine
+                // 빈 시간을 훑거나 눌러서 왔으면 그 시각이 이미 정해진 것이다.
+                if let h = initialStartHour { startHour = h; hasExactTime = true }
+                if let d = initialDuration {
+                    let snapped = max(0.25, (d * 4).rounded(.down) / 4)
+                    durationHours = initialDurationIsExplicit ? snapped : min(2, snapped)
+                }
+            }
+            loadExisting()
+            revalidate()
+        }
+        // 창이 뜨자마자 제목 칸에 손이 가 있다. 시트가 서는 한 박자 뒤에 잡아야 먹힌다.
+        .task {
+            try? await Task.sleep(for: .milliseconds(80))
+            titleFocused = true
+        }
+    }
+
+    private var compactBody: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
+                TextField("제목", text: $title)
+                    .textFieldStyle(.plain)
+                    .font(.title2.weight(.semibold))
+                    .focused($titleFocused)
+                    .onSubmit { save() }
+                    .onChange(of: title) { revalidate() }
+
+                // 이미 정해진 것 — 요일·시각·길이. 누르면 전부 펼쳐 고친다.
+                Button {
+                    showsMore = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: withinRoutine ? "rectangle.inset.filled" : "clock")
+                        Text(whenSummary)
+                            .monospacedDigit()
+                        Image(systemName: "chevron.down")
+                            .imageScale(.small)
+                    }
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .pointingCursor()
+                .help(String(localized: "시각·길이·자세한 내용 정하기"))
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Divider()
+
+            footerBar
+        }
+        .frame(width: 460)
+    }
+
+    /// 접힌 창에서 이미 정해진 것을 한 줄로. "월요일 · 11:00–12:00 · 1시간"
+    private var whenSummary: String {
+        let span = formatDuration(durationHours)
+        if withinRoutine || hasExactTime {
+            let range = "\(formatHour(startHour))–\(formatHour(startHour + durationHours))"
+            return withinRoutine
+                ? String(localized: "\(day.longLabel) · \(range) · 루틴 시간 안")
+                : String(localized: "\(day.longLabel) · \(range) · \(span)")
+        }
+        return String(localized: "\(day.longLabel) · \(timeBand.label) · \(span)")
+    }
+
+    private var fullBody: some View {
         VStack(spacing: 0) {
             header
 
             Divider()
 
             Form {
-                Section("활동") {
-                    TextField("무엇을 할 것인가?", text: $title, prompt: Text("예: Swift Combine 학습"))
+                Section {
+                    TextField("제목", text: $title, prompt: Text("제목"))
+                        .focused($titleFocused)
                         .onChange(of: title) { revalidate() }
                 }
 
@@ -159,25 +263,7 @@ struct BlockEditorView: View {
 
             footerBar
         }
-        // 시각을 정하기로 켰는데 아직 아무 시각도 없으면, 고른 시간대가 시작하는 때로 세운다.
-        // 00:00이 뜨면 사람이 거기서부터 스무 번을 눌러야 한다.
-        .onChange(of: hasExactTime) { _, on in
-            guard on, existing?.startHour ?? -1 < 0, initialStartHour == nil else { return }
-            startHour = timeBand.defaultStartHour
-        }
-        .onAppear {
-            if existing == nil {
-                timeBand = initialStartHour.map(TimeBand.containing) ?? suggestedBand
-                // 빈 시간을 훑거나 눌러서 왔으면 그 시각이 이미 정해진 것이다.
-                if let h = initialStartHour { startHour = h; hasExactTime = true }
-                if let d = initialDuration {
-                    let snapped = max(0.25, (d * 4).rounded(.down) / 4)
-                    durationHours = initialDurationIsExplicit ? snapped : min(2, snapped)
-                }
-            }
-            loadExisting()
-            revalidate()
-        }
+        .frame(minWidth: 520, minHeight: 540)
     }
 
     // MARK: subviews
@@ -311,7 +397,7 @@ struct BlockEditorView: View {
                 .keyboardShortcut(.cancelAction)
 
             // 버튼이 흐린 이유를 버튼 옆에서 말한다.
-            if !missing.isEmpty {
+            if !missing.isEmpty && !isCompact {
                 Label("\(missing.joined(separator: " · "))", systemImage: "exclamationmark.circle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)

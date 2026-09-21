@@ -40,7 +40,7 @@ struct DayScheduleView: View {
     /// 할 일 카드·블록을 떨어뜨렸다. (드래그 토큰, 떨어뜨린 시각)
     var onDropBacklog: (String, Double) -> Void = { _, _ in }
     var onEditBlock: (PlanBlock) -> Void = { _ in }
-    var onEditRoutine: (Routine) -> Void = { _ in }
+    var onEditRoutine: (Routine, RoutineDayAction?) -> Void = { _, _ in }
     var onEditRoutineSchedule: (Routine) -> Void = { _ in }
     /// 빈 시간을 눌러 고를 수 있는 할 일 — 아직 요일을 안 정한 것.
     var candidates: [GapCandidate] = []
@@ -55,6 +55,12 @@ struct DayScheduleView: View {
     ///
     /// 사람이 손으로 그은 길이라 **그대로 쓴다** — `onAddBlock`처럼 깎지 않는다.
     var onDrawBlock: (Double, Double) -> Void = { _, _ in }
+    /// 루틴 시간 **안**에 겹쳐 세운다. (시작 시각, 길이)
+    ///
+    /// 회사 09–18시 같은 띠는 하루를 통째로 덮고 있어서 그 안에는 누를 빈 시간이 없고,
+    /// 그 위를 끌면 **회사 자체가** 움직인다. 이미 확보된 시간 안의 회의는 자유 시간을
+    /// 더 쓰는 것이 아니므로 빈 시간을 만들어 낼 수도 없다 — 들어갈 길을 따로 낸다.
+    var onAddWithinRoutine: (Double, Double) -> Void = { _, _ in }
     /// 시간표 **밖**의 받는 자리들 (오늘의 계획 판·할 일 목록). 계획 블록을 끌어 그 위에 놓을 수 있다.
     var zones: DayDragZones? = nil
     /// 블록을 할 일 목록에 놓았다 — 날짜를 무른다.
@@ -87,13 +93,19 @@ struct DayScheduleView: View {
     @State private var dropTargeted = false
     /// 끌고 오는 손의 높이. 그 아래 빈 시간을 밝힌다.
     @State private var dropY: CGFloat?
-    /// 끄는 알약이 지금 붙어 있는 자석 자리(시작 시각). 바뀌는 순간 손끝에 딸깍.
-    @State private var magnetHour: Double?
+    /// **끄는 알약이 놓일 시각.** 손을 떼면 여기 적힌다 — 알약의 자리, 옆에 뜨는 시각,
+    /// 시각 칸의 표지가 모두 이 값 하나를 본다. 바뀌는 순간 손끝에 딸깍.
+    /// (시간표 밖 판 위로 끌어냈으면 nil — 그때는 시각이 아니라 어디에 놓느냐의 문제다.)
+    @State private var dragHour: Double?
     /// 가리키고 있는 빈 시간, 눌러서 열어 둔 빈 시간.
     @State private var hoverGap: String?
     @State private var openGap: String?
     /// 빈 시간을 훑어 범위를 그리는 중.
     @State private var scrub: GapScrub?
+    /// 단단한 일정의 **안**(오른쪽 절반)을 훑어 그리는 중 (→ nestSurface).
+    @State private var nestScrub: NestScrub?
+    /// 손이 올라가 있는 '이 시간 안' 자리 — 어느 일정의 것인가 (`SegmentSource.key`).
+    @State private var nestHover: String?
     /// 훑어 **잡아 둔** 시간. 손을 떼어도 남아서 양끝을 다시 끌 수 있다 (→ GapSelection).
     @State private var selection: GapSelection?
     /// 잡아 둔 시간을 통째로 옮기는 중 — 끌기 시작할 때의 시작 시각.
@@ -175,15 +187,79 @@ struct DayScheduleView: View {
             .padding(.vertical, 4)
             .background((overbooked ? Color.red : Color.accentColor).opacity(0.12), in: Capsule())
             .animation(Motion.number, value: free)
+
+            hiddenChip
+
             Spacer()
             // '블록 추가' 단추는 두지 않는다 — 요일에 일을 올리는 건 주간이 하는 일이다.
             // 여기서는 이미 올린 것을 실제로 한 시각으로 옮기는 것까지만 한다.
         }
     }
 
+    /// **숨긴 것 N개.** 뺀 루틴·끼니가 여기 모인다 — 눌러서 되살린다.
+    ///
+    /// 자 위에 유령으로 세워 두는 대신이다. 뺐는데 그 자리에 계속 서 있으면 안 지워진 것으로
+    /// 읽히고, 하루 세 번인 끼니에서는 그 줄이 쌓인다. 되살릴 길은 잃지 않으면서 자 위에는
+    /// 실제로 할 일만 남게 한다.
+    @ViewBuilder
+    private var hiddenChip: some View {
+        let ghosts = restorableGhosts
+        if !ghosts.isEmpty {
+            Menu {
+                ForEach(ghosts) { g in
+                    Button { actions.restore(g) } label: {
+                        Label("\(g.title) · \(formatHour(g.logicalStart))",
+                              systemImage: "arrow.uturn.backward")
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "eye.slash")
+                        .font(.system(size: 10, weight: .bold))
+                    Text("숨긴 것 \(ghosts.count)개")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                }
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 4)
+                .background(Color.primary.opacity(0.06), in: Capsule())
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .pointingCursor()
+            .help(String(localized: "이 날 뺀 루틴·끼니 — 눌러서 되살리기"))
+            .transition(.pop)
+        }
+    }
+
     // MARK: 하루
 
-    private func timeline(_ segs: [TimeSegment]) -> some View {
+    /// **되살릴 만한 유령.** 뺀 루틴·끼니 가운데 **아직 안 지난** 것들만.
+    ///
+    /// 유령은 자 위에 안 선다 (→ `timeline(_:)`). 되살리기가 거기밖에 없어서 남겨 두었더니,
+    /// 하루 세 번인 끼니를 거를 때마다 취소선 그어진 흐릿한 줄이 쌓여서 뺐는데 안 없어지는
+    /// 것처럼 읽혔다. 지나간 자리는 되살려도 할 수 없는 일이라 아예 빼고, 남은 것만
+    /// 하루 머리의 칩 뒤에 세운다.
+    ///
+    /// 자정을 넘겨 두 조각으로 그려지는 잠은 한 줄로만 센다 (→ `SegmentSource.key`).
+    private var restorableGhosts: [TimeSegment] {
+        let cal = Calendar.current
+        guard cal.startOfDay(for: date) >= cal.startOfDay(for: Date()) else { return [] }
+        let cutoff = isToday ? DayTimelineRow.hourOfDay(Date()) : 0
+        var seen = Set<String>()
+        return segments
+            .filter { $0.isGhost && $0.logicalStart + $0.logicalDuration > cutoff }
+            .sorted { $0.logicalStart < $1.logicalStart }
+            .filter { seen.insert($0.source.key).inserted }
+    }
+
+    private func timeline(_ allSegs: [TimeSegment]) -> some View {
+        // 유령은 자 위에 안 선다 — 하루 머리의 '숨긴 것' 칩 뒤로 간다 (→ restorableGhosts).
+        // 아래 셈들은 원래도 유령을 빼고 했으므로(`!$0.isGhost`) 여기서 미리 걸러도 같다.
+        let segs = allSegs.filter { !$0.isGhost }
         // 나란히 설 칸을 나누는 건 루틴·계획 블록뿐이다. 루틴 안 일정과 다른 일정 위에 겹친
         // 끼니는 칸을 따로 갖지 않고 오른쪽에 얹힌다 — 회사 9시간이 끼니 한 번 때문에 반쪽이 되지 않게.
         let laned = segs.filter { !$0.isNested && !$0.isGhost && !$0.isFlexible }
@@ -209,6 +285,26 @@ struct DayScheduleView: View {
                     connectorLayer(conns, trackWidth: trackWidth, now: nil)
                 }
 
+                // **이 시간 안.** 단단한 일정의 오른쪽 절반 — 끌면 그 안에 겹쳐 놓을 시간이 그려진다.
+                // **모든 알약 아래**(z 0.5)에 깐다 — 얹힌 회의·끼니(z 2)는 물론, 회사와 겹쳐 오른쪽
+                // 칸에 선 보통 블록(z 1)도 그대로 잡혀야 한다. 빈 자리를 끌 때만 이 판이 받는다.
+                //
+                // 둘로 갈린 칸(겹친 블록이 하나 있음)에서도 선다. 가르는 선이 45%로 같아서 모양이
+                // 똑같다 (→ `frame(for:)`). 한때 혼자일 때만 세워서, 회사와 겹친 블록이 하나
+                // 생기는 순간 회사 안에 그을 자리가 통째로 사라졌다.
+                ForEach(segs.filter { host in
+                    guard hostsNested(host) else { return false }
+                    guard let lane = lanes[host.id] else { return true }
+                    return lane.count == 1 || (lane.count == 2 && lane.index == 0)
+                }) { host in
+                    if let hf = frame(for: host, lanes: lanes, laned: laned, trackWidth: trackWidth) {
+                        let x = trackWidth * Self.nestSplit
+                        nestSurface(host, rect: CGRect(x: x, y: hf.minY,
+                                                       width: trackWidth - x, height: hf.height))
+                            .zIndex(0.5)
+                    }
+                }
+
                 ForEach(segs) { seg in
                     if let frame = frame(for: seg, lanes: lanes, laned: laned, trackWidth: trackWidth) {
                         let i = order[seg.id] ?? 0
@@ -220,7 +316,7 @@ struct DayScheduleView: View {
                             .scaleEffect(drawn ? 1 : 0.92, anchor: .leading)
                             .opacity(drawn ? 1 : 0)
                             .animation(reduceMotion ? nil : Motion.squish.delay(Double(min(i, 16)) * 0.03), value: drawn)
-                            // 놓는 순간 15분 격자로 **통** 붙는다. 끄는 동안에는 손을 바로 따른다.
+                            // 끄는 알약은 dragPy 가 몰고, 놓고 나면 새 자리로 출렁이며 옮겨 앉는다.
                             .animation(seg.id == dragId ? nil : Motion.squish, value: frame)
                             .transition(.pop)
                             .landingBounce(landing.landed == seg.id)
@@ -246,6 +342,11 @@ struct DayScheduleView: View {
                 }
 
                 if isToday { nowLine }
+
+                // 끄는 알약이 내려앉을 시각 — 자 위에 미리 세워 둔다.
+                if let dragHour, dragId != nil {
+                    dropGuide(dragHour, trackWidth: trackWidth)
+                }
 
                 selectionLayer(trackWidth: trackWidth,
                                trackHeight: CGFloat(window.span) * Self.hourHeight)
@@ -316,6 +417,20 @@ struct DayScheduleView: View {
         var end: Double { max(anchor, current) }
         var hours: Double { end - start }
         /// 한 칸(15분)도 안 그었으면 그린 것으로 치지 않는다 — 그건 누른 것이다.
+        var isDrawn: Bool { hours >= 0.25 - 1e-6 }
+    }
+
+    /// **단단한 일정 안을 훑어 그리는 중의 범위.** `GapScrub`과 같은 결인데 가두는 벽이 다르다 —
+    /// 빈 시간의 양끝이 아니라 **그 일정의 머리와 발치**다. 회사 안의 회의는 회사 밖으로 못 나간다.
+    struct NestScrub {
+        /// 어느 일정 안인가 (`SegmentSource.key`).
+        let hostKey: String
+        let anchor: Double
+        var current: Double
+
+        var start: Double { min(anchor, current) }
+        var end: Double { max(anchor, current) }
+        var hours: Double { end - start }
         var isDrawn: Bool { hours >= 0.25 - 1e-6 }
     }
 
@@ -798,11 +913,35 @@ struct DayScheduleView: View {
             .onEnded { _ in moveOrigin = nil; Haptic.snap() }
     }
 
-    /// 빈자리의 앞머리·끝 (15분 격자). 잡은 시간은 이 사이를 못 벗어난다.
-    private func gapLow(_ c: Connector) -> Double { (max(c.startHour, window.start) * 4).rounded(.up) / 4 }
-    private func gapHigh(_ c: Connector) -> Double { (min(c.endHour, window.end) * 4).rounded(.down) / 4 }
+    /// **그어 잡은 시간이 넘어설 수 없는 것들** — 고정 루틴과 계획 블록.
+    ///
+    /// 끼니(시간 유연)는 여기 없다. 겹쳐도 되고 옮겨도 되는 것이라 **무른 경계**다 —
+    /// 07–08시 식사 하나 때문에 06시부터 09시까지 세 시간을 그을 수 없으면,
+    /// 사람은 한 시간짜리 둘로 쪼개 적고 그 둘이 같은 일이라는 것은 아무 데도 안 남는다.
+    private var hardIntervals: [(start: Double, end: Double)] {
+        segments
+            .filter { !$0.isGhost && !$0.isNested && !$0.isFlexible }
+            .compactMap { window.clamp($0.start, $0.end) }
+    }
 
-    /// 하루 시간표의 자 위 높이 → 시각. 15분 격자에 붙이고, 그 빈 시간 밖으로는 못 나간다.
+    /// 빈자리의 앞머리·끝 (15분 격자). 잡은 시간은 이 사이를 못 벗어난다.
+    ///
+    /// 경계는 **이 빈 시간의 끝이 아니라 그 너머 첫 단단한 일정**이다. 사이에 낀 끼니는
+    /// 가로질러 그을 수 있고, 그렇게 선 일정 위에 끼니가 오른쪽으로 얹힌다
+    /// (회의가 회사 위에 얹히는 것과 같은 자리 → `frame(for:)`의 `overlaysOther`).
+    /// '빈 시간 N시간' 글씨는 그대로 둔다 — 식사 한 시간은 실제로 비어 있지 않다.
+    private func gapLow(_ c: Connector) -> Double {
+        var low = window.start
+        for h in hardIntervals where h.end <= c.startHour + 1e-6 { low = max(low, h.end) }
+        return (max(low, window.start) * 4).rounded(.up) / 4
+    }
+    private func gapHigh(_ c: Connector) -> Double {
+        var high = window.end
+        for h in hardIntervals where h.start >= c.endHour - 1e-6 { high = min(high, h.start) }
+        return (min(high, window.end) * 4).rounded(.down) / 4
+    }
+
+    /// 하루 시간표의 자 위 높이 → 시각. 15분 격자에 붙이고, 단단한 이웃 밖으로는 못 나간다.
     private func gapHour(_ y: CGFloat, in c: Connector) -> Double {
         let low = gapLow(c), high = gapHigh(c)
         return min(max(trackHour(y), low), max(low, high))
@@ -913,6 +1052,37 @@ struct DayScheduleView: View {
         .zIndex(4)
     }
 
+    /// **놓일 자리.** 끄는 동안 시각 칸에 그 시각이 서고, 자 위로 선 하나가 지난다.
+    ///
+    /// 알약 옆 글씨만으로는 부족하다 — 좁은 칸에서는 글씨가 아예 안 서고, 서더라도 알약과 함께
+    /// 움직여서 **눈금에 대어 볼** 기준이 없다. 시각 칸(왼쪽 자)에 세우면 몇 시인지가 위아래
+    /// 정시 글씨 사이에서 바로 읽히고, 가로선은 그 시각이 어느 일정 사이에 끼는지를 보여 준다.
+    private func dropGuide(_ hour: Double, trackWidth: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            Text(formatHour(hour))
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                // 시각 칸이 좁아도 "14:15"가 두 줄로 꺾이지 않게 — 넘치면 왼쪽으로 삐져나간다.
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 5)
+                .padding(.vertical, 2)
+                .background(Color.accentColor, in: Capsule())
+                .shadow(color: .accentColor.opacity(0.35), radius: 3, y: 1)
+                .contentTransition(.numericText())
+                .frame(width: Self.gutter - 4, alignment: .trailing)
+            Rectangle()
+                .fill(Color.accentColor.opacity(0.55))
+                .frame(width: trackWidth, height: 1.5)
+        }
+        .offset(y: y(hour) - 7)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .allowsHitTesting(false)
+        .transition(.opacity)
+        .zIndex(5)
+    }
+
     // MARK: 한 구간
 
     /// 알약 속 그림. 루틴은 저마다 고른 아이콘, 계획 블록은 제목 첫 글자.
@@ -954,10 +1124,13 @@ struct DayScheduleView: View {
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .strikethrough(done || seg.isGhost, color: .secondary)
                         .foregroundStyle(done || seg.isGhost ? .secondary : .primary)
-                    let when = Text(timeRange(seg))
-                        .font(.system(size: 10.5, weight: .medium, design: .rounded))
+                    // 끄는 동안에는 **놓일 시각**을 적는다. 알약은 내려가는데 글씨는 그대로면
+                    // 둘 중 하나는 거짓말이고, 사람은 놓아 보는 쪽으로 확인하게 된다.
+                    let moving = dragging ? dragHour : nil
+                    let when = Text(timeRange(seg, start: moving))
+                        .font(.system(size: 10.5, weight: moving != nil ? .bold : .medium, design: .rounded))
                         .monospacedDigit()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(moving != nil ? Color.accentColor : .secondary)
 
                     Group {
                         // 낮은 줄(30분 안팎)에서는 시각과 제목을 한 줄에 나란히 — 두 줄을 욱여넣으면 잘린다.
@@ -975,6 +1148,7 @@ struct DayScheduleView: View {
                             .frame(height: max(Self.minRowHeight, size.height), alignment: .center)
                         }
                     }
+                    .contentTransition(.numericText())
                     .padding(.trailing, showsCheck ? 30 : 4)
                 }
                 Spacer(minLength: 0)
@@ -1014,29 +1188,34 @@ struct DayScheduleView: View {
                                 if zone != nil { Haptic.tick() }
                             }
                             if zone != nil {
-                                magnetHour = nil
+                                dragHour = nil
                                 dragPy = v.translation.height
                                 return
                             }
                         }
                         // **자석.** 빈 시간의 앞머리·끝머리 가까이 오면 알약이 그 자리로 톡 빨려 들어간다.
+                        //
+                        // 자석이 안 걸려도 **15분 격자에는 언제나 붙는다.** 손을 그대로 따라가게 두면
+                        // 알약은 14:07에 떠 있는데 놓는 순간 14:15로 반올림되어, 원하는 시각에 세우려면
+                        // 놓아 보고 다시 끄는 일을 몇 번씩 되풀이하게 된다. 끄는 내내 **놓일 자리에**
+                        // 서 있게 하고, 한 칸 옮겨 갈 때마다 손끝에 딸깍 한 번.
                         let proposed = seg.logicalStart + Double(v.translation.height / Self.hourHeight)
-                        if let snapped = magnetStart(proposed: proposed, duration: seg.logicalDuration,
-                                                     excluding: seg) {
-                            if magnetHour != snapped {
-                                magnetHour = snapped
-                                Haptic.snap()
-                            }
-                            withAnimation(Motion.squish) {
-                                dragPy = CGFloat(snapped - seg.logicalStart) * Self.hourHeight
-                            }
-                        } else {
-                            magnetHour = nil
-                            dragPy = v.translation.height
+                        let aimed = magnetStart(proposed: proposed, duration: seg.logicalDuration,
+                                                excluding: seg) ?? proposed
+                        // 보이는 창 밖으로는 못 나간다. 수면을 숨겨 하루가 6~23시만 그려져 있을 때
+                        // 알약이 자 위쪽으로 미끄러져 나가면, 어디에 놓이는지는 고사하고 무엇을 끌고
+                        // 있는지도 안 보인다. (할 일을 떨어뜨릴 때와 같은 자 → hour(atY:))
+                        let landing = min(max(SegmentActions.landingHour(seg, deltaHours: aimed - seg.logicalStart),
+                                              window.start), window.end)
+                        guard dragHour != landing else { return }
+                        Haptic.snap()
+                        withAnimation(Motion.squish) {
+                            dragHour = landing
+                            dragPy = CGFloat(landing - seg.logicalStart) * Self.hourHeight
                         }
                     }
                     .onEnded { v in
-                        let snapped = magnetHour
+                        let snapped = dragHour
                         let zone = block != nil ? zones?.zone(at: v.location) : nil
                         defer {
                             withAnimation(Motion.squish) {
@@ -1044,7 +1223,7 @@ struct DayScheduleView: View {
                                 dragPy = 0
                                 dragPx = 0
                             }
-                            magnetHour = nil
+                            dragHour = nil
                             zones?.isDragging = false
                             zones?.hovering = nil
                         }
@@ -1092,6 +1271,16 @@ struct DayScheduleView: View {
                         Label("요일·시각 수정…", systemImage: "calendar.badge.clock")
                     }
                 }
+                // 확보된 시간 안에 회의 하나를 얹는다. 띠 위의 `+`와 같은 자리로 간다 —
+                // 손이 올라가야 보이는 단추 하나만 두면 못 찾는 사람이 생긴다.
+                if hostsNested(seg) {
+                    Button {
+                        let (start, hours) = nestSuggestion(seg)
+                        onAddWithinRoutine(start, hours)
+                    } label: {
+                        Label("이 시간 안에 일정 추가… (회의 등)", systemImage: "rectangle.inset.filled")
+                    }
+                }
                 Divider()
                 if let target = actions.timerTarget(seg) {
                     TimerMenuItems(token: target.token, title: target.title, hours: target.hours,
@@ -1099,13 +1288,13 @@ struct DayScheduleView: View {
                     Divider()
                 }
                 Button(role: .destructive) { actions.delete(seg) } label: {
-                    Label(seg.deleteLabel(on: day), systemImage: "trash")
+                    Label(seg.deleteLabel(on: day, isToday: isToday), systemImage: "trash")
                 }
             }
         }
-        .help(seg.isGhost
-              ? String(localized: "\(seg.title) — 삭제됨 · 우클릭으로 되살리기")
-              : String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기"))
+        // 무엇을 할 수 있는지는 띠마다 다르다. 루틴은 **오늘만 빼기**가 우클릭에 들어 있어서,
+        // "더 보기"라고만 적어 두면 거기 있는 줄 모른다. 긴 일정은 오른쪽 절반이 '이 시간 안'이다.
+        .help(helpText(seg))
     }
 
     /// **알약.** 길이가 곧 걸리는 시간이고, 색과 그림이 곧 무엇인지다.
@@ -1124,7 +1313,24 @@ struct DayScheduleView: View {
                 shape.fill(Color.surface)
                 shape.fill(seg.color.opacity(0.3))
                 shape.strokeBorder(seg.color.opacity(0.75), style: StrokeStyle(lineWidth: 1.2, dash: [3, 2.5]))
+            } else if seg.isNested {
+                // 루틴 시간 **안**의 일정(회의 등)은 흰 링을 두른다 — 자기 시간을 새로 쓴 것이
+                // 아니라 이미 확보된 시간 위에 얹힌 것이라는 뜻. (주간 시간축과 같은 표시)
+                //
+                // 점선은 안 쓴다. 점선은 이미 **끼니**의 말이고(시간이 유연하다), 회의는 오히려
+                // 시각이 못 박힌 쪽이다. 두 가지가 같은 모양이면 모양이 아무 말도 안 하게 된다.
+                shape.fill(Color.surface)
+                shape.fill(seg.color.gradient)
+                    .opacity(done ? 0.55 : 1)
+                shape.strokeBorder(Color.white.opacity(0.9), lineWidth: 1.5)
             } else {
+                // ⚠️ **바탕을 먼저 깔고** 색을 얹는다. 색만 옅게 칠하면 알약 **뒤로 지나는
+                //    잇는 선이 비쳐** 머리와 발치에 세로줄이 생긴다 (선은 알약 한가운데를
+                //    지나고 양끝 12pt가 알약 속으로 파묻힌다 → `connectorView`의 `tuck`).
+                //    끼니는 `Color.surface` 바탕이 있어 안 비쳤고 루틴(0.85)과 끝낸 일(0.55)만
+                //    비쳐서, 같은 자 위의 알약들이 서로 다른 물건처럼 보였다.
+                //    옅기는 **색의 무게**를 정하는 값이지 뒤를 비추라는 뜻이 아니다.
+                shape.fill(Color.surface)
                 shape.fill(seg.color.gradient)
                     .opacity(done ? 0.55 : (seg.isRoutine ? 0.85 : 1))
             }
@@ -1150,6 +1356,144 @@ struct DayScheduleView: View {
                 radius: dragging ? 9 : (hovering ? 6 : 3), y: dragging ? 5 : 2)
     }
 
+    private func helpText(_ seg: TimeSegment) -> String {
+        if seg.isGhost { return String(localized: "\(seg.title) — 삭제됨 · 우클릭으로 되살리기") }
+        let isRoutine: Bool = { if case .fixedRoutine = seg.source { return true }; return false }()
+        switch (hostsNested(seg), isRoutine) {
+        case (true, true):
+            return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 오늘만 빼기")
+        case (true, false):
+            return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 더 보기")
+        default:
+            return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기")
+        }
+    }
+
+    /// 얹힌 것이 서는 자리 — 자의 몇 할부터 오른쪽인가. 단단한 일정은 이 앞까지만 차지한다.
+    private static let nestSplit: CGFloat = 0.45
+    /// 안에 무엇을 그어 넣을 만큼 긴가. 한 시간이면 46pt — 15분 한 칸을 그을 수 있다.
+    private static let minHostHours = 1.0
+
+    /// **그 시간 안에 겹쳐 놓을 수 있는 자리인가.** 이미 단단히 잡혀 있는 긴 일정 —
+    /// 고정 루틴과 시각이 박힌 계획 블록.
+    ///
+    /// 여기 얹히는 것은 자기 시간을 새로 쓰지 않는다. 회사 아홉 시간 안의 회의는 그 아홉 시간을
+    /// 이미 센 뒤라, 남은 시간에서 또 빼면 두 번 깎인다 (→ `isNested`는 모든 셈에서 빠진다).
+    ///
+    /// 끼니는 여기 없다. 끼니는 그 자신이 남의 위에 얹히는 쪽이다.
+    private func hostsNested(_ seg: TimeSegment) -> Bool {
+        guard !seg.isGhost, !seg.isNested, !seg.isFlexible else { return false }
+        guard seg.logicalDuration >= Self.minHostHours else { return false }
+        switch seg.source {
+        case .fixedRoutine, .planBlock: return true
+        case .quotaSession, .none: return false
+        }
+    }
+
+    /// **이 시간 안.** 단단한 일정의 오른쪽 절반 — 여기를 위아래로 끌면 그 일정 안에
+    /// 겹쳐 놓을 시간이 그려진다.
+    ///
+    /// 왼쪽 절반(알약과 제목)은 여전히 그 일정 자신이라 끌면 통째로 옮겨진다. 둘이 한 띠 안에
+    /// 나란히 있어서, 무엇을 잡을지는 **어디를 짚느냐**가 정한다 — 단추를 찾을 필요가 없다.
+    ///
+    /// 이 판은 모든 알약보다 아래에 깔린다(z). 얹힌 것·겹친 것은 그대로 잡아 옮길 수 있다.
+    @ViewBuilder
+    private func nestSurface(_ host: TimeSegment, rect: CGRect) -> some View {
+        let key = host.source.key
+        // 다른 알약을 끌고 지나가는 중이면 점선을 안 세운다 — 여기에 놓으라는 말로 오해한다.
+        let hovering = nestHover == key && dragId == nil
+        let drawing = nestScrub.flatMap { $0.hostKey == key && $0.isDrawn ? $0 : nil }
+
+        ZStack(alignment: .topLeading) {
+            if let s = drawing {
+                // 그은 만큼 그 일정의 색으로 밝아진다 — 무엇 **안에** 넣는지가 색으로 읽힌다.
+                let top = y(s.start) - rect.minY
+                let height = max(8, y(s.end) - y(s.start))
+                RoundedRectangle.soft(Corner.card)
+                    .fill(host.color.opacity(0.16))
+                    .overlay(RoundedRectangle.soft(Corner.card)
+                        .strokeBorder(host.color.opacity(0.65), lineWidth: 1.5))
+                    .frame(width: rect.width, height: height)
+                    .offset(y: top)
+                Text("\(formatHour(s.start)) – \(formatHour(s.end)) · \(formatDuration(s.hours))")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(host.color)
+                    .lineLimit(1)
+                    .fixedSize()
+                    .contentTransition(.numericText())
+                    .offset(x: 10, y: top + max(0, height / 2 - 8))
+            } else if hovering {
+                // 손이 오르면 자리가 점선으로 선다 — 여기가 '이 시간 안'이라는 것.
+                RoundedRectangle.soft(Corner.card)
+                    .strokeBorder(host.color.opacity(0.3), style: StrokeStyle(lineWidth: 1.2, dash: [4, 4]))
+                    .frame(width: rect.width, height: rect.height)
+                    .transition(.opacity)
+            }
+        }
+        .frame(width: rect.width, height: rect.height, alignment: .topLeading)
+        .contentShape(Rectangle())
+        .onHover { nestHover = $0 ? key : (nestHover == key ? nil : nestHover) }
+        .animation(Motion.hover, value: hovering)
+        .hoverCursor(.crosshair)
+        .gesture(
+            DragGesture(minimumDistance: 4, coordinateSpace: .named(Self.trackSpace))
+                .onChanged { v in
+                    let at = nestHour(v.location.y, in: host)
+                    if nestScrub?.hostKey == key {
+                        if nestScrub?.current != at { Haptic.tick() }
+                        nestScrub?.current = at
+                    } else {
+                        selection = nil
+                        openGap = nil
+                        nestScrub = NestScrub(hostKey: key,
+                                              anchor: nestHour(v.startLocation.y, in: host),
+                                              current: at)
+                    }
+                }
+                .onEnded { _ in
+                    guard let s = nestScrub, s.hostKey == key else { return }
+                    nestScrub = nil
+                    guard s.isDrawn else { return }
+                    Haptic.snap()
+                    onAddWithinRoutine(s.start, s.hours)
+                }
+        )
+        .help(String(localized: "\(host.title) 시간 안에 일정 추가 (회의 등)"))
+        .offset(x: Self.gutter + rect.minX, y: rect.minY)
+    }
+
+    /// 자 위 높이 → 시각. 15분 격자에 붙이고 **그 일정의 머리와 발치 안**에 가둔다.
+    private func nestHour(_ y: CGFloat, in host: TimeSegment) -> Double {
+        let low = (max(host.logicalStart, window.start) * 4).rounded(.up) / 4
+        let high = (min(host.logicalStart + host.logicalDuration, window.end) * 4).rounded(.down) / 4
+        return min(max(trackHour(y), low), max(low, high))
+    }
+
+    /// 우클릭으로 열었을 때 **몇 시부터 한 시간**을 제안할지.
+    ///
+    /// 지금이 그 띠 안이면 **다음 15분**부터 — 10:59에 회사 띠에서 열었는데 09:00이 뜨면
+    /// 사람이 다이얼을 여덟 번 돌려야 한다. 오늘이 아니거나 이미 지난 띠면 머리에서 시작한다.
+    /// 이미 얹어 둔 일정이 있으면 그 뒤로 비켜 세운다.
+    private func nestSuggestion(_ seg: TimeSegment) -> (start: Double, hours: Double) {
+        let head = seg.logicalStart
+        let tail = seg.logicalStart + seg.logicalDuration
+        var start = head
+        if isToday {
+            let now = DayTimelineRow.hourOfDay(Date())
+            if now > head, now < tail { start = (now * 4).rounded(.up) / 4 }
+        }
+        // 같은 띠 안에 이미 얹힌 일정들 뒤로.
+        for nested in segments.filter({ $0.isNested && !$0.isGhost })
+            .sorted(by: { $0.logicalStart < $1.logicalStart })
+        {
+            let end = nested.logicalStart + nested.logicalDuration
+            if start < end - 1e-6, nested.logicalStart < tail - 1e-6 { start = end }
+        }
+        start = min(max(start, head), max(head, tail - 0.25))
+        return (start, min(1, max(0.25, tail - start)))
+    }
+
     /// 오른쪽 동그라미 — 누르면 끝낸 것이 되고, 다시 누르면 풀린다 (→ SoftCheck, ReflectionRow의 같은 손짓).
     /// 옆 회고 판과 같은 표시라 어느 쪽에서 눌러도 양쪽이 함께 바뀐다.
     private func checkButton(_ block: PlanBlock, color: Color) -> some View {
@@ -1160,15 +1504,23 @@ struct DayScheduleView: View {
         .help(block.reviewStatus == nil ? "끝냈다고 표시한다" : "표시를 지운다 (적어 둔 회고는 그대로 남습니다)")
     }
 
+    /// 루틴·끼니 한 칸을 눌러 상세를 열 때 함께 쥐여 줄 '이 칸 지우기'.
+    /// 우클릭 메뉴의 삭제와 **같은 글자, 같은 일**이다 (→ SegmentActions.delete).
+    private func dayAction(_ seg: TimeSegment) -> RoutineDayAction? {
+        guard !seg.isGhost else { return nil }
+        let a = actions
+        return RoutineDayAction(label: seg.deleteLabel(on: day, isToday: isToday)) { a.delete(seg) }
+    }
+
     private func edit(_ seg: TimeSegment) {
         guard !seg.isGhost else { return }
         switch seg.source {
         case .planBlock(let blk):
             onEditBlock(blk)
         case .fixedRoutine(let name):
-            if let r = routines.first(where: { $0.name == name }) { onEditRoutine(r) }
+            if let r = routines.first(where: { $0.name == name }) { onEditRoutine(r, dayAction(seg)) }
         case .quotaSession(let name, _):
-            if let r = quotaRoutines.first(where: { $0.name == name }) { onEditRoutine(r) }
+            if let r = quotaRoutines.first(where: { $0.name == name }) { onEditRoutine(r, dayAction(seg)) }
         case .none:
             break
         }
@@ -1180,9 +1532,14 @@ struct DayScheduleView: View {
     }
 
     /// "09:00–18:00 · 9h". 자정을 넘기는 잠은 끝 시각을 다음 날 시각으로 적는다.
-    private func timeRange(_ seg: TimeSegment) -> String {
-        let end = (seg.logicalStart + seg.logicalDuration).truncatingRemainder(dividingBy: 24)
-        return "\(formatHour(seg.logicalStart))–\(formatHour(end)) · \(shortHours(seg.logicalDuration))"
+    ///
+    /// - Parameter start: 이 시각에 선 것처럼 적는다. 끄는 동안에는 **놓일 시각**을 넣는다 —
+    ///   알약은 손을 따라 내려가는데 옆의 글씨는 원래 시각을 그대로 말하고 있어서,
+    ///   몇 시에 놓이는지는 놓아 본 뒤에야 알 수 있었다.
+    private func timeRange(_ seg: TimeSegment, start: Double? = nil) -> String {
+        let from = start ?? seg.logicalStart
+        let end = (from + seg.logicalDuration).truncatingRemainder(dividingBy: 24)
+        return "\(formatHour(from))–\(formatHour(end)) · \(shortHours(seg.logicalDuration))"
     }
 
     // MARK: 자리 셈
@@ -1208,11 +1565,29 @@ struct DayScheduleView: View {
         let overlaysOther = seg.isNested
             || (seg.isFlexible && laned.contains { $0.start < seg.end - 1e-6 && seg.start < $0.end - 1e-6 })
         if overlaysOther {
-            let x = w * 0.45
+            let x = w * Self.nestSplit
             return CGRect(x: x, y: top, width: max(Self.pillWidth, w - x), height: height)
         }
         guard let lane = lanes[seg.id], lane.count > 1 else {
-            return CGRect(x: 0, y: top, width: w, height: height)
+            // **단단히 잡힌 긴 일정은 왼쪽 절반만 차지한다.**
+            //
+            // 09–18시 회사가 자를 통째로 덮고 있으면 그 아홉 시간 어디를 짚어도 잡히는 것은
+            // 회사뿐이라, 그 **안에** 무엇을 넣으려고 끌면 회사가 통째로 움직인다.
+            // 오른쪽 절반을 비워 두면 그 자리가 곧 '이 시간 안'이 된다 — 얹힌 것이 이미
+            // 서는 자리와 같은 x다 (→ `overlaysOther`). 왼쪽은 그대로 회사를 잡아 옮긴다.
+            let width = hostsNested(seg) ? w * Self.nestSplit : w
+            return CGRect(x: 0, y: top, width: width, height: height)
+        }
+        // 둘이 겹치면 **얹힌 것과 같은 선**(45%)에서 가른다.
+        //
+        // ⚠️ 한때 반반 + 틈 8pt로 갈랐다. 회사 위에 얹힌 회의는 45%에 서는데, 회사와 겹친
+        //    보통 블록은 50%+8에 서서 오른쪽 칸의 알약들이 한 줄에 안 섰다 — 같은 '회사 옆'인데
+        //    어떻게 거기 왔느냐에 따라 x가 달랐다. 오른쪽 칸은 어디서 왔든 한 선에서 시작한다.
+        if lane.count == 2 {
+            let split = w * Self.nestSplit
+            return lane.index == 0
+                ? CGRect(x: 0, y: top, width: split, height: height)
+                : CGRect(x: split, y: top, width: w - split, height: height)
         }
         let gap: CGFloat = 8
         let columnWidth = (w - gap * CGFloat(lane.count - 1)) / CGFloat(lane.count)

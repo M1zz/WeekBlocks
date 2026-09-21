@@ -403,7 +403,7 @@ struct DayTimelineRow: View {
     /// 계획 블록을 눌렀다 — 제목·시간·성공 기준을 고치는 편집기로.
     var onEditBlock: (PlanBlock) -> Void = { _ in }
     /// 루틴을 눌렀다 — 상세(정보·실행 전략·프리모템)로.
-    var onEditRoutine: (Routine) -> Void = { _ in }
+    var onEditRoutine: (Routine, RoutineDayAction?) -> Void = { _, _ in }
     /// 루틴의 요일·시각을 고치는 편집기로.
     var onEditRoutineSchedule: (Routine) -> Void = { _ in }
     /// 요일을 눌렀을 때 — 그날의 일간으로.
@@ -412,6 +412,10 @@ struct DayTimelineRow: View {
     // 드래그 중인 세그먼트와 이동량(px). 같은 행 안에서만 유효.
     @State private var dragId: String? = nil
     @State private var dragPx: CGFloat = 0
+    /// **끄는 띠가 놓일 시각.** 손을 떼면 여기 적힌다 — 띠가 선 자리와 위에 뜨는 시각이
+    /// 이 값 하나를 본다. 한 칸(15분) 넘어갈 때마다 손끝에 딸깍.
+    /// (일간과 같은 손 → DayScheduleView 의 `dragHour`)
+    @State private var dragHour: Double? = nil
     /// 카드를 이 줄 위로 끌고 와 있는가. 받을 자리라는 것을 테두리로 말한다.
     @State private var dropTargeted = false
     /// 요일 글자를 가리키는 중. 누르면 그날로 들어간다는 것을 동그라미가 부풀어 말한다.
@@ -522,7 +526,10 @@ struct DayTimelineRow: View {
 
                     // 활동 구간 — 창 밖은 그리지 않고, 걸친 것은 잘라서 그린다.
                     ZStack(alignment: .leading) {
-                        ForEach(segments) { seg in
+                        // 뺀 루틴·끼니(유령)는 안 그린다. 지웠는데 점선으로 남아 있으면 안 지워진
+                        // 것으로 읽힌다 — 끼니는 하루 세 번이라 특히. 되살리기는 그날 일간 머리의
+                        // '숨긴 것' 칩에 있다 (→ DayScheduleView.restorableGhosts).
+                        ForEach(segments.filter { !$0.isGhost }) { seg in
                             if let vis = window.clamp(seg.start, seg.end) {
                                 let x = window.x(vis.start, width: w)
                                 let segW = window.x(vis.end, width: w) - x
@@ -577,6 +584,8 @@ struct DayTimelineRow: View {
                     }
                 }
                 .clipShape(Capsule(style: .continuous))
+                // 끄는 띠가 내려앉을 시각 — 껍질 밖에 얹어 양끝에서도 안 잘린다.
+                .overlay(alignment: .leading) { dropGuide(rowWidth: w) }
                 .overlay {
                     // 받을 자리 표시. 카드가 올라와 있는 동안에만 테두리가 선다.
                     // 다른 줄에서 계획 블록을 끌고 와도 같은 테두리로 "여기 놓으면 이 요일"이라고 말한다.
@@ -685,15 +694,28 @@ struct DayTimelineRow: View {
                 .onChanged { v in
                     guard !seg.isGhost, moved(v.translation) else { return }
                     dragId = seg.id
-                    dragPx = v.translation.width
                     NSCursor.closedHand.set()
                     // 위아래로도 끌 수 있다 — 지나는 요일 줄에 테두리가 선다.
                     onDayTargetChange(targetDay(seg, at: v.location))
+
+                    // **끄는 내내 15분 격자에 붙는다.** 손을 그대로 따라가게 두면 띠는 14:07에
+                    // 떠 있는데 놓는 순간 14:15로 반올림된다. 30pt 줄에서 15분은 겨우 몇 픽셀이라
+                    // 그 어긋남이 눈에는 안 보이고 결과로만 나타나서, 원하는 시각에 세우려면
+                    // 놓아 보고 다시 끄는 일을 되풀이하게 된다. (일간과 같은 손)
+                    let landing = landingHour(seg, at: v.translation.width, rowWidth: rowWidth)
+                    guard dragHour != landing else { return }
+                    Haptic.snap()
+                    withAnimation(Motion.timeline) {
+                        dragHour = landing
+                        dragPx = CGFloat((landing - seg.logicalStart) / window.span) * rowWidth
+                    }
                 }
                 .onEnded { v in
+                    let landing = dragHour
                     defer {
                         dragId = nil
                         dragPx = 0
+                        dragHour = nil
                         onDayTargetChange(nil)
                     }
                     guard !seg.isGhost else { return }
@@ -703,7 +725,8 @@ struct DayTimelineRow: View {
                         return
                     }
                     // 창이 좁아졌으면 같은 픽셀이 더 적은 시간을 의미한다.
-                    let deltaHours = Double(v.translation.width / max(rowWidth, 1)) * window.span
+                    let deltaHours = landing.map { $0 - seg.logicalStart }
+                        ?? Double(v.translation.width / max(rowWidth, 1)) * window.span
                     commitDrag(seg, deltaHours: deltaHours, toDay: targetDay(seg, at: v.location))
                 }
         )
@@ -748,6 +771,52 @@ struct DayTimelineRow: View {
         abs(translation.width) > 2 || abs(translation.height) > 2
     }
 
+    /// **이만큼 끌면 몇 시에 놓이는가.** 창이 좁아졌으면 같은 픽셀이 더 적은 시간을 의미한다.
+    ///
+    /// 적히는 값과 **같은 셈**(`SegmentActions.landingHour`)에서 나온다 — 미리 보여 주는 시각과
+    /// 손을 뗐을 때 적히는 시각이 다르면 사람은 놓아 보는 쪽으로 확인하게 된다.
+    /// 보이는 창 밖으로는 못 나간다. 수면을 숨겨 6~23시만 그려져 있을 때 띠가 자 밖으로
+    /// 미끄러지면 무엇을 끌고 있는지조차 안 보인다.
+    private func landingHour(_ seg: TimeSegment, at translationWidth: CGFloat, rowWidth: CGFloat) -> Double {
+        let deltaHours = Double(translationWidth / max(rowWidth, 1)) * window.span
+        let landing = SegmentActions.landingHour(seg, deltaHours: deltaHours)
+        return min(max(landing, window.start), window.end)
+    }
+
+    /// **놓일 자리.** 끄는 동안 띠가 시작할 시각이 그 자리에 뜬다.
+    ///
+    /// 일간과 달리 여기엔 시각을 적어 둘 자(왼쪽 칸)가 줄마다 있지 않고, 30pt 줄에서 15분은
+    /// 겨우 몇 픽셀이라 띠가 선 자리만 봐서는 몇 시인지 셀 수 없다. 껍질(캡슐) **밖**에 그려
+    /// 하루의 양끝에서도 잘리지 않게 한다.
+    @ViewBuilder
+    private func dropGuide(rowWidth w: CGFloat) -> some View {
+        if let dragHour, dragId != nil {
+            Text(formatHour(dragHour))
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.accentColor, in: Capsule())
+                .shadow(color: .accentColor.opacity(0.35), radius: 3, y: 1)
+                .contentTransition(.numericText())
+                // 띠가 시작하는 자리에 왼쪽 끝을 맞춘다. 줄 오른쪽 끝에서는 밖으로 안 나가게 잡아둔다.
+                .offset(x: min(max(0, w - 48), max(0, window.x(dragHour, width: w))))
+                .allowsHitTesting(false)
+                .transition(.opacity)
+        }
+    }
+
+    /// 루틴·끼니 한 칸을 눌러 상세를 열 때 함께 쥐여 줄 '이 칸 지우기'.
+    /// 우클릭 메뉴의 삭제와 **같은 글자, 같은 일**이다 (→ SegmentActions.delete).
+    private func dayAction(_ seg: TimeSegment) -> RoutineDayAction? {
+        guard !seg.isGhost else { return nil }
+        let a = actions
+        return RoutineDayAction(label: seg.deleteLabel(on: day, isToday: isToday)) { a.delete(seg) }
+    }
+
     /// 자 위의 구간을 눌렀을 때 열리는 자리. 요일 칸의 칩을 누른 것과 같은 곳으로 간다.
     /// 유령(숨긴 것)은 고칠 게 없다 — 되살리기부터다.
     private func edit(_ seg: TimeSegment) {
@@ -756,9 +825,9 @@ struct DayTimelineRow: View {
         case .planBlock(let blk):
             onEditBlock(blk)
         case .fixedRoutine(let name):
-            if let r = routines.first(where: { $0.name == name }) { onEditRoutine(r) }
+            if let r = routines.first(where: { $0.name == name }) { onEditRoutine(r, dayAction(seg)) }
         case .quotaSession(let name, _):
-            if let r = quotaRoutines.first(where: { $0.name == name }) { onEditRoutine(r) }
+            if let r = quotaRoutines.first(where: { $0.name == name }) { onEditRoutine(r, dayAction(seg)) }
         case .none:
             break
         }
@@ -779,7 +848,7 @@ struct DayTimelineRow: View {
     /// 자정을 넘겨 잘린 조각이어도 **원본의 길이**(logicalDuration)로 센다 — 사람이 하는 일은 하나다.
     private func timerTarget(_ seg: TimeSegment) -> SegmentActions.TimerTarget? { actions.timerTarget(seg) }
 
-    private func deleteLabel(_ seg: TimeSegment) -> String { seg.deleteLabel(on: day) }
+    private func deleteLabel(_ seg: TimeSegment) -> String { seg.deleteLabel(on: day, isToday: isToday) }
 
     private func restoreLabel(_ seg: TimeSegment) -> String { seg.restoreLabel }
 

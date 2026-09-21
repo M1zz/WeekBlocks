@@ -1,25 +1,61 @@
 import SwiftUI
 import SwiftData
 
+/// 자 위의 **한 칸**(그날 그 끼니·그날 그 루틴)을 눌러 열었을 때만 생기는 손짓.
+///
+/// 이 창은 루틴 **정의**를 다룬다 — 모든 날의 식사다. 그런데 사람은 월요일 13시 식사 한 칸을
+/// 눌러 들어왔고, 그 한 칸을 지우려는 참이다. 계획 블록은 눌러 연 창에 삭제 단추가 있는데
+/// 끼니는 우클릭까지 가야 했다. 어느 칸에서 왔는지는 부른 쪽만 알기에 그쪽이 쥐여 준다.
+struct RoutineDayAction {
+    /// "이 끼니 삭제 (오늘만)" 처럼 — 우클릭 메뉴와 같은 글자 (→ TimeSegment.deleteLabel).
+    let label: String
+    let perform: () -> Void
+}
+
 struct RoutineDetailView: View {
     @Bindable var routine: Routine
+    /// 자 위의 한 칸에서 열었으면 그 칸을 지우는 손짓. 루틴 목록에서 열었으면 nil.
+    var dayAction: RoutineDayAction? = nil
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingEditor = false
+    @State private var tab: Tab = .info
+
+    private enum Tab: Hashable, CaseIterable {
+        case info, execution, premortem
+        var title: LocalizedStringKey {
+            switch self {
+            case .info: "정보"
+            case .execution: "실행 전략"
+            case .premortem: "프리모템"
+            }
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             header
             Divider()
-            TabView {
-                infoTab
-                    .tabItem { Label("정보", systemImage: "info.circle") }
-                executionTab
-                    .tabItem { Label("실행 전략", systemImage: "list.bullet.clipboard") }
-                premortemTab
-                    .tabItem { Label("프리모템", systemImage: "exclamationmark.triangle") }
+            // ⚠️ `TabView`를 쓰지 않는다. 시트 안의 TabView 는 탭 머리를 가운데 작은 칸 하나에
+            //    몰아 그려서 "정보·실행 전략·프리모템" 세 글자가 한 자리에 겹쳐 보였다.
+            //    고르는 줄(세그먼트)과 몸통을 직접 나눠 그리면 폭을 제대로 받는다.
+            Picker("", selection: $tab) {
+                ForEach(Tab.allCases, id: \.self) { Text($0.title).tag($0) }
             }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .padding(.vertical, 10)
+
+            Group {
+                switch tab {
+                case .info: infoTab
+                case .execution: executionTab
+                case .premortem: premortemTab
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         // 색을 고르면 머리의 동그라미·바탕까지 함께 물든다. 한 번에 갈리지 않게.
         .animation(Motion.disclose, value: routine.colorName)
@@ -48,6 +84,18 @@ struct RoutineDetailView: View {
             Spacer()
             // 이 화면은 정보·실행 전략만 다룬다. 이름·요일·시각을 바꾸려면 편집기가 필요한데
             // 여기서 갈 길이 없으면 막다른 길이 된다.
+            // 그날 그 칸만 지운다 — 루틴 정의와 다른 날은 그대로. 지우면 창도 닫는다
+            // (지운 것의 상세를 계속 보고 있을 까닭이 없다).
+            if let dayAction {
+                Button(role: .destructive) {
+                    dayAction.perform()
+                    dismiss()
+                } label: {
+                    Label(dayAction.label, systemImage: "trash")
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.red)
+            }
             Button("수정") { showingEditor = true }
                 .buttonStyle(.borderless)
             Button("닫기") { dismiss() }
