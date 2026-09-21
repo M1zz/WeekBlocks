@@ -11,6 +11,10 @@ final class BacklogItem {
     var dragToken: String = UUID().uuidString
     /// 연결된 BacklogCategory.uuid (없으면 nil = 미분류).
     var categoryID: String? = nil
+    /// 연결된 Project.uuid (없으면 nil = 프로젝트 없음). 분류와는 다른 축이다 (→ Project).
+    /// 단계(하위 줄)에는 안 적는다 — 최상위 할 일의 것을 따른다.
+    /// ⚠️ 아이폰 BacklogItem 에도 같은 칸이 있다. 한쪽만 고치지 말 것.
+    var projectID: String? = nil
     /// 이 할 일이 속한 주 (월요일 00:00). 지난 주에 못 한 항목 구분에 사용.
     var weekStartDate: Date = Date.currentWeekStart
     /// iOS Todo에서 체크한 완료 상태. 완료되면 맥 백로그 그리드에서는 숨긴다.

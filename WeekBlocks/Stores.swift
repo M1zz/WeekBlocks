@@ -64,10 +64,11 @@ final class PlanStore {
     static let containerID = "iCloud.com.devkoan.ScheduleDensity"
     /// 이 앱이 iCloud로 오가는 전부. **한 스토어에 여섯 타입**이 함께 산다.
     /// ⚠️ `ProMark`는 일곱 번째 타입이다 — "한쪽에서 샀다"는 표 (→ ProMark.swift).
+    /// ⚠️ `Project`는 여덟 번째 — 할 일을 끝이 있는 일로 묶는다 (→ BacklogCategory.swift).
     ///    아이폰 스토어의 같은 목록과 **글자 하나까지 같아야 한다.**
     static let schema = Schema([Routine.self, PlanBlock.self, BacklogItem.self,
                                 RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self,
-                                ProMark.self])
+                                ProMark.self, Project.self])
 
     let container: ModelContainer
     var context: ModelContext { container.mainContext }
@@ -161,7 +162,7 @@ final class TodoStore {
     /// 설정에서 부른다. 지금 있는 할 일을 먼저 떠 두고, 다음 실행 때 로컬 사본을 버리게 표시한다.
     /// 앱이 스토어를 열고 있는 동안에는 파일을 지울 수 없어서 **다음 실행**으로 미룬다.
     func requestRefetchFromCloud() {
-        LegacyTodoArchive.write(items: allItems(), categories: categories())
+        LegacyTodoArchive.write(items: allItems(), categories: categories(), projects: projects())
         UserDefaults.standard.set(true, forKey: TodoStore.refetchKey)
     }
 
@@ -200,6 +201,12 @@ final class TodoStore {
     func categories() -> [BacklogCategory] {
         let d = FetchDescriptor<BacklogCategory>(sortBy: [SortDescriptor(\.sortIndex),
                                                           SortDescriptor(\.createdAt)])
+        return (try? context.fetch(d)) ?? []
+    }
+
+    func projects() -> [Project] {
+        let d = FetchDescriptor<Project>(sortBy: [SortDescriptor(\.sortIndex),
+                                                  SortDescriptor(\.createdAt)])
         return (try? context.fetch(d)) ?? []
     }
 
@@ -282,8 +289,13 @@ final class TodoStore {
 
         let known = Set(items.map(\.dragToken))
         let knownCategories = Set(categories().map(\.uuid))
+        let knownProjects = Set(projects().map(\.uuid))
         var added = 0
         for row in archive.categories where !knownCategories.contains(row.uuid) {
+            context.insert(row.model())
+        }
+        // 프로젝트도 uuid 그대로 — 할 일이 projectID로 붙잡고 있다. 옛 스냅샷에는 없다(nil).
+        for row in archive.projects ?? [] where !knownProjects.contains(row.uuid) {
             context.insert(row.model())
         }
         for row in archive.items where !known.contains(row.dragToken) {
@@ -299,14 +311,17 @@ final class TodoStore {
     func refreshArchive() {
         let items = allItems()
         let categories = self.categories()
+        let projects = self.projects()
         // 켤 때마다 같은 내용을 다시 직렬화해 디스크에 쓸 이유가 없다.
+        // (프로젝트를 새로 만들기만 해도 다시 떠야 하므로 그 수도 본다.)
         if let current = LegacyTodoArchive.load(),
            current.items.count == items.count,
            current.categories.count == categories.count,
+           (current.projects?.count ?? 0) == projects.count,
            current.lastTouched == TodoStore.lastTouched(items) {
             return
         }
-        LegacyTodoArchive.write(items: items, categories: categories)
+        LegacyTodoArchive.write(items: items, categories: categories, projects: projects)
     }
 
     /// 이름이 같은 분류를 **가장 먼저 만들어진 하나로** 합친다.
@@ -416,10 +431,11 @@ enum LegacyTodoArchive {
 
     /// 지금 스토어에 있는 것을 그대로 떠서 덮어쓴다.
     /// '다시 받아오기' 직전에 부른다 — 클라우드가 못 돌려주는 것이 있어도 이 파일이 남는다.
-    static func write(items: [BacklogItem], categories: [BacklogCategory]) {
+    static func write(items: [BacklogItem], categories: [BacklogCategory], projects: [Project] = []) {
         let snapshot = Snapshot(capturedAt: Date(),
                                 items: items.map(ItemRow.init),
-                                categories: categories.map(CategoryRow.init))
+                                categories: categories.map(CategoryRow.init),
+                                projects: projects.map(ProjectRow.init))
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
@@ -452,6 +468,8 @@ enum LegacyTodoArchive {
         let capturedAt: Date
         let items: [ItemRow]
         let categories: [CategoryRow]
+        /// 프로젝트가 생기기 전에 뜬 스냅샷에는 이 칸이 없다 — 옵셔널이라 그대로 읽힌다.
+        var projects: [ProjectRow]? = nil
 
         /// 이 벌을 마지막으로 손댄 시각. 항목이 없으면 뜬 시각으로 본다.
         var lastTouched: Date {
@@ -467,6 +485,8 @@ enum LegacyTodoArchive {
         var createdAt: Date
         var dragToken: String
         var categoryID: String?
+        /// 옛 스냅샷에는 없다 — 옵셔널이라 nil 로 읽힌다.
+        var projectID: String?
         var weekStartDate: Date
         var isCompleted: Bool
         var completedAt: Date?
@@ -480,6 +500,7 @@ enum LegacyTodoArchive {
             createdAt = m.createdAt
             dragToken = m.dragToken
             categoryID = m.categoryID
+            projectID = m.projectID
             weekStartDate = m.weekStartDate
             isCompleted = m.isCompleted
             completedAt = m.completedAt
@@ -501,6 +522,7 @@ enum LegacyTodoArchive {
             m.completedAt = completedAt
             m.parentToken = parentToken
             m.labelRaw = labelRaw
+            m.projectID = projectID
             return m
         }
     }
@@ -528,6 +550,36 @@ enum LegacyTodoArchive {
                                     iconName: iconName, sortIndex: sortIndex)
             m.uuid = uuid
             m.createdAt = createdAt
+            return m
+        }
+    }
+
+    struct ProjectRow: Codable {
+        var uuid: String
+        var name: String
+        var colorName: String
+        var sortIndex: Int
+        var createdAt: Date
+        var isCompleted: Bool
+        var completedAt: Date?
+
+        init(_ m: Project) {
+            uuid = m.uuid
+            name = m.name
+            colorName = m.colorName
+            sortIndex = m.sortIndex
+            createdAt = m.createdAt
+            isCompleted = m.isCompleted
+            completedAt = m.completedAt
+        }
+
+        /// uuid도 그대로 — 할 일이 projectID로 이 값을 붙잡고 있다.
+        func model() -> Project {
+            let m = Project(name: name, colorName: colorName, sortIndex: sortIndex)
+            m.uuid = uuid
+            m.createdAt = createdAt
+            m.isCompleted = isCompleted
+            m.completedAt = completedAt
             return m
         }
     }

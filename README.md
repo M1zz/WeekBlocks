@@ -61,7 +61,8 @@ xcodebuild -project WeekBlocks.xcodeproj -scheme WeekBlocks \
 - `TodoTips.swift`
 - `BacklogItem+Label.swift`
 
-`BacklogItem` / `BacklogCategory` 는 같은 CloudKit 스키마를 쓰므로 **필드 추가·삭제는 반드시 양쪽 동시에** 한다.
+`BacklogItem` / `BacklogCategory` / `Project` 는 같은 CloudKit 스키마를 쓰므로 **필드 추가·삭제는 반드시 양쪽 동시에** 한다.
+`Project` 정의는 두 저장소의 `BacklogCategory.swift` 맨 아래에 **글자 하나까지 같게** 있다.
 전파 계약 필드는 맥에만 있으므로 전부 옵셔널 또는 기본값이다.
 
 ## 데이터
