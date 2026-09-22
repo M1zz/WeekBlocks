@@ -33,6 +33,12 @@ struct PreDecisionBanner: View {
 
     /// 마지막으로 닫은 안내. "2026-09-18-morning" 꼴이다.
     @AppStorage("preDecision.dismissed") private var dismissed = ""
+    /// **지금 화면에 서 있는 안내**(key). 보일지 말지를 여기 따로 들고, 바뀔 때마다 `withAnimation`으로 옮긴다.
+    ///
+    /// ⚠️ 한때 `withAnimation { dismissed = key }`로 닫았는데 **사라질 때 결이 없었다.**
+    ///    `@AppStorage`의 변경은 UserDefaults 를 한 번 돌아 나중에 화면에 닿아서 그 애니메이션에 안 실린다.
+    ///    12시가 지나거나 첫 걸음을 끝내서 저절로 내려갈 때는 애초에 애니메이션이 없었다.
+    @State private var shownKey: String?
 
     enum Kind: Equatable {
         /// 아침 — 오늘의 첫 걸음 하나.
@@ -75,10 +81,23 @@ struct PreDecisionBanner: View {
         return "\(f.string(from: now))-\(phase)"
     }
 
+    /// 지금 서야 할 안내. 없거나 오늘 닫았으면 nil.
+    private var visibleKey: String? {
+        guard let key, dismissed != key else { return nil }
+        return key
+    }
+
     var body: some View {
-        if let kind, let key, dismissed != key {
-            card(kind, key: key)
-                .transition(.disclose)
+        VStack(spacing: 0) {
+            if let kind, let key, shownKey == key {
+                card(kind, key: key)
+                    .transition(.disclose)
+            }
+        }
+        .onAppear { shownKey = visibleKey }
+        // 서야 할 것이 바뀌면(닫음·시각·첫 걸음을 끝냄) 결을 실어 옮긴다 — 아래 요일 줄도 함께 올라온다.
+        .onChange(of: visibleKey) { _, new in
+            withAnimation(Motion.disclose) { shownKey = new }
         }
     }
 
@@ -121,7 +140,9 @@ struct PreDecisionBanner: View {
 
             Button {
                 Haptic.tick()
-                withAnimation(Motion.squish) { dismissed = key }
+                // 먼저 화면에서 결을 실어 내리고, 오늘 닫았다는 것은 그다음에 적는다.
+                withAnimation(Motion.disclose) { shownKey = nil }
+                dismissed = key
             } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 10, weight: .bold))
