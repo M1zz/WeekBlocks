@@ -20,6 +20,10 @@ final class Routine {
     var weeklyHours: Double = 0
     /// 쿼터 루틴의 하루 횟수(끼니·세션). 0 = 미설정. 회당 시간 계산에 사용.
     var sessionsPerDay: Int = 0
+    /// 쿼터 루틴의 **회차별 기본 시작 시각** — "7,12.5,19" 꼴(시, 소수). nil 이면 하루 활동 구간에
+    /// 고르게 나눈 계산값을 쓴다(맥 `Routine.defaultSessionStart`). 요일마다 옮긴 것(QuotaPlacement)이 이보다 먼저다.
+    /// ⚠️ CloudKit 스키마가 늘어나는 필드다 — 맥·아이폰 양쪽에 같이 있어야 한다 (→ README).
+    var sessionStartsRaw: String? = nil
 
     var sortIndex: Int = 0
     var createdAt: Date = Date()
@@ -119,5 +123,47 @@ final class Routine {
             }
             return s
         }
+    }
+}
+
+// MARK: - 쿼터 회차의 기본 시각
+
+extension Routine {
+    /// 끼니가 고르게 놓이는 하루 활동 구간 (회차 가운데가 이 사이에 고르게 선다).
+    static let quotaWindow: (start: Double, end: Double) = (7.5, 19.5)
+
+    /// 회차 수 — 미설정(0)이면 하루 한 번으로 본다.
+    var quotaPieces: Int { max(1, sessionsPerDay) }
+
+    /// 한 회차의 길이.
+    var sessionLength: Double { (weeklyHours / 7) / Double(quotaPieces) }
+
+    /// 저장해 둔 회차별 시각. 비었거나 읽을 수 없는 칸은 빠진다(그 회차는 계산값을 쓴다).
+    var storedSessionStarts: [Double] {
+        (sessionStartsRaw ?? "").split(separator: ",").compactMap { Double($0) }
+    }
+
+    /// **고르게 나눈** 기본 시각 — 저장된 것이 없을 때 쓴다. 15분 격자에 붙인다
+    /// (옮긴 뒤 다시 기본 자리로 끌어 돌아올 수 있게).
+    static func evenSessionStart(index i: Int, pieces: Int, length each: Double) -> Double {
+        let (lo, hi) = quotaWindow
+        let center = pieces == 1 ? (lo + hi) / 2 : lo + (hi - lo) * Double(i) / Double(pieces - 1)
+        let snapped = ((center - each / 2) / 0.25).rounded() * 0.25
+        return min(max(snapped, 0), max(0, 24 - each))
+    }
+
+    /// i번째 회차의 기본 시작 시각. 저장해 둔 것이 있으면 그것, 없으면 고르게 나눈 값.
+    /// 시간표(→ TimelineLayout)와 루틴 편집기가 **같은 값**을 본다 — 편집기에 뜬 시각이 곧 자 위의 시각이다.
+    func defaultSessionStart(_ i: Int) -> Double {
+        let each = sessionLength
+        let stored = storedSessionStarts
+        if i < stored.count { return min(max(stored[i], 0), max(0, 24 - each)) }
+        return Self.evenSessionStart(index: i, pieces: quotaPieces, length: each)
+    }
+
+    /// 회차별 시각을 적는다. nil 이면 지워서 다시 고르게 나눈다.
+    func setSessionStarts(_ starts: [Double]?) {
+        guard let starts, !starts.isEmpty else { sessionStartsRaw = nil; return }
+        sessionStartsRaw = starts.map { String(format: "%g", ($0 * 4).rounded() / 4) }.joined(separator: ",")
     }
 }

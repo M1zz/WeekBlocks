@@ -104,6 +104,26 @@ struct SegmentActions {
         withAnimation(Motion.squish) { try? context.save() }
     }
 
+    /// 끼니 하나의 **지금 시각을 매일의 기본으로** 올린다 (→ Routine.sessionStartsRaw).
+    ///
+    /// 시간표에서 끄는 것은 그 주 그 요일만 바꾼다. 점심을 12시로 두려고 일곱 날을 끌어도 다음 주면
+    /// 도로 13시였다. 한 날 옮겨 보고 마음에 들면 이것으로 모든 날의 기본을 바꾼다.
+    /// 이 날 이 회차를 따로 옮겨 둔 기록은 이제 기본과 같으므로 지운다(숨긴 것이면 둔다).
+    /// 다른 날 따로 옮겨 둔 것은 그대로 — 그날만 다르게 둔 뜻이 있다.
+    func makeDailyDefault(_ seg: TimeSegment) {
+        guard case .quotaSession(let name, let index) = seg.source,
+              let r = quotaRoutines.first(where: { $0.name == name }) else { return }
+        var starts = (0..<r.quotaPieces).map { r.defaultSessionStart($0) }
+        guard index < starts.count else { return }
+        starts[index] = seg.logicalStart
+        r.setSessionStarts(starts)
+        if let p = quotaPlacements.first(where: { $0.routineName == name && $0.sessionIndex == index }), !p.hidden {
+            context.delete(p)
+        }
+        Haptic.snap()
+        withAnimation(Motion.squish) { try? context.save() }
+    }
+
     /// 숨긴(유령) 구간을 다시 보이게 한다.
     func restore(_ seg: TimeSegment) {
         switch seg.source {

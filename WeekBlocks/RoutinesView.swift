@@ -168,6 +168,8 @@ struct RoutineEditorView: View {
     @State private var durationHours: Double = 1
     @State private var weeklyHours: Double = 4
     @State private var sessionsPerDay: Int = 0
+    /// 회차별 기본 시각을 **손으로 고쳤는가**. nil 이면 고르게 나눈 값을 쓴다(저장도 nil).
+    @State private var customStarts: [Double]?
     @State private var showingDeleteConfirm = false
 
     private let iconOptions: [String] = [
@@ -303,11 +305,15 @@ struct RoutineEditorView: View {
                             }
                             .font(.callout)
                         }
-                        Text(sessionsPerDay > 0
-                             ? "회당과 주 합계는 한 값의 두 얼굴입니다 — 한쪽을 고치면 다른 쪽이 따라 바뀝니다(회당 × 횟수 × 7일). 편한 쪽으로 넣으세요.\n정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다."
-                             : "정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        if sessionsPerDay > 0 {
+                            Text("회당과 주 합계는 한 값의 두 얼굴입니다 — 한쪽을 고치면 다른 쪽이 따라 바뀝니다(회당 × 횟수 × 7일). 편한 쪽으로 넣으세요.")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    // 매일 몇 시에 — 지금 시간표에 서 있는 시각이 그대로 보이고, 여기서 고친다.
+                    if weeklyHours > 0 {
+                        sessionTimesSection
                     }
                 }
             }
@@ -318,6 +324,7 @@ struct RoutineEditorView: View {
             .animation(Motion.disclose, value: conflicts)
             .animation(Motion.disclose, value: sessionsPerDay > 0)
             .animation(Motion.disclose, value: weeklyHours > 0)
+            .animation(Motion.disclose, value: customStarts)
 
             Divider()
 
@@ -500,6 +507,70 @@ struct RoutineEditorView: View {
         return weeklyHours > 0
     }
 
+    // MARK: 회차별 시각
+
+    private var pieces: Int { max(1, sessionsPerDay) }
+    private var sessionLength: Double { (weeklyHours / 7) / Double(pieces) }
+
+    /// i번째 회차가 **지금** 서는 시각 — 고친 것이 있으면 그것, 없으면 고르게 나눈 값.
+    /// 시간표가 그리는 것과 같은 셈이다 (→ Routine.defaultSessionStart).
+    private func displayStart(_ i: Int) -> Double {
+        if let customStarts, i < customStarts.count {
+            return min(max(customStarts[i], 0), max(0, 24 - sessionLength))
+        }
+        return Routine.evenSessionStart(index: i, pieces: pieces, length: sessionLength)
+    }
+
+    private func startBinding(_ i: Int) -> Binding<Date> {
+        Binding(
+            get: {
+                let total = Int((displayStart(i) * 60).rounded())
+                var c = DateComponents(); c.hour = (total / 60) % 24; c.minute = total % 60
+                return Calendar.current.date(from: c) ?? Date()
+            },
+            set: { d in
+                let c = Calendar.current.dateComponents([.hour, .minute], from: d)
+                var starts = (0..<pieces).map(displayStart)
+                starts[i] = Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60
+                customStarts = starts
+            })
+    }
+
+    /// **매일 몇 시에** — 지금 시간표에 서 있는 시각을 그대로 보여 주고, 여기서 고치면 모든 날이 따라온다.
+    ///
+    /// 한때 이 시각은 어디에도 없었다. 하루 활동 구간(07:30~19:30)에 고르게 나눈 계산값이라, 점심을
+    /// 12시로 두려면 요일마다 끌어야 했고 다음 주면 도로 13시였다.
+    private var sessionTimesSection: some View {
+        Section {
+            ForEach(0..<pieces, id: \.self) { i in
+                HStack {
+                    Text(pieces == 1 ? String(localized: "매일") : String(localized: "\(i + 1)회"))
+                    Spacer()
+                    DatePicker("", selection: startBinding(i), displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                    Text("→ " + formatHour(displayStart(i) + sessionLength))
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
+            }
+        } header: {
+            Text("매일 몇 시에")
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(customStarts == nil
+                     ? "지금은 하루 활동 시간(07:30~19:30)에 고르게 나눈 시각입니다. 고치면 모든 날의 기본이 됩니다."
+                     : "모든 날의 기본 시각입니다. 시간표에서 그날만 옮긴 것은 그날만 따로 섭니다.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                if customStarts != nil {
+                    Button("고르게 나누기로 되돌리기") { customStarts = nil }
+                        .buttonStyle(.borderless)
+                        .font(.body)
+                }
+            }
+        }
+    }
+
     private func loadExisting() {
         guard let existing else { return }
         name = existing.name
@@ -510,6 +581,8 @@ struct RoutineEditorView: View {
         durationHours = existing.durationHours
         weeklyHours = existing.weeklyHours
         sessionsPerDay = existing.sessionsPerDay
+        let stored = existing.storedSessionStarts
+        customStarts = stored.isEmpty ? nil : stored
     }
 
     private func save() {
@@ -523,6 +596,7 @@ struct RoutineEditorView: View {
             existing.durationHours = durationHours
             existing.weeklyHours = weeklyHours
             existing.sessionsPerDay = sessionsPerDay
+            existing.setSessionStarts(customStarts.map { Array($0.prefix(pieces)) })
         } else {
             let r = Routine(
                 name: name,
@@ -535,6 +609,7 @@ struct RoutineEditorView: View {
                 sessionsPerDay: sessionsPerDay,
                 sortIndex: Int(Date().timeIntervalSince1970)
             )
+            r.setSessionStarts(customStarts.map { Array($0.prefix(pieces)) })
             context.insert(r)
             Telemetry.record(.routineAdded)
         }

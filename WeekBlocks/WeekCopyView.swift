@@ -221,7 +221,7 @@ struct WeekCopyView: View {
             }
             if duplicate { continue }
             // init이 공유 표시(TodoSharing.stamp)를 찍는다. 회고는 옮기지 않는다.
-            context.insert(PlanBlock(
+            let copy = PlanBlock(
                 day: b.day,
                 timeBand: b.timeBand,
                 durationHours: b.durationHours,
@@ -232,7 +232,10 @@ struct WeekCopyView: View {
                 concreteVerified: b.concreteVerified,
                 withinRoutine: b.withinRoutine,
                 startHour: b.startHour
-            ))
+            )
+            // 아이콘도 따라간다 — 안 적으면 새로 만든 시각에서 다른 아이콘을 뽑아, 같은 일이 주마다 달라 보인다.
+            copy.iconName = b.symbol
+            context.insert(copy)
         }
         Haptic.snap()
         withAnimation(Motion.squish) { try? context.save() }

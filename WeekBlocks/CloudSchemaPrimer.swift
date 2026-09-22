@@ -84,6 +84,8 @@ enum CloudSchemaPrimer {
         block.calendarEventID = "schema-sample-event"
         // 멈출 때 남기는 '다음 첫 동작' 칸 (→ PlanBlock.nextAction).
         block.nextAction = "schema-sample-next"
+        // 알약 아이콘 칸 (→ PlanBlock.iconName). 아이콘을 한 번이라도 누른 사람에게서만 생긴다.
+        block.iconName = "star.fill"
         // 계획·루틴에도 걸린 함께 쓰기 칸 (→ TodoSharing.swift).
         block.isShared = true
         block.originInstallID = "schema-sample-install"
@@ -91,6 +93,8 @@ enum CloudSchemaPrimer {
         let routine = Routine(name: marker, kind: .quota)
         routine.weeklyHours = 1
         routine.sessionsPerDay = 1
+        // 회차별 기본 시각 칸 (→ Routine.sessionStartsRaw). 편집기에서 시각을 고친 사람에게서만 생긴다.
+        routine.sessionStartsRaw = "12"
         routine.isShared = true
         routine.originInstallID = "schema-sample-install"
 

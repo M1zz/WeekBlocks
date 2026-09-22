@@ -59,6 +59,13 @@ final class PlanBlock {
     ///       (→ CloudSchemaPrimer.swift가 이 칸에 표본 값을 채워 올린다).
     var nextAction: String? = nil
 
+    /// **알약 아이콘** (SF Symbol 이름). nil 이면 만든 시각에서 늘 같은 하나를 뽑아 그린다
+    /// (→ `symbol`). 일간 시간표에서 알약 아이콘을 누르면 새로 뽑아 여기 적는다.
+    ///
+    /// ⚠️ **CloudKit 스키마가 늘어나는 필드다.** 맥·아이폰 PlanBlock 양쪽에 같이 있어야 하고,
+    ///    출시 전 Development → Production 스키마 배포에 실려 가야 한다 (→ CloudSchemaPrimer).
+    var iconName: String? = nil
+
     // Review (populated after the day passes)
     var reviewStatusRaw: String? = nil
     var reviewNote: String? = nil
@@ -166,5 +173,45 @@ extension PlanBlock {
         let cal = Calendar(identifier: .iso8601)
         guard let d = cal.date(byAdding: .day, value: day.rawValue, to: weekStart) else { return false }
         return cal.startOfDay(for: d) < cal.startOfDay(for: now)
+    }
+}
+
+// MARK: - 알약 아이콘
+
+extension PlanBlock {
+    /// 뽑을 수 있는 아이콘. 할 일의 성격을 짐작하지 않는 두루 쓰이는 것들이다 —
+    /// 제목을 보고 고르면 틀리는 순간 거슬리고, 무작위는 틀릴 일이 없다. 마음에 안 들면 누르면 된다.
+    static let symbolChoices: [String] = [
+        "star.fill", "leaf.fill", "flame.fill", "bolt.fill", "book.fill", "pencil",
+        "paintbrush.fill", "hammer.fill", "cup.and.saucer.fill", "fork.knife", "figure.walk",
+        "dumbbell.fill", "music.note", "gamecontroller.fill", "laptopcomputer", "phone.fill",
+        "envelope.fill", "cart.fill", "house.fill", "car.fill", "airplane", "heart.fill",
+        "brain.head.profile", "lightbulb.fill", "graduationcap.fill", "briefcase.fill",
+        "calendar", "checklist", "paperplane.fill", "camera.fill", "gift.fill", "pawprint.fill",
+        "sparkles", "moon.fill", "sun.max.fill", "drop.fill", "globe.asia.australia.fill",
+        "puzzlepiece.fill", "wrench.and.screwdriver.fill", "chart.bar.fill", "scissors",
+        "tshirt.fill", "bicycle", "tram.fill", "film.fill", "headphones", "mic.fill",
+        "bubble.left.fill", "person.2.fill", "cloud.fill",
+    ]
+
+    /// 그릴 아이콘. 정해 둔 것이 없으면 **만든 시각**에서 늘 같은 하나를 뽑는다.
+    ///
+    /// ⚠️ 씨앗으로 `dragToken`(= persistentModelID)을 쓰지 않는다. 저장 전후로 바뀌고 기기마다
+    ///    달라서, 같은 블록이 맥과 아이폰에서, 저장하기 전과 후에 다른 아이콘이 된다.
+    ///    Swift 의 `hashValue` 도 안 쓴다 — 실행할 때마다 달라진다. 그래서 FNV-1a 로 직접 섞는다.
+    var symbol: String {
+        if let iconName, !iconName.isEmpty { return iconName }
+        let ms = UInt64(max(0, createdAt.timeIntervalSince1970 * 1000))
+        var h: UInt64 = 0xcbf2_9ce4_8422_2325
+        withUnsafeBytes(of: ms.littleEndian) { bytes in
+            for b in bytes { h ^= UInt64(b); h &*= 0x0000_0100_0000_01b3 }
+        }
+        return Self.symbolChoices[Int(h % UInt64(Self.symbolChoices.count))]
+    }
+
+    /// 지금 것과 다른 아이콘을 새로 뽑아 적는다.
+    func shuffleSymbol() {
+        let current = symbol
+        iconName = Self.symbolChoices.filter { $0 != current }.randomElement() ?? current
     }
 }

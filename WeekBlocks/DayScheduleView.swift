@@ -118,6 +118,8 @@ struct DayScheduleView: View {
     /// 열어 둔 이름만 붙들고 있으면 판이 툭 닫혀서, 다섯 시간을 셋으로 채우려면 세 번 열어야 했다.
     /// 이름 대신 **시각**을 붙들었다가 새로 그려진 빈 시간에서 그 시각을 찾아 다시 연다.
     @State private var reopenGapAt: Double?
+    /// 계획 블록 알약의 **아이콘 자리**(전역 좌표). 누른 자리가 아이콘이면 아이콘을 바꾼다.
+    @State private var glyphFrames = GlyphFrames()
     /// 방금 놓인 알약. 한 번 부풀었다 내려앉는다 (→ LandingTracker).
     @State private var landing = LandingTracker()
     /// 일정이 다 드러났는가. 하루가 설 때 위에서부터 하나씩 톡톡 선다.
@@ -1085,7 +1087,10 @@ struct DayScheduleView: View {
 
     // MARK: 한 구간
 
-    /// 알약 속 그림. 루틴은 저마다 고른 아이콘, 계획 블록은 제목 첫 글자.
+    /// 알약 속 그림. 루틴은 저마다 고른 아이콘, 계획 블록도 아이콘(→ PlanBlock.symbol).
+    ///
+    /// 한때 계획 블록은 제목 첫 글자였다 — "밥먹기"는 "밥". 글자 하나로는 무엇인지보다
+    /// 몇 칸인지가 먼저 읽혔고, 같은 글자로 시작하는 일이 둘이면 구분도 안 됐다.
     private func glyph(for seg: TimeSegment) -> (symbol: String?, letter: String) {
         let letter = seg.title.trimmingCharacters(in: .whitespaces).first.map { String($0).uppercased() } ?? "•"
         switch seg.source {
@@ -1094,7 +1099,9 @@ struct DayScheduleView: View {
             return (r?.iconName, letter)
         case .quotaSession(let name, _):
             return (quotaRoutines.first { $0.name == name }?.iconName, letter)
-        default:
+        case .planBlock(let blk):
+            return (blk.symbol, letter)
+        case .none:
             return (nil, letter)
         }
     }
@@ -1229,6 +1236,18 @@ struct DayScheduleView: View {
                         }
                         guard !seg.isGhost else { return }
                         guard moved(v.translation) else {
+                            // **아이콘을 눌렀으면 아이콘을 바꾼다.** 끌기는 알약 어디서든 그대로 되고,
+                            // 누르기만 아이콘 자리에서 다르게 받는다. (단추를 따로 얹으면 그 자리에서
+                            // 끌기가 시작되지 못한다 — 알약이 가장 자연스러운 손잡이다.)
+                            if let block,
+                               glyphFrames.frames[seg.id]?.insetBy(dx: -3, dy: -3).contains(v.startLocation) == true {
+                                Haptic.tick()
+                                withAnimation(Motion.squish) {
+                                    block.shuffleSymbol()
+                                    try? context.save()
+                                }
+                                return
+                            }
                             edit(seg)
                             return
                         }
@@ -1269,6 +1288,12 @@ struct DayScheduleView: View {
                    let r = routines.first(where: { $0.name == name }) {
                     Button { onEditRoutineSchedule(r) } label: {
                         Label("요일·시각 수정…", systemImage: "calendar.badge.clock")
+                    }
+                }
+                // 끼니 — 그날 옮긴 시각을 매일의 기본으로 (→ SegmentActions.makeDailyDefault).
+                if case .quotaSession = seg.source {
+                    Button { actions.makeDailyDefault(seg) } label: {
+                        Label("이 시각을 매일 기본으로 (\(formatHour(seg.logicalStart)))", systemImage: "calendar.day.timeline.left")
                     }
                 }
                 // 확보된 시간 안에 회의 하나를 얹는다. 띠 위의 `+`와 같은 자리로 간다 —
@@ -1349,6 +1374,11 @@ struct DayScheduleView: View {
             .foregroundStyle(seg.isGhost || seg.isFlexible ? seg.color : .white)
             .frame(width: Self.pillWidth, height: min(Self.pillWidth, max(Self.minRowHeight, height)))
             .scaleEffect(hovering && !dragging ? 1.05 : 1)
+            .contentTransition(.symbolEffect(.replace))
+            // 계획 블록의 아이콘은 누르면 바뀐다 — 그 자리를 적어 둔다 (→ 끌기 제스처의 onEnded).
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                if seg.isPlanBlock { glyphFrames.frames[seg.id] = frame }
+            }
         }
         // 알약도 줄 키를 따른다. 30분짜리가 한 시간처럼 보이면 눈금이 거짓말을 한다.
         .frame(width: Self.pillWidth, height: max(Self.minRowHeight, height))
@@ -1365,6 +1395,9 @@ struct DayScheduleView: View {
         case (true, false):
             return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 더 보기")
         default:
+            if seg.isPlanBlock {
+                return String(localized: "\(seg.title) — 눌러서 보기·수정 · 알약 아이콘을 누르면 바뀜 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기")
+            }
             return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기")
         }
     }
@@ -2068,4 +2101,10 @@ extension View {
             }
         }
     }
+}
+
+/// 알약 아이콘 자리들. **관찰하지 않는 상자**다 — `@State` 딕셔너리에 바로 적으면 스크롤할 때마다
+/// 모든 알약이 자리를 적고, 그때마다 하루 시간표 전체를 다시 그린다. 누른 순간에만 읽으면 되는 값이다.
+final class GlyphFrames {
+    var frames: [String: CGRect] = [:]
 }

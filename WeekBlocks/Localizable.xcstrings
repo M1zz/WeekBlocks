@@ -309,6 +309,16 @@
         }
       }
     },
+    "%@ — 눌러서 보기·수정 · 알약 아이콘을 누르면 바뀜 · 위아래로 끌어 시각 이동(15분 단위) · 우클릭으로 더 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — Click to view or edit · Click the pill icon to change it · Drag up or down to move it (15-minute steps) · Right-click for more"
+          }
+        }
+      }
+    },
     "%@ — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 더 보기" : {
       "localizations" : {
         "en" : {
@@ -952,6 +962,16 @@
         }
       }
     },
+    "%lld회" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session %lld"
+          }
+        }
+      }
+    },
     "%lld회 (끼니·세션)" : {
       "localizations" : {
         "en" : {
@@ -983,6 +1003,7 @@
       }
     },
     "= 100%" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -993,6 +1014,7 @@
       }
     },
     "= 100%%, 단계 %lld개가 나눠 가짐" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1089,6 +1111,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10 characters or more · no vague wording"
+          }
+        }
+      }
+    },
+    "15분씩 · ← → 키로도" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In 15-minute steps · ← → keys work too"
           }
         }
       }
@@ -1584,6 +1616,16 @@
         }
       }
     },
+    "고르게 나누기로 되돌리기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spread Evenly Again"
+          }
+        }
+      }
+    },
     "고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**" : {
       "localizations" : {
         "en" : {
@@ -1826,33 +1868,22 @@
         }
       }
     },
+    "그대로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No change"
+          }
+        }
+      }
+    },
     "그대로 무료인 것" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Still free"
-          }
-        }
-      }
-    },
-    "그대로 보입니다." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stays visible."
-          }
-        }
-      }
-    },
-    "글쓰기·구현·설계처럼 맥락을 다시 불러와야 하는 일은 조각 크기로 잡아두면 시동만 걸다 끝납니다. 시간을 늘리거나, 그 앞에 '준비' 조각 단계를 따로 두세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Writing, building, designing — anything where you have to load the context back in will spend the whole fragment just spinning up. Give them more time, or put a separate “get ready” fragment in front."
           }
         }
       }
@@ -1868,12 +1899,13 @@
         }
       }
     },
-    "그대로" : {
+    "그대로 보입니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No change"
+            "value" : "Stays visible."
           }
         }
       }
@@ -1885,6 +1917,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your %lld reviews so far show which days and times work for you, and what you keep putting off."
+          }
+        }
+      }
+    },
+    "글쓰기·구현·설계처럼 맥락을 다시 불러와야 하는 일은 조각 크기로 잡아두면 시동만 걸다 끝납니다. 시간을 늘리거나, 그 앞에 '준비' 조각 단계를 따로 두세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing, building, designing — anything where you have to load the context back in will spend the whole fragment just spinning up. Give them more time, or put a separate “get ready” fragment in front."
           }
         }
       }
@@ -1962,6 +2004,7 @@
       }
     },
     "길이 (h)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2021,6 +2064,16 @@
         }
       }
     },
+    "끝낸 것 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld done"
+          }
+        }
+      }
+    },
     "끝낸 것까지 포함한 전체 할 일" : {
       "localizations" : {
         "en" : {
@@ -2037,6 +2090,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Everything, finished included, gathered week by week"
+          }
+        }
+      }
+    },
+    "끝낸 단계 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld finished steps"
+          }
+        }
+      }
+    },
+    "끝낸 단계 접기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide finished steps"
+          }
+        }
+      }
+    },
+    "끝낸 프로젝트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished Projects"
+          }
+        }
+      }
+    },
+    "끝냈다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark as done"
           }
         }
       }
@@ -2172,6 +2265,16 @@
         }
       }
     },
+    "남은 %lld개 · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld left · %@"
+          }
+        }
+      }
+    },
     "남은 시간" : {
       "localizations" : {
         "en" : {
@@ -2228,6 +2331,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All that’s left"
+          }
+        }
+      }
+    },
+    "남은 할 일 없음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing left to do"
           }
         }
       }
@@ -2414,6 +2527,26 @@
         }
       }
     },
+    "눌러서 이 프로젝트 열기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to open this project"
+          }
+        }
+      }
+    },
+    "눌러서 이 프로젝트 열기 — 할 일 적기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to open this project and write its to-dos"
+          }
+        }
+      }
+    },
     "늦게 시작했을 때 — 일정에 적힌 끝 시각 대신 지금부터의 길이를 셉니다" : {
       "localizations" : {
         "en" : {
@@ -2433,6 +2566,9 @@
           }
         }
       }
+    },
+    "다 하면" : {
+
     },
     "다 하면 %@" : {
       "localizations" : {
@@ -2504,6 +2640,16 @@
         }
       }
     },
+    "다시 열기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen"
+          }
+        }
+      }
+    },
     "다음 · %@" : {
       "localizations" : {
         "en" : {
@@ -2545,11 +2691,22 @@
       }
     },
     "단계" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Steps"
+          }
+        }
+      }
+    },
+    "단계 보기·편집" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View or edit steps"
           }
         }
       }
@@ -2560,6 +2717,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "View and edit steps…"
+          }
+        }
+      }
+    },
+    "단계 시간의 합 — 단계마다 시간을 고치면 따라 바뀝니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sum of the steps — change a step's time and this follows"
           }
         }
       }
@@ -2690,6 +2857,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This is a chunk. Put it in time you've protected."
+          }
+        }
+      }
+    },
+    "도우미 접기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Helper"
           }
         }
       }
@@ -2875,12 +3052,32 @@
         }
       }
     },
+    "만들기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        }
+      }
+    },
     "맞춰봤습니다" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reconciled"
+          }
+        }
+      }
+    },
+    "매일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every day"
           }
         }
       }
@@ -2901,6 +3098,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Looking back each day is free."
+          }
+        }
+      }
+    },
+    "매일 몇 시에" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What time each day"
           }
         }
       }
@@ -2975,6 +3182,16 @@
         }
       }
     },
+    "모든 날의 기본 시각입니다. 시간표에서 그날만 옮긴 것은 그날만 따로 섭니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These are the defaults for every day. Anything you moved on a single day in the timeline stays as it is for that day."
+          }
+        }
+      }
+    },
     "목" : {
       "comment" : "요일 한 글자",
       "localizations" : {
@@ -3022,6 +3239,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete all data"
+          }
+        }
+      }
+    },
+    "모든 프로젝트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Projects"
           }
         }
       }
@@ -3453,6 +3680,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New category name"
+          }
+        }
+      }
+    },
+    "새 프로젝트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Project"
+          }
+        }
+      }
+    },
+    "새 프로젝트…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Project…"
           }
         }
       }
@@ -3925,11 +4172,22 @@
       }
     },
     "아직 단계가 없습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No steps yet."
+          }
+        }
+      }
+    },
+    "아직 단계가 없습니다. 아래에 적어 보세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No steps yet. Write one below."
           }
         }
       }
@@ -4024,6 +4282,16 @@
         }
       }
     },
+    "안 끝낸 것으로 되돌리기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark as not done"
+          }
+        }
+      }
+    },
     "안 정한 것이 먼저 막고 있습니다." : {
       "localizations" : {
         "en" : {
@@ -4050,6 +4318,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show me how"
+          }
+        }
+      }
+    },
+    "안으로 넣기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put Inside"
           }
         }
       }
@@ -4130,6 +4408,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Everything has a day."
+          }
+        }
+      }
+    },
+    "얼마나 걸릴까요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How long will it take?"
+          }
+        }
+      }
+    },
+    "얼마나 걸릴지" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How long it takes"
           }
         }
       }
@@ -4461,6 +4759,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "왼쪽에서 프로젝트를 고르세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a project on the left."
           }
         }
       }
@@ -4861,6 +5169,16 @@
         }
       }
     },
+    "이 시각을 매일 기본으로 (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make This the Daily Default (%@)"
+          }
+        }
+      }
+    },
     "이 시간 안에 일정 추가… (회의 등)" : {
       "localizations" : {
         "en" : {
@@ -4923,12 +5241,75 @@
         }
       }
     },
+    "이 프로젝트 끝내기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finish This Project"
+          }
+        }
+      }
+    },
+    "이 프로젝트 열기…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open This Project…"
+          }
+        }
+      }
+    },
+    "이 프로젝트만 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Only This Project"
+          }
+        }
+      }
+    },
+    "이 할 일 삭제" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this to-do"
+          }
+        }
+      }
+    },
+    "이 할 일에 걸리는 시간 고르기" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how long this to-do takes"
+          }
+        }
+      }
+    },
     "이 할 일을 이루는 단계를 '되어야 하는 순서대로' 적어보세요.\n단계들은 전체 %@를 N분의 1로 나눠 갖습니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Write the steps this to-do is made of, in the order they have to happen.\nThe steps split the full %@ evenly between them."
+          }
+        }
+      }
+    },
+    "일" : {
+      "comment" : "요일 한 글자",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
           }
         }
       }
@@ -4964,23 +5345,22 @@
         }
       }
     },
+    "이름 없음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untitled"
+          }
+        }
+      }
+    },
     "이메일로 문의하기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Email the developer"
-          }
-        }
-      }
-    },
-    "일" : {
-      "comment" : "요일 한 글자",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sun"
           }
         }
       }
@@ -5491,6 +5871,16 @@
         }
       }
     },
+    "접기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse"
+          }
+        }
+      }
+    },
     "정리 노트 1장 + 동작하는 예제 1개" : {
       "comment" : "샘플 계획 블록",
       "localizations" : {
@@ -5513,6 +5903,7 @@
       }
     },
     "정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6009,6 +6400,16 @@
         }
       }
     },
+    "지금은 하루 활동 시간(07:30~19:30)에 고르게 나눈 시각입니다. 고치면 모든 날의 기본이 됩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These are spread evenly across the active day (07:30–19:30). Change them and they become the default for every day."
+          }
+        }
+      }
+    },
     "지난 %lld주까지 넓혀 보기" : {
       "localizations" : {
         "en" : {
@@ -6111,6 +6512,16 @@
         }
       }
     },
+    "진행 중인 프로젝트가 없습니다. 왼쪽 아래에서 새로 만드세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No projects in progress. Create one at the bottom left."
+          }
+        }
+      }
+    },
     "짧게 잡아 두어도 여기서 끝나지는 않습니다." : {
       "localizations" : {
         "en" : {
@@ -6152,11 +6563,22 @@
       }
     },
     "쪼개기 도우미" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Splitting helper"
+          }
+        }
+      }
+    },
+    "쪼개기 도우미…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splitting Helper…"
           }
         }
       }
@@ -6258,356 +6680,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
-          }
-        }
-      }
-    },
-    "이 할 일에 걸리는 시간 고르기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose how long this to-do takes"
-          }
-        }
-      }
-    },
-    "단계 시간의 합 — 단계마다 시간을 고치면 따라 바뀝니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sum of the steps — change a step's time and this follows"
-          }
-        }
-      }
-    },
-    "하위 %lld개 · %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld steps · %@"
-          }
-        }
-      }
-    },
-    "쪼개기 도우미…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Splitting Helper…"
-          }
-        }
-      }
-    },
-    "도우미 접기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide Helper"
-          }
-        }
-      }
-    },
-    "아직 단계가 없습니다. 아래에 적어 보세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No steps yet. Write one below."
-          }
-        }
-      }
-    },
-    "끝낸 것 %lld개" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld done"
-          }
-        }
-      }
-    },
-    "프로젝트에서 빼기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove from Project"
-          }
-        }
-      }
-    },
-    "이 할 일 삭제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete this to-do"
-          }
-        }
-      }
-    },
-    "얼마나 걸릴지" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How long it takes"
-          }
-        }
-      }
-    },
-    "단계 보기·편집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View or edit steps"
-          }
-        }
-      }
-    },
-    "끝냈다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mark as done"
-          }
-        }
-      }
-    },
-    "안 끝낸 것으로 되돌리기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mark as not done"
-          }
-        }
-      }
-    },
-    "프로젝트 이름 — 예: 테크맵" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Project name — e.g. Tech Map"
-          }
-        }
-      }
-    },
-    "할 일을 묶을 첫 프로젝트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your first project for grouping to-dos"
-          }
-        }
-      }
-    },
-    "왼쪽에서 프로젝트를 고르세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pick a project on the left."
-          }
-        }
-      }
-    },
-    "프로젝트 삭제 (할 일은 남김)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete Project (Keep Its To-Dos)"
-          }
-        }
-      }
-    },
-    "이 프로젝트 끝내기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finish This Project"
-          }
-        }
-      }
-    },
-    "다시 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reopen"
-          }
-        }
-      }
-    },
-    "할 일 적고 ⏎" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type a to-do and press ⏎"
-          }
-        }
-      }
-    },
-    "남은 할 일 없음" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing left to do"
-          }
-        }
-      }
-    },
-    "이름 없음" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Untitled"
-          }
-        }
-      }
-    },
-    "끝낸 프로젝트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finished Projects"
-          }
-        }
-      }
-    },
-    "눌러서 이 프로젝트 열기 — 할 일 적기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Click to open this project and write its to-dos"
-          }
-        }
-      }
-    },
-    "이 프로젝트 열기…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open This Project…"
-          }
-        }
-      }
-    },
-    "프로젝트…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Projects…"
-          }
-        }
-      }
-    },
-    "만들기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create"
-          }
-        }
-      }
-    },
-    "프로젝트 이름" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Project name"
-          }
-        }
-      }
-    },
-    "할 일을 묶을 프로젝트를 만든다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create a project to group to-dos"
-          }
-        }
-      }
-    },
-    "모든 프로젝트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All Projects"
-          }
-        }
-      }
-    },
-    "이 프로젝트만 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Only This Project"
-          }
-        }
-      }
-    },
-    "새 프로젝트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Project"
-          }
-        }
-      }
-    },
-    "새 프로젝트…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Project…"
-          }
-        }
-      }
-    },
-    "프로젝트 없음" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Project"
-          }
-        }
-      }
-    },
-    "프로젝트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Project"
           }
         }
       }
@@ -6854,6 +6926,16 @@
         }
       }
     },
+    "펼치기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expand"
+          }
+        }
+      }
+    },
     "평생" : {
       "localizations" : {
         "en" : {
@@ -6912,6 +6994,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro"
+          }
+        }
+      }
+    },
+    "프로젝트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Project"
+          }
+        }
+      }
+    },
+    "프로젝트 삭제 (할 일은 남김)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Project (Keep Its To-Dos)"
+          }
+        }
+      }
+    },
+    "프로젝트 없음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Project"
+          }
+        }
+      }
+    },
+    "프로젝트 이름" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Project name"
+          }
+        }
+      }
+    },
+    "프로젝트 이름 — 예: 테크맵" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Project name — e.g. Tech Map"
+          }
+        }
+      }
+    },
+    "프로젝트…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Projects…"
+          }
+        }
+      }
+    },
+    "프로젝트들을 한눈에 보고, 고르면 그 안에 할 일을 적는다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See all your projects at a glance, and pick one to write its to-dos"
+          }
+        }
+      }
+    },
+    "프로젝트에서 빼기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from Project"
           }
         }
       }
@@ -7002,6 +7164,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Times a day"
+          }
+        }
+      }
+    },
+    "하위 %lld개 · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld steps · %@"
           }
         }
       }
@@ -7138,6 +7310,16 @@
         }
       }
     },
+    "한눈에 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview"
+          }
+        }
+      }
+    },
     "할 것이 정해져 있어 바로 손이 갑니다." : {
       "localizations" : {
         "en" : {
@@ -7184,6 +7366,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type a to-do and press Enter"
+          }
+        }
+      }
+    },
+    "할 일 적고 ⏎" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type a to-do and press ⏎"
           }
         }
       }
@@ -7254,6 +7446,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shows the advice you dismissed on the To-dos screen — labels, weights, splitting tips — from the start again."
+          }
+        }
+      }
+    },
+    "할 일을 묶을 첫 프로젝트" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your first project for grouping to-dos"
+          }
+        }
+      }
+    },
+    "할 일을 묶을 프로젝트를 만든다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a project to group to-dos"
           }
         }
       }
@@ -7543,7 +7755,18 @@
         }
       }
     },
+    "회당과 주 합계는 한 값의 두 얼굴입니다 — 한쪽을 고치면 다른 쪽이 따라 바뀝니다(회당 × 횟수 × 7일). 편한 쪽으로 넣으세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per-session and weekly total are two sides of one value — change one and the other follows (per session × sessions × 7 days). Enter whichever is easier."
+          }
+        }
+      }
+    },
     "회당과 주 합계는 한 값의 두 얼굴입니다 — 한쪽을 고치면 다른 쪽이 따라 바뀝니다(회당 × 횟수 × 7일). 편한 쪽으로 넣으세요.\n정확한 요일·시간 없이 주 단위로만 추적합니다. 자유 시간 계산에는 그대로 반영됩니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

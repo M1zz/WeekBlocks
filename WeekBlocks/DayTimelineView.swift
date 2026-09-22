@@ -194,19 +194,14 @@ enum TimelineLayout {
         // 3) 주간 쿼터(시간 유연) — 끼니/세션 수만큼 하루 활동 구간(아침~저녁)에 분산.
         //    저장된 위치(드래그)가 있으면 그 자리에, 없으면 기본 위치에. 회사 등 다른 블록과 겹쳐도 되며,
         //    겹친 시간은 자유 시간을 깎지 않는다 — 남은 시간 계산은 구간 합집합으로 처리.
-        let winStart = 7.5, winEnd = 19.5   // 끼니가 놓이는 하루 활동 구간
         for q in quota where q.weeklyHours > 0 {
-            let pieces = max(1, q.sessionsPerDay)
-            let each = (q.weeklyHours / 7) / Double(pieces)
+            let pieces = q.quotaPieces
+            let each = q.sessionLength
             guard each > 0.05 else { continue }
             let hiddenSessions = quotaHidden[q.name] ?? []
             for i in 0..<pieces {
-                let center = pieces == 1
-                    ? (winStart + winEnd) / 2
-                    : winStart + (winEnd - winStart) * Double(i) / Double(pieces - 1)
-                // 기본 위치도 드래그 격자(15분)에 맞춰, 옮긴 뒤 다시 기본 자리로 드래그해 돌아올 수 있게 한다.
-                let snappedDefault = ((center - each / 2) / 0.25).rounded() * 0.25
-                let defaultStart = min(max(snappedDefault, 0), 24 - each)
+                // 기본 자리 — 루틴에 적어 둔 회차 시각, 없으면 활동 구간에 고르게 (→ Routine.defaultSessionStart).
+                let defaultStart = q.defaultSessionStart(i)
                 let s = min(max(quotaPlacement[q.name]?[i] ?? defaultStart, 0), 24 - each)
                 // 숨긴 끼니는 유령 블록으로(시간엔 영향 없음, 되살리기용).
                 segs.append(TimeSegment(id: "quota:\(q.name):\(i)", start: s, end: s + each,
@@ -743,6 +738,11 @@ struct DayTimelineRow: View {
                    let r = routines.first(where: { $0.name == name }) {
                     Button { onEditRoutineSchedule(r) } label: {
                         Label("요일·시각 수정…", systemImage: "calendar.badge.clock")
+                    }
+                }
+                if case .quotaSession = seg.source {
+                    Button { actions.makeDailyDefault(seg) } label: {
+                        Label("이 시각을 매일 기본으로 (\(formatHour(seg.logicalStart)))", systemImage: "calendar.day.timeline.left")
                     }
                 }
                 Divider()
