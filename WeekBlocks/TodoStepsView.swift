@@ -35,12 +35,31 @@ struct TodoStepsView: View {
     @FocusState private var focused: Bool
     /// 쪼개기 도우미(기본 뼈대)를 펼쳤는가. 기본은 접힘 — 부를 때만 선다.
     @State private var showsHelper = false
+    /// 끝낸 단계를 펼쳐 보는가. 기본은 접힘 — 줄기 바로 아래가 **지금 할 단계**가 되게.
+    @State private var showsFinished = false
 
     private var tree: TodoTree { TodoTree(allItems) }
 
     private var rows: [(item: BacklogItem, depth: Int)] {
         Array(tree.flattened(from: root).dropFirst())
     }
+
+    /// 다 끝난 줄 — 제가 끝났고, 아래 단계가 있으면 그것까지 다 끝났다.
+    private func isFinished(_ item: BacklogItem) -> Bool {
+        tree.hasChildren(item) ? tree.progress(of: item) >= 1 : item.isCompleted
+    }
+
+    /// 목록에 세울 줄. **끝낸 단계는 접는다.**
+    ///
+    /// 단계는 순서대로 서고 끝낸 것도 제자리에 남아서, 앞을 끝낼수록 '지금' 줄이 아래로 밀려났다.
+    /// 다섯 중 셋을 끝내면 줄기 밑으로 넉 줄을 지나야 할 차례가 나왔다 — 할 것을 찾으러 매번
+    /// 끝난 것을 다시 읽게 된다. 접어 두면 줄기 바로 밑이 늘 지금 할 단계다.
+    /// 부모가 다 끝났을 때만 그 부모를 접으므로, 보이는 자식의 부모는 언제나 보인다(가지가 안 끊긴다).
+    private var visibleRows: [(item: BacklogItem, depth: Int)] {
+        showsFinished ? rows : rows.filter { !isFinished($0.item) }
+    }
+
+    private var finishedCount: Int { rows.filter { !tree.hasChildren($0.item) && $0.item.isCompleted }.count }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -97,11 +116,14 @@ struct TodoStepsView: View {
                     // 그 아래로 가지를 친다(├ └). 들여쓰기만 있을 때는 단계가 할 일과 나란한
                     // 다른 줄들로 읽혀서 '하나를 나눈 것'이라는 느낌이 안 났다.
                     // 줄 사이 간격은 0 — 가지 선이 줄과 줄 사이에서 끊기지 않게.
-                    let branches = Self.branches(for: rows.map(\.depth))
+                    let shown = visibleRows
+                    let branches = Self.branches(for: shown.map(\.depth))
                     LazyVStack(alignment: .leading, spacing: 0) {
                         trunkRow
 
-                        ForEach(Array(rows.enumerated()), id: \.element.item.id) { index, row in
+                        if finishedCount > 0 { finishedToggle }
+
+                        ForEach(Array(shown.enumerated()), id: \.element.item.id) { index, row in
                             StepRow(
                                 item: row.item,
                                 depth: row.depth,
@@ -124,7 +146,7 @@ struct TodoStepsView: View {
                     .padding(.horizontal, 20)
                     .padding(.vertical, 12)
                     // 단계는 붙고 떨어지고 위아래로 자리를 옮긴다. 그 셋이 한 결이다.
-                    .animation(Motion.row, value: rows.map(\.item.dragToken))
+                    .animation(Motion.row, value: shown.map(\.item.dragToken))
                 }
                 .transition(.opacity)
             }
@@ -135,6 +157,42 @@ struct TodoStepsView: View {
         }
         .frame(minWidth: 560, minHeight: 480)
         .animation(Motion.screen, value: rows.isEmpty)
+    }
+
+    // MARK: - 끝낸 단계 (접힘)
+
+    /// "✓ 끝낸 단계 3개" — 줄기 바로 밑. 누르면 끝낸 것까지 제 순서대로 펼친다.
+    private var finishedToggle: some View {
+        Button {
+            withAnimation(Motion.disclose) { showsFinished.toggle() }
+        } label: {
+            HStack(spacing: 0) {
+                // 줄기에서 내려온 선이 이 줄을 지나 아래 단계로 이어진다 — 여기서 끊기면
+                // 아래 단계들이 줄기와 떨어진 것처럼 보인다.
+                BranchGuide()
+                    .stroke(Color.secondary.opacity(visibleRows.isEmpty ? 0 : 0.35),
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
+                    .frame(width: StepBranch.column)
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text(showsFinished ? "끝낸 단계 접기" : "끝낸 단계 \(finishedCount)개")
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.right")
+                        .imageScale(.small)
+                        .rotationEffect(.degrees(showsFinished ? 90 : 0))
+                        .foregroundStyle(.tertiary)
+                    Spacer()
+                }
+                .font(.body)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+            }
+            .padding(.horizontal, 8)
+            .fixedSize(horizontal: false, vertical: true)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - 줄기 (쪼개진 할 일 자신)
@@ -256,50 +314,12 @@ struct TodoStepsView: View {
             .fixedSize()
             .help(String(localized: "단계 시간의 합 — 단계마다 시간을 고치면 따라 바뀝니다"))
         } else {
-            Menu {
-                ForEach(hourChoices, id: \.self) { h in
-                    Button {
-                        setHours(root, h)
-                    } label: {
-                        if abs(h - root.durationHours) < 0.001 {
-                            Label(formatDuration(h), systemImage: "checkmark")
-                        } else {
-                            Text(formatDuration(h))
-                        }
-                    }
-                }
-            } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: "clock").font(.body)
-                    Text("다 하면 \(formatDuration(total))")
-                        .font(.body.weight(.semibold))
-                        .monospacedDigit()
-                    Image(systemName: "chevron.down")
-                        .font(.body)
-                        .imageScale(.small)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(Color.accentColor.opacity(0.1), in: Capsule())
-                .foregroundStyle(Color.accentColor)
-            }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
-            .help(String(localized: "이 할 일에 걸리는 시간 고르기"))
+            DurationPicker(hours: Binding(get: { root.durationHours },
+                                          set: { setHours(root, $0) }),
+                           prefix: "다 하면")
         }
     }
 
-    /// 고를 수 있는 시간들. 지금 값이 목록에 없으면(다른 곳에서 1시간 45분처럼 적었으면) 그것도 넣는다 —
-    /// 안 넣으면 메뉴를 열었을 때 지금 값에 체크가 없어서 무엇이 골라져 있는지 모른다.
-    private static let baseHourChoices: [Double] = [0.25, 0.5, 1, 1.5, 2, 3, 4, 6, 8]
-    private var hourChoices: [Double] {
-        let now = root.durationHours
-        guard now > 0, !Self.baseHourChoices.contains(where: { abs($0 - now) < 0.001 }) else {
-            return Self.baseHourChoices
-        }
-        return (Self.baseHourChoices + [now]).sorted()
-    }
 
 
     // MARK: - 추가 입력 줄
@@ -590,14 +610,7 @@ private struct StepRow: View {
             // 시간은 여기서 직접 적는다. 그리고 그게 전체에서 몇 %인지 바로 옆에 —
             // 시간을 손으로 적게 된 뒤로는 이 숫자가 "어디를 더 쪼개야 하나"를 말해준다.
             if !hasChildren {
-                HStack(spacing: 2) {
-                    TextField("", value: hoursBinding, format: .number.precision(.fractionLength(0...2)))
-                        .textFieldStyle(.plain)
-                        .frame(width: 34)
-                        .multilineTextAlignment(.trailing)
-                        .monospacedDigit()
-                    Text("h").font(.system(size: 11)).foregroundStyle(.secondary)
-                }
+                DurationPicker(hours: hoursBinding, style: .plain)
             }
 
             if let share {

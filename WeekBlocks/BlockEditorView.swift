@@ -217,13 +217,9 @@ struct BlockEditorView: View {
                         }
                     }
                     HStack {
-                        Text("길이 (h)")
+                        Text("얼마나 걸릴지")
                         Spacer()
-                        TextField("", value: $durationHours, format: .number.precision(.fractionLength(0...2)))
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                        Stepper("", value: $durationHours, in: 0.25...12, step: 0.25)
-                            .labelsHidden()
+                        DurationPicker(hours: $durationHours)
                     }
                 }
 
