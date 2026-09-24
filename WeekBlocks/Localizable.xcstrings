@@ -3351,7 +3351,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rainbow Workshop"
+            "value" : "Rainbow Craft"
           }
         }
       }
@@ -3361,7 +3361,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rainbow Workshop Pro"
+            "value" : "Rainbow Craft Pro"
           }
         }
       }
@@ -3371,7 +3371,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "How to use Rainbow Workshop"
+            "value" : "How to use Rainbow Craft"
           }
         }
       }
@@ -4889,7 +4889,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rainbow of Desire · Rainbow Workshop"
+            "value" : "Rainbow of Desire · Rainbow Craft"
           }
         }
       }
@@ -6799,7 +6799,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Calendar access is off, so events can't be imported. If you'd like to import them, turn on Rainbow Workshop in System Settings → Privacy & Security → Calendars. Everything else works without it."
+            "value" : "Calendar access is off, so events can't be imported. If you'd like to import them, turn on Rainbow Craft in System Settings → Privacy & Security → Calendars. Everything else works without it."
           }
         }
       }

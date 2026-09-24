@@ -15,14 +15,14 @@ DeployBar 가 배포할 때 그 절을 읽어 갑니다. 두 벌로 두면 반�
   부제  빼놓을 수 없는 시간부터 세우는 한 주 (21)
 
 English
-  Name      Rainbow Workshop (16)
+  Name      Rainbow Craft: Week Planner (27)
   Subtitle  See where your 168 hours go (27)
 
 ═════════════════════════════ 영어(미국) 필수 필드
 
 설명 (Description · 4000자까지)
 ──
-A to-do list cannot tell you whether your week actually holds it. Rainbow Workshop lets you put the week down where you can see it.
+A to-do list cannot tell you whether your week actually holds it. Rainbow Craft lets you put the week down where you can see it.
 
 Lay down the hours you cannot take back first, such as sleep, meals and work. What is left is the time you can actually use. Then drag your to-dos onto the days that are still open.
 

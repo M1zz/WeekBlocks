@@ -14,7 +14,7 @@
         },
         {
           "description": "Reflection trends and copying past weeks, with one payment.",
-          "displayName": "Rainbow Workshop Pro Lifetime",
+          "displayName": "Rainbow Craft Pro Lifetime",
           "locale": "en_US"
         }
       ],
@@ -79,7 +79,7 @@
             },
             {
               "description": "Unlocks reflection trends and copying past weeks.",
-              "displayName": "Rainbow Workshop Pro Yearly",
+              "displayName": "Rainbow Craft Pro Yearly",
               "locale": "en_US"
             }
           ],
@@ -106,7 +106,7 @@
             },
             {
               "description": "Unlocks reflection trends and copying past weeks.",
-              "displayName": "Rainbow Workshop Pro Monthly",
+              "displayName": "Rainbow Craft Pro Monthly",
               "locale": "en_US"
             }
           ],

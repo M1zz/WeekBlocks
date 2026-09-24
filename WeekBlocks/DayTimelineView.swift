@@ -478,7 +478,7 @@ struct DayTimelineRow: View {
             HStack(spacing: 5) {
                 Text(day.shortLabel)
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isToday ? Color.red : .secondary)
+                    .foregroundStyle(isToday ? Color.blue : .secondary)
                     .frame(width: 14)
                 Text(dayNumber)
                     .font(.system(size: 13, weight: .bold))
@@ -487,8 +487,9 @@ struct DayTimelineRow: View {
                     .frame(width: 26, height: 26)
                     .background {
                         if isToday {
-                            Circle().fill(Color.red)
-                                .shadow(color: .red.opacity(0.3), radius: 4, y: 1.5)
+                            // 오늘은 파랑 — 달력에서 빨강은 공휴일이라, 오늘을 빨갛게 칠하면 쉬는 날로 읽힌다.
+                            Circle().fill(Color.blue)
+                                .shadow(color: .blue.opacity(0.3), radius: 4, y: 1.5)
                         } else if labelHovering {
                             Circle().fill(Color.primary.opacity(0.07))
                         }

@@ -10,7 +10,7 @@ import Foundation
 import LeeoKit
 
 enum WeekBlocksSpec: LeeoAppSpec {
-    /// 사람에게 보여 주는 이름 — 영어 환경에서는 "Rainbow Workshop"이 된다.
+    /// 사람에게 보여 주는 이름 — 영어 환경에서는 "Rainbow Craft"이 된다.
     static var appName: String { String(localized: "무지개 공방", comment: "앱 이름") }
     static let developerEmail = "leeo@kakao.com"
 

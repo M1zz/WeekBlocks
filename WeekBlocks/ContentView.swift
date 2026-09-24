@@ -851,18 +851,18 @@ struct ContentView: View {
             VStack(spacing: 4) {
                 Text(day.shortLabel)
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(today ? Color.red : .secondary)
+                    .foregroundStyle(today ? Color.blue : .secondary)
                 ZStack {
                     if selected {
                         Circle()
-                            .fill(today ? Color.red : Color.accentColor)
-                            .shadow(color: (today ? Color.red : Color.accentColor).opacity(0.35), radius: 5, y: 2)
+                            .fill(today ? Color.blue : Color.accentColor)
+                            .shadow(color: (today ? Color.blue : Color.accentColor).opacity(0.35), radius: 5, y: 2)
                             .matchedGeometryEffect(id: "selectedDay", in: dayStripNamespace)
                     }
                     Text(dayNumber(day))
                         .font(.system(size: 15, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                        .foregroundStyle(selected ? Color.white : (today ? Color.red : Color.primary))
+                        .foregroundStyle(selected ? Color.white : (today ? Color.blue : Color.primary))
                 }
                 .frame(width: 32, height: 32)
                 // 지난 날인데 안 찍은 것이 남았다. 그 요일을 열기 전에 알아야 한다.

@@ -1,4 +1,4 @@
-// Builds the App Store screenshot mockups for Rainbow Workshop / 무지개 공방 (macOS),
+// Builds the App Store screenshot mockups for Rainbow Craft / 무지개 공방 (macOS),
 // in both languages the app speaks: English (en/) and Korean (ko/).
 //
 // The Mac app cannot be built or run here (no macOS/Xcode), so these are pixel
@@ -97,7 +97,7 @@ const C = { red:'#FF3B30', orange:'#FF9500', yellow:'#FFCC00', green:'#34C759',
 // sample data, so they are simply written in each language.
 const STRINGS = {
   en: {
-    lang:'en', app:'Rainbow Workshop',
+    lang:'en', app:'Rainbow Craft',
     timer:'Timer', review:'Review', settings:'Settings', more:'More',
     weekRange:'Mar 3 – Mar 9', thisWeek:'This week',
     lensPlan:'Block view', lensDay:'Timeline view',

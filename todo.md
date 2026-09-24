@@ -1080,3 +1080,11 @@ sortIndex·createdAt·isCompleted·completedAt. 관계 대신 uuid 문자열로 
       기본과 같아지므로 지우고, 다른 날 따로 옮긴 것은 그대로 둔다.
 - [ ] ⚠️ **새 CloudKit 칸 `CD_Routine.CD_sessionStartsRaw`** — Production 배포 대상(프로젝트·nextAction·iconName과 함께).
       맥 표본 올리기가 채운다(쿼터 루틴 표본). 아이폰 Routine 에도 칸을 넣었다(아이폰은 끼니 시각을 안 그린다).
+
+## 1.1.6 — 영어 이름 Rainbow Craft, 오늘은 파랑 (2026-09-24)
+- [x] 영어 이름 Rainbow Workshop → Rainbow Craft (앱 안·스크린샷·영문 페이지). 스토어 이름은 `Rainbow Craft: Week Planner`
+- [x] 오늘 표시를 빨강에서 파랑으로 (빨강은 공휴일로 읽힌다) — 주간 두 보기·일간 날짜 줄·일간 머리
+- [x] `LSHasLocalizedDisplayName` — 예전 `WeekBlocks.app`으로 설치된 사람도 스포트라이트에서 이름으로 찾게
+- [ ] App Store Connect: English (U.S.) 현지화 추가, 이름 `Rainbow Craft: Week Planner`
+- [x] 1.1.6 릴리즈 노트
+- [ ] 스크린샷 목업(build.mjs)의 오늘 표시도 파랑으로 맞추기

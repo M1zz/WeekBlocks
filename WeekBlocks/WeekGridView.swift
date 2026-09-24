@@ -295,7 +295,7 @@ struct DayColumn: View {
             VStack(spacing: 3) {
                 Text(day.shortLabel)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(isToday ? Color.red : .secondary)
+                    .foregroundStyle(isToday ? Color.blue : .secondary)
                 Text(dayNumber)
                     .font(.system(size: 17, weight: .bold))
                     .monospacedDigit()
@@ -303,9 +303,10 @@ struct DayColumn: View {
                     .frame(width: 32, height: 32)
                     .background {
                         if isToday {
+                            // 오늘은 파랑 — 달력에서 빨강은 공휴일이라, 오늘을 빨갛게 칠하면 쉬는 날로 읽힌다.
                             Circle()
-                                .fill(Color.red)
-                                .shadow(color: .red.opacity(0.35), radius: 5, y: 2)
+                                .fill(Color.blue)
+                                .shadow(color: .blue.opacity(0.35), radius: 5, y: 2)
                         } else if headerHovering, onOpenDay != nil {
                             Circle().fill(Color.primary.opacity(0.06))
                         }

@@ -174,7 +174,7 @@ struct DayScheduleView: View {
         HStack(alignment: .center, spacing: 10) {
             Text(day.longLabel)
                 .font(.system(size: 17, weight: .bold, design: .rounded))
-                .foregroundStyle(isToday ? Color.red : .primary)
+                .foregroundStyle(isToday ? Color.blue : .primary)
             // 남은 시간은 말랑한 알약 하나 — 숫자가 표의 칸이 아니라 한마디로 읽힌다.
             HStack(spacing: 4) {
                 Image(systemName: overbooked ? "exclamationmark.circle.fill" : "hourglass")
