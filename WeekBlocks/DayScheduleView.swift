@@ -1317,7 +1317,7 @@ struct DayScheduleView: View {
                 }
             }
         }
-        // 무엇을 할 수 있는지는 띠마다 다르다. 루틴은 **오늘만 빼기**가 우클릭에 들어 있어서,
+        // 무엇을 할 수 있는지는 띠마다 다르다. 루틴은 **오늘만 삭제**가 우클릭에 들어 있어서,
         // "더 보기"라고만 적어 두면 거기 있는 줄 모른다. 긴 일정은 오른쪽 절반이 '이 시간 안'이다.
         .help(helpText(seg))
     }
@@ -1391,7 +1391,7 @@ struct DayScheduleView: View {
         let isRoutine: Bool = { if case .fixedRoutine = seg.source { return true }; return false }()
         switch (hostsNested(seg), isRoutine) {
         case (true, true):
-            return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 오늘만 빼기")
+            return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 오늘만 삭제")
         case (true, false):
             return String(localized: "\(seg.title) — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 더 보기")
         default:

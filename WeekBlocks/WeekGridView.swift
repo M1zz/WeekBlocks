@@ -120,6 +120,8 @@ struct DayColumn: View {
     let onEditRoutine: (Routine) -> Void
     /// 루틴 '수정' — 이름·요일·시각을 바꾸는 편집기
     var onEditRoutineSchedule: ((Routine) -> Void)? = nil
+    /// 루틴·끼니 하나를 이 주 이 요일에서만 지운다 (→ ContentView.deleteRoutineItem).
+    var onDeleteRoutine: ((DayPlanItem) -> Void)? = nil
     let onDropBacklog: (String) -> Void
     /// 칩과 칩 **사이**에 떨어뜨렸을 때. (토큰, 놓을 시각, 그 틈의 크기)
     /// 틈보다 큰 것이 들어오면 받는 쪽이 겹침을 알린다 (→ ContentView.dropIntoGap).
@@ -233,6 +235,12 @@ struct DayColumn: View {
     }
 
     /// 한 항목의 칩. '지금' 선을 끼우느라 두 곳에서 쓰므로 따로 뺐다.
+    private func deleteAction(_ item: DayPlanItem, isMeal: Bool) -> (label: String, perform: () -> Void)? {
+        guard let onDeleteRoutine else { return nil }
+        return (SegmentActions.routineDeleteLabel(isMeal: isMeal, on: day, isToday: isToday),
+                { onDeleteRoutine(item) })
+    }
+
     @ViewBuilder
     private func chip(for item: DayPlanItem) -> some View {
         switch item {
@@ -244,7 +252,8 @@ struct DayColumn: View {
                         subtitleOverride: shortHours(hours),
                         currentSlot: liveSlot(for: item),
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } },
-                        dragToken: item.dragToken(on: day)) {
+                        dragToken: item.dragToken(on: day),
+                        delete: deleteAction(item, isMeal: false)) {
                 onEditRoutine(routine)
             }
         case .quotaSession(let routine, let index, _):
@@ -255,7 +264,8 @@ struct DayColumn: View {
                         currentSlot: liveSlot(for: item),
                         timerToken: "\(TaskTimer.token(for: routine)):\(index)",
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } },
-                        dragToken: item.dragToken(on: day)) { onEditRoutine(routine) }
+                        dragToken: item.dragToken(on: day),
+                        delete: deleteAction(item, isMeal: true)) { onEditRoutine(routine) }
         case .block(let block, _):
             BlockChip(block: block, currentSlot: liveSlot(for: item)) { onEdit(block) }
         }
@@ -394,6 +404,8 @@ struct RoutineChip: View {
     var onEdit: (() -> Void)? = nil
     /// 끌 때 실어 보낼 표. 있으면 같은 요일 안에서 끌어 시각을 옮길 수 있다 (→ RoutineDragToken).
     var dragToken: String? = nil
+    /// 그날만 지우기 — 글자와 할 일. 없으면 메뉴에 안 선다.
+    var delete: (label: String, perform: () -> Void)? = nil
     let onTap: () -> Void
 
     @State private var hovering = false
@@ -445,8 +457,15 @@ struct RoutineChip: View {
                                hours: timerHours,
                                iconName: routine.iconName,
                                colorName: routine.colorName)
+                // 시간축·일간과 같은 글자, 같은 일 (→ SegmentActions.delete). 되살리기는 시간축의 '숨긴 것'에서.
+                if let delete {
+                    Divider()
+                    Button(role: .destructive, action: delete.perform) {
+                        Label(delete.label, systemImage: "trash")
+                    }
+                }
             }
-            .help("\(routine.scheduleDescription)\n눌러서 상세 · 같은 요일 안에서 끌어 시각 옮기기 · 우클릭으로 타이머 시작")
+            .help("\(routine.scheduleDescription)\n눌러서 상세 · 같은 요일 안에서 끌어 시각 옮기기 · 우클릭으로 타이머 시작·삭제")
     }
 
     private var chipBody: some View {

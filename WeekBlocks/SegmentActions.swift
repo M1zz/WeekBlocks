@@ -169,6 +169,18 @@ struct SegmentActions {
     }
 }
 
+extension SegmentActions {
+    /// 루틴·끼니를 그날만 지우는 글자. 시간축·일간·블록으로 보기가 **같은 말**을 쓰도록 한 곳에 둔다.
+    static func routineDeleteLabel(isMeal: Bool, on day: DayOfWeek, isToday: Bool) -> String {
+        if isMeal {
+            return isToday ? String(localized: "이 끼니 삭제 (오늘만)")
+                           : String(localized: "이 끼니 삭제 (이번 주 \(day.shortLabel)만)")
+        }
+        return isToday ? String(localized: "이 루틴 삭제 (오늘만)")
+                       : String(localized: "이 루틴 삭제 (이번 주 \(day.shortLabel)만)")
+    }
+}
+
 extension TimeSegment {
     /// 요일까지 넘나들 수 있는 것(계획 블록)인가. 떠 있게 그릴지 여기서 정한다.
     var isPlanBlock: Bool {
@@ -186,20 +198,17 @@ extension TimeSegment {
     }
 
     /// - Parameter isToday: 보고 있는 날이 오늘인가. 하루만 펴 놓고 보는 자리(일간)에서는
-    ///   "이번 주 월요일에서 빼기"보다 **"오늘만 빼기"**가 무슨 일이 일어나는지를 바로 말한다.
+    ///   "이번 주 월만"보다 **"오늘만"**이 무슨 일이 일어나는지를 바로 말한다.
     ///   루틴을 하루만 뺀 것인지 루틴 자체를 지운 것인지는 되돌릴 수 있느냐가 걸린 물음이라,
     ///   글자가 한 번에 안 읽히면 사람은 아예 안 누른다.
     func deleteLabel(on day: DayOfWeek, isToday: Bool = false) -> String {
         switch source {
-        case .fixedRoutine:
-            isToday ? String(localized: "오늘만 빼기 (루틴은 그대로)")
-                    : String(localized: "이번 주 \(day.longLabel)에서 빼기")
-        // 끼니는 **삭제**라고 부른다. 계획 블록과 같은 말이어야 같은 손짓인 줄 안다 —
-        // "빼기"라고 적어 두었더니 지우는 단추를 따로 찾았다. 루틴 정의(다른 날의 끼니)는
-        // 그대로라서 뒤에 붙은 괄호가 그 범위를 말한다.
-        case .quotaSession:
-            isToday ? String(localized: "이 끼니 삭제 (오늘만)")
-                    : String(localized: "이 끼니 삭제 (이번 주 \(day.shortLabel)만)")
+        // 루틴도 끼니도 **삭제**라고 부른다. 계획 블록과 같은 말이어야 같은 손짓인 줄 안다 —
+        // "빼기"라고 적어 두었더니 지우는 단추를 따로 찾았고, 끼니만 '삭제'로 바꾸자 이번엔
+        // 고정 루틴은 하루만 지울 수 없는 줄 알았다. 루틴 정의(다른 날)는 그대로라서
+        // 뒤에 붙은 괄호가 그 범위를 말한다.
+        case .fixedRoutine: SegmentActions.routineDeleteLabel(isMeal: false, on: day, isToday: isToday)
+        case .quotaSession: SegmentActions.routineDeleteLabel(isMeal: true, on: day, isToday: isToday)
         case .planBlock:    String(localized: "이 계획 삭제")
         case .none:         String(localized: "삭제")
         }

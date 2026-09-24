@@ -1107,6 +1107,27 @@ struct ContentView: View {
         )
     }
 
+    /// 블록으로 보기에서 루틴·끼니 하나를 그날만 지운다.
+    /// 칸 항목은 시간축 구간에서 나왔으므로(→ dayPlanItems) 그 구간을 되찾아 **시간축·일간과 같은 자리에** 적는다.
+    private func deleteRoutineItem(_ item: DayPlanItem, on day: DayOfWeek) {
+        let seg = daySegments(on: day).first { seg in
+            guard !seg.isGhost else { return false }
+            switch (item, seg.source) {
+            case (.fixedRoutine(_, let oid, _, _), .fixedRoutine): return seg.id == oid
+            case (.quotaSession(let r, let index, _), .quotaSession(let name, let i)): return r.name == name && index == i
+            default: return false
+            }
+        }
+        guard let seg else { return }
+        let cal = Calendar(identifier: .iso8601)
+        SegmentActions(context: context, day: day, weekStart: selectedWeek,
+                       routines: fixedRoutines(on: day),
+                       quotaRoutines: routines.filter { $0.kind == .quota },
+                       occurrences: allOccurrences.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) },
+                       quotaPlacements: allQuotaPlacements.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) })
+            .delete(seg)
+    }
+
     private func dayPlanItems(on day: DayOfWeek) -> [DayPlanItem] {
         let dayBlocks = weekBlocks.filter { $0.day == day }
         let fixed = fixedRoutines(on: day)
@@ -1341,6 +1362,7 @@ struct ContentView: View {
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
                         },
+                        onDeleteRoutine: { item in deleteRoutineItem(item, on: day) },
                             onDropBacklog: { token in
                                 dropBacklogItem(token: token, day: day)
                             },

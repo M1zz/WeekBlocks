@@ -253,12 +253,12 @@
         }
       }
     },
-    "%@\n눌러서 상세 · 같은 요일 안에서 끌어 시각 옮기기 · 우클릭으로 타이머 시작" : {
+    "%@\n눌러서 상세 · 같은 요일 안에서 끌어 시각 옮기기 · 우클릭으로 타이머 시작·삭제" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\nClick for details · drag within the same day to change the time · right-click to start the timer"
+            "value" : "%@\nClick for details · drag within the same day to change the time · right-click to start the timer or delete it"
           }
         }
       }
@@ -329,12 +329,12 @@
         }
       }
     },
-    "%@ — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 오늘만 빼기" : {
+    "%@ — 눌러서 보기·수정 · 위아래로 끌어 시각 이동(15분 단위) · 오른쪽 절반을 끌면 이 시간 안에 일정 추가 · 우클릭으로 오늘만 삭제" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ — Click to view or edit · Drag up or down to move it (15-minute steps) · Drag in the right half to add something inside this time · Right-click to skip it just for today"
+            "value" : "%@ — Click to view or edit · Drag up or down to move it (15-minute steps) · Drag in the right half to add something inside this time · Right-click to delete it just for today"
           }
         }
       }
@@ -4683,12 +4683,12 @@
         }
       }
     },
-    "오늘만 빼기 (루틴은 그대로)" : {
+    "이 루틴 삭제 (오늘만)" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skip It Just for Today (the Routine Stays)"
+            "value" : "Delete This Routine (Today Only)"
           }
         }
       }
@@ -5385,12 +5385,12 @@
         }
       }
     },
-    "이번 주 %@에서 빼기" : {
+    "이 루틴 삭제 (이번 주 %@만)" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skip it on %@ this week"
+            "value" : "Delete This Routine (Only %@ This Week)"
           }
         }
       }
