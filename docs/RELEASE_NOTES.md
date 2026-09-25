@@ -1,5 +1,48 @@
 # 릴리즈 노트
 
+## 1.1.7
+
+### 앱스토어 (한국어)
+
+맥의 언어가 한국어나 영어가 아니면 이제 영어로 보입니다
+설정과 앱 메뉴에서 English와 한국어 중 원하는 언어를 고를 수 있습니다
+한 주를 일요일부터 시작하도록 바꿀 수 있습니다
+점심처럼 다른 일정과 겹친 시간을 어느 쪽 몫으로 셀지 고를 수 있습니다
+루틴을 오늘만 삭제해도 그대로 남아 있던 문제를 고쳤습니다
+주간 요약이 겹친 시간을 두 번 세던 문제를 고쳤습니다
+
+### App Store (English)
+
+If your Mac isn't set to Korean or English, the app now appears in English
+Choose English or Korean in Settings or from the app menu
+Start your week on Sunday if you prefer
+Choose how overlapping time is counted, such as lunch during work
+Fixed deleting a routine for today only having no effect
+The weekly summary no longer counts overlapping time twice
+
+### 무지개 공방 (macOS)
+
+**영어가 기본입니다.**
+
+맥의 언어가 독일어처럼 앱에 없는 말이면 한국어가 떴습니다. 이제 영어로 보입니다. 한국어 맥에서는 그대로 한국어입니다.
+
+**앱 안에서 언어를 고릅니다.**
+
+설정 맨 위와 앱 이름 메뉴에 'Language · 언어'가 있습니다. 고르면 앱이 다시 열리며 바뀝니다. 시스템 설정의 앱별 언어와 같은 값이라 어느 쪽에서 바꿔도 맞습니다.
+
+**한 주를 일요일부터 볼 수 있습니다.**
+
+설정의 '주 시작'에서 고릅니다. 보이는 차례만 바뀌고 적어 둔 계획과 루틴은 그대로이며, 아이폰 앱과도 그대로 맞습니다.
+
+**겹친 시간 세기.**
+
+회사 안에 점심이 있으면 그 한 시간을 회사로 셀지 점심으로 셀지 설정에서 고릅니다. 그림으로 두 기준을 비교해 볼 수 있고, 시간표에 처음 겹침이 생기면 배너가 한 번 묻습니다. 하루 남은 시간은 어느 쪽이든 같습니다.
+
+**고친 것**
+
+- 맥과 아이폰을 함께 쓰면 '이 루틴 삭제 (오늘만)'을 눌러도 루틴이 남아 있던 문제를 고쳤습니다.
+- 주간 요약의 '고정 루틴'과 '남은 자유 시간'이 회사 안의 점심처럼 겹친 시간을 두 번 세던 것을 고쳤습니다. 이제 일간의 남은 시간과 같은 셈입니다.
+
 ## 1.1.6
 
 ### 앱스토어 (한국어)

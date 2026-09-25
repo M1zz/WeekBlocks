@@ -24,6 +24,16 @@
         }
       }
     },
+    "%@ %@ · %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ · %3$@ %4$@"
+          }
+        }
+      }
+    },
     "— 끝냈으면 체크하세요" : {
       "localizations" : {
         "en" : {
@@ -1020,6 +1030,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "= 100%%, split across %lld steps"
+          }
+        }
+      }
+    },
+    "「%@」 안에 「%@」 %@ 겹쳐 있어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%2$@” overlaps “%1$@” by %3$@"
+          }
+        }
+      }
+    },
+    "겹친 시간 세기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counting Overlaps"
+          }
+        }
+      }
+    },
+    "겹친 시간을 어느 쪽 몫으로 셀까요? 남은 시간은 어느 쪽이든 같고, 바깥 일정의 길이만 달라집니다. 설정에서 언제든 바꿀 수 있습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which one should the overlap count toward? Your free time is the same either way; only the length of the outer event changes. You can change this anytime in Settings."
+          }
+        }
+      }
+    },
+    "바깥 일정 기준" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Count by the Outer Event"
+          }
+        }
+      }
+    },
+    "안쪽 일정 기준" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Count by the Inner Event"
+          }
+        }
+      }
+    },
+    "예: 회사 09:00–18:00 안에 점심 12:00–13:00. 하루에 남은 시간은 어느 기준이든 14시간으로 같고, 회사를 몇 시간으로 적을지만 달라집니다. 회사 안에 올린 회의처럼 '루틴 안' 일정은 루틴에서 하는 일이라 빼지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Example: Lunch 12:00–13:00 inside Work 09:00–18:00. Your free time for the day is 14 hours under either rule; only how many hours Work shows changes. Events placed inside a routine, like a meeting inside Work, are part of that routine and are never subtracted."
+          }
+        }
+      }
+    },
+    "점심" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunch"
+          }
+        }
+      }
+    },
+    "점심 먹는 동안은 회사 시간이 아닙니다. 겹친 만큼 회사에서 뺍니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While you're at lunch, you're not at work. The overlap is taken out of work time."
+          }
+        }
+      }
+    },
+    "지금 기준대로 두고 더 묻지 않기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the current rule and don't ask again"
+          }
+        }
+      }
+    },
+    "한 주를 보여 주는 차례만 바뀝니다. 적어 둔 계획과 루틴은 그대로이고, 아이폰 앱과도 그대로 맞습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the order the week is shown in changes. Your plans and routines stay as they are and still match the iPhone app."
+          }
+        }
+      }
+    },
+    "회사" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work"
+          }
+        }
+      }
+    },
+    "회사 안에서 먹은 점심도 회사 시간으로 셉니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunch eaten during work still counts as work time."
           }
         }
       }

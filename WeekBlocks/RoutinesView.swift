@@ -150,6 +150,8 @@ struct RoutineBlock: View {
 }
 
 struct RoutineEditorView: View {
+    /// 요일 단추도 시간표와 같은 차례로 선다 (→ WeekStartSetting).
+    @AppStorage(WeekStartSetting.key) private var weekStartsOnSunday = false
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     /// 겹침을 미리 말해 주려면 이미 세워 둔 것들을 알아야 한다.
@@ -207,7 +209,7 @@ struct RoutineEditorView: View {
                 if kind == .fixed {
                     Section("요일") {
                         HStack(spacing: 6) {
-                            ForEach(DayOfWeek.allCases) { day in
+                            ForEach(DayOfWeek.displayOrder(sundayFirst: weekStartsOnSunday)) { day in
                                 DayToggle(
                                     label: day.shortLabel,
                                     isOn: selectedDays.contains(day)

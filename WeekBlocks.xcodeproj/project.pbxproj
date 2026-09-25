@@ -12,6 +12,7 @@
 		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
 		0B6B259A6790F4A36E517BC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */; };
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
+		1AFF77D8C86DCEDFDFD238A7 /* OverlapRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F14B31687AFBB85553F24C7 /* OverlapRule.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
 		2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */; };
 		2BD0550462640DD942B3590F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
@@ -70,6 +71,7 @@
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
 		E9C19CBAE78FAC241507D607 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE20311F927F785DA2C6677B /* Telemetry.swift */; };
 		EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 144D087CE2C3CFFED2EABEE8 /* LeeoKit */; };
+		EAE7E8DCDDF38D8D9E2637A2 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057B281BD7D45DD504A07D00 /* AppLanguage.swift */; };
 		ED80D0BA5F1168CBEDCE0747 /* ShareTodoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622A5D436D0F426C007C5246 /* ShareTodoView.swift */; };
 		EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */; };
 		F732F7B42572DDAE53A1BCCF /* Corner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B332338ED7B9E880F7FBE51 /* Corner.swift */; };
@@ -101,6 +103,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		057B281BD7D45DD504A07D00 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		0B332338ED7B9E880F7FBE51 /* Corner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corner.swift; sourceTree = "<group>"; };
 		0DAA819E703DC5BE377B3688 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		10227076947BFE4B02E2B004 /* Soft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Soft.swift; sourceTree = "<group>"; };
@@ -135,6 +138,7 @@
 		7970A4DA39D1705294090BDC /* TodoShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodoShare.entitlements; sourceTree = "<group>"; };
 		8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSplitAdvisor.swift; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
+		8F14B31687AFBB85553F24C7 /* OverlapRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapRule.swift; sourceTree = "<group>"; };
 		90641A10CE63E76FFACFD63E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksSpec.swift; sourceTree = "<group>"; };
 		9F541E3039606B54D810E610 /* RoutineDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineDetailView.swift; sourceTree = "<group>"; };
@@ -219,6 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				1162BD316D362F2B5D760A08 /* Affordance.swift */,
+				057B281BD7D45DD504A07D00 /* AppLanguage.swift */,
 				90641A10CE63E76FFACFD63E /* Assets.xcassets */,
 				3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */,
 				FBBBB02A0B2EEE92CBBE5E05 /* BacklogItem.swift */,
@@ -240,6 +245,7 @@
 				CC4A396C6929CB1C576DBA52 /* Models.swift */,
 				30CD73EF7D52999BFEC85767 /* Motion.swift */,
 				D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */,
+				8F14B31687AFBB85553F24C7 /* OverlapRule.swift */,
 				3DC93778BE68B512FD31ECFF /* PaywallView.swift */,
 				5CC172BAFFE573306711B4CE /* PlanBlock.swift */,
 				FAB8A8D7902B2D88193F5F44 /* PreDecision.swift */,
@@ -303,6 +309,7 @@
 				541F11E22B4F2947FA4944EF /* Resources */,
 				066E0521B58884D419671397 /* Frameworks */,
 				AEEA7B0C58E35A18FCB57F8A /* Embed Foundation Extensions */,
+				2BDE107352C4A2F5209245B9 /* 한국어 원문 표 넣기 */,
 			);
 			buildRules = (
 			);
@@ -323,6 +330,7 @@
 			buildPhases = (
 				F05602A7486B0E5C5FD77C5A /* Sources */,
 				6FC79A261161E7983E1CCC5C /* Resources */,
+				019A1D1C3BC98ECC8B5E3302 /* 한국어 원문 표 넣기 */,
 			);
 			buildRules = (
 			);
@@ -356,7 +364,7 @@
 			};
 			buildConfigurationList = 167CBDBB670FA4DE3377C1AE /* Build configuration list for PBXProject "WeekBlocks" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = ko;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
@@ -403,6 +411,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		019A1D1C3BC98ECC8B5E3302 /* 한국어 원문 표 넣기 */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/source-language-strings.py",
+				"$(SRCROOT)/TodoShare/Localizable.xcstrings",
+			);
+			name = "한국어 원문 표 넣기";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/source-language-strings.py\" \"$SRCROOT/TodoShare/Localizable.xcstrings\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/ko.lproj/Localizable.strings\"";
+		};
 		17109347C6A697BCCA93B3D6 /* 권한 문구 검사 (App Review 5.1.1(iv)) */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -422,6 +451,27 @@
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/scripts/check-permission-wording.sh\"";
 		};
+		2BDE107352C4A2F5209245B9 /* 한국어 원문 표 넣기 */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/source-language-strings.py",
+				"$(SRCROOT)/WeekBlocks/Localizable.xcstrings",
+			);
+			name = "한국어 원문 표 넣기";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/source-language-strings.py\" \"$SRCROOT/WeekBlocks/Localizable.xcstrings\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/ko.lproj/Localizable.strings\"";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -430,6 +480,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2A0A55F465DF4893B6A6A40 /* Affordance.swift in Sources */,
+				EAE7E8DCDDF38D8D9E2637A2 /* AppLanguage.swift in Sources */,
 				80A02C44C4632837BA134587 /* BacklogCategory.swift in Sources */,
 				2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */,
 				5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */,
@@ -447,6 +498,7 @@
 				12DCD47B097FBED701EECC11 /* Models.swift in Sources */,
 				5EDE5B050A5B14698839D7A9 /* Motion.swift in Sources */,
 				918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */,
+				1AFF77D8C86DCEDFDFD238A7 /* OverlapRule.swift in Sources */,
 				076A03104420525A517BD699 /* PaywallView.swift in Sources */,
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
 				7D757422C991FA2C9B300591 /* PreDecision.swift in Sources */,

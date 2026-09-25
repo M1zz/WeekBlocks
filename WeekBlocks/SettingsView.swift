@@ -14,6 +14,11 @@ struct SettingsView: View {
     var onReplayOnboarding: () -> Void = { }
 
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
+    /// 한 주를 무슨 요일부터 보이는가 (→ WeekStartSetting).
+    @AppStorage(WeekStartSetting.key) private var weekStartsOnSunday = false
+    /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 여기서 고르면 배너는 더 묻지 않는다.
+    @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
+    @AppStorage(OverlapRule.decidedKey) private var overlapRuleDecided = false
 
     /// '지금 맞춰보기'를 눌렀는가 (한 번 누르면 더 누를 일이 없다).
     @State private var matchDone = false
@@ -71,15 +76,39 @@ struct SettingsView: View {
 
             NavigationStack {
             Form {
+                // 맨 위에 둔다 — 화면 글자를 못 읽는 사람이 가장 먼저 찾는 자리다 (→ AppLanguage.swift).
+                // 글자는 번역하지 않고 두 말로 적는다. 어느 쪽 사람이든 여기가 언어 자리인 줄 안다.
                 Section {
-                    HStack {
-                        Text("주 시작")
-                        Spacer()
-                        Text("월요일")
-                            .foregroundStyle(.secondary)
+                    ForEach(AppLanguage.allCases) { lang in
+                        Button {
+                            lang.applyAndRelaunch()
+                        } label: {
+                            HStack {
+                                Image(systemName: lang == AppLanguage.chosen ? "largecircle.fill.circle" : "circle")
+                                    .foregroundStyle(lang == AppLanguage.chosen ? Color.accentColor : .secondary)
+                                Text(verbatim: lang.name)
+                                    .font(.body)
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
                     }
-                    Text("ISO 8601 기준으로 주를 계산합니다. 지역 설정이 바뀌어도 월요일 시작이 유지됩니다.")
-                        .font(.caption)
+                } header: {
+                    Text(verbatim: "Language · 언어")
+                } footer: {
+                    Text(verbatim: "The app restarts to switch. · 고르면 앱이 다시 열립니다.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+
+                Section {
+                    Picker("주 시작", selection: $weekStartsOnSunday) {
+                        Text("월요일").tag(false)
+                        Text("일요일").tag(true)
+                    }
+                    Text("한 주를 보여 주는 차례만 바뀝니다. 적어 둔 계획과 루틴은 그대로이고, 아이폰 앱과도 그대로 맞습니다.")
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 } header: {
                     Text("주간 계획")
@@ -92,6 +121,40 @@ struct SettingsView: View {
                 } footer: {
                     Text("하루 양끝의 수면 시간을 잘라내 남은 시간을 더 넓게 봅니다. 이름에 '수면·잠·취침'이 들어간 고정 루틴을 수면으로 봅니다. 잘라낼 자리에 다른 일정이 걸쳐 있으면 그 일정이 보이도록 범위를 도로 넓힙니다.")
                         .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Section {
+                    // 고르기 전에 무엇이 달라지는지 먼저 보인다 — 말로만 적은 기준은 읽고도 어느 쪽인지 모른다.
+                    ForEach(OverlapRule.allCases) { rule in
+                        Button {
+                            overlapRule = rule
+                            overlapRuleDecided = true
+                        } label: {
+                            HStack(alignment: .top, spacing: 10) {
+                                Image(systemName: overlapRule == rule ? "largecircle.fill.circle" : "circle")
+                                    .font(.body)
+                                    .foregroundStyle(overlapRule == rule ? Color.accentColor : .secondary)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(rule.title)
+                                        .font(.body.weight(.semibold))
+                                    Text(rule.summary)
+                                        .font(.body)
+                                        .foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    OverlapRuleExampleView(example: .sample, rule: rule)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                } header: {
+                    Text("겹친 시간 세기")
+                } footer: {
+                    Text("예: 회사 09:00–18:00 안에 점심 12:00–13:00. 하루에 남은 시간은 어느 기준이든 14시간으로 같고, 회사를 몇 시간으로 적을지만 달라집니다. 회사 안에 올린 회의처럼 '루틴 안' 일정은 루틴에서 하는 일이라 빼지 않습니다.")
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
 

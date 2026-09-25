@@ -46,8 +46,9 @@ struct SegmentActions {
 
         switch seg.source {
         case .fixedRoutine(let name):
-            if let occ = occurrences.first(where: { $0.routineName == name }) {
-                occ.startHourOverride = newStart
+            let same = occurrences.filter { $0.routineName == name }
+            if !same.isEmpty {
+                same.forEach { $0.startHourOverride = newStart }
             } else {
                 let occ = RoutineOccurrence(routineName: name, day: day, weekStartDate: weekStart)
                 occ.startHourOverride = newStart
@@ -56,7 +57,8 @@ struct SegmentActions {
         case .planBlock(let blk):
             blk.startHour = newStart
             blk.timeBand = .containing(newStart)   // 요일 칸 칩의 '아침/오후/저녁'이 시각을 따라오게.
-            if let newDay { blk.day = newDay }
+            // 일요일 시작 화면에서는 일요일 칸을 오가면 주도 바뀐다 (→ PlanBlock.move(to:)).
+            if let newDay { blk.move(to: newDay) }
         case .quotaSession(let name, let index):
             if let p = quotaPlacements.first(where: { $0.routineName == name && $0.sessionIndex == index }) {
                 p.startHour = newStart
@@ -90,8 +92,12 @@ struct SegmentActions {
                 context.insert(p)
             }
         case .fixedRoutine(let name):
-            if let occ = occurrences.first(where: { $0.routineName == name }) {
-                occ.hidden = true
+            // ⚠️ **같은 칸의 배치가 여러 개일 수 있다.** 맥과 아이폰이 각자 이번 주 배치를 만들고
+            //    iCloud가 둘 다 들여오면 한 요일에 둘이 선다. 하나만 숨기면 남은 하나가 루틴을
+            //    계속 세워서(→ ContentView.fixedRoutines) 눌러도 아무 일이 없는 것처럼 보였다.
+            let same = occurrences.filter { $0.routineName == name }
+            if !same.isEmpty {
+                same.forEach { $0.hidden = true }
             } else {
                 let occ = RoutineOccurrence(routineName: name, day: day, weekStartDate: weekStart)
                 occ.hidden = true
@@ -128,7 +134,7 @@ struct SegmentActions {
     func restore(_ seg: TimeSegment) {
         switch seg.source {
         case .fixedRoutine(let name):
-            occurrences.first(where: { $0.routineName == name })?.hidden = false
+            occurrences.filter { $0.routineName == name }.forEach { $0.hidden = false }
         case .quotaSession(let name, let index):
             quotaPlacements.first(where: { $0.routineName == name && $0.sessionIndex == index })?.hidden = false
         default:

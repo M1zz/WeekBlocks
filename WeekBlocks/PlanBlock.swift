@@ -168,6 +168,16 @@ extension PlanBlock {
     }
 
     /// 지나간 날인데 아직 안 찍은 줄인가. 오지 않은 날은 세지 않는다 — 나무랄 수 없다.
+    /// 같은 **보이는 주** 안에서 요일만 옮긴다.
+    /// 일요일 시작 화면의 일요일은 앞 ISO 주에 적혀 있어서, 그 칸을 오가면 요일과 함께 주도 바뀐다
+    /// (→ WeekStartSetting). 요일만 바꾸면 한 주 뒤의 일요일로 사라진다.
+    func move(to newDay: DayOfWeek, sundayFirst: Bool = WeekStartSetting.sundayFirst) {
+        guard newDay != day else { return }
+        let shown = DayOfWeek.shownWeek(of: day, storedWeek: weekStartDate, sundayFirst: sundayFirst)
+        day = newDay
+        weekStartDate = DayOfWeek.storedWeek(of: newDay, shownWeek: shown, sundayFirst: sundayFirst)
+    }
+
     func isUnreviewedPast(weekStart: Date, routineNames: Set<String>, now: Date = Date()) -> Bool {
         guard reviewStatus == nil, !isRoutineKind(routineNames) else { return false }
         let cal = Calendar(identifier: .iso8601)

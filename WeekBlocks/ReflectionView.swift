@@ -30,7 +30,17 @@ struct ReflectionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
+    /// 보고 있는 주 — 그 주 월요일 (→ WeekStartSetting). 일요일 시작이면 맨 앞 일요일은 앞 ISO 주에서 온다.
     let weekStart: Date
+    @AppStorage(WeekStartSetting.key) private var weekStartsOnSunday = false
+
+    /// 이 요일의 기록이 적힌 ISO 주.
+    private func storedWeek(for day: DayOfWeek) -> Date {
+        DayOfWeek.storedWeek(of: day, shownWeek: weekStart, sundayFirst: weekStartsOnSunday)
+    }
+
+    /// 화면에 세우는 요일 차례.
+    private var shownDays: [DayOfWeek] { DayOfWeek.displayOrder(sundayFirst: weekStartsOnSunday) }
 
     /// 이번 주를 돌아보는가, 지난 주들을 겹쳐 보는가 (→ ReflectionTrendsView, Pro).
     enum Tab: Hashable { case week, trends }
@@ -52,8 +62,12 @@ struct ReflectionView: View {
     }
     private var weekBlocks: [PlanBlock] {
         allBlocks
-            .filter { Calendar.current.isDate($0.weekStartDate, inSameDayAs: weekStart) }
-            .sorted { ($0.day.rawValue, $0.sortHour) < ($1.day.rawValue, $1.sortHour) }
+            .filter { Calendar.current.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: $0.day)) }
+            .sorted { day1, day2 in
+                let order = shownDays
+                let i = order.firstIndex(of: day1.day) ?? 0, j = order.firstIndex(of: day2.day) ?? 0
+                return (i, day1.sortHour) < (j, day2.sortHour)
+            }
     }
 
     private func blocks(on day: DayOfWeek) -> [PlanBlock] {
@@ -67,12 +81,12 @@ struct ReflectionView: View {
 
     /// **아직 안 찍은 것.** 지나간 날만 센다.
     private var unreviewed: [PlanBlock] {
-        weekBlocks.filter { $0.isUnreviewedPast(weekStart: weekStart, routineNames: routineNames) }
+        weekBlocks.filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames) }
     }
 
     /// 계획이 하나라도 있는 요일만. 빈 요일까지 머리를 세우면 돌아볼 것이 없는 줄이 끼어든다.
     private var daysWithBlocks: [DayOfWeek] {
-        DayOfWeek.allCases.filter { day in weekBlocks.contains { $0.day == day } }
+        shownDays.filter { day in weekBlocks.contains { $0.day == day } }
     }
 
     var body: some View {
@@ -204,8 +218,11 @@ struct ReflectionView: View {
         var lines: [String] = []
         let f = DateFormatter()
         f.setLocalizedDateFormatFromTemplate("MMMd")
-        let end = Calendar(identifier: .iso8601).date(byAdding: .day, value: 6, to: weekStart) ?? weekStart
-        lines.append("# \(f.string(from: weekStart)) – \(f.string(from: end))")
+        let cal = Calendar(identifier: .iso8601)
+        let first = shownDays.first ?? .mon, last = shownDays.last ?? .sun
+        let start = cal.date(byAdding: .day, value: first.rawValue, to: storedWeek(for: first)) ?? weekStart
+        let end = cal.date(byAdding: .day, value: last.rawValue, to: storedWeek(for: last)) ?? weekStart
+        lines.append("# \(f.string(from: start)) – \(f.string(from: end))")
         let stats = ReflectionStats(reviewableBlocks)
         lines.append(String(localized: "달성 \(stats.done) · 부분 \(stats.partial) · 건너뜀 \(stats.skipped) · 미회고 \(stats.pending)"))
         for day in daysWithBlocks {

@@ -113,6 +113,10 @@ struct WeekBlocksApp: App {
         .windowResizability(.contentMinSize)
         .commands {
             CommandGroup(replacing: .newItem) { }
+            // 앱 이름 메뉴의 '설정' 자리 옆. 설정 단추를 못 읽어도 여기는 모든 맥 앱에 있다 (→ AppLanguage.swift).
+            CommandGroup(after: .appSettings) {
+                AppLanguageMenu()
+            }
             // 처음 쓰는 사람이 길을 잃었을 때 찾아가는 곳은 메뉴 막대의 '도움말'이다.
             // 설정 안에만 두면 거기까지 가지 못한다.
             CommandGroup(replacing: .help) {

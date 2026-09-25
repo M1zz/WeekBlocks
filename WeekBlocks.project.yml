@@ -12,7 +12,12 @@ options:
   #
   # ⚠️ SwiftUI 의 Text("…")·Button("…") 은 저절로 번역되지만, 그냥 String 을 돌려주는
   #    자리는 String(localized: "…") 로 감싸야 한다. 감싸지 않으면 조용히 한국어로 남는다.
-  developmentLanguage: ko
+  #
+  # ⚠️ **개발 언어는 영어다 — 원문이 한국어여도.** 개발 언어는 '사람이 고른 말 중 앱이 가진 것이
+  #    하나도 없을 때' 쓰는 말이다. ko로 두었더니 시스템이 독일어인 사람의 맥에 한국어가 떴다
+  #    (영어를 선호 언어 목록에 따로 넣어야 영어가 나왔다). 대신 한국어 표를 빌드마다 따로
+  #    만들어 넣는다 (→ scripts/source-language-strings.py). 그게 없으면 한국어 쓰는 사람에게 영어가 뜬다.
+  developmentLanguage: en
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
@@ -76,6 +81,14 @@ targets:
       - name: 권한 문구 검사 (App Review 5.1.1(iv))
         script: '"$SRCROOT/scripts/check-permission-wording.sh"'
         basedOnDependencyAnalysis: false
+    postBuildScripts:
+      - name: 한국어 원문 표 넣기
+        script: '"$SRCROOT/scripts/source-language-strings.py" "$SRCROOT/WeekBlocks/Localizable.xcstrings" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/ko.lproj/Localizable.strings"'
+        inputFiles:
+          - $(SRCROOT)/scripts/source-language-strings.py
+          - $(SRCROOT)/WeekBlocks/Localizable.xcstrings
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp
@@ -126,6 +139,15 @@ targets:
       - path: WeekBlocks/TodoSplitAdvisor.swift
       # formatDuration, Date.currentWeekStart
       - path: WeekBlocks/Models.swift
+    # 앱과 같은 까닭으로 한국어 원문 표를 따로 넣는다 (→ options.developmentLanguage).
+    postBuildScripts:
+      - name: 한국어 원문 표 넣기
+        script: '"$SRCROOT/scripts/source-language-strings.py" "$SRCROOT/TodoShare/Localizable.xcstrings" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/ko.lproj/Localizable.strings"'
+        inputFiles:
+          - $(SRCROOT)/scripts/source-language-strings.py
+          - $(SRCROOT)/TodoShare/Localizable.xcstrings
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.TodoShare

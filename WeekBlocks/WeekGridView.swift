@@ -114,6 +114,8 @@ struct DayColumn: View {
     var currentSlot: ScheduleSlot? = nil
     /// 시각 순으로 정렬된 통합 항목(고정 루틴·쿼터·블록).
     let items: [DayPlanItem]
+    /// 항목 id → 겹친 시간 규칙으로 센 길이 (→ OverlapRule). 없으면 그린 길이를 적는다.
+    var countedHours: [String: Double] = [:]
     let onAdd: () -> Void
     let onEdit: (PlanBlock) -> Void
     /// 루틴을 눌렀을 때 — 상세(정보·실행 전략·프리모템)
@@ -249,7 +251,7 @@ struct DayColumn: View {
         // (자정을 넘겨 쪼개진 조각은 각자 자기 길이를 보여, 합이 루틴 전체 길이가 된다.)
         case .fixedRoutine(let routine, _, _, let hours):
             RoutineChip(routine: routine,
-                        subtitleOverride: shortHours(hours),
+                        subtitleOverride: shortHours(countedHours[item.id] ?? hours),
                         currentSlot: liveSlot(for: item),
                         onEdit: onEditRoutineSchedule.map { f in { f(routine) } },
                         dragToken: item.dragToken(on: day),

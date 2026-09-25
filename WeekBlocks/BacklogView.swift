@@ -168,13 +168,16 @@ struct BacklogSection: View {
     /// 보고 있는 주에서 **이미 지나간 요일들**.
     /// 지난 주를 보고 있으면 전부, 앞으로의 주면 하나도 없다.
     private var pastDays: Set<DayOfWeek> {
-        let today = Date()
-        let thisWeek = today.weekStart()
-        if weekStart < thisWeek { return Set(DayOfWeek.allCases) }
-        guard cal.isDate(weekStart, inSameDayAs: thisWeek) else { return [] }
+        // 요일마다 그 **날짜**를 짚어 오늘과 견준다. 일요일 시작이면 맨 앞 일요일이 월요일보다
+        // 먼저 지나가므로, 요일 번호로 견주면 틀린다 (→ DayOfWeek.storedWeek).
         // 오늘은 아직 안 지났다 — 어제까지만 지난 것으로 본다.
-        let index = (cal.dateComponents([.day], from: weekStart, to: today).day ?? 0)
-        return Set(DayOfWeek.allCases.filter { $0.rawValue < index })
+        let today = cal.startOfDay(for: Date())
+        let sundayFirst = WeekStartSetting.sundayFirst
+        return Set(DayOfWeek.allCases.filter { day in
+            let stored = DayOfWeek.storedWeek(of: day, shownWeek: weekStart, sundayFirst: sundayFirst)
+            guard let date = cal.date(byAdding: .day, value: day.rawValue, to: stored) else { return false }
+            return date < today
+        })
     }
 
     /// 올려 둔 요일이 지났는데 아직 안 끝낸 일. **루틴은 여기 없다** —

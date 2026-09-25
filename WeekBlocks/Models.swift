@@ -40,6 +40,36 @@ enum DayOfWeek: Int, Codable, CaseIterable, Identifiable {
 
     /// 오늘이 무슨 요일인가.
     static var today: DayOfWeek { of(Date()) }
+
+    /// 화면에 세우는 차례. 일요일 시작이면 일요일이 맨 앞으로 온다 (→ WeekStartSetting).
+    static func displayOrder(sundayFirst: Bool) -> [DayOfWeek] {
+        sundayFirst ? [.sun] + allCases.dropLast() : allCases
+    }
+
+    /// 보이는 주(그 주 **월요일**로 부른다)에서 이 요일 칸의 기록이 **어느 ISO 주에 적혀 있는가.**
+    ///
+    /// 일요일 시작이면 맨 앞 일요일은 그 월요일의 전날이라, ISO로는 앞 주의 일요일이다.
+    static func storedWeek(of day: DayOfWeek, shownWeek: Date, sundayFirst: Bool) -> Date {
+        guard sundayFirst, day == .sun else { return shownWeek }
+        return Calendar(identifier: .iso8601).date(byAdding: .day, value: -7, to: shownWeek) ?? shownWeek
+    }
+
+    /// `storedWeek`의 거꾸로 — 이 요일이 이 ISO 주에 적혀 있으면 화면에서는 어느 주에 서는가.
+    static func shownWeek(of day: DayOfWeek, storedWeek: Date, sundayFirst: Bool) -> Date {
+        guard sundayFirst, day == .sun else { return storedWeek }
+        return Calendar(identifier: .iso8601).date(byAdding: .day, value: 7, to: storedWeek) ?? storedWeek
+    }
+}
+
+/// **한 주를 무슨 요일부터 보여 줄까.**
+///
+/// ⚠️ 보여 주는 차례만 바뀐다. 기록은 언제나 ISO 주(월요일 시작)에 적는다 — 아이폰 '욕망의 무지개'가
+///    같은 기록을 iCloud로 함께 읽고, 이미 적힌 몇 달치 기록도 모두 월요일 주에 붙어 있다.
+///    그래서 일요일 시작 화면의 맨 앞 일요일은 **앞 ISO 주의 일요일**을 읽고 쓴다 (→ DayOfWeek.storedWeek).
+enum WeekStartSetting {
+    static let key = "weekStartsOnSunday"
+    /// 화면 밖(시트·모델 도우미)에서 읽을 때. 화면은 `@AppStorage(WeekStartSetting.key)`로 읽어 바로 따라 바뀐다.
+    static var sundayFirst: Bool { UserDefaults.standard.bool(forKey: key) }
 }
 
 enum TimeBand: String, Codable, CaseIterable, Identifiable {
@@ -139,6 +169,13 @@ extension Date {
         cal.firstWeekday = 2
         let comps = cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self)
         return cal.date(from: comps) ?? self
+    }
+
+    /// 이 날짜가 **화면에서** 서는 주 — 그 주 월요일로 부른다.
+    /// 일요일 시작이면 일요일은 다음 날(월요일)의 주 맨 앞에 선다.
+    func shownWeekStart(sundayFirst: Bool) -> Date {
+        guard sundayFirst, DayOfWeek.of(self) == .sun else { return weekStart() }
+        return (Calendar(identifier: .iso8601).date(byAdding: .day, value: 1, to: self) ?? self).weekStart()
     }
 }
 

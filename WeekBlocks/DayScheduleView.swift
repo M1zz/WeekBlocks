@@ -127,6 +127,9 @@ struct DayScheduleView: View {
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
 
+    /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule). 알약 옆 길이가 이것을 따른다.
+    @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
+
     private var actions: SegmentActions {
         SegmentActions(context: context, day: day, weekStart: weekStart,
                        routines: routines, quotaRoutines: quotaRoutines,
@@ -1572,7 +1575,9 @@ struct DayScheduleView: View {
     private func timeRange(_ seg: TimeSegment, start: Double? = nil) -> String {
         let from = start ?? seg.logicalStart
         let end = (from + seg.logicalDuration).truncatingRemainder(dividingBy: 24)
-        return "\(formatHour(from))–\(formatHour(end)) · \(shortHours(seg.logicalDuration))"
+        // 시각은 그대로, 길이만 규칙을 따른다 — 09–18시 회사가 점심을 빼면 8h다.
+        let inner = overlapRule == .subtractInner ? TimelineLayout.innerOverlap(of: seg, among: segments) : 0
+        return "\(formatHour(from))–\(formatHour(end)) · \(shortHours(max(0, seg.logicalDuration - inner)))"
     }
 
     // MARK: 자리 셈

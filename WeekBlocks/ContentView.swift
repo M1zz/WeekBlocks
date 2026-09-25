@@ -22,7 +22,10 @@ struct ContentView: View {
     @Query private var allOccurrences: [RoutineOccurrence]
     @Query private var allQuotaPlacements: [QuotaPlacement]
 
-    @State private var selectedWeek: Date = .currentWeekStart
+    /// 보고 있는 주. **그 주의 월요일**로 부른다 — 일요일 시작이어도 (→ WeekStartSetting).
+    @State private var selectedWeek: Date = Date().shownWeekStart(sundayFirst: WeekStartSetting.sundayFirst)
+    /// 한 주를 일요일부터 보이는가. 기록은 그대로 ISO 주에 적히고, 보이는 차례만 바뀐다.
+    @AppStorage(WeekStartSetting.key) private var weekStartsOnSunday = false
     /// 캘린더에서 가져온 결과를 사람에게 알리는 자리. 조용히 끝나면 눌린 줄도 모른다.
     @State private var calendarNotice: String?
     /// 끼워 넣은 것이 틈보다 커서 겹쳤을 때 뜨는 붉은 줄.
@@ -43,6 +46,9 @@ struct ContentView: View {
     @State private var onboarding = OnboardingPresenter.shared
     /// '다음 한 걸음' 줄을 아주 닫았는가. 다 아는 사람에게 계속 말을 걸지 않는다.
     @AppStorage("didDismissNextStep") private var didDismissNextStep = false
+    /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 겹침이 처음 생겼을 때 배너가 한 번 묻는다.
+    @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
+    @AppStorage(OverlapRule.decidedKey) private var overlapRuleDecided = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
@@ -80,11 +86,44 @@ struct ContentView: View {
 
     private var weekBlocks: [PlanBlock] {
         let cal = Calendar(identifier: .iso8601)
-        return allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
+        return allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: $0.day)) }
     }
 
+    /// 화면에 세우는 요일 차례.
+    private var shownDays: [DayOfWeek] { DayOfWeek.displayOrder(sundayFirst: weekStartsOnSunday) }
+
+    /// 이 요일 칸의 기록이 적힌 ISO 주. 일요일 시작 화면의 일요일만 한 주 앞이다 (→ DayOfWeek.storedWeek).
+    private func storedWeek(for day: DayOfWeek) -> Date {
+        DayOfWeek.storedWeek(of: day, shownWeek: selectedWeek, sundayFirst: weekStartsOnSunday)
+    }
+
+    /// 보이는 주가 걸친 ISO 주들. 일요일 시작이면 둘이다.
+    private var storedWeeks: [Date] {
+        Array(Set(DayOfWeek.allCases.map(storedWeek(for:)))).sorted()
+    }
+
+    /// 이번 주 루틴이 실제로 차지한 시간. **요일마다 겹친 곳은 한 번만** 센다 — 일간의 '남은 시간'과 같은 셈이다.
+    ///
+    /// 예전에는 루틴 정의를 그대로 더해서(회사 45h + 끼니 21h) 회사 안의 점심을 두 번 셌다.
+    /// 일간은 14h 남았다는데 주간 요약은 그보다 적게 남았다고 했다.
+    /// 겹친 시간을 누구 몫으로 부르든(→ OverlapRule) 이 합은 같다.
     private var routineHours: Double {
-        routines.reduce(0) { $0 + $1.totalWeeklyHours }
+        DayOfWeek.allCases.reduce(0) { total, day in
+            total + TimelineLayout.unionLength(daySegments(on: day).compactMap { seg in
+                guard !seg.isGhost, !seg.isNested else { return nil }
+                switch seg.source {
+                case .fixedRoutine, .quotaSession: return (seg.start, seg.end)
+                default: return nil
+                }
+            })
+        }
+    }
+
+    /// 이번 주에 가장 크게 겹친 곳 하나 — 배너가 그 사람의 일정 이름으로 묻는다.
+    private var weekOverlapExample: OverlapExample? {
+        DayOfWeek.allCases
+            .compactMap { TimelineLayout.biggestOverlap(in: daySegments(on: $0)) }
+            .max { $0.overlap < $1.overlap }
     }
 
     private var plannedHours: Double {
@@ -115,6 +154,20 @@ struct ContentView: View {
                                            didDismissNextStep = true
                                        }
                                    })
+                    .transition(.banner)
+                }
+                // 겹침이 **생긴 뒤에** 한 번 묻는다. 처음 온 사람 안내와 겹쳐 두 줄이 서지 않게 그 뒤에.
+                if nextStep == nil, !overlapRuleDecided, let example = weekOverlapExample {
+                    OverlapNudgeBanner(example: example,
+                                       onChoose: { rule in
+                                           withAnimation(Motion.banner) {
+                                               overlapRule = rule
+                                               overlapRuleDecided = true
+                                           }
+                                       },
+                                       onDismiss: {
+                                           withAnimation(Motion.banner) { overlapRuleDecided = true }
+                                       })
                     .transition(.banner)
                 }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
@@ -298,7 +351,7 @@ struct ContentView: View {
             BlockEditorView(
                 existing: ctx.block,
                 day: ctx.day,
-                weekStart: selectedWeek,
+                weekStart: storedWeek(for: ctx.day),
                 suggestedBand: TimelineLayout.suggestedBand(
                     routines: fixedRoutines(on: ctx.day),
                     blocks: weekBlocks.filter { $0.day == ctx.day }
@@ -364,17 +417,26 @@ struct ContentView: View {
                     dedupeRoutinesByName()
                 }
             }
-            reconcileOccurrences(for: selectedWeek)
+            for w in storedWeeks { reconcileOccurrences(for: w) }
             await shareStore.refresh()
             await autoPublishSharedSchedule()
         }
-        .onChange(of: selectedWeek) { _, newWeek in
-            reconcileOccurrences(for: newWeek)
+        .onChange(of: selectedWeek) { _, _ in
+            for w in storedWeeks { reconcileOccurrences(for: w) }
             Task { await autoPublishSharedSchedule() }
+        }
+        // 한 주의 시작을 바꾸면 보던 **날**은 그대로 두고, 그 날이 새 차례에서 서는 주로 옮겨 선다.
+        // (일요일을 보고 있다가 일요일 시작으로 바꾸면 다음 월요일의 주가 된다.)
+        .onChange(of: weekStartsOnSunday) { wasSunday, isSunday in
+            let stored = DayOfWeek.storedWeek(of: selectedDay, shownWeek: selectedWeek, sundayFirst: wasSunday)
+            let date = Calendar(identifier: .iso8601)
+                .date(byAdding: .day, value: selectedDay.rawValue, to: stored) ?? stored
+            selectedWeek = date.shownWeekStart(sundayFirst: isSunday)
+            for w in storedWeeks { reconcileOccurrences(for: w) }
         }
         .onChange(of: routineSignature) { _, _ in
             // 루틴 추가·삭제·편집(이름·요일·종류) 시 모든 주의 occurrence를 현재 루틴에 맞게 재동기화.
-            let weeks = Set(allOccurrences.map(\.weekStartDate)).union([selectedWeek])
+            let weeks = Set(allOccurrences.map(\.weekStartDate)).union(storedWeeks)
             for w in weeks { reconcileOccurrences(for: w) }
         }
         .onChange(of: shareSignature) { _, _ in
@@ -489,7 +551,7 @@ struct ContentView: View {
 
             if !isAtNow {
                 Button(scope == .day ? String(localized: "오늘로") : String(localized: "이번 주로")) {
-                    if scope == .day { showToday() } else { shiftWeek(to: .currentWeekStart) }
+                    if scope == .day { showToday() } else { shiftWeek(to: Date().shownWeekStart(sundayFirst: weekStartsOnSunday)) }
                 }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
@@ -602,7 +664,7 @@ struct ContentView: View {
         dayForward = days > 0
         weekForward = days > 0
         withAnimation(Motion.screen) {
-            selectedWeek = date.weekStart()
+            selectedWeek = date.shownWeekStart(sundayFirst: weekStartsOnSunday)
             selectedDay = DayOfWeek.of(date)
         }
     }
@@ -611,7 +673,7 @@ struct ContentView: View {
         dayForward = dayOffset < 0
         weekForward = dayForward
         withAnimation(Motion.screen) {
-            selectedWeek = .currentWeekStart
+            selectedWeek = Date().shownWeekStart(sundayFirst: weekStartsOnSunday)
             selectedDay = .today
         }
     }
@@ -686,12 +748,12 @@ struct ContentView: View {
                     quotaRoutines: routines.filter { $0.kind == .quota },
                     hiddenRoutines: hiddenFixedRoutines(on: selectedDay),
                     occurrences: allOccurrences.filter {
-                        $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                        $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: selectedDay))
                     },
                     quotaPlacements: allQuotaPlacements.filter {
-                        $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                        $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: selectedDay))
                     },
-                    weekStart: selectedWeek,
+                    weekStart: storedWeek(for: selectedDay),
                     window: timelineWindow,
                     canPlan: hasFixedRoutines,
                     
@@ -833,7 +895,7 @@ struct ContentView: View {
     /// 오늘은 붉게, 보고 있는 날은 동그라미가 채워진 채 **통통 미끄러져** 온다.
     private var dayStrip: some View {
         HStack(spacing: 4) {
-            ForEach(DayOfWeek.allCases) { day in
+            ForEach(shownDays) { day in
                 dayStripCell(day)
             }
         }
@@ -920,7 +982,7 @@ struct ContentView: View {
     /// 지나간 날인데 아직 안 찍은 것이 남았는가 — 요일 줄에 점으로 세운다.
     private func hasUnreviewed(on day: DayOfWeek) -> Bool {
         weekBlocks.contains {
-            $0.day == day && $0.isUnreviewedPast(weekStart: selectedWeek, routineNames: routineNames)
+            $0.day == day && $0.isUnreviewedPast(weekStart: storedWeek(for: day), routineNames: routineNames)
         }
     }
 
@@ -936,18 +998,19 @@ struct ContentView: View {
     }
 
     private var weekRangeString: String {
-        let end = Calendar.current.date(byAdding: .day, value: 6, to: selectedWeek) ?? selectedWeek
+        let start = dayDate(shownDays.first ?? .mon)
+        let end = dayDate(shownDays.last ?? .sun)
         let f = DateFormatter()
         // ⚠️ "M월 d일"로 못 박지 않는다. 언어마다 월·일 차례와 사이에 오는 것이 다르므로,
         //    무엇을 보일지(월과 일)만 말하고 어떻게 쓸지는 로케일에 맡긴다.
         f.setLocalizedDateFormatFromTemplate("MMMd")
-        return "\(f.string(from: selectedWeek)) – \(f.string(from: end))"
+        return "\(f.string(from: start)) – \(f.string(from: end))"
     }
 
     /// 현재 주 기준 선택된 주의 상대 위치 (0 = 이번 주, +1 = 다음 주 …)
     private var weekOffset: Int {
         let cal = Calendar(identifier: .iso8601)
-        let days = cal.dateComponents([.day], from: .currentWeekStart, to: selectedWeek).day ?? 0
+        let days = cal.dateComponents([.day], from: Date().shownWeekStart(sundayFirst: weekStartsOnSunday), to: selectedWeek).day ?? 0
         return Int((Double(days) / 7).rounded())
     }
 
@@ -971,7 +1034,7 @@ struct ContentView: View {
 
     private func dayDate(_ day: DayOfWeek) -> Date {
         Calendar(identifier: .iso8601)
-            .date(byAdding: .day, value: day.rawValue, to: selectedWeek) ?? selectedWeek
+            .date(byAdding: .day, value: day.rawValue, to: storedWeek(for: day)) ?? selectedWeek
     }
 
     private var metricsRow: some View {
@@ -1061,7 +1124,7 @@ struct ContentView: View {
     private func fixedRoutines(on day: DayOfWeek) -> [Routine] {
         let cal = Calendar(identifier: .iso8601)
         let names = Set(allOccurrences
-            .filter { $0.day == day && !$0.hidden && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
+            .filter { $0.day == day && !$0.hidden && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day)) }
             .map(\.routineName))
         return routines
             .filter { $0.kind == .fixed && names.contains($0.name) }
@@ -1072,7 +1135,7 @@ struct ContentView: View {
     private func hiddenFixedRoutines(on day: DayOfWeek) -> [Routine] {
         let cal = Calendar(identifier: .iso8601)
         let names = Set(allOccurrences
-            .filter { $0.day == day && $0.hidden && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
+            .filter { $0.day == day && $0.hidden && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day)) }
             .map(\.routineName))
         return routines
             .filter { $0.kind == .fixed && names.contains($0.name) }
@@ -1086,8 +1149,8 @@ struct ContentView: View {
     /// 시간축 줄과 일간은 같은 값을 넘겨 각자 `TimelineLayout.segments`를 부르고, 요일 칸은 여기서 받는다.
     private func daySegments(on day: DayOfWeek) -> [TimeSegment] {
         let cal = Calendar(identifier: .iso8601)
-        let occs = allOccurrences.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
-        let placements = allQuotaPlacements.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) }
+        let occs = allOccurrences.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day)) }
+        let placements = allQuotaPlacements.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day)) }
 
         var startOverride: [String: Double] = [:]
         for o in occs where o.startHourOverride >= 0 { startOverride[o.routineName] = o.startHourOverride }
@@ -1120,12 +1183,24 @@ struct ContentView: View {
         }
         guard let seg else { return }
         let cal = Calendar(identifier: .iso8601)
-        SegmentActions(context: context, day: day, weekStart: selectedWeek,
+        SegmentActions(context: context, day: day, weekStart: storedWeek(for: day),
                        routines: fixedRoutines(on: day),
                        quotaRoutines: routines.filter { $0.kind == .quota },
-                       occurrences: allOccurrences.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) },
-                       quotaPlacements: allQuotaPlacements.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek) })
+                       occurrences: allOccurrences.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day)) },
+                       quotaPlacements: allQuotaPlacements.filter { $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day)) })
             .delete(seg)
+    }
+
+    /// 칸 항목 id → 겹친 시간 규칙(→ OverlapRule)으로 센 고정 루틴 길이. '바깥 기준'이면 비어 있다(그린 길이 그대로).
+    private func countedRoutineHours(on day: DayOfWeek) -> [String: Double] {
+        guard overlapRule == .subtractInner else { return [:] }
+        let segs = daySegments(on: day)
+        var result: [String: Double] = [:]
+        for seg in segs where !seg.isGhost {
+            guard case .fixedRoutine = seg.source else { continue }
+            result["fixed:\(seg.id)"] = TimelineLayout.countedHours(of: seg, among: segs, rule: overlapRule)
+        }
+        return result
     }
 
     private func dayPlanItems(on day: DayOfWeek) -> [DayPlanItem] {
@@ -1279,7 +1354,7 @@ struct ContentView: View {
             HourAxis(window: window)
 
             VStack(spacing: 4) {
-                ForEach(DayOfWeek.allCases) { day in
+                ForEach(shownDays) { day in
                     DayTimelineRow(
                         day: day,
                         date: dayDate(day),
@@ -1288,12 +1363,12 @@ struct ContentView: View {
                         quotaRoutines: routines.filter { $0.kind == .quota },
                         hiddenRoutines: hiddenFixedRoutines(on: day),
                         occurrences: allOccurrences.filter {
-                            $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                            $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day))
                         },
                         quotaPlacements: allQuotaPlacements.filter {
-                            $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                            $0.day == day && Calendar(identifier: .iso8601).isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day))
                         },
-                        weekStart: selectedWeek,
+                        weekStart: storedWeek(for: day),
                         window: window,
                         onDropBacklog: { token, hour in
                             dropBacklogItem(token: token, day: day, atHour: hour)
@@ -1343,13 +1418,14 @@ struct ContentView: View {
         TimelineView(.everyMinute) { ctx in
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top, spacing: 10) {
-                    ForEach(DayOfWeek.allCases) { day in
+                    ForEach(shownDays) { day in
                         DayColumn(
                             day: day,
                             date: dayDate(day),
                             canPlan: hasFixedRoutines,
                             currentSlot: currentSlot(at: ctx.date),
                         items: dayPlanItems(on: day),
+                        countedHours: countedRoutineHours(on: day),
                         onAdd: {
                             blockSheet = BlockSheetContext(day: day, block: nil)
                         },
@@ -1473,7 +1549,7 @@ struct ContentView: View {
             // 이미 계획에 올린 블록을 옮긴다 — 요일 칸에서는 요일만, 자 위에서는 시각까지.
             guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
             var changed = false
-            if blk.day != day { blk.day = day; changed = true }
+            if blk.day != day { blk.move(to: day, sundayFirst: weekStartsOnSunday); changed = true }
             if let duration, abs(blk.durationHours - duration) > 1e-6 {
                 blk.durationHours = duration
                 changed = true
@@ -1504,7 +1580,7 @@ struct ContentView: View {
                 title: routine.name,
                 successCriteria: "",
                 deliverable: "",
-                weekStartDate: selectedWeek,
+                weekStartDate: storedWeek(for: day),
                 concreteVerified: false,
                 startHour: start ?? -1
             )
@@ -1537,7 +1613,7 @@ struct ContentView: View {
             return
         }
         guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
-        blk.day = day
+        blk.move(to: day, sundayFirst: weekStartsOnSunday)
         blk.startHour = clampStart(startHour, duration: blk.durationHours)
         blk.timeBand = timeBand(for: blk.startHour)
         try? context.save()
@@ -1571,19 +1647,21 @@ struct ContentView: View {
         switch move.kind {
         case .fixed(let pieceStart):
             guard let routine = routines.first(where: { $0.name == move.name }) else { return }
-            let occ = allOccurrences.first {
-                $0.routineName == move.name && $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+            // 같은 칸의 배치가 둘일 수 있다(맥·아이폰이 각자 만든 것) — 모두 같이 옮긴다 (→ SegmentActions.delete).
+            let same = allOccurrences.filter {
+                $0.routineName == move.name && $0.day == day && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day))
             }
+            let occ = same.first
             let logical = (occ?.startHourOverride ?? -1) >= 0 ? occ!.startHourOverride : routine.startHour
             // 자정을 넘겨 둘로 그려진 잠은 어느 조각을 잡았든 **잡은 조각의 머리**가 놓은 자리에 오게,
             // 원래 시작 시각을 같은 만큼 민다.
             var newStart = (logical + (startHour - pieceStart)).truncatingRemainder(dividingBy: 24)
             if newStart < 0 { newStart += 24 }
             newStart = min(max(newStart, 0), 23.75)
-            if let occ {
-                occ.startHourOverride = newStart
+            if !same.isEmpty {
+                same.forEach { $0.startHourOverride = newStart }
             } else {
-                let created = RoutineOccurrence(routineName: move.name, day: day, weekStartDate: selectedWeek)
+                let created = RoutineOccurrence(routineName: move.name, day: day, weekStartDate: storedWeek(for: day))
                 created.startHourOverride = newStart
                 context.insert(created)
             }
@@ -1594,11 +1672,11 @@ struct ContentView: View {
             let newStart = clampStart(startHour, duration: each)
             if let placement = allQuotaPlacements.first(where: {
                 $0.routineName == move.name && $0.day == day && $0.sessionIndex == index
-                    && cal.isDate($0.weekStartDate, inSameDayAs: selectedWeek)
+                    && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: day))
             }) {
                 placement.startHour = newStart
             } else {
-                context.insert(QuotaPlacement(routineName: move.name, day: day, weekStartDate: selectedWeek,
+                context.insert(QuotaPlacement(routineName: move.name, day: day, weekStartDate: storedWeek(for: day),
                                               sessionIndex: index, startHour: newStart))
             }
             // 틈보다 크면 다음 일정과 겹친다. 계획 블록과 같은 말로 알린다.
@@ -1664,7 +1742,7 @@ struct ContentView: View {
             title: title,
             successCriteria: "",
             deliverable: "",
-            weekStartDate: selectedWeek,
+            weekStartDate: storedWeek(for: day),
             concreteVerified: false,
             startHour: start ?? -1
         )
@@ -1742,7 +1820,7 @@ struct ContentView: View {
         guard !victims.isEmpty else { return }
         for v in victims { context.delete(v) }
         try? context.save()
-        reconcileOccurrences(for: selectedWeek)
+        for w in storedWeeks { reconcileOccurrences(for: w) }
     }
 
     private func addSampleData() {
