@@ -159,6 +159,8 @@ enum TimelineLayout {
             return (s, s + d)
         }
 
+        // 종일 블록은 자 위에 서지 않는다 — 하루 중 어느 시간도 차지하지 않는다 (→ PlanBlock.isAllDay).
+        let blocks = blocks.filter { !$0.isAllDay }
         let freeBlocks = blocks.filter { !$0.withinRoutine }
 
         // 2a) 시각이 지정된(드래그된) 계획 블록 — 그 자리에 그대로 둔다(겹쳐도 됨).

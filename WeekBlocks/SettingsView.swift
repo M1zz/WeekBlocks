@@ -14,6 +14,8 @@ struct SettingsView: View {
     var onReplayOnboarding: () -> Void = { }
 
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
+    /// 설정 위의 아이폰 앱 권유를 닫았는가 (→ IPhoneNudge).
+    @AppStorage(IPhoneNudge.dismissedKey) private var iphoneNudgeDismissed = false
     /// 한 주를 무슨 요일부터 보이는가 (→ WeekStartSetting).
     @AppStorage(WeekStartSetting.key) private var weekStartsOnSunday = false
     /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 여기서 고르면 배너는 더 묻지 않는다.
@@ -100,6 +102,15 @@ struct SettingsView: View {
                     Text(verbatim: "The app restarts to switch. · 고르면 앱이 다시 열립니다.")
                         .font(.body)
                         .foregroundStyle(.secondary)
+                }
+
+                // 아이폰 앱 권유 — 닫거나 소개를 한 번 읽으면 더 안 선다 (→ IPhoneCompanionView.swift).
+                if !iphoneNudgeDismissed {
+                    Section {
+                        IPhoneNudgeRow {
+                            withAnimation { iphoneNudgeDismissed = true }
+                        }
+                    }
                 }
 
                 Section {
@@ -242,6 +253,12 @@ struct SettingsView: View {
                         Spacer()
                         Text("욕망의 무지개 · 무지개 공방")
                             .foregroundStyle(.secondary)
+                    }
+                    // 권유를 닫아도 소개로 가는 길은 여기 늘 남는다.
+                    NavigationLink {
+                        IPhoneCompanionView()
+                    } label: {
+                        Label("아이폰 앱 ‘욕망의 무지개’", systemImage: "iphone")
                     }
                 } header: {
                     Text("정보")

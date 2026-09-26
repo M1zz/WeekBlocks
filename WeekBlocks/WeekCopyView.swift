@@ -154,7 +154,7 @@ struct WeekCopyView: View {
                                     .foregroundStyle(.secondary)
                                 ForEach(mine) { block in
                                     HStack(spacing: 8) {
-                                        Text(block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel)
+                                        Text(block.whenLabel)
                                             .font(.caption)
                                             .monospacedDigit()
                                             .foregroundStyle(.secondary)
@@ -163,7 +163,7 @@ struct WeekCopyView: View {
                                             .font(.callout)
                                             .lineLimit(1)
                                         Spacer()
-                                        Text(formatDuration(block.durationHours))
+                                        Text(block.isAllDay ? "" : formatDuration(block.durationHours))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }

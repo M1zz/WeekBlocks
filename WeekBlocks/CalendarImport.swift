@@ -184,7 +184,8 @@ final class CalendarBridge {
             guard let day = Self.day(of: start, in: weekStart) else { continue }
             if event.isAllDay { result.allDay += 1 }
 
-            let hour = event.isAllDay ? -1 : Self.hourOfDay(start, calendar: cal)
+            // 종일 일정은 '종일' 블록으로 — 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
+            let hour = event.isAllDay ? PlanBlock.allDayHour : Self.hourOfDay(start, calendar: cal)
             let duration = Self.duration(of: event, startHour: hour)
             let title = (event.title ?? "").isEmpty ? String(localized: "(제목 없는 일정)") : event.title!
 
@@ -286,11 +287,12 @@ final class CalendarBridge {
     /// 블록 길이.
     ///
     /// 종일 일정을 24시간짜리로 들이면 그 요일의 자유 시간이 통째로 사라져 하루가
-    /// 빨갛게 물든다. 종일은 '이 날 안에 해야 하는 것'이지 '하루를 다 쓰는 것'이 아니므로
-    /// 한 시간으로 놓고 시각은 비워 둔다(→ `startHour = -1`).
+    /// 빨갛게 물든다. 한때는 한 시간으로 놓았는데, 그 한 시간도 자유 시간에서 빠져서
+    /// 기념일 하나가 할 일 한 시간을 밀어냈다 (레딧 피드백). 종일은 '이 날의 일'이지
+    /// '시간을 쓰는 일'이 아니므로 길이 0으로 들인다 (→ `PlanBlock.makeAllDay`).
     private static func duration(of event: EKEvent, startHour: Double) -> Double {
-        guard !event.isAllDay,
-              let start = event.startDate, let end = event.endDate else { return 1 }
+        if event.isAllDay { return 0 }
+        guard let start = event.startDate, let end = event.endDate else { return 1 }
         let hours = end.timeIntervalSince(start) / 3600
         guard hours > 0 else { return 1 }
         // 자정을 넘기는 일정은 그날 남은 만큼만 차지한다.

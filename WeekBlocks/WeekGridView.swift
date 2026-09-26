@@ -39,6 +39,12 @@ enum DayPlanItem: Identifiable {
     /// 이 항목이 끝나는 시각.
     var endHour: Double { atHour + hours }
 
+    /// 시간을 차지하지 않는 종일 블록인가 (→ PlanBlock.isAllDay). 칸 맨 위에 따로 선다.
+    var isAllDay: Bool {
+        if case .block(let b, _) = self { return b.isAllDay }
+        return false
+    }
+
     /// 요일 칸에서 이 항목을 끌 때 실어 보내는 표.
     /// 계획 블록은 제 토큰(`block:`), 루틴·끼니는 **어느 요일의 어느 조각인지**까지 싣는다.
     func dragToken(on day: DayOfWeek) -> String {
@@ -141,6 +147,12 @@ struct DayColumn: View {
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
 
+    /// 종일 블록 — 요일 머리 바로 밑에 따로 세운다. 시각 순 목록에 섞으면 틈(끼워 넣는 자리)과
+    /// '지금' 선이 0시 앞에 없는 시각을 재게 된다.
+    private var allDayItems: [DayPlanItem] { items.filter(\.isAllDay) }
+    /// 하루 중 어느 시각에 서는 항목들.
+    private var timedItems: [DayPlanItem] { items.filter { !$0.isAllDay } }
+
     /// 그 시각을 0–24 소수 시간으로. (14:30 → 14.5)
     static func hourOfDay(_ date: Date) -> Double {
         let c = Calendar.current.dateComponents([.hour, .minute], from: date)
@@ -170,6 +182,7 @@ struct DayColumn: View {
     @ViewBuilder
     private func itemList(now: Double?) -> some View {
         // 지금보다 늦은 첫 항목 **앞**에 선을 끼운다. 그런 항목이 없으면 맨 아래 = 오늘 계획을 다 지났다.
+        let items = timedItems
         let cut = now.map { n in items.firstIndex { $0.atHour > n } ?? items.count }
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
@@ -228,6 +241,7 @@ struct DayColumn: View {
     /// ⚠️ **끌고 있는 그 항목은 빼고 잰다.** 제 바로 아래 틈에 놓았는데 자기 끝 시각부터 재면,
     ///    제자리에 둔 것이 제 길이만큼 뒤로 밀린다.
     private func gapBounds(at index: Int, excluding token: String? = nil) -> (start: Double, gap: Double) {
+        let items = timedItems
         let isDragged: (DayPlanItem) -> Bool = { token != nil && $0.dragToken(on: day) == token }
         let prev = items[..<index].last { !isDragged($0) }
         let next = items[index...].first { !isDragged($0) }
@@ -339,6 +353,17 @@ struct DayColumn: View {
             //
             // 오늘 칸에는 지나간 것과 남은 것 사이에 붉은 '지금' 선이 끼어든다.
             // 컬럼이 시각 순으로 서 있으므로, 선 위는 이미 지난 계획이고 아래가 남은 계획이다.
+            // 종일 — 시간을 차지하지 않는 것은 시각 순 목록 위에 따로.
+            if !allDayItems.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(allDayItems) { item in
+                        chip(for: item)
+                            .transition(.pop)
+                    }
+                }
+                .padding(.bottom, 2)
+            }
+
             if isToday {
                 // 분이 바뀌면 선도 한 칸씩 내려간다. 다시 그리는 건 오늘 칸 하나뿐이다.
                 TimelineView(.everyMinute) { ctx in
@@ -564,7 +589,10 @@ struct BlockChip: View {
             .animation(Motion.hover, value: hovering)
             // 계획을 보는 자리에서 바로 세기 시작한다 — 창을 열러 갈 필요 없이 (→ TimerView.swift).
             .contextMenu {
-                TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours)
+                // 종일은 잴 시간이 없다 — 길이 0짜리 타이머는 켜자마자 끝난다.
+                if !block.isAllDay {
+                    TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours)
+                }
             }
             // 내리는 길이 생겼으니 말해 준다 — 손짓은 있는데 아무도 모르면 없는 것과 같다.
             .help(block.successCriteria.isEmpty
@@ -604,7 +632,7 @@ struct BlockChip: View {
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 4)
-                    Text(shortHours(block.durationHours))
+                    Text(block.isAllDay ? String(localized: "종일") : shortHours(block.durationHours))
                         .font(.system(size: 11, weight: .medium))
                         .monospacedDigit()
                         .foregroundStyle(.secondary)

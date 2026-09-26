@@ -161,6 +161,7 @@ struct DayScheduleView: View {
 
         VStack(alignment: .leading, spacing: 14) {
             header(free: free, overbooked: overbooked)
+            allDayStrip
             timeline(segs)
         }
         .onAppear {
@@ -198,6 +199,45 @@ struct DayScheduleView: View {
             Spacer()
             // '블록 추가' 단추는 두지 않는다 — 요일에 일을 올리는 건 주간이 하는 일이다.
             // 여기서는 이미 올린 것을 실제로 한 시각으로 옮기는 것까지만 한다.
+        }
+    }
+
+    /// **종일.** 시간을 차지하지 않는 블록은 자 위가 아니라 머리 밑 한 줄에 선다 (→ PlanBlock.isAllDay).
+    /// 캘린더의 기념일·마감일이 한 시간을 잡아먹던 것을 풀었다 — 누르면 다듬고, 자 위로 끌면 그 시각의 일이 된다.
+    @ViewBuilder
+    private var allDayStrip: some View {
+        let allDay = blocks.filter(\.isAllDay)
+        if !allDay.isEmpty {
+            HStack(spacing: 8) {
+                Text("종일")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(allDay, id: \.dragToken) { block in
+                            Button { onEditBlock(block) } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: block.symbol)
+                                    Text(block.title)
+                                        .lineLimit(1)
+                                }
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(block.concreteVerified ? Color.accentColor : Color.orange)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background((block.concreteVerified ? Color.accentColor : Color.orange).opacity(0.14),
+                                            in: Capsule())
+                                .contentShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                            .draggable(block.dragToken)
+                            .pointingCursor()
+                            .help(String(localized: "시간을 차지하지 않는 종일 일정 — 눌러서 다듬기 · 자 위로 끌면 그 시각에 세움"))
+                        }
+                    }
+                }
+            }
+            .transition(.pop)
         }
     }
 

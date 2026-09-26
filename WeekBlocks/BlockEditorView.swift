@@ -52,6 +52,11 @@ struct BlockEditorView: View {
     /// 끄면 "그날 하긴 하는데 몇 시인지는 안 정함"이 된다 (`startHour = -1`).
     /// 하루 시간표에서 알약을 계획 판으로 끌어내는 것(→ ContentView.onClearTime)과 같은 상태다.
     @State private var hasExactTime: Bool = false
+    /// **종일** — 그날의 일이지만 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
+    /// 켜 두면 시각·시간대·길이는 묻지 않는다.
+    @State private var isAllDay: Bool = false
+    /// 루틴 안 일정은 늘 시각을 갖는다 — 두 토글이 함께 켜지면 루틴 쪽을 따른다.
+    private var savesAllDay: Bool { isAllDay && !withinRoutine }
 
     /// '자세히 정하기'를 펼쳐 두었는가. **기본은 접힘.**
     /// 이미 적어 둔 것이 있는 블록을 열 때만 펴서, 적힌 글이 접힌 채 숨지 않게 한다.
@@ -162,6 +167,7 @@ struct BlockEditorView: View {
 
     /// 접힌 창에서 이미 정해진 것을 한 줄로. "월요일 · 11:00–12:00 · 1시간"
     private var whenSummary: String {
+        if savesAllDay { return String(localized: "\(day.longLabel) · 종일") }
         let span = formatDuration(durationHours)
         if withinRoutine || hasExactTime {
             let range = "\(formatHour(startHour))–\(formatHour(startHour + durationHours))"
@@ -195,31 +201,44 @@ struct BlockEditorView: View {
                     }
                 }
 
-                Section("시간") {
+                Section {
                     // 루틴 안 일정은 늘 시각을 갖는다 — 회의는 '오후 어딘가'에 있지 않다.
                     if !withinRoutine {
-                        Toggle("몇 시에 할지 정하기", isOn: $hasExactTime)
+                        Toggle("종일", isOn: $isAllDay)
                     }
-                    if withinRoutine || hasExactTime {
-                        HStack {
-                            Text("시작")
-                            Spacer()
-                            DatePicker("", selection: startTimeBinding, displayedComponents: .hourAndMinute)
-                                .labelsHidden()
-                            Text("→ " + formatHour(startHour + durationHours))
-                                .font(.callout).foregroundStyle(.secondary).monospacedDigit()
+                    if !savesAllDay {
+                        if !withinRoutine {
+                            Toggle("몇 시에 할지 정하기", isOn: $hasExactTime)
                         }
-                    } else {
-                        Picker("시간대", selection: $timeBand) {
-                            ForEach(TimeBand.allCases) { band in
-                                Text(band.label).tag(band)
+                        if withinRoutine || hasExactTime {
+                            HStack {
+                                Text("시작")
+                                Spacer()
+                                DatePicker("", selection: startTimeBinding, displayedComponents: .hourAndMinute)
+                                    .labelsHidden()
+                                Text("→ " + formatHour(startHour + durationHours))
+                                    .font(.callout).foregroundStyle(.secondary).monospacedDigit()
+                            }
+                        } else {
+                            Picker("시간대", selection: $timeBand) {
+                                ForEach(TimeBand.allCases) { band in
+                                    Text(band.label).tag(band)
+                                }
                             }
                         }
+                        HStack {
+                            Text("얼마나 걸릴지")
+                            Spacer()
+                            DurationPicker(hours: $durationHours)
+                        }
                     }
-                    HStack {
-                        Text("얼마나 걸릴지")
-                        Spacer()
-                        DurationPicker(hours: $durationHours)
+                } header: {
+                    Text("시간")
+                } footer: {
+                    if savesAllDay {
+                        Text("기념일·마감일처럼 그날의 일이지만 시간을 차지하지 않습니다. 남은 시간에서 빠지지 않고, 그날 맨 위에 따로 섭니다.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -424,7 +443,7 @@ struct BlockEditorView: View {
 
     /// 이 날이 이미 얼마나 찼는지. 새로 넣을 길이가 남은 자리보다 크면 말해 준다.
     private var crowding: String? {
-        guard !withinRoutine, durationHours > 0 else { return nil }
+        guard !withinRoutine, !savesAllDay, durationHours > 0 else { return nil }
         let cal = Calendar(identifier: .iso8601)
         let dayBlocks = allBlocks.filter {
             $0.day == day && !$0.withinRoutine
@@ -472,6 +491,9 @@ struct BlockEditorView: View {
         nextAction = existing.nextAction ?? ""
         withinRoutine = existing.withinRoutine
         hasExactTime = existing.withinRoutine || existing.startHour >= 0
+        isAllDay = existing.isAllDay
+        // 종일을 끄면 길이를 다시 물어야 한다 — 0에서 시작하면 자 위에 설 폭이 없다.
+        if isAllDay { durationHours = 1 }
         if existing.startHour >= 0 { startHour = existing.startHour }
         // 이미 적어 둔 것이 있으면 펴 둔다 — 접힌 칸 안에 글이 숨어 있으면 지운 줄 안다.
         showsDetail = hasDetail
@@ -504,6 +526,7 @@ struct BlockEditorView: View {
             // 시각이 있으면 시간대는 거기서 따라 나온다 — 둘이 어긋나면 칩의 부제가 거짓말을 한다.
             existing.timeBand = keepsExactTime ? TimeBand.containing(startHour) : timeBand
             existing.concreteVerified = verified
+            if savesAllDay { existing.makeAllDay() }
         } else {
             let block = PlanBlock(
                 day: day,
@@ -518,6 +541,7 @@ struct BlockEditorView: View {
                 startHour: keepsExactTime ? startHour : -1
             )
             block.nextAction = na.isEmpty ? nil : na
+            if savesAllDay { block.makeAllDay() }
             context.insert(block)
             Telemetry.record(.planBlockAdded)
         }

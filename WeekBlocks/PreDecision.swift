@@ -198,10 +198,10 @@ struct PreDecisionBanner: View {
     private func note(_ kind: Kind) -> String? {
         switch kind {
         case .morning(let block):
-            let when = block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
-            return "\(when) · \(formatDuration(block.durationHours))"
+            if block.isAllDay { return block.whenLabel }
+            return "\(block.whenLabel) · \(formatDuration(block.durationHours))"
         case .tomorrowReady(let block):
-            let when = block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
+            let when = block.whenLabel
             let rest = tomorrowBlocks.count - 1
             let first = String(localized: "첫 걸음 \(when)")
             return rest > 0 ? "\(first) · \(String(localized: "그 밖에 \(rest)개"))" : first

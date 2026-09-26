@@ -241,8 +241,9 @@ struct ReflectionView: View {
                     case nil: mark = "[ ]"
                     }
                 }
-                let when = block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
-                lines.append("- \(mark) \(when) \(block.title) (\(shortHours(block.durationHours)))")
+                lines.append(block.isAllDay
+                             ? "- \(mark) \(block.whenLabel) \(block.title)"
+                             : "- \(mark) \(block.whenLabel) \(block.title) (\(shortHours(block.durationHours)))")
                 if let note = block.reviewNote, !note.isEmpty { lines.append("      \(note)") }
                 if let next = block.nextAction, !next.isEmpty {
                     lines.append("      → \(next)")
@@ -539,7 +540,7 @@ struct ReflectionRow: View {
 
     /// 시각이 정해진 블록은 시각을, 아니면 시간대를. 하루 시간표 옆에서는 몇 시였는지가 먼저 읽혀야 한다.
     private var whenLabel: String {
-        block.startHour >= 0 ? formatHour(block.startHour) : block.timeBand.shortLabel
+        block.whenLabel
     }
 
     var body: some View {
@@ -562,7 +563,7 @@ struct ReflectionRow: View {
                         .font(compact ? .callout.weight(.semibold) : .body.weight(.semibold))
                         .strikethrough(isDone)
                         .foregroundStyle(isDone ? .secondary : .primary)
-                    Text("\(whenLabel) · \(String(format: "%.1fh", block.durationHours))")
+                    Text(block.isAllDay ? whenLabel : "\(whenLabel) · \(String(format: "%.1fh", block.durationHours))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

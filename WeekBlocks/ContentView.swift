@@ -49,6 +49,9 @@ struct ContentView: View {
     /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 겹침이 처음 생겼을 때 배너가 한 번 묻는다.
     @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
     @AppStorage(OverlapRule.decidedKey) private var overlapRuleDecided = false
+    /// 쓰는 중에 서는 아이폰 앱 권유를 닫았는가 (→ IPhoneCompanionView.swift).
+    @AppStorage(IPhoneNudge.bannerDismissedKey) private var iphoneBannerDismissed = false
+    @State private var showingIPhoneCompanion = false
     @State private var showingDeleteAllAlert = false
     @State private var didSeed = false
     /// 타임라인에서 수면 시간을 잘라내 남은 시간을 넓게 본다.
@@ -135,6 +138,13 @@ struct ContentView: View {
         max(0, 168 - routineHours)
     }
 
+    /// 아이폰 앱 권유를 세울 때인가. 다른 배너(다음 한 걸음·겹침)가 서 있으면 기다린다 — 한 번에 한 줄.
+    private var showsIPhoneBanner: Bool {
+        guard !iphoneBannerDismissed, nextStep == nil,
+              overlapRuleDecided || weekOverlapExample == nil else { return false }
+        return IPhoneNudge.shouldShowBanner(blocks: allBlocksRaw, todos: backlogItems)
+    }
+
     /// 빼놓을 수 없는 중요한 고정 루틴이 하나라도 확보돼 있는지.
     /// 이게 true가 되어야 백로그·계획 블록을 추가할 수 있다.
     private var hasFixedRoutines: Bool {
@@ -168,6 +178,14 @@ struct ContentView: View {
                                        onDismiss: {
                                            withAnimation(Motion.banner) { overlapRuleDecided = true }
                                        })
+                    .transition(.banner)
+                }
+                // 아이폰 앱 권유 — 계획을 몇 칸 세운 뒤, 다른 안내가 다 지나간 자리에 한 번.
+                if showsIPhoneBanner {
+                    IPhoneNudgeBanner(onLearnMore: { showingIPhoneCompanion = true },
+                                      onDismiss: {
+                                          withAnimation(Motion.banner) { iphoneBannerDismissed = true }
+                                      })
                     .transition(.banner)
                 }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
@@ -383,6 +401,12 @@ struct ContentView: View {
         .sheet(item: $routineDetailSheet) { ctx in
             RoutineDetailView(routine: ctx.routine, dayAction: ctx.dayAction)
                 .frame(minWidth: 560, minHeight: 520)
+        }
+        .sheet(isPresented: $showingIPhoneCompanion, onDismiss: {
+            // 소개를 열어 봤으면 배너는 할 일을 다 했다 (→ IPhoneCompanionView.onAppear).
+            iphoneBannerDismissed = IPhoneNudge.bannerDismissed
+        }) {
+            IPhoneCompanionSheet()
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(scheduleSnapshots: {
@@ -1555,6 +1579,8 @@ struct ContentView: View {
                 changed = true
             }
             if let hour = atHour {
+                // 종일 블록을 자 위에 놓았다 — 그 시각의 일이 된다.
+                if blk.isAllDay { blk.leaveAllDay(); changed = true }
                 let start = clampStart(hour, duration: blk.durationHours)
                 if blk.startHour != start {
                     blk.startHour = start
@@ -1614,6 +1640,7 @@ struct ContentView: View {
         }
         guard let blk = PlanBlock.matching(dragToken: token, in: allBlocks) else { return }
         blk.move(to: day, sundayFirst: weekStartsOnSunday)
+        blk.leaveAllDay()
         blk.startHour = clampStart(startHour, duration: blk.durationHours)
         blk.timeBand = timeBand(for: blk.startHour)
         try? context.save()

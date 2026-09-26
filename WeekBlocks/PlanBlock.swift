@@ -113,6 +113,7 @@ final class PlanBlock {
     /// 하루 일정 흐름대로 정렬하기 위한 대표 시작 시각.
     /// 정확한 시각이 있으면 그 값을, 없으면 시간대(아침/오후/저녁/심야)의 시작 시각을 쓴다.
     var sortHour: Double {
+        if isAllDay { return -1 }
         if startHour >= 0 { return startHour }
         switch timeBand {
         case .morning: return 6
@@ -131,6 +132,42 @@ final class PlanBlock {
     }
 }
 
+
+// MARK: - 종일
+
+extension PlanBlock {
+    /// `startHour`에 적는 '종일' 표시.
+    ///
+    /// 캘린더의 기념일·마감일 같은 종일 일정은 '이 날의 일'이지 '하루 중 한 시간을 쓰는 일'이
+    /// 아니다. 예전에는 한 시간짜리로 들여서 그 한 시간이 자유 시간에서 빠졌다 (레딧 피드백).
+    ///
+    /// ⚠️ **필드를 늘리지 않고 기존 칸에 적는다.** 새 필드는 아이폰 '욕망의 무지개'와 CloudKit
+    ///    스키마까지 걸린다. -1(시각 미정)보다 작은 값이라 이 표시를 모르는 쪽(아이폰)은
+    ///    '시각 없음'으로 읽고, 길이가 0이라 어디서도 시간을 차지하지 않는다.
+    static let allDayHour: Double = -2
+
+    /// 시간을 차지하지 않고 그날 맨 위에 서는 블록인가. 루틴 안 일정은 늘 시각을 갖는다.
+    var isAllDay: Bool { startHour <= Self.allDayHour + 0.5 && !withinRoutine }
+
+    /// 시각이 정해진 블록은 시각을, 종일은 '종일'을, 아니면 시간대를.
+    var whenLabel: String {
+        if isAllDay { return String(localized: "종일") }
+        return startHour >= 0 ? formatHour(startHour) : timeBand.shortLabel
+    }
+
+    /// 종일로 만든다 — 시각은 비우고 길이는 0.
+    func makeAllDay() {
+        startHour = Self.allDayHour
+        durationHours = 0
+    }
+
+    /// 종일 블록을 하루 어느 시각에 세울 때. 길이가 0이면 자 위에 설 폭이 없으니 한 시간을 준다.
+    func leaveAllDay(defaultHours: Double = 1) {
+        guard isAllDay else { return }
+        startHour = -1
+        if durationHours <= 0 { durationHours = defaultHours }
+    }
+}
 
 // MARK: - 끌어 옮기기
 
