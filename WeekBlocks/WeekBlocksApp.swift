@@ -100,9 +100,12 @@ struct WeekBlocksApp: App {
                     // 스토어가 선 뒤라야 개수를 셀 수 있어서 init이 아니라 여기다.
                     // 끈 사람에게는 아무것도 나가지 않는다.
                     Telemetry.reportSnapshot()
+                    Telemetry.recordOpen()
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
+                    // 켜 둔 채 날이 바뀌고 다시 앞으로 온 날도 '연 날'이다 (→ Telemetry.recordOpen).
+                    Telemetry.recordOpen()
                     TodoShareIntake.drain(into: TodoStore.shared.context)
                     // 앱을 켜 둔 채 다른 기기에서 사고 돌아오는 길.
                     Task { await PurchaseManager.shared.refresh() }

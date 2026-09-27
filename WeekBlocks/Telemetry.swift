@@ -146,6 +146,22 @@ enum Telemetry {
 
     /// 허브에 남길 만큼은 아니지만 "썼다"고는 세어야 하는 행동.
     /// 만족도 프롬프트가 이 숫자를 보고 뜬다.
+    /// **이 앱을 연 날** — 하루 한 건. 허브의 DAU · 잔존 · "며칠 왔나"는 그날 이벤트가
+    /// 하나라도 있었는지로 세는데, 위 `Milestone` 만 보내면 할 일을 적거나 블록을 놓은
+    /// 날만 잡힌다. 계획을 열어 보기만 한 날이 '안 온 날'이 되어 모든 활성 숫자가 낮게
+    /// 나왔다(2026-09-26, 허브에서 어제 DAU 0).
+    ///
+    /// ⚠️ 행동이 아니라서 `registerSignificantEvent()` 를 부르지 않는다. 앱을 앞으로
+    ///    가져온 것까지 '만족한 행동'으로 세면 리뷰 요청이 너무 일찍 뜬다.
+    ///    맥 앱은 며칠씩 켜 둔 채로 있어서, 켤 때만이 아니라 앞으로 올 때마다 확인한다.
+    static func recordOpen() {
+        guard isEnabled, firstTimeToday(appOpenEvent) else { return }
+        reporter.logEventInBackground(appOpenEvent)
+    }
+
+    /// 허브가 "앱을 연 날"로 알아보는 이름. 다른 앱과 같은 말이어야 한다.
+    static let appOpenEvent = "app_open"
+
     static func signal() {
         LeeoEngagement.shared.registerSignificantEvent()
     }
