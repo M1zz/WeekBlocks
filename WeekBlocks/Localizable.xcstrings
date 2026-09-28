@@ -2739,7 +2739,14 @@
       }
     },
     "다 하면" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
     },
     "다 하면 %@" : {
       "localizations" : {
