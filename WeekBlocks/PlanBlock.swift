@@ -192,16 +192,17 @@ extension PlanBlock {
     /// 루틴은 '했는지'를 묻지 않는다. 수면·끼니·출근은 달성하는 것이 아니라 지켜지는 것이고,
     /// 그것까지 체크 줄에 세우면 정작 돌아봐야 할 것이 그 사이에 묻힌다.
     ///
-    /// 둘 중 하나면 루틴으로 본다.
-    /// - `withinRoutine` — '기존 루틴 시간 안에서 진행'으로 적어 둔 것.
-    /// - 제목이 루틴 이름과 같은 것 — 루틴을 요일에 끌어 올리면 그 **이름 그대로** 계획 블록이
-    ///   된다 (→ ContentView.dropBacklogItem의 `routine:` 갈래).
+    /// 제목이 루틴 이름과 같은 것만 루틴으로 본다 — 루틴을 요일에 끌어 올리면 그 **이름 그대로**
+    /// 계획 블록이 된다 (→ ContentView.dropBacklogItem의 `routine:` 갈래).
+    ///
+    /// ⚠️ `withinRoutine`('기존 루틴 시간 안에서 진행')은 보지 않는다. 그 표시는 **시간을 새로 안
+    ///    잡아먹는다**는 뜻일 뿐, 회의처럼 루틴 시간 안에서 하는 일도 했는지는 찍어야 한다.
     ///
     /// ⚠️ 모델에 표시를 더하지 않고 **이름으로 가린다.** 필드를 늘리면 같은 CloudKit 그릇을 쓰는
     ///    아이폰 '욕망의 무지개'까지 스키마가 걸린다. 이름이 겹치는 일은 드물고, 겹쳐도 잃는 것은
     ///    '점검 줄에서 빠진다'뿐이다.
     func isRoutineKind(_ routineNames: Set<String>) -> Bool {
-        withinRoutine || routineNames.contains(title)
+        routineNames.contains(title)
     }
 
     /// 지나간 날인데 아직 안 찍은 줄인가. 오지 않은 날은 세지 않는다 — 나무랄 수 없다.
