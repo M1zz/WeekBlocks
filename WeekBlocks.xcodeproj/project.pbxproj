@@ -71,6 +71,7 @@
 		CC4549A93976AA601DFD2B73 /* TodoRainbow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F2729111E0B1DEA68C05EA /* TodoRainbow.swift */; };
 		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
 		D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */; };
+		DA5D2669BF8034915FB6EA6B /* CalendarMerge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7DA6B68AC7163ACA0B879E /* CalendarMerge.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
 		E9C19CBAE78FAC241507D607 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE20311F927F785DA2C6677B /* Telemetry.swift */; };
 		EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 144D087CE2C3CFFED2EABEE8 /* LeeoKit */; };
@@ -118,6 +119,7 @@
 		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
 		30CD73EF7D52999BFEC85767 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOccurrence.swift; sourceTree = "<group>"; };
+		3C7DA6B68AC7163ACA0B879E /* CalendarMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMerge.swift; sourceTree = "<group>"; };
 		3DC93778BE68B512FD31ECFF /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		3EA4DAA5FEC707CC689804D2 /* BacklogCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogCategory.swift; sourceTree = "<group>"; };
 		45EF8BFE32D234EF9576302C /* ReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionView.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 				28ADD71097A3C0E497BF731A /* BlockEditorView.swift */,
 				6AADC0BCF03A5E947E84D020 /* CalendarExport.swift */,
 				C11B625903C69DAA3D0BC27A /* CalendarImport.swift */,
+				3C7DA6B68AC7163ACA0B879E /* CalendarMerge.swift */,
 				2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */,
 				ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */,
 				E29F659737698D0D348D6468 /* ContentView.swift */,
@@ -497,6 +500,7 @@
 				2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */,
 				105555A9BADE77C379BEB722 /* CalendarExport.swift in Sources */,
 				000C681D2D7046529311197E /* CalendarImport.swift in Sources */,
+				DA5D2669BF8034915FB6EA6B /* CalendarMerge.swift in Sources */,
 				D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */,
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,
 				55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */,

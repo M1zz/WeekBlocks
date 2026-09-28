@@ -191,6 +191,8 @@ final class CalendarBridge {
         var removed = 0
         /// 사라진 일정인데 사람이 손을 댄 흔적이 있어 남겨 둔 것.
         var keptOrphans = 0
+        /// 사람이 이미 세운 같은 일에 짝지어 붙인 것 (→ CalendarMerge.autoMatch).
+        var linked = 0
         var allDay = 0
         /// 캘린더에서 사라졌지만 **아직 안 지운** 블록들.
         ///
@@ -200,7 +202,7 @@ final class CalendarBridge {
         var pendingRemovals: [PlanBlock] = []
 
         var isEmpty: Bool {
-            added == 0 && updated == 0 && removed == 0 && pendingRemovals.isEmpty
+            added == 0 && updated == 0 && removed == 0 && linked == 0 && pendingRemovals.isEmpty
         }
 
         var summary: String {
@@ -208,6 +210,7 @@ final class CalendarBridge {
             var parts: [String] = []
             if added > 0 { parts.append(String(localized: "\(added)개 가져옴")) }
             if updated > 0 { parts.append(String(localized: "\(updated)개 갱신")) }
+            if linked > 0 { parts.append(String(localized: "내 계획 \(linked)개와 짝지음")) }
             if removed > 0 { parts.append(String(localized: "\(removed)개 지움")) }
             if keptOrphans > 0 { parts.append(String(localized: "손댄 \(keptOrphans)개는 남겨둠")) }
             return parts.joined(separator: " · ")
@@ -242,9 +245,11 @@ final class CalendarBridge {
         let predicate = store.predicateForEvents(withStart: weekStart, end: weekEnd, calendars: chosen)
         let events = store.events(matching: predicate)
 
-        // 이 주에 이미 들어와 있는, 캘린더에서 온 블록들.
-        let existing = ((try? context.fetch(FetchDescriptor<PlanBlock>())) ?? [])
-            .filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) && $0.calendarEventID != nil }
+        // 이 주의 블록들. 캘린더에서 온 것은 맞춰 갈 대상, 사람이 세운 것은 짝지을 후보다.
+        let weekBlocks = ((try? context.fetch(FetchDescriptor<PlanBlock>())) ?? [])
+            .filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) }
+        let existing = weekBlocks.filter { $0.calendarEventID != nil }
+        var mine = weekBlocks.filter { $0.calendarEventID == nil }
         var byKey = Dictionary(existing.map { ($0.calendarEventID!, $0) }, uniquingKeysWith: { a, _ in a })
         var seen = importedKeys
         // 이 기능 전에 들어온 블록도 '가져온 것'으로 적어 둔다 — 그래야 지우면 안 돌아온다.
@@ -259,6 +264,7 @@ final class CalendarBridge {
             if byKey[key] == nil, !event.hasRecurrenceRules, let id = event.eventIdentifier,
                let moved = byKey.first(where: { $0.key.hasPrefix(id + "|") }) {
                 byKey.removeValue(forKey: moved.key)
+                if CalendarMerge.hasOwnTitle(moved.key) { CalendarMerge.keepOwnTitle(for: key) }
                 moved.value.calendarEventID = key
                 byKey[key] = moved.value
             }
@@ -277,10 +283,22 @@ final class CalendarBridge {
                 if block.day != day { block.day = day; changed = true }
                 if block.startHour != hour { block.startHour = hour; changed = true }
                 if block.durationHours != duration { block.durationHours = duration; changed = true }
-                if block.title != title { block.title = title; changed = true }
+                // 합친 블록의 제목은 사람 것이다 — 캘린더 제목으로 덮지 않는다 (→ CalendarMerge).
+                if block.title != title, !CalendarMerge.hasOwnTitle(key) { block.title = title; changed = true }
                 let band = TimeBand.containing(hour >= 0 ? hour : 9)
                 if block.timeBand != band { block.timeBand = band; changed = true }
                 if changed { result.updated += 1 }
+            } else if !event.isAllDay,
+                      let match = CalendarMerge.autoMatch(title: title, day: day, startHour: hour, among: mine) {
+                // 사람이 이미 같은 일을 세워 두었다 — 새로 만들지 않고 그 블록이 이 일정을 맡는다.
+                // 시각은 캘린더를 따르고, 제목과 사람이 적은 것은 그대로 둔다.
+                match.calendarEventID = key
+                match.startHour = hour
+                match.durationHours = duration
+                match.timeBand = .containing(hour)
+                CalendarMerge.keepOwnTitle(for: key)
+                mine.removeAll { $0 === match }
+                result.linked += 1
             } else {
                 let block = PlanBlock(
                     day: day,

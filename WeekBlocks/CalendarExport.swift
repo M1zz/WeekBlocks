@@ -43,7 +43,7 @@ extension CalendarBridge {
     }
 
     /// 블록의 신원 — 만든 시각(밀리초). 동기화를 거쳐도 같은 값이 되도록 밀리초로 자른다.
-    static func exportID(for block: PlanBlock) -> String {
+    nonisolated static func exportID(for block: PlanBlock) -> String {
         String(Int64((block.createdAt.timeIntervalSince1970 * 1000).rounded()))
     }
 

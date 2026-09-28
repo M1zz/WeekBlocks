@@ -461,6 +461,16 @@
         }
       }
     },
+    "%@ %@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ · %3$@"
+          }
+        }
+      }
+    },
     "%@ %@ · %@ %@" : {
       "localizations" : {
         "en" : {
@@ -1468,6 +1478,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "With the same iCloud account, your routines, plans and to-dos show up on the iPhone as they are."
+          }
+        }
+      }
+    },
+    "같은 일이면 합치세요. 내 계획이 남고, 시각은 캘린더를 따라갑니다. 다른 일이면 따로 두면 다시 묻지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If they're the same thing, merge them: your plan stays and its time follows the calendar. If they're different, keep them apart and you won't be asked again."
           }
         }
       }
@@ -2486,6 +2506,26 @@
         }
       }
     },
+    "내 계획" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My plan"
+          }
+        }
+      }
+    },
+    "내 계획 %lld개와 짝지음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "matched %lld with your plans"
+          }
+        }
+      }
+    },
     "내 일정 공유" : {
       "localizations" : {
         "en" : {
@@ -3069,6 +3109,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To-dos that fit"
+          }
+        }
+      }
+    },
+    "따로 두기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep apart"
           }
         }
       }
@@ -3820,6 +3870,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Write the deliverable — what you're holding when it's done."
+          }
+        }
+      }
+    },
+    "살펴보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review"
           }
         }
       }
@@ -7165,6 +7225,26 @@
         }
       }
     },
+    "캘린더 일정과 겹치는 계획" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plans that overlap calendar events"
+          }
+        }
+      }
+    },
+    "캘린더 일정과 시간이 겹치는 계획 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld plans overlap calendar events"
+          }
+        }
+      }
+    },
     "캘린더 접근 권한이 없습니다." : {
       "localizations" : {
         "en" : {
@@ -7968,6 +8048,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ total"
+          }
+        }
+      }
+    },
+    "합치기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
           }
         }
       }

@@ -39,6 +39,8 @@ struct ContentView: View {
     @State private var calendarImportTask: Task<Void, Never>?
     /// 블록을 끌어 옮기는 동안 여러 번 바뀐다. 손을 멈춘 뒤에 한 번 쓴다.
     @State private var calendarExportTask: Task<Void, Never>?
+    /// 캘린더 일정과 겹치는 계획을 짝지어 고르는 창 (→ CalendarMergeSheet).
+    @State private var mergePairs: [CalendarMerge.Pair]?
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: RoutineDetailContext?
@@ -375,6 +377,9 @@ struct ContentView: View {
             Button("확인", role: .cancel) { calendarNotice = nil }
         } message: {
             Text(calendarNotice ?? "")
+        }
+        .sheet(isPresented: Binding(get: { mergePairs != nil }, set: { if !$0 { mergePairs = nil } })) {
+            CalendarMergeSheet(pairs: mergePairs ?? [])
         }
         .sheet(item: $blockSheet) { ctx in
             BlockEditorView(
@@ -1276,6 +1281,9 @@ struct ContentView: View {
             if !liveCalendarOrphans.isEmpty {
                 calendarOrphanBanner
             }
+            if !calendarOverlaps.isEmpty {
+                calendarOverlapBanner
+            }
 
             // 바깥 껍질은 **보는 자리**가 바뀌는 결(옆으로 넘김), 안쪽 껍질은 **주**가
             // 바뀌는 결이다. 한 뷰에 `.transition`을 두 번 붙이면 바깥 것만 살아남으므로
@@ -1538,6 +1546,34 @@ struct ContentView: View {
     /// 배너에 세울 것 — 그사이 사람이 지웠거나 캘린더에 되돌아온 것은 뺀다.
     private var liveCalendarOrphans: [PlanBlock] {
         calendarOrphans.filter { !$0.isDeleted && $0.modelContext != nil && $0.calendarEventID != nil }
+    }
+
+    /// 이 주에 캘린더 일정과 시간이 겹치는 내 계획 (→ CalendarMerge.pairs).
+    private var calendarOverlaps: [CalendarMerge.Pair] {
+        CalendarMerge.pairs(in: weekBlocks, routineNames: routineNames)
+    }
+
+    /// **같은 일을 두 번 적었을지 모른다는 줄.** 누르면 짝마다 합칠지 고르는 창이 열린다.
+    private var calendarOverlapBanner: some View {
+        let count = calendarOverlaps.count
+        return HStack(spacing: 8) {
+            Image(systemName: "rectangle.on.rectangle")
+                .font(.system(size: 12))
+            Text("캘린더 일정과 시간이 겹치는 계획 \(count)개")
+                .font(.system(size: 12, weight: .medium))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button("살펴보기") { mergePairs = calendarOverlaps }
+                .buttonStyle(.squish)
+                .font(.system(size: 12, weight: .semibold))
+                .underline()
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.accentColor.opacity(0.92), in: .soft(Corner.card))
+        .transition(.banner)
     }
 
     /// **캘린더에서 사라진 일정이 있다는 줄.** 누르면 무엇을 지울지 보여 주는 확인 창으로 간다.
