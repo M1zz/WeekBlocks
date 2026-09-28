@@ -3,6 +3,19 @@
 iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝트에서
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
+## ▶ 맥 → 아이폰 동기화가 9/22부터 멈춰 있음 (2026-09-28 진단)
+
+원인: 맥 1.1.7(스토어판)이 올리는 `Routine.sessionStartsRaw` 가 CloudKit **Production 스키마에 없다.**
+로그: "Cannot create or modify field 'CD_sessionStartsRaw' in record 'CD_Routine' in production schema"
+→ 146건 일괄 실패, "Never successfully initialized" — 맥은 보내기도 받기도 전부 멈춤.
+아이폰(1.1.3)은 오늘도 정상으로 받아오고 있음. 아이폰의 맥발 최신 할 일 = 9/22 09:36.
+
+- [ ] 디버그 빌드 실행 → 설정의 스키마 표본(CloudSchemaPrimer) 실행 (Development에 칸 생성)
+- [ ] CloudKit 콘솔 iCloud.com.devkoan.ScheduleDensity → Deploy Schema Changes
+      (sessionStartsRaw · nextAction · Project 타입 · BacklogItem.projectID 등 실리는지 확인)
+- [ ] 스토어판 맥 앱 다시 켜기 → 로그에서 production schema 오류 사라졌는지, 아이폰에 내려오는지 확인
+- [ ] 재발 방지: predeploy.sh에 "스키마 배포했나" 확인 단계
+
 ## 하루 한 건 app_open (2026-09-27, 빌드 성공)
 - [x] `Telemetry.recordOpen()` — 켤 때 · 앞으로 돌아올 때 하루 한 건. 허브 DAU · 잔존이 할 일을 적은 날만 잡히던 것
 - [ ] 배포 뒤 허브에서 무지개 공방 DAU가 0에서 벗어나는지 확인
