@@ -1,5 +1,23 @@
 # 릴리즈 노트
 
+## 1.1.8
+
+### 앱스토어 (한국어)
+
+그날 할 일이 몇 개인지 무지개로 한눈에 봅니다
+캘린더 일정을 알아서 가져옵니다
+계획을 캘린더에 적어 아이폰에서도 볼 수 있습니다
+같은 일정이 캘린더와 계획에 겹치면 하나로 합칩니다
+종일 일정이 하루 시간을 깎지 않습니다
+
+### App Store (English)
+
+A rainbow shows how many to-dos fill each day
+Calendar events now come in on their own
+Write plans to Calendar to see them on iPhone
+Merge a plan with its matching calendar event
+All-day events no longer eat into your day
+
 ## 1.1.7
 
 ### 앱스토어 (한국어)
