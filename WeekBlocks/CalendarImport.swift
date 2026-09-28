@@ -27,6 +27,8 @@ final class CalendarBridge {
 
     private let store = EKEventStore()
     private static let selectionKey = "calendar.selectedIDs"
+    private static let autoKey = "calendar.autoImport"
+    private static let importedKey = "calendar.importedKeys"
 
     private(set) var status: EKAuthorizationStatus = EKEventStore.authorizationStatus(for: .event)
     /// 권한이 있을 때만 채워진다.
@@ -40,6 +42,25 @@ final class CalendarBridge {
     static let privacySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars")!
 
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
+    @ObservationIgnored private var storeObserver: NSObjectProtocol?
+
+    /// **캘린더가 바뀌면 알아서 가져온다.** 끄면 예전처럼 '더 보기 → 캘린더에서 가져오기'를 눌러야 한다.
+    ///
+    /// 켜 두는 것이 기본이다 — 무엇을 가져올지는 이미 캘린더를 **골라서** 정했으므로,
+    /// 고른 뒤에 또 단추를 누르게 하는 것은 같은 허락을 두 번 받는 일이다.
+    var autoImport: Bool = UserDefaults.standard.object(forKey: CalendarBridge.autoKey) as? Bool ?? true {
+        didSet {
+            UserDefaults.standard.set(autoImport, forKey: Self.autoKey)
+            if autoImport { changeTick += 1 }
+        }
+    }
+
+    /// 가져올 거리가 생겼다는 신호. 캘린더가 바뀌거나 고른 캘린더가 바뀌면 하나 오른다.
+    /// 화면(ContentView)이 이 값을 지켜보다가 가져온다 — 이 다리는 어느 주를 보는지 모른다.
+    private(set) var changeTick = 0
+
+    /// 자동으로 가져올 수 있는 상태인가.
+    var isAutoReady: Bool { autoImport && hasAccess && !selectedIDs.isEmpty }
 
     private init() {
         reloadCalendarsIfAllowed()
@@ -49,6 +70,13 @@ final class CalendarBridge {
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.refreshStatus() }
+        }
+        // 캘린더 앱에서 고치든, 아이폰에서 고친 것이 iCloud로 내려오든 여기로 온다.
+        // 한 번 고칠 때 여러 번 울리므로 몇 번 울렸는지는 보지 않는다 — 부르는 쪽이 잠깐 기다렸다 한 번 가져온다.
+        storeObserver = NotificationCenter.default.addObserver(
+            forName: .EKEventStoreChanged, object: store, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.changeTick += 1 }
         }
     }
 
@@ -73,6 +101,7 @@ final class CalendarBridge {
             ids.insert(calendar.calendarIdentifier)
         }
         selectedIDs = ids
+        changeTick += 1
     }
 
     func isSelected(_ calendar: EKCalendar) -> Bool {
@@ -116,6 +145,19 @@ final class CalendarBridge {
     }
 
     // MARK: - 가져오기
+
+    /// **한 번이라도 가져온 일정들.** 블록이 없어졌는데 이 목록에 있으면 사람이 앱에서 지운 것이다.
+    ///
+    /// ⚠️ 이것이 없으면 자동 가져오기가 지운 블록을 곧바로 되살린다 — 캘린더에는 그 일정이
+    ///    그대로 있으니까. 캘린더는 건드리지 않는 앱이라, '이 일정은 안 들이기로 했다'를 여기에 적는다.
+    ///    기기마다 따로 적힌다(UserDefaults). 다른 맥에서 지운 것은 그 맥이 기억한다.
+    private var importedKeys: Set<String> {
+        get { Set(UserDefaults.standard.stringArray(forKey: Self.importedKey) ?? []) }
+        set {
+            // 끝없이 쌓이지 않게 자른다. 한 주에 수십 개라 이만큼이면 한 해를 넘게 담는다.
+            UserDefaults.standard.set(Array(newValue.suffix(3000)), forKey: Self.importedKey)
+        }
+    }
 
     struct ImportResult {
         var added = 0
@@ -178,10 +220,25 @@ final class CalendarBridge {
         let existing = ((try? context.fetch(FetchDescriptor<PlanBlock>())) ?? [])
             .filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) && $0.calendarEventID != nil }
         var byKey = Dictionary(existing.map { ($0.calendarEventID!, $0) }, uniquingKeysWith: { a, _ in a })
+        var seen = importedKeys
+        // 이 기능 전에 들어온 블록도 '가져온 것'으로 적어 둔다 — 그래야 지우면 안 돌아온다.
+        seen.formUnion(byKey.keys)
 
         for event in events {
             guard let key = Self.key(for: event), let start = event.startDate else { continue }
             guard let day = Self.day(of: start, in: weekStart) else { continue }
+
+            // 시각을 옮긴 일정은 이름(= id + 시작 시각)이 바뀐다. 반복 일정이 아니면 같은 id의
+            // 블록을 찾아 그 블록을 옮긴다 — 안 그러면 새 블록 하나와 '사라진 일정' 하나로 갈린다.
+            if byKey[key] == nil, !event.hasRecurrenceRules, let id = event.eventIdentifier,
+               let moved = byKey.first(where: { $0.key.hasPrefix(id + "|") }) {
+                byKey.removeValue(forKey: moved.key)
+                moved.value.calendarEventID = key
+                byKey[key] = moved.value
+            }
+            // 가져온 적 있는데 블록이 없다 = 사람이 앱에서 지웠다. 되살리지 않는다.
+            if byKey[key] == nil, seen.contains(key) { continue }
+            seen.insert(key)
             if event.isAllDay { result.allDay += 1 }
 
             // 종일 일정은 '종일' 블록으로 — 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
@@ -231,6 +288,7 @@ final class CalendarBridge {
             }
         }
 
+        importedKeys = seen
         try? context.save()
         // 고르기만 하고 아무것도 안 들어온 주가 흔하다. '가져왔다'는 들어왔을 때만이다.
         if result.added > 0 || result.updated > 0 { Telemetry.record(.calendarImported) }
@@ -245,6 +303,14 @@ final class CalendarBridge {
         for block in blocks { context.delete(block) }
         try? context.save()
         return blocks.count
+    }
+
+    /// 캘린더에서 사라졌지만 **남겨 두기로 한** 블록들. 캘린더 연결을 끊어 사람이 세운 블록이 된다 —
+    /// 그러지 않으면 자동 가져오기가 돌 때마다 같은 것을 또 묻는다.
+    func unlink(_ blocks: [PlanBlock], in context: ModelContext) {
+        guard !blocks.isEmpty else { return }
+        for block in blocks { block.calendarEventID = nil }
+        try? context.save()
     }
 
     /// 사람이 이 블록에 무언가를 보탰는가. 보탰으면 캘린더가 사라져도 지우지 않는다.

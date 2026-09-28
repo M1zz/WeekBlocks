@@ -136,6 +136,8 @@ struct DayColumn: View {
     var onDropIntoGap: (String, Double, Double) -> Void = { _, _, _ in }
     /// 요일 머리를 눌렀을 때 — 그날의 일간으로 (→ ContentView.openDay).
     var onOpenDay: (() -> Void)? = nil
+    /// 그날 해야 할 일의 수 — 머리 밑 무지개로 선다 (→ TodoRainbow).
+    var todoLoad: TodoLoad? = nil
 
     @State private var isDropTargeted = false
     /// 요일 머리를 가리키는 중. 누르면 그날로 들어간다는 것을 동그라미가 부풀어 말한다.
@@ -348,6 +350,13 @@ struct DayColumn: View {
             .onTapGesture { onOpenDay?() }
             .pointingCursor(enabled: onOpenDay != nil)
             .help(String(localized: "\(day.longLabel) 하루 보기"))
+
+            // 그날의 무지개 — 한 주를 가로로 훑으면 어느 날에 일이 몰렸는지가 색으로 읽힌다.
+            if let todoLoad {
+                TodoRainbow(load: todoLoad)
+                    .padding(.horizontal, 2)
+                    .padding(.bottom, 4)
+            }
 
             // 고정 루틴·유연 쿼터·계획 블록을 시각 순으로 섞어, '요일별 하루' 타임라인과 같은 흐름으로 표시.
             //

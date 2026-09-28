@@ -67,6 +67,7 @@
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
 		BFC8522E06BD4CF008D7AB0B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B72BFAC893324616AC725BF2 /* Localizable.xcstrings */; };
 		C2A5B375AC8D47ACC6A8421C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */; };
+		CC4549A93976AA601DFD2B73 /* TodoRainbow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F2729111E0B1DEA68C05EA /* TodoRainbow.swift */; };
 		D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */; };
 		D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */; };
 		E3F9A77A54C393B44ABAE457 /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F541E3039606B54D810E610 /* RoutineDetailView.swift */; };
@@ -169,6 +170,7 @@
 		DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTimer.swift; sourceTree = "<group>"; };
 		DE20311F927F785DA2C6677B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E9F2729111E0B1DEA68C05EA /* TodoRainbow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRainbow.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		F3EF66EAB632EF007258912A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F9A9E5AA931F9F6D41838D03 /* SegmentActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentActions.swift; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 				A47970A792B8AE57E021D9CB /* Theme.swift */,
 				D500334C7133BD6E4CFCC361 /* TimerView.swift */,
 				AB645C90135FC303A3A31FA0 /* TodoAccess.swift */,
+				E9F2729111E0B1DEA68C05EA /* TodoRainbow.swift */,
 				B1AB87F24F692342EEFC5FC3 /* TodoShareInbox.swift */,
 				1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */,
 				526E2EF2A25551766D802F91 /* TodoSharing.swift */,
@@ -526,6 +529,7 @@
 				2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */,
 				682DEFEE6B1A522E1AA94BAA /* TimerView.swift in Sources */,
 				B121540A19F0977281258CD9 /* TodoAccess.swift in Sources */,
+				CC4549A93976AA601DFD2B73 /* TodoRainbow.swift in Sources */,
 				4EA685D4C9D593CD84458458 /* TodoShareInbox.swift in Sources */,
 				B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */,
 				AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */,

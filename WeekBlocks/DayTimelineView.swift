@@ -405,6 +405,11 @@ struct DayTimelineRow: View {
     var onEditRoutineSchedule: (Routine) -> Void = { _ in }
     /// 요일을 눌렀을 때 — 그날의 일간으로.
     var onOpenDay: () -> Void = {}
+    /// 그날 해야 할 일의 수 — 띠와 남은 시간 사이에 무지개로 선다 (→ TodoRainbow).
+    /// 요일 줄이 위아래로 쌓이므로 일곱 줄의 무지개가 아이폰 '욕망의 무지개'와 같은 모양이 된다.
+    var todoLoad: TodoLoad? = nil
+    /// 무지개 칸의 폭. 위의 시각 자(HourAxis)가 같은 만큼 비워야 띠와 눈금이 맞는다.
+    static let rainbowWidth: CGFloat = 84
 
     // 드래그 중인 세그먼트와 이동량(px). 같은 행 안에서만 유효.
     @State private var dragId: String? = nil
@@ -608,6 +613,12 @@ struct DayTimelineRow: View {
                 // 요일 순서대로 조금씩 늦게 — 일곱 줄이 위에서부터 차례로 그려진다.
                 if reduceMotion { drawn = true; return }
                 withAnimation(Motion.stagger(day.rawValue)) { drawn = true }
+            }
+
+            if let todoLoad {
+                // 폭을 박아 둔다 — 넘친 수(+n)가 있는 줄과 없는 줄의 띠 길이가 같아야 한다.
+                TodoRainbow(load: todoLoad, cellWidth: 7, cellHeight: 14)
+                    .frame(width: Self.rainbowWidth, alignment: .leading)
             }
 
             Text("남은 시간 \(fmtHours(freeHours))h")
@@ -890,6 +901,8 @@ struct DayTimelineRow: View {
 
 struct HourAxis: View {
     var window: HourWindow = .full
+    /// 아래 줄들에 무지개 칸이 서 있는가 (→ DayTimelineRow.todoLoad).
+    var showsRainbow = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -929,6 +942,7 @@ struct HourAxis: View {
                 }
             }
             .frame(height: 14)
+            if showsRainbow { Spacer().frame(width: DayTimelineRow.rainbowWidth) }
             Spacer().frame(width: 110)
         }
     }

@@ -32,6 +32,11 @@ struct ContentView: View {
     @State private var conflictNotice: String?
     /// 캘린더에서 사라져 지울 참인 블록들. **묻기 전에는 안 지운다.**
     @State private var pendingRemovals: [PlanBlock] = []
+    /// 자동 가져오기가 찾은, 캘린더에서 사라진 일정의 블록들. 창으로 묻지 않고 배너로 세운다.
+    @State private var calendarOrphans: [PlanBlock] = []
+    @State private var calendarBridge = CalendarBridge.shared
+    /// 캘린더는 한 번 고칠 때 여러 번 울린다. 잠깐 기다렸다가 한 번만 가져온다.
+    @State private var calendarImportTask: Task<Void, Never>?
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: RoutineDetailContext?
@@ -344,7 +349,11 @@ struct ContentView: View {
         .alert("캘린더에서 사라진 일정 \(pendingRemovals.count)개를 지울까요?",
                isPresented: Binding(get: { !pendingRemovals.isEmpty },
                                     set: { if !$0 { pendingRemovals = [] } })) {
-            Button("남겨두기", role: .cancel) { pendingRemovals = [] }
+            Button("남겨두기", role: .cancel) {
+                // 남긴 것은 캘린더 연결을 끊는다 — 안 끊으면 자동 가져오기가 돌 때마다 또 묻는다.
+                CalendarBridge.shared.unlink(pendingRemovals, in: context)
+                pendingRemovals = []
+            }
             Button("지우기", role: .destructive) {
                 let removed = CalendarBridge.shared.removeOrphans(pendingRemovals, in: context)
                 pendingRemovals = []
@@ -444,11 +453,16 @@ struct ContentView: View {
             for w in storedWeeks { reconcileOccurrences(for: w) }
             await shareStore.refresh()
             await autoPublishSharedSchedule()
+            scheduleCalendarImport()
         }
         .onChange(of: selectedWeek) { _, _ in
             for w in storedWeeks { reconcileOccurrences(for: w) }
             Task { await autoPublishSharedSchedule() }
+            // 넘겨 간 주도 캘린더와 맞춘다. 가져오기는 보는 주 하나만 한다.
+            scheduleCalendarImport()
         }
+        // 캘린더가 바뀌었다(캘린더 앱에서 고쳤거나, 고른 캘린더를 바꿨거나).
+        .onChange(of: calendarBridge.changeTick) { _, _ in scheduleCalendarImport() }
         // 한 주의 시작을 바꾸면 보던 **날**은 그대로 두고, 그 날이 새 차례에서 서는 주로 옮겨 선다.
         // (일요일을 보고 있다가 일요일 시작으로 바꾸면 다음 월요일의 주가 된다.)
         .onChange(of: weekStartsOnSunday) { wasSunday, isSunday in
@@ -932,7 +946,6 @@ struct ContentView: View {
     private func dayStripCell(_ day: DayOfWeek) -> some View {
         let selected = day == selectedDay
         let today = Calendar.current.isDateInToday(dayDate(day))
-        let dots = dayDots(on: day)
         return Button { showDay(day) } label: {
             VStack(spacing: 4) {
                 Text(day.shortLabel)
@@ -962,22 +975,10 @@ struct ContentView: View {
                             .transition(.pop)
                     }
                 }
-                // 그날의 계획 블록을 점으로 — 채운 점은 끝낸 것, 빈 점은 아직 안 한 것.
-                HStack(spacing: 3) {
-                    ForEach(Array(dots.enumerated()), id: \.offset) { _, filled in
-                        ZStack {
-                            Circle()
-                                .strokeBorder(Color.accentColor.opacity(0.6), lineWidth: 1.2)
-                            Circle()
-                                .fill(Color.accentColor)
-                                .scaleEffect(filled ? 1 : 0.1)
-                                .opacity(filled ? 1 : 0)
-                        }
-                        .frame(width: 6, height: 6)
-                    }
-                }
-                .frame(height: 6)
-                .animation(Motion.squish, value: dots)
+                // 그날의 무지개 — 주간 두 보기와 같은 것이다 (→ TodoRainbow).
+                // 루틴은 세지 않는다. 수면·끼니까지 칸이 되면 이레 내내 같은 모양이 서 아무 말도 안 한다.
+                TodoRainbow(load: todoLoad(on: day), cellWidth: 5, cellHeight: 5)
+                    .frame(height: 6)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 4)
@@ -988,19 +989,12 @@ struct ContentView: View {
         .help(day.longLabel)
     }
 
-    /// 요일 줄에 찍을 점 — **그날의 계획 블록만.** true는 끝낸 것(채운 점), false는 아직(빈 점).
-    ///
-    /// 처음엔 고정 루틴 색까지 찍었는데, 잠·끼니·회사는 날마다 있어서 이레 내내 같은 구슬이 서
-    /// 아무 말도 하지 않았다. 요일마다 달라지는 계획만 찍으면 "이 날은 할 일이 있다/없다"와
-    /// "얼마나 해냈다"가 함께 읽힌다.
-    ///
-    /// 넷을 넘으면 점은 넷에 두고 **채운 비율**을 맞춘다 — 여덟 개 중 넷을 끝냈으면 넷 중 둘이 찬다.
     /// 루틴 이름. 이 이름으로 선 계획 블록은 점검하지 않는다 (→ PlanBlock.isRoutineKind).
     private var routineNames: Set<String> { Set(routines.map(\.name)) }
 
-    /// 그 요일에 **점검해야 하는** 계획 블록.
-    private func reviewableBlocks(on day: DayOfWeek) -> [PlanBlock] {
-        weekBlocks.filter { $0.day == day && !$0.isRoutineKind(routineNames) }
+    /// 그 요일에 해야 할 일의 수 — 일간 요일 줄과 주간 두 보기의 무지개가 같은 값을 본다 (→ TodoRainbow).
+    private func todoLoad(on day: DayOfWeek) -> TodoLoad {
+        TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames)
     }
 
     /// 지나간 날인데 아직 안 찍은 것이 남았는가 — 요일 줄에 점으로 세운다.
@@ -1008,17 +1002,6 @@ struct ContentView: View {
         weekBlocks.contains {
             $0.day == day && $0.isUnreviewedPast(weekStart: storedWeek(for: day), routineNames: routineNames)
         }
-    }
-
-    private func dayDots(on day: DayOfWeek) -> [Bool] {
-        // 루틴은 세지 않는다. 수면·끼니까지 구슬이 되면 어느 날이 밀렸는지가 안 읽힌다.
-        let blocks = reviewableBlocks(on: day)
-        let total = blocks.count
-        guard total > 0 else { return [] }
-        let done = blocks.filter { $0.reviewStatus == .done }.count
-        let slots = min(4, total)
-        let filled = total <= 4 ? done : Int((Double(done) / Double(total) * 4).rounded())
-        return (0..<slots).map { $0 < filled }
     }
 
     private var weekRangeString: String {
@@ -1284,6 +1267,9 @@ struct ContentView: View {
             if let notice = conflictNotice {
                 conflictBanner(notice)
             }
+            if !liveCalendarOrphans.isEmpty {
+                calendarOrphanBanner
+            }
 
             // 바깥 껍질은 **보는 자리**가 바뀌는 결(옆으로 넘김), 안쪽 껍질은 **주**가
             // 바뀌는 결이다. 한 뷰에 `.transition`을 두 번 붙이면 바깥 것만 살아남으므로
@@ -1375,7 +1361,7 @@ struct ContentView: View {
         // 창은 한 번만 잰다 — 일곱 요일의 구간을 다 훑어서 정하는 값이라 줄마다 다시 재면 무겁다.
         let window = timelineWindow
         return VStack(alignment: .leading, spacing: 8) {
-            HourAxis(window: window)
+            HourAxis(window: window, showsRainbow: true)
 
             VStack(spacing: 4) {
                 ForEach(shownDays) { day in
@@ -1412,7 +1398,8 @@ struct ContentView: View {
                         onEditRoutineSchedule: { routine in
                             routineSheet = RoutineSheetContext(routine: routine)
                         },
-                        onOpenDay: { openDay(day) }
+                        onOpenDay: { openDay(day) },
+                        todoLoad: todoLoad(on: day)
                     )
                     .background {
                         GeometryReader { geo in
@@ -1469,7 +1456,8 @@ struct ContentView: View {
                             onDropIntoGap: { token, start, gap in
                                 dropIntoGap(token: token, day: day, startHour: start, gap: gap)
                             },
-                            onOpenDay: { openDay(day) }
+                            onOpenDay: { openDay(day) },
+                            todoLoad: todoLoad(on: day)
                         )
                         .frame(maxWidth: .infinity, alignment: .top)
                     }
@@ -1496,9 +1484,67 @@ struct ContentView: View {
         // 이 삭제는 CloudKit을 타고 아이폰까지 건너가 거기서도 사라진다 — 되돌릴 수 없다.
         if !result.pendingRemovals.isEmpty {
             pendingRemovals = result.pendingRemovals
+            calendarOrphans = []   // 같은 것을 배너로도 묻지 않는다.
             return
         }
         calendarNotice = bridge.failureMessage ?? result.summary
+    }
+
+    /// **캘린더가 바뀌면 알아서 가져온다** (→ CalendarBridge.autoImport).
+    ///
+    /// 조용히 한다 — 무엇을 가져왔는지 창을 띄우지 않는다. 블록이 칸에 나타나는 것이 곧 알림이다.
+    /// 캘린더에서 사라진 일정만은 **지우기 전에 묻는다**(CloudKit을 타고 아이폰에서도 사라진다).
+    /// 다만 창으로 가로막지 않고 배너로 세운다 — 사람이 뭘 하던 중이든 끊지 않는다.
+    private func scheduleCalendarImport() {
+        calendarImportTask?.cancel()
+        guard calendarBridge.isAutoReady else { return }
+        calendarImportTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            guard !Task.isCancelled, calendarBridge.isAutoReady else { return }
+            let result = calendarBridge.importWeek(selectedWeek, into: context)
+            guard !result.pendingRemovals.isEmpty else { return }
+            let known = Set(calendarOrphans.map(\.persistentModelID))
+            let fresh = result.pendingRemovals.filter { !known.contains($0.persistentModelID) }
+            guard !fresh.isEmpty else { return }
+            withAnimation(Motion.banner) { calendarOrphans += fresh }
+        }
+    }
+
+    /// 배너에 세울 것 — 그사이 사람이 지웠거나 캘린더에 되돌아온 것은 뺀다.
+    private var liveCalendarOrphans: [PlanBlock] {
+        calendarOrphans.filter { !$0.isDeleted && $0.modelContext != nil && $0.calendarEventID != nil }
+    }
+
+    /// **캘린더에서 사라진 일정이 있다는 줄.** 누르면 무엇을 지울지 보여 주는 확인 창으로 간다.
+    private var calendarOrphanBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "calendar.badge.minus")
+                .font(.system(size: 12))
+            Text("캘린더에서 사라진 일정 \(liveCalendarOrphans.count)개가 아직 계획에 있습니다")
+                .font(.system(size: 12, weight: .medium))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button("지우기…") {
+                // 무엇이 지워지는지와 아이폰에서도 사라진다는 말은 확인 창이 한다.
+                pendingRemovals = liveCalendarOrphans
+                withAnimation(Motion.banner) { calendarOrphans = [] }
+            }
+            .buttonStyle(.squish)
+            .font(.system(size: 12, weight: .semibold))
+            .underline()
+            Button("남겨두기") {
+                calendarBridge.unlink(liveCalendarOrphans, in: context)
+                withAnimation(Motion.banner) { calendarOrphans = [] }
+            }
+            .buttonStyle(.squish)
+            .font(.system(size: 12, weight: .semibold))
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.92), in: .soft(Corner.card))
+        .transition(.banner)
     }
 
     /// 지울 참인 블록들을 사람이 읽을 수 있게 늘어놓는다. 숫자만 보여주고 지우면

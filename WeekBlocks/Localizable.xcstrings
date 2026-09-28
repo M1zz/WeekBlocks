@@ -1717,6 +1717,16 @@
         }
       }
     },
+    "고른 캘린더의 일정을 보고 있는 주의 계획 블록으로 가져옵니다. 캘린더에서 고치면 곧바로 따라오고, 앱에서 지운 일정은 다시 들이지 않습니다. **읽기만 하며 캘린더에 쓰지 않습니다.**" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brings events from the calendars you pick into the week you're viewing as plan blocks. Changes in Calendar follow right away, and events you delete here won't come back. **It only reads your calendars and never writes to them.**"
+          }
+        }
+      }
+    },
     "고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**" : {
       "localizations" : {
         "en" : {
@@ -6803,6 +6813,16 @@
         }
       }
     },
+    "지우기…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete…"
+          }
+        }
+      }
+    },
     "직접 세는 것을 그만두고, 일정에 적힌 시각을 다시 따릅니다" : {
       "localizations" : {
         "en" : {
@@ -7145,12 +7165,32 @@
         }
       }
     },
+    "캘린더가 바뀌면 자동으로 가져오기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import automatically when the calendar changes"
+          }
+        }
+      }
+    },
     "캘린더에서 가져오기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import from Calendar"
+          }
+        }
+      }
+    },
+    "캘린더에서 사라진 일정 %lld개가 아직 계획에 있습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld events removed from your calendar are still in your plan"
           }
         }
       }
@@ -7908,6 +7948,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Billed yearly. Cancel anytime."
+          }
+        }
+      }
+    },
+    "해야 할 일 %lld개 · 남은 것 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld to do · %2$lld left"
+          }
+        }
+      }
+    },
+    "해야 할 일 없음" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to do"
           }
         }
       }

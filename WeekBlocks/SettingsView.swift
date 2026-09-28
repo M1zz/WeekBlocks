@@ -401,9 +401,18 @@ struct SettingsView: View {
                     }
                 }
 
-                Text("고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Toggle("캘린더가 바뀌면 자동으로 가져오기", isOn: $calendars.autoImport)
+
+                // ⚠️ 삼항으로 한 Text에 넣지 않는다 — 문자열이 String으로 읽혀 번역도 굵은 글씨도 빠진다.
+                Group {
+                    if calendars.autoImport {
+                        Text("고른 캘린더의 일정을 보고 있는 주의 계획 블록으로 가져옵니다. 캘린더에서 고치면 곧바로 따라오고, 앱에서 지운 일정은 다시 들이지 않습니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
+                    } else {
+                        Text("고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             } else if calendars.canAsk {
                 // ⚠️ **이 단추에 '허용'이라고 적지 않는다.** 누르면 곧바로 시스템 권한 창이 뜨는데,
                 //    그 앞 단추가 '허용'이면 사람은 앱 안에서 이미 허락한 셈이 되어 시스템 창에서도
