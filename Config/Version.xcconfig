@@ -18,9 +18,11 @@
 //      1.1.0(1)  → "must contain a higher version than [9]"
 //      1.1.2(1)  → "must contain a higher version than [11]"  (2026-09-08)
 //      1.1.6(21) → "must contain a higher version than [21]" (2026-09-24) — 21을 한 번 올려 둔 채 다시 올렸다
+//    마케팅 버전은 스토어에서 승인되면 닫힌다. 그 뒤로는 빌드만 올려서는 못 올린다:
+//      1.1.7(24) → "train version '1.1.7' is closed" (2026-09-28) — 1.1.7 승인 뒤 버전을 안 올렸다
 
 // 사람이 읽는 버전 (App Store 에 보이는 번호)
-MARKETING_VERSION = 1.1.7
+MARKETING_VERSION = 1.1.8
 
-// 빌드 번호 — 업로드마다 올린다 (1.1.6(21) 업로드됨)
-CURRENT_PROJECT_VERSION = 23
+// 빌드 번호 — 업로드마다 올린다 (1.1.7(23) 업로드됨)
+CURRENT_PROJECT_VERSION = 24
