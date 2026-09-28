@@ -1687,6 +1687,16 @@
         }
       }
     },
+    "계획을 ‘무지개 공방’ 캘린더에 쓰기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write my plan to the “Rainbow Craft” calendar"
+          }
+        }
+      }
+    },
     "계획을 세운 주가 생기면 여기에서 고를 수 있습니다." : {
       "localizations" : {
         "en" : {
@@ -1717,22 +1727,22 @@
         }
       }
     },
-    "고른 캘린더의 일정을 보고 있는 주의 계획 블록으로 가져옵니다. 캘린더에서 고치면 곧바로 따라오고, 앱에서 지운 일정은 다시 들이지 않습니다. **읽기만 하며 캘린더에 쓰지 않습니다.**" : {
+    "고른 캘린더의 일정을 보고 있는 주의 계획 블록으로 가져옵니다. 캘린더에서 고치면 곧바로 따라오고, 앱에서 지운 일정은 다시 들이지 않습니다. **고른 캘린더는 읽기만 합니다.**" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brings events from the calendars you pick into the week you're viewing as plan blocks. Changes in Calendar follow right away, and events you delete here won't come back. **It only reads your calendars and never writes to them.**"
+            "value" : "Brings events from the calendars you pick into the week you're viewing as plan blocks. Changes in Calendar follow right away, and events you delete here won't come back. **The calendars you pick are only read, never changed.**"
           }
         }
       }
     },
-    "고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**" : {
+    "고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **고른 캘린더는 읽기만 합니다.**" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brings events from the calendars you chose into this week as plan blocks. Run it from the toolbar: More → Import from Calendar. **It only reads; it never writes to your calendar.**"
+            "value" : "Brings events from the calendars you chose into this week as plan blocks. Run it from the toolbar: More → Import from Calendar. **The calendars you pick are only read, never changed.**"
           }
         }
       }
@@ -3233,12 +3243,12 @@
         }
       }
     },
-    "맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다." : {
+    "맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 원하면 계획을 앱이 만든 ‘무지개 공방’ 캘린더에 적을 수도 있습니다. 다른 캘린더는 읽기만 하고 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can bring the meetings and appointments already in your Mac calendar into your weekly plan. It only reads; it never writes to or changes your calendar. When you continue, macOS will ask about calendar access."
+            "value" : "You can bring the meetings and appointments already in your Mac calendar into your weekly plan. If you like, your plan can also be written to a separate “Rainbow Craft” calendar the app creates. Your other calendars are only read, never changed. When you continue, macOS will ask about calendar access."
           }
         }
       }
@@ -4064,6 +4074,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Set the time, length, and details"
+          }
+        }
+      }
+    },
+    "시각을 정한 계획 블록이 ‘무지개 공방’ 캘린더에 섭니다. 앱에서 옮기거나 지우면 캘린더도 따라가고, 캘린더에서 고친 것은 앱의 계획으로 되돌아갑니다. 루틴과 캘린더에서 가져온 일정은 쓰지 않으며, 다른 캘린더는 건드리지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan blocks with a set time appear in the “Rainbow Craft” calendar. Move or delete them here and the calendar follows; edits made in Calendar are replaced by your plan. Routines and imported events aren't written, and your other calendars are never touched."
           }
         }
       }
@@ -7175,6 +7195,16 @@
         }
       }
     },
+    "캘린더에 쓰지 못했습니다: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't write to the calendar: %@"
+          }
+        }
+      }
+    },
     "캘린더에서 가져오기" : {
       "localizations" : {
         "en" : {
@@ -7201,6 +7231,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete %lld blocks whose calendar events are gone?"
+          }
+        }
+      }
+    },
+    "켜면 ‘무지개 공방’ 캘린더를 만들어 계획 블록을 적습니다. 아이폰 캘린더와 위젯에서도 오늘 계획이 보입니다. 끄면 더 고치지 않으며, 필요 없으면 캘린더 앱에서 그 캘린더를 지우면 됩니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn this on to create a “Rainbow Craft” calendar and write your plan blocks to it, so today's plan shows up in Calendar and widgets on your iPhone too. Turning it off stops updates; delete that calendar in the Calendar app if you no longer need it."
           }
         }
       }

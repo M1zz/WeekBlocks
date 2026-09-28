@@ -7,9 +7,9 @@
 //  회의·약속처럼 이미 시각이 박힌 일정을 손으로 또 적게 하면, 앱이 계획을 돕는 게 아니라
 //  베껴 쓰기를 시킨다. 그래서 읽어 온다.
 //
-//  ⚠️ **한 방향이다.** 캘린더 → 앱. 이 앱은 사용자의 진짜 캘린더에 한 글자도 쓰지 않는다.
-//     권한도 그렇게 말하고, 실제로도 `EKEventStore`에 저장 계열 호출이 없다.
-//     양방향으로 바꾸고 싶어지면 그때는 '사고가 나면 남의 일정이 지워진다'를 먼저 풀 것.
+//  ⚠️ **남의 캘린더에는 쓰지 않는다.** 가져오기는 캘린더 → 앱 한 방향이다.
+//     앱 → 캘린더(→ CalendarExport.swift)는 사람이 켰을 때만, 앱이 만든 '무지개 공방'
+//     캘린더 하나에만 쓴다. 그 캘린더는 가져오기에서 빠진다 — 안 빼면 쓴 것을 다시 읽어 두 벌이 된다.
 //
 //  ⚠️ 고르는 단위는 **캘린더**다 (일정 하나하나가 아니라). 한 번 정해두면 손이 안 가고,
 //     '업무만 가져오기' 같은 실제 쓰임과도 맞는다.
@@ -25,17 +25,20 @@ import SwiftData
 final class CalendarBridge {
     static let shared = CalendarBridge()
 
-    private let store = EKEventStore()
+    let store = EKEventStore()
     private static let selectionKey = "calendar.selectedIDs"
     private static let autoKey = "calendar.autoImport"
     private static let importedKey = "calendar.importedKeys"
+    private static let exportKey = "calendar.export"
+    static let exportCalendarKey = "calendar.exportCalendarID"
 
     private(set) var status: EKAuthorizationStatus = EKEventStore.authorizationStatus(for: .event)
     /// 권한이 있을 때만 채워진다.
     private(set) var calendars: [EKCalendar] = []
     private(set) var isWorking = false
     /// 막혔을 때 화면에 그대로 보여줄 말. 조용히 실패하면 단추가 고장 난 줄 안다.
-    private(set) var failureMessage: String?
+    /// 쓰기(→ CalendarExport.swift)도 여기에 적는다.
+    var failureMessage: String?
 
     /// 시스템 설정의 캘린더 권한 화면. 거부한 뒤에는 앱이 다시 물어도 macOS가 창을 띄우지
     /// 않으므로, 켜는 자리로 곧장 보낸다.
@@ -58,6 +61,29 @@ final class CalendarBridge {
     /// 가져올 거리가 생겼다는 신호. 캘린더가 바뀌거나 고른 캘린더가 바뀌면 하나 오른다.
     /// 화면(ContentView)이 이 값을 지켜보다가 가져온다 — 이 다리는 어느 주를 보는지 모른다.
     private(set) var changeTick = 0
+
+    /// **계획을 '무지개 공방' 캘린더에 쓴다** (→ CalendarExport.swift). 사람이 켜야만 쓴다 —
+    /// 캘린더는 아이폰·워치·다른 사람과의 공유로 번지는 자리라, 묻지 않고 채우면 안 된다.
+    var exportEnabled: Bool = UserDefaults.standard.bool(forKey: CalendarBridge.exportKey) {
+        didSet {
+            UserDefaults.standard.set(exportEnabled, forKey: Self.exportKey)
+            exportTick += 1
+        }
+    }
+
+    /// 쓸 거리가 생겼다는 신호. 켜는 순간 한 번 쓰게 한다 (블록이 바뀐 것은 화면이 따로 본다).
+    private(set) var exportTick = 0
+
+    /// 앱이 만든 캘린더의 id. 기기마다 따로 적힌다 — 다른 맥은 제목으로 같은 캘린더를 찾는다.
+    var exportCalendarID: String? {
+        get { UserDefaults.standard.string(forKey: Self.exportCalendarKey) }
+        set { UserDefaults.standard.set(newValue, forKey: Self.exportCalendarKey) }
+    }
+
+    /// 가져오기에서 고를 수 있는 캘린더 — 앱이 쓰는 캘린더는 뺀다.
+    var importableCalendars: [EKCalendar] {
+        calendars.filter { !isExportCalendar($0) }
+    }
 
     /// 자동으로 가져올 수 있는 상태인가.
     var isAutoReady: Bool { autoImport && hasAccess && !selectedIDs.isEmpty }
@@ -203,7 +229,7 @@ final class CalendarBridge {
             failureMessage = String(localized: "캘린더 접근 권한이 없습니다.")
             return result
         }
-        let chosen = calendars.filter { isSelected($0) }
+        let chosen = importableCalendars.filter { isSelected($0) }
         guard !chosen.isEmpty else {
             failureMessage = String(localized: "가져올 캘린더를 먼저 고르세요.")
             return result

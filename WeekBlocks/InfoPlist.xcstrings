@@ -41,13 +41,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brings events from your Mac calendar into your weekly plan. It only reads; it never writes to or changes your calendar."
+            "value" : "Brings events from your Mac calendar into your weekly plan. If you turn it on, your plan is also written to a separate “Rainbow Craft” calendar the app creates; your other calendars are never changed."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "맥 캘린더의 일정을 주간 계획으로 가져옵니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다."
+            "value" : "맥 캘린더의 일정을 주간 계획으로 가져옵니다. 원하면 계획을 앱이 만든 ‘무지개 공방’ 캘린더에 적으며, 다른 캘린더는 고치지 않습니다."
           }
         }
       }

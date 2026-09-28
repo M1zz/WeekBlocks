@@ -37,6 +37,8 @@ struct ContentView: View {
     @State private var calendarBridge = CalendarBridge.shared
     /// 캘린더는 한 번 고칠 때 여러 번 울린다. 잠깐 기다렸다가 한 번만 가져온다.
     @State private var calendarImportTask: Task<Void, Never>?
+    /// 블록을 끌어 옮기는 동안 여러 번 바뀐다. 손을 멈춘 뒤에 한 번 쓴다.
+    @State private var calendarExportTask: Task<Void, Never>?
     @State private var blockSheet: BlockSheetContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: RoutineDetailContext?
@@ -454,6 +456,7 @@ struct ContentView: View {
             await shareStore.refresh()
             await autoPublishSharedSchedule()
             scheduleCalendarImport()
+            scheduleCalendarExport()
         }
         .onChange(of: selectedWeek) { _, _ in
             for w in storedWeeks { reconcileOccurrences(for: w) }
@@ -463,6 +466,9 @@ struct ContentView: View {
         }
         // 캘린더가 바뀌었다(캘린더 앱에서 고쳤거나, 고른 캘린더를 바꿨거나).
         .onChange(of: calendarBridge.changeTick) { _, _ in scheduleCalendarImport() }
+        // 계획이 바뀌었거나 캘린더에 쓰기를 막 켰다 → '무지개 공방' 캘린더와 맞춘다.
+        .onChange(of: calendarExportSignature) { _, _ in scheduleCalendarExport() }
+        .onChange(of: calendarBridge.exportTick) { _, _ in scheduleCalendarExport(after: 0) }
         // 한 주의 시작을 바꾸면 보던 **날**은 그대로 두고, 그 날이 새 차례에서 서는 주로 옮겨 선다.
         // (일요일을 보고 있다가 일요일 시작으로 바꾸면 다음 월요일의 주가 된다.)
         .onChange(of: weekStartsOnSunday) { wasSunday, isSunday in
@@ -1508,6 +1514,25 @@ struct ContentView: View {
             guard !fresh.isEmpty else { return }
             withAnimation(Motion.banner) { calendarOrphans += fresh }
         }
+    }
+
+    /// **계획을 '무지개 공방' 캘린더에 쓴다** (→ CalendarExport.swift). 켰을 때만.
+    private func scheduleCalendarExport(after seconds: Double = 1.5) {
+        calendarExportTask?.cancel()
+        guard calendarBridge.exportEnabled, calendarBridge.hasAccess else { return }
+        calendarExportTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            calendarBridge.exportPlan(blocks: allBlocks, routineNames: routineNames)
+        }
+    }
+
+    /// 캘린더에 쓰는 값들이 바뀌었는가. 회고·메모처럼 캘린더에 안 가는 것은 넣지 않는다.
+    private var calendarExportSignature: String {
+        let blocks = allBlocks.map {
+            "\($0.createdAt.timeIntervalSince1970)|\($0.title)|\($0.dayRaw)|\($0.weekStartDate.timeIntervalSince1970)|\($0.startHour)|\($0.durationHours)|\($0.calendarEventID ?? "")|\($0.successCriteria)"
+        }
+        return (blocks.sorted() + routineNames.sorted()).joined(separator: "\n")
     }
 
     /// 배너에 세울 것 — 그사이 사람이 지웠거나 캘린더에 되돌아온 것은 뺀다.

@@ -11,6 +11,7 @@
 		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
 		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
 		0B6B259A6790F4A36E517BC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */; };
+		105555A9BADE77C379BEB722 /* CalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AADC0BCF03A5E947E84D020 /* CalendarExport.swift */; };
 		12DCD47B097FBED701EECC11 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
 		1AFF77D8C86DCEDFDFD238A7 /* OverlapRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F14B31687AFBB85553F24C7 /* OverlapRule.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
@@ -134,6 +135,7 @@
 		5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BacklogItem+Fragment.swift"; sourceTree = "<group>"; };
 		622A5D436D0F426C007C5246 /* ShareTodoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTodoView.swift; sourceTree = "<group>"; };
 		693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionTrendsView.swift; sourceTree = "<group>"; };
+		6AADC0BCF03A5E947E84D020 /* CalendarExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarExport.swift; sourceTree = "<group>"; };
 		73D46C0413552F70FBCA3EC2 /* ScheduleShareStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleShareStore.swift; sourceTree = "<group>"; };
 		77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksApp.swift; sourceTree = "<group>"; };
 		7825F06D743B533E2C379989 /* IPhoneCompanionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPhoneCompanionView.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */,
 				295B1036D16FB52A4E7D0C74 /* BacklogView.swift */,
 				28ADD71097A3C0E497BF731A /* BlockEditorView.swift */,
+				6AADC0BCF03A5E947E84D020 /* CalendarExport.swift */,
 				C11B625903C69DAA3D0BC27A /* CalendarImport.swift */,
 				2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */,
 				ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */,
@@ -492,6 +495,7 @@
 				5A7FAEDE2641B14C3D1AFE7F /* BacklogItem.swift in Sources */,
 				7FC4A705F75D1EFA5BFA6A58 /* BacklogView.swift in Sources */,
 				2EEF15F748E4787419FB76DD /* BlockEditorView.swift in Sources */,
+				105555A9BADE77C379BEB722 /* CalendarExport.swift in Sources */,
 				000C681D2D7046529311197E /* CalendarImport.swift in Sources */,
 				D7DE46680F1648C99CCE7B20 /* CloudSchemaPrimer.swift in Sources */,
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,

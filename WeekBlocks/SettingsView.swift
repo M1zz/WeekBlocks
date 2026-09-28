@@ -376,12 +376,12 @@ struct SettingsView: View {
     private var calendarSection: some View {
         Section {
             if calendars.hasAccess {
-                if calendars.calendars.isEmpty {
+                if calendars.importableCalendars.isEmpty {
                     Text("맥에 캘린더가 없습니다.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(calendars.calendars, id: \.calendarIdentifier) { cal in
+                    ForEach(calendars.importableCalendars, id: \.calendarIdentifier) { cal in
                         Toggle(isOn: Binding(
                             get: { calendars.isSelected(cal) },
                             set: { _ in calendars.toggle(cal) }
@@ -406,9 +406,23 @@ struct SettingsView: View {
                 // ⚠️ 삼항으로 한 Text에 넣지 않는다 — 문자열이 String으로 읽혀 번역도 굵은 글씨도 빠진다.
                 Group {
                     if calendars.autoImport {
-                        Text("고른 캘린더의 일정을 보고 있는 주의 계획 블록으로 가져옵니다. 캘린더에서 고치면 곧바로 따라오고, 앱에서 지운 일정은 다시 들이지 않습니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
+                        Text("고른 캘린더의 일정을 보고 있는 주의 계획 블록으로 가져옵니다. 캘린더에서 고치면 곧바로 따라오고, 앱에서 지운 일정은 다시 들이지 않습니다. **고른 캘린더는 읽기만 합니다.**")
                     } else {
-                        Text("고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **읽기만 하며 캘린더에 쓰지 않습니다.**")
+                        Text("고른 캘린더의 일정을 이번 주 계획 블록으로 가져옵니다. 툴바의 '더 보기 → 캘린더에서 가져오기'를 누르면 실행됩니다. **고른 캘린더는 읽기만 합니다.**")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+                Divider()
+
+                Toggle("계획을 ‘무지개 공방’ 캘린더에 쓰기", isOn: $calendars.exportEnabled)
+
+                Group {
+                    if calendars.exportEnabled {
+                        Text("시각을 정한 계획 블록이 ‘무지개 공방’ 캘린더에 섭니다. 앱에서 옮기거나 지우면 캘린더도 따라가고, 캘린더에서 고친 것은 앱의 계획으로 되돌아갑니다. 루틴과 캘린더에서 가져온 일정은 쓰지 않으며, 다른 캘린더는 건드리지 않습니다.")
+                    } else {
+                        Text("켜면 ‘무지개 공방’ 캘린더를 만들어 계획 블록을 적습니다. 아이폰 캘린더와 위젯에서도 오늘 계획이 보입니다. 끄면 더 고치지 않으며, 필요 없으면 캘린더 앱에서 그 캘린더를 지우면 됩니다.")
                     }
                 }
                 .font(.caption)
@@ -421,7 +435,7 @@ struct SettingsView: View {
                 //    빌드 단계의 `scripts/check-permission-wording.sh`가 그 낱말을 막는다.
                 //
                 //    설명이 **단추보다 먼저** 온다 — 무엇을 왜 보는지 읽고 나서 누르게 한다.
-                Text("맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 읽기만 하며, 캘린더에 쓰거나 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다.")
+                Text("맥 캘린더에 이미 적어 둔 회의·약속을 주간 계획으로 가져올 수 있습니다. 원하면 계획을 앱이 만든 ‘무지개 공방’ 캘린더에 적을 수도 있습니다. 다른 캘린더는 읽기만 하고 고치지 않습니다. 계속하면 macOS가 캘린더 접근 여부를 묻습니다.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
