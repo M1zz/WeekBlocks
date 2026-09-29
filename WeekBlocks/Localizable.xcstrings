@@ -8414,6 +8414,196 @@
           }
         }
       }
+    },
+    "회고하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflect"
+          }
+        }
+      }
+    },
+    "무엇이 잘 됐고 무엇이 안 됐는지 한 줄로 남깁니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave one line on what went well and what didn't"
+          }
+        }
+      }
+    },
+    "눌러서 고치기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to edit"
+          }
+        }
+      }
+    },
+    "겹침 %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld overlap"
+          }
+        }
+      }
+    },
+    "같은 시간에 겹친 일정 %lld개를 펼쳐 봅니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the %lld plans that overlap here"
+          }
+        }
+      }
+    },
+    "같은 시간에 겹친 일정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlapping at this time"
+          }
+        }
+      }
+    },
+    "%lld줄 · 2줄로 줄이기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld columns · make it 2"
+          }
+        }
+      }
+    },
+    "%lld줄로 겹쳤어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld plans side by side"
+          }
+        }
+      }
+    },
+    "한 시간에 셋 이상 나란히 서면 글자가 좁아져 읽기 어렵습니다. 옮기거나 빼서 두 줄로 줄여 보세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With three or more side by side, the text gets too narrow to read. Move or drop one to get back to two."
+          }
+        }
+      }
+    },
+    "한 시간에 셋 이상 나란히 서 있습니다 — 옮기거나 빼면 두 줄로 돌아옵니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three or more plans share this time — move or drop one to get back to two"
+          }
+        }
+      }
+    },
+    "바탕 루틴 — 그대로 둡니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background routine — stays as is"
+          }
+        }
+      }
+    },
+    "%@로 미루기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Push to %@"
+          }
+        }
+      }
+    },
+    "시각 무르기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear time"
+          }
+        }
+      }
+    },
+    "시각을 지우고 시간대 자리로 돌려놓습니다 (그날 계획에는 남습니다)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clears the time and puts it back in its part of the day (stays on that day's plan)"
+          }
+        }
+      }
+    },
+    "할 일로 되돌리기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to To-dos"
+          }
+        }
+      }
+    },
+    "오늘은 빼기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop for this day"
+          }
+        }
+      }
+    },
+    "이 날만 뺍니다. 루틴은 그대로입니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drops it for this day only. The routine stays."
+          }
+        }
+      }
+    },
+    "꼭 함께여야 하면" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If they must overlap"
+          }
+        }
+      }
+    },
+    "이대로 두기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep as is"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

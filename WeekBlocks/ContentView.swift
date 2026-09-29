@@ -531,20 +531,26 @@ struct ContentView: View {
     }
 
     /// 타임라인에 그릴 시간 범위. 수면 숨김이 꺼져 있으면 하루 전체.
-    private var timelineWindow: HourWindow {
+    /// 한 주 시간축은 일곱 줄이 자 하나를 같이 쓰므로 한 주를 본다.
+    private var timelineWindow: HourWindow { timelineWindow(on: DayOfWeek.allCases) }
+
+    /// 그 요일들만 보고 정한 범위. **일간은 그날 하나만 본다** — 한 주를 보면 목요일 새벽의 캘린더 일정
+    /// 하나 때문에 월요일 일간까지 수면이 도로 펼쳐졌다.
+    private func timelineWindow(on days: [DayOfWeek]) -> HourWindow {
         guard hideSleepInTimeline else { return .full }
         let fixed = routines.filter { $0.kind == .fixed }
         // 하루하루 **실제로 그려진 자리**를 지킨다 — 옮겨 둔 루틴·끼니, 시각 없이 빈 구간에 놓인 블록까지.
         // 기본 시각만 보고 자르면 그런 것들이 창 밖으로 밀려 요일 칸에만 서 있게 된다.
         let sleepNames = Set(fixed.filter { $0.isSleepRoutine }.map(\.name))
-        let drawn = DayOfWeek.allCases.flatMap { daySegments(on: $0) }
+        let drawn = days.flatMap { daySegments(on: $0) }
             .filter { seg in
                 guard !seg.isGhost else { return false }
                 if case .fixedRoutine(let name) = seg.source { return !sleepNames.contains(name) }
                 return true
             }
             .map { ($0.start, $0.end) }
-        return TimelineLayout.visibleWindow(fixedRoutines: fixed, blocks: weekBlocks,
+        return TimelineLayout.visibleWindow(fixedRoutines: fixed,
+                                            blocks: weekBlocks.filter { days.contains($0.day) },
                                             extraProtected: drawn, hideSleep: true)
     }
 
@@ -821,7 +827,7 @@ struct ContentView: View {
                         $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: selectedDay))
                     },
                     weekStart: storedWeek(for: selectedDay),
-                    window: timelineWindow,
+                    window: timelineWindow(on: [selectedDay]),
                     canPlan: hasFixedRoutines,
                     
                     onDropBacklog: { token, hour in

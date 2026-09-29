@@ -531,6 +531,12 @@ struct ReflectionRow: View {
     let onChange: () -> Void
 
     @State private var hovering = false
+    /// 한 줄 회고를 적는 중인가. **찍는다고 저절로 열지 않는다** — 찍을 때마다 칸이 열려 줄이 길어지고
+    /// 목록이 들썩였다. '회고하기'를 눌러야 열린다.
+    @State private var writing = false
+    @FocusState private var noteFocused: Bool
+
+    private var note: String { block.reviewNote ?? "" }
 
     /// 다 한 것으로 보는가. 줄을 흐리고 제목에 줄을 긋는 기준이다.
     private var isDone: Bool { block.reviewStatus == .done }
@@ -570,6 +576,21 @@ struct ReflectionRow: View {
 
                 Spacer()
 
+                // 찍었고 아직 안 적었으면 버튼 하나만 선다 — 줄 높이는 그대로.
+                if reviewable, block.reviewStatus != nil, note.isEmpty, !writing {
+                    Button {
+                        withAnimation(Motion.row) { writing = true }
+                    } label: {
+                        Label("회고하기", systemImage: "square.and.pencil")
+                            .font(.body)
+                    }
+                    // 글자만 있는 단추는 눌러도 되는지 안 읽힌다 — 도드라진 단추로 세운다.
+                    .buttonStyle(.bordered)
+                    .fixedSize()
+                    .help("무엇이 잘 됐고 무엇이 안 됐는지 한 줄로 남깁니다")
+                    .transition(.pop)
+                }
+
                 // 부분·건너뜀은 자주 쓰는 손짓이 아니다. 늘 세워 두면 '끝냄' 하나를
                 // 누르러 온 사람이 셋 중에 고르는 일이 되므로, 가리키기 전에는 숨긴다.
                 // (마우스를 안 쓰는 사람을 위해 줄 전체에 같은 메뉴를 우클릭으로도 단다.)
@@ -601,7 +622,7 @@ struct ReflectionRow: View {
                     .padding(.leading, detailIndent)
             }
 
-            if block.reviewStatus != nil {
+            if writing {
                 TextField(
                     "한 줄 회고 — 무엇이 잘 됐고 무엇이 안 됐는지",
                     text: Binding(
@@ -612,6 +633,31 @@ struct ReflectionRow: View {
                 )
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(1...3)
+                .focused($noteFocused)
+                .onSubmit { finishWriting() }
+                .onExitCommand { finishWriting() }
+                .onChange(of: noteFocused) { _, focused in if !focused { finishWriting() } }
+                .onAppear { noteFocused = true }
+                .padding(.leading, detailIndent)
+                .transition(.disclose)
+            } else if !note.isEmpty {
+                // 적어 둔 회고는 글로만 선다. 누르면 다시 고친다.
+                Button {
+                    withAnimation(Motion.row) { writing = true }
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Image(systemName: "text.quote")
+                        Text(note)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("눌러서 고치기")
                 .padding(.leading, detailIndent)
                 .transition(.disclose)
             }
@@ -620,10 +666,16 @@ struct ReflectionRow: View {
         .padding(.vertical, compact ? 9 : 14)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
-        // 표시를 찍으면 회고 칸이 아래로 열리고, 제목에 줄이 그어진다. 한 결로 묶는다.
+        // 표시를 찍으면 제목에 줄이 그어지고 옆에 '회고하기'가 선다. 한 결로 묶는다.
         .animation(Motion.row, value: block.reviewStatus)
+        .animation(Motion.row, value: writing)
         .animation(Motion.hover, value: hovering)
         .contextMenu { if reviewable { stateButtons } }
+    }
+
+    private func finishWriting() {
+        guard writing else { return }
+        withAnimation(Motion.row) { writing = false }
     }
 
     /// 루틴 줄의 표시. 체크 동그라미 자리를 비워 두면 줄이 어긋나므로 같은 크기로 세운다.

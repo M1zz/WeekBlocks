@@ -133,6 +133,13 @@ struct DayScheduleView: View {
     @State private var drawn = false
     /// 분마다 바뀌는 '지금'. "끝냈나요?"가 일정이 끝나는 분에 서도록 다시 그리게 한다.
     @State private var minuteTick = Date()
+    /// 펼쳐 둔 겹침 묶음(첫 조각의 id).
+    @State private var openOverlap: String?
+    /// 펼쳐 둔 세 줄 안내 (→ Crowd.key).
+    @State private var openCrowd: String?
+    /// '세 줄 그대로 두기'를 고른 자리. 기기에만 남긴다 — 보는 방식의 일이다.
+    @AppStorage("dayCrowdKept") private var keptCrowdsRaw = ""
+    private var keptCrowds: Set<String> { Set(keptCrowdsRaw.split(separator: "\n").map(String.init)) }
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
 
@@ -328,6 +335,12 @@ struct DayScheduleView: View {
         let laned = segs.filter { !$0.isNested && !$0.isGhost && !$0.isFlexible }
         // 나란히 세우는 판단은 **시각만 본다** — 화면에서 몇 pt 스치는 것은 겹친 것이 아니다.
         let lanes = Self.lanes(laned)
+        // **오른쪽 자리(45%~)에 서는 것은 모두 한데 모아 칸을 나눈다.** 루틴 안 일정, 다른 일정 위에 얹힌 끼니,
+        // 둘로 갈린 칸의 오른쪽 블록이 각자 다른 규칙으로 같은 자리에 섰더니, 13시 점심(끼니)과 회사와 겹친
+        // '런치' 블록이 한 자리에 포개져 글자까지 겹쳤다.
+        let right = Self.lanes(segs.filter { seg in
+            isOverlay(seg, laned: laned) || lanes[seg.id].map { $0.count == 2 && $0.index == 1 } == true
+        })
         let order = Dictionary(uniqueKeysWithValues: segs.sorted { $0.start < $1.start }
             .enumerated().map { ($1.id, $0) })
         let conns = connectors(segs, laned: laned, lanes: lanes)
@@ -368,8 +381,27 @@ struct DayScheduleView: View {
                     }
                 }
 
+                // **세 줄로 겹친 곳** — 두 줄로 줄이자고 권한다. 그대로 두기로 한 곳은 보통 '겹침 N'으로.
+                let crowds = crowdedSpans(segs)
+                ForEach(crowds, id: \.key) { crowd in
+                    if keptCrowds.contains(crowd.key) {
+                        overlapBadge(crowd.items, trackWidth: trackWidth)
+                            .zIndex(4)
+                    } else {
+                        crowdBadge(crowd, trackWidth: trackWidth)
+                            .zIndex(4)
+                    }
+                }
+                // 두 개 이상 겹친 묶음 — 오른쪽 위 '겹침 N'을 누르면 다 펼쳐 본다.
+                ForEach(overlapClusters(segs).filter { cluster in
+                    !crowds.contains { c in cluster.contains { $0.start < c.end && c.start < $0.end } }
+                }, id: \.first!.id) { cluster in
+                    overlapBadge(cluster, trackWidth: trackWidth)
+                        .zIndex(4)
+                }
+
                 ForEach(segs) { seg in
-                    if let frame = frame(for: seg, lanes: lanes, laned: laned, trackWidth: trackWidth) {
+                    if let frame = frame(for: seg, lanes: lanes, laned: laned, right: right, trackWidth: trackWidth) {
                         let i = order[seg.id] ?? 0
                         segmentView(seg, size: frame.size)
                             .offset(x: Self.gutter + frame.minX + (seg.id == dragId ? dragPx : 0),
@@ -1700,19 +1732,25 @@ struct DayScheduleView: View {
     }
 
     private func frame(for seg: TimeSegment, lanes: [String: Lane], laned: [TimeSegment],
-                       trackWidth w: CGFloat) -> CGRect? {
+                       right: [String: Lane] = [:], trackWidth w: CGFloat) -> CGRect? {
         guard let vis = window.clamp(seg.start, seg.end) else { return nil }
         let top = y(vis.start)
         // 짧은 일도 알약 하나와 글씨 한 줄은 들어간다. 겹칠 몫은 칸 나누기가 미리 셌다.
         let height = max(Self.minRowHeight, y(vis.end) - y(vis.start) - 3)
 
         // 루틴 안 일정, 다른 일정 위에 겹친 끼니는 칸을 따로 갖지 않고 오른쪽에 얹는다.
-        let overlaysOther = seg.isNested
-            || (seg.isFlexible && laned.contains { $0.start < seg.end - 1e-6 && seg.start < $0.end - 1e-6 })
-        if overlaysOther {
+        /// 오른쪽 자리 — 거기 서는 것끼리 겹치면 나눠 선다 (→ `right`).
+        func rightSide() -> CGRect {
             let x = w * Self.nestSplit
-            return CGRect(x: x, y: top, width: max(Self.pillWidth, w - x), height: height)
+            let room = max(Self.pillWidth, w - x)
+            guard let lane = right[seg.id], lane.count > 1 else {
+                return CGRect(x: x, y: top, width: room, height: height)
+            }
+            let gap: CGFloat = 6
+            let col = max(Self.pillWidth, (room - gap * CGFloat(lane.count - 1)) / CGFloat(lane.count))
+            return CGRect(x: x + CGFloat(lane.index) * (col + gap), y: top, width: col, height: height)
         }
+        if isOverlay(seg, laned: laned) { return rightSide() }
         guard let lane = lanes[seg.id], lane.count > 1 else {
             // **단단히 잡힌 긴 일정은 왼쪽 절반만 차지한다.**
             //
@@ -1732,7 +1770,7 @@ struct DayScheduleView: View {
             let split = w * Self.nestSplit
             return lane.index == 0
                 ? CGRect(x: 0, y: top, width: split, height: height)
-                : CGRect(x: split, y: top, width: w - split, height: height)
+                : rightSide()
         }
         let gap: CGFloat = 8
         let columnWidth = (w - gap * CGFloat(lane.count - 1)) / CGFloat(lane.count)
@@ -1742,6 +1780,245 @@ struct DayScheduleView: View {
     struct Lane {
         let index: Int
         let count: Int
+    }
+
+    /// 칸을 따로 갖지 않고 오른쪽에 얹히는가 — 루틴 안 일정, 다른 일정 위에 겹친 끼니.
+    private func isOverlay(_ seg: TimeSegment, laned: [TimeSegment]) -> Bool {
+        seg.isNested
+            || (seg.isFlexible && laned.contains { $0.start < seg.end - 1e-6 && seg.start < $0.end - 1e-6 })
+    }
+
+    // MARK: 겹친 일정 펼쳐 보기
+
+    /// 서로 이어 겹치는 묶음 중 **둘 이상**인 것. 회사처럼 안에 일정을 품는 긴 루틴은 바탕이라 세지 않는다 —
+    /// 회사 안의 회의 하나까지 '겹침'이라 부르면 날마다 뱃지가 선다.
+    private func overlapClusters(_ segs: [TimeSegment]) -> [[TimeSegment]] {
+        let items = segs.filter { !hostsNested($0) }.sorted { $0.start < $1.start }
+        var result: [[TimeSegment]] = []
+        var cluster: [TimeSegment] = []
+        var end = -Double.infinity
+        for seg in items {
+            if !cluster.isEmpty, seg.start >= end - 1e-6 {
+                if cluster.count >= 2 { result.append(cluster) }
+                cluster = []
+                end = -Double.infinity
+            }
+            cluster.append(seg)
+            end = max(end, seg.end)
+        }
+        if cluster.count >= 2 { result.append(cluster) }
+        return result
+    }
+
+    private func overlapBadge(_ cluster: [TimeSegment], trackWidth: CGFloat) -> some View {
+        let id = cluster.first!.id
+        let top = cluster.map(\.start).min() ?? 0
+        return Button {
+            openOverlap = openOverlap == id ? nil : id
+        } label: {
+            Label("겹침 \(cluster.count)", systemImage: "square.stack")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(.regularMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .fixedSize()
+        .help("같은 시간에 겹친 일정 \(cluster.count)개를 펼쳐 봅니다")
+        .popover(isPresented: Binding(get: { openOverlap == id },
+                                      set: { if !$0, openOverlap == id { openOverlap = nil } }),
+                 arrowEdge: .leading) {
+            overlapList(cluster)
+        }
+        .frame(width: trackWidth, alignment: .trailing)
+        .offset(x: Self.gutter, y: max(0, y(max(top, window.start)) - 12))
+    }
+
+    // MARK: 세 줄 → 두 줄
+
+    /// 한 시각에 **셋 이상** 나란히 서는 구간과 거기 선 것들.
+    struct Crowd {
+        let start: Double
+        let end: Double
+        let items: [TimeSegment]
+        /// 가장 붐빌 때 나란히 서는 수 = 줄 수.
+        let columns: Int
+        /// 같은 날 같은 겹침을 알아보는 열쇠 — 제목과 시각으로 (블록 열쇠는 재실행마다 바뀐다).
+        let key: String
+    }
+
+    /// 칸을 나누는 것 모두(회사 같은 바탕 포함)를 세어, 동시에 셋 이상인 구간을 이어 붙여 돌려준다.
+    private func crowdedSpans(_ segs: [TimeSegment]) -> [Crowd] {
+        let marks = Array(Set(segs.flatMap { [$0.start, $0.end] })).sorted()
+        guard marks.count > 1 else { return [] }
+        var spans: [(start: Double, end: Double, items: [TimeSegment], columns: Int)] = []
+        for i in 0..<(marks.count - 1) {
+            let mid = (marks[i] + marks[i + 1]) / 2
+            let active = segs.filter { $0.start < mid && mid < $0.end }
+            guard active.count >= 3 else { continue }
+            if var last = spans.last, abs(last.end - marks[i]) < 1e-6 {
+                let more = active.filter { a in !last.items.contains { $0.id == a.id } }
+                last.end = marks[i + 1]
+                last.items += more
+                last.columns = max(last.columns, active.count)
+                spans[spans.count - 1] = last
+            } else {
+                spans.append((marks[i], marks[i + 1], active, active.count))
+            }
+        }
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        let day = f.string(from: date)
+        return spans.map { span in
+            let sig = span.items.map { "\($0.title)@\($0.logicalStart)" }.sorted().joined(separator: ",")
+            return Crowd(start: span.start, end: span.end, items: span.items.sorted { $0.logicalStart < $1.logicalStart },
+                         columns: span.columns, key: "\(day)|\(sig)")
+        }
+    }
+
+    private func crowdBadge(_ crowd: Crowd, trackWidth: CGFloat) -> some View {
+        Button {
+            openCrowd = openCrowd == crowd.key ? nil : crowd.key
+        } label: {
+            Label("\(crowd.columns)줄 · 2줄로 줄이기", systemImage: "rectangle.split.3x1")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.orange)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(.regularMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(Color.orange.opacity(0.45), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .fixedSize()
+        .help("한 시간에 셋 이상 나란히 서 있습니다 — 옮기거나 빼면 두 줄로 돌아옵니다")
+        .popover(isPresented: Binding(get: { openCrowd == crowd.key },
+                                      set: { if !$0, openCrowd == crowd.key { openCrowd = nil } }),
+                 arrowEdge: .leading) {
+            crowdPanel(crowd)
+        }
+        .frame(width: trackWidth, alignment: .trailing)
+        .offset(x: Self.gutter, y: max(0, y(max(crowd.start, window.start)) - 12))
+    }
+
+    /// 세 줄 안내 판. 겹친 것마다 **두 줄로 돌아가는 길**을 단추로 준다.
+    /// 회사처럼 안에 일정을 품는 루틴은 바탕이라 옮기라고 하지 않는다.
+    private func crowdPanel(_ crowd: Crowd) -> some View {
+        // 겹친 구간이 끝나는 때(15분 올림) — 여기로 미루면 그 자리에서 빠진다.
+        let after = min(23.75, (crowd.end * 4).rounded(.up) / 4)
+        return VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(crowd.columns)줄로 겹쳤어요")
+                    .font(.title3.weight(.semibold))
+                Text("한 시간에 셋 이상 나란히 서면 글자가 좁아져 읽기 어렵습니다. 옮기거나 빼서 두 줄로 줄여 보세요.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            ForEach(crowd.items) { seg in
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Circle().fill(seg.color).frame(width: 9, height: 9)
+                        Text(timeRange(seg))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                        Text(seg.title)
+                            .fontWeight(.semibold)
+                            .lineLimit(1)
+                    }
+                    .font(.body)
+
+                    if hostsNested(seg) {
+                        Text("바탕 루틴 — 그대로 둡니다")
+                            .font(.body)
+                            .foregroundStyle(.tertiary)
+                            .padding(.leading, 17)
+                    } else {
+                        HStack(spacing: 6) {
+                            if seg.logicalStart < after - 1e-6 {
+                                Button("\(formatHour(after))로 미루기") {
+                                    openCrowd = nil
+                                    actions.move(seg, deltaHours: after - seg.logicalStart)
+                                }
+                            }
+                            if let block = planBlock(seg) {
+                                Button("시각 무르기") {
+                                    openCrowd = nil
+                                    onClearTime(block)
+                                }
+                                .help("시각을 지우고 시간대 자리로 돌려놓습니다 (그날 계획에는 남습니다)")
+                                Button("할 일로 되돌리기") {
+                                    openCrowd = nil
+                                    onReturnToBacklog(block)
+                                }
+                            } else {
+                                Button("오늘은 빼기") {
+                                    openCrowd = nil
+                                    actions.delete(seg)
+                                }
+                                .help("이 날만 뺍니다. 루틴은 그대로입니다")
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .padding(.leading, 17)
+                    }
+                }
+            }
+
+            Divider()
+            HStack {
+                Text("꼭 함께여야 하면")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("이대로 두기") {
+                    openCrowd = nil
+                    var kept = keptCrowds
+                    kept.insert(crowd.key)
+                    // 오래된 것은 흘려보낸다 — 날짜가 열쇠에 들어 있어 지난 날 것은 다시 쓸 일이 없다.
+                    keptCrowdsRaw = Array(kept).sorted().suffix(200).joined(separator: "\n")
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding(16)
+        .frame(width: 400)
+    }
+
+    /// 겹친 일정을 시각 순으로 한 줄씩. 누르면 그 일정을 연다 (알약을 누른 것과 같다).
+    private func overlapList(_ cluster: [TimeSegment]) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("같은 시간에 겹친 일정")
+                .font(.body.weight(.semibold))
+                .padding(.bottom, 4)
+            ForEach(cluster.sorted { $0.logicalStart < $1.logicalStart }) { seg in
+                Button {
+                    openOverlap = nil
+                    edit(seg)
+                } label: {
+                    HStack(spacing: 8) {
+                        Circle().fill(seg.color).frame(width: 9, height: 9)
+                        Text(timeRange(seg))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                        Text(seg.title)
+                            .fontWeight(.medium)
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                    }
+                    .font(.body)
+                    .padding(.vertical, 5)
+                    .padding(.horizontal, 6)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .pointingCursor()
+            }
+        }
+        .padding(14)
+        .frame(minWidth: 280)
     }
 
     /// 겹치는 일정은 옆으로 나란히 세운다. id → (몇 번째 칸, 모두 몇 칸).
