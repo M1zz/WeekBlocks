@@ -614,9 +614,24 @@ struct ContentView: View {
             // 지금 세고 있는 일이 있으면 남은 시간이 여기 늘 서 있다.
             // 타이머 창을 닫아 두어도 "무엇을 하는 중이고 얼마 남았는지"는 사라지지 않는다.
             TimelineView(.everyMinute) { ctx in
-                TimerPill(slot: currentSlot(at: ctx.date)) {
-                    openWindow(id: WeekBlocksWindow.timer)
+                let slots = ScheduleClock.slots(routines: routines, blocks: allBlocks,
+                                                occurrences: allOccurrences, placements: allQuotaPlacements,
+                                                around: ctx.date)
+                let overdue = overdueBlocks(at: ctx.date)
+                HStack(spacing: 8) {
+                    // 지나갔는데 안 찍은 일정 — 바로 찍지 않아도 되지만, 끝났는지는 묻는다.
+                    OverdueAskBadge(blocks: overdue)
+                    TimerPill(slot: ScheduleClock.current(slots, at: ctx.date)) {
+                        openWindow(id: WeekBlocksWindow.timer)
+                    }
+                    // 매분, 그리고 새로 켤 때마다 타임라인에 맞춘다 — 끝난 일정의 타이머는 여기서 물러난다.
+                    .task(id: "\(ctx.date.timeIntervalSince1970)-\(taskTimer.target?.token ?? "")-\(taskTimer.isRunning)") {
+                        taskTimer.reconcile(with: slots)
+                        // 위젯에도 같은 타임라인을 건넨다 — 바뀌었을 때만 (→ TimerWidgetBridge).
+                        TimerWidgetBridge.publish(slots: slots, timer: taskTimer)
+                    }
                 }
+                .animation(Motion.row, value: overdue.count)
             }
 
             // 블록·시간축과 요약은 **한 주를 볼 때만**. 일간은 하루 한 장뿐이라 고를 것이 없다.
@@ -776,7 +791,10 @@ struct ContentView: View {
                     tomorrowBlocks: blocks(on: tomorrow),
                     isViewingToday: dayOffset == 0,
                     onStart: { block in
-                        TaskTimer.shared.start(block: block)
+                        let slot = slotNow(of: block)
+                        TaskTimer.shared.start(block: block, scheduledStart: slot?.start,
+                                               colorName: slot?.colorName
+                                                   ?? todoLoad(on: block.day).colorName(for: block))
                         openWindow(id: WeekBlocksWindow.timer)
                     },
                     onOpenTomorrow: { shiftDay(by: 1) }
@@ -851,7 +869,8 @@ struct ContentView: View {
                             block.startHour = -1
                             try? context.save()
                         }
-                    }
+                    },
+                    todoLoad: todoLoad(on: selectedDay)
                 )
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
@@ -1006,6 +1025,13 @@ struct ContentView: View {
     /// 그 요일에 해야 할 일의 수 — 일간 요일 줄과 주간 두 보기의 무지개가 같은 값을 본다 (→ TodoRainbow).
     private func todoLoad(on day: DayOfWeek) -> TodoLoad {
         TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames)
+    }
+
+    /// 보는 주에서 지나갔는데 안 찍은 블록 (→ OverdueAskBadge). 요일 → 시각 순.
+    private func overdueBlocks(at date: Date) -> [PlanBlock] {
+        weekBlocks
+            .filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames, now: date) }
+            .sorted { ($0.day.rawValue, $0.sortHour) < ($1.day.rawValue, $1.sortHour) }
     }
 
     /// 지나간 날인데 아직 안 찍은 것이 남았는가 — 요일 줄에 점으로 세운다.
@@ -1184,7 +1210,8 @@ struct ContentView: View {
             routineStartOverride: startOverride,
             quotaPlacement: quotaPlace,
             quotaHidden: quotaHiddenMap,
-            hiddenRoutines: hiddenFixedRoutines(on: day)
+            hiddenRoutines: hiddenFixedRoutines(on: day),
+            blockColors: todoLoad(on: day).colors
         )
     }
 
@@ -1617,6 +1644,21 @@ struct ContentView: View {
             text += "\n" + String(localized: "… 외 \(pendingRemovals.count - names.count)개")
         }
         return text
+    }
+
+    /// 이 블록이 오늘 서 있는 자리 중 아직 안 끝난 것. 없으면 nil — 타이머가 적힌 길이를 처음부터 센다.
+    /// 시작 전이어도 돌려준다 — 타이머의 끝을 일정의 끝에 맞추려면 그 자리를 알아야 한다.
+    private func slotNow(of block: PlanBlock, at date: Date = Date()) -> ScheduleSlot? {
+        ScheduleClock.slots(routines: routines, blocks: allBlocks,
+                            occurrences: allOccurrences, placements: allQuotaPlacements,
+                            around: date)
+            .filter { slot in
+                guard slot.id == block.dragToken else { return false }
+                // 지금 그 안이거나(자정 넘긴 것 포함), 오늘 아직 안 온 것.
+                return slot.contains(date)
+                    || (slot.start > date && Calendar.current.isDate(slot.start, inSameDayAs: date))
+            }
+            .min { $0.start < $1.start }
     }
 
     /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).

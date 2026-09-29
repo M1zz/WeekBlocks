@@ -94,6 +94,19 @@ struct TimeSegment: Identifiable {
     var logicalStart: Double = 0   // 자정을 넘겨 나뉘어도 원본의 '진짜' 시작 시각(드래그 기준)
     var logicalDuration: Double = 0
     var isGhost: Bool = false       // 삭제(숨김)된 블록 — 흐릿하게 그려 '되살리기'만 가능, 시간엔 영향 없음
+
+    /// 계획 블록 조각이면 그날 무지개에서 받은 색 이름 (→ TodoLoad.colorNames).
+    func rainbowColorName(in load: TodoLoad?) -> String? {
+        guard case .planBlock(let blk) = source else { return nil }
+        return load?.colorName(for: blk)
+    }
+
+    /// 이 조각의 원본이 시작한 절대 시각. 자정을 넘겨 잘린 뒤 조각(0시~)은 원본이 전날 밤에 시작했다.
+    func scheduledStart(on date: Date) -> Date {
+        let midnight = Calendar.current.startOfDay(for: date)
+        let dayShift: Double = start + 0.001 < logicalStart ? -24 : 0
+        return midnight.addingTimeInterval((logicalStart + dayShift) * 3600)
+    }
 }
 
 enum TimelineLayout {
@@ -104,7 +117,8 @@ enum TimelineLayout {
                          routineStartOverride: [String: Double] = [:],
                          quotaPlacement: [String: [Int: Double]] = [:],
                          quotaHidden: [String: Set<Int>] = [:],
-                         hiddenRoutines: [Routine] = []) -> [TimeSegment] {
+                         hiddenRoutines: [Routine] = [],
+                         blockColors: [String: Color] = [:]) -> [TimeSegment] {
         var segs: [TimeSegment] = []
         var occupied: [(Double, Double)] = []
 
@@ -165,7 +179,7 @@ enum TimelineLayout {
 
         // 2a) 시각이 지정된(드래그된) 계획 블록 — 그 자리에 그대로 둔다(겹쳐도 됨).
         for blk in freeBlocks where blk.startHour >= 0 {
-            let color: Color = blk.concreteVerified ? .accentColor : .orange
+            let color: Color = blockColors[blk.dragToken] ?? (blk.concreteVerified ? .accentColor : .orange)
             let dur = visibleDuration(blk)
             let s = min(blk.startHour, 24 - minVisibleHours)
             var piece = 0
@@ -181,7 +195,7 @@ enum TimelineLayout {
         let bandStart: [TimeBand: Double] = [.morning: 6, .afternoon: 12, .evening: 18, .night: 23]
         for band in [TimeBand.morning, .afternoon, .evening, .night] {
             for blk in freeBlocks.filter({ $0.startHour < 0 && $0.timeBand == band }).sorted(by: { $0.durationHours > $1.durationHours }) {
-                let color: Color = blk.concreteVerified ? .accentColor : .orange
+                let color: Color = blockColors[blk.dragToken] ?? (blk.concreteVerified ? .accentColor : .orange)
                 let desired = bandStart[band] ?? 12
                 let dur = visibleDuration(blk)
                 // ⚠️ 들어갈 빈 구간이 없어도 **안 그리지는 않는다.** 요일 칸에는 서 있는데 자 위에서만
@@ -220,7 +234,8 @@ enum TimelineLayout {
             var piece = 0
             for (a, b) in splitAtMidnight(start, start + dur) {
                 segs.append(TimeSegment(id: "nested:\(blockID(blk)):\(piece)", start: a, end: b,
-                                        color: .accentColor, title: blk.title, isRoutine: false,
+                                        color: blockColors[blk.dragToken] ?? .accentColor,
+                                        title: blk.title, isRoutine: false,
                                         isNested: true, source: .planBlock(blk),
                                         logicalStart: start, logicalDuration: dur))
                 piece += 1
@@ -463,7 +478,8 @@ struct DayTimelineRow: View {
                                 routineStartOverride: routineStartOverride,
                                 quotaPlacement: quotaPlacementMap,
                                 quotaHidden: quotaHiddenMap,
-                                hiddenRoutines: hiddenRoutines)
+                                hiddenRoutines: hiddenRoutines,
+                                blockColors: todoLoad?.colors ?? [:])
     }
     // 실제로 그려진 구간들의 합집합 = 차지한 시간.
     // 유연(식사) 블록이 회사 등과 겹치면 그 부분은 합집합에서 한 번만 세므로 자유 시간을 깎지 않는다.
@@ -763,7 +779,9 @@ struct DayTimelineRow: View {
                 // 자 위에서도 바로 세기 시작한다 — 오늘 줄에서 지금 하는 것을 바로 집는 길 (→ TimerView.swift).
                 if let target = timerTarget(seg) {
                     TimerMenuItems(token: target.token, title: target.title, hours: target.hours,
-                                   iconName: target.iconName, colorName: target.colorName)
+                                   iconName: target.iconName,
+                                   colorName: target.colorName ?? seg.rainbowColorName(in: todoLoad),
+                                   scheduledStart: seg.scheduledStart(on: date))
                     Divider()
                 }
                 Button(role: .destructive) { deleteSegment(seg) } label: {

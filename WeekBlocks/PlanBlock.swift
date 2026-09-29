@@ -216,11 +216,18 @@ extension PlanBlock {
         weekStartDate = DayOfWeek.storedWeek(of: newDay, shownWeek: shown, sundayFirst: sundayFirst)
     }
 
+    ///
+    /// **오늘도 센다 — 적힌 끝 시각이 지났으면.** 09:30–11:00 인터뷰를 12시까지 안 찍었으면 이미 지나간 줄이다.
+    /// 바로 찍으라고 다그치지는 않지만, 끝났는지는 물어야 한다 (→ OverdueAskBadge).
+    /// 시각이 없는 것(시간대 · 종일)은 그날이 지나야 센다.
     func isUnreviewedPast(weekStart: Date, routineNames: Set<String>, now: Date = Date()) -> Bool {
         guard reviewStatus == nil, !isRoutineKind(routineNames) else { return false }
         let cal = Calendar(identifier: .iso8601)
         guard let d = cal.date(byAdding: .day, value: day.rawValue, to: weekStart) else { return false }
-        return cal.startOfDay(for: d) < cal.startOfDay(for: now)
+        let dayStart = cal.startOfDay(for: d)
+        if dayStart < cal.startOfDay(for: now) { return true }
+        guard cal.isDate(dayStart, inSameDayAs: now), startHour >= 0, !isAllDay else { return false }
+        return dayStart.addingTimeInterval((startHour + durationHours) * 3600) <= now
     }
 }
 

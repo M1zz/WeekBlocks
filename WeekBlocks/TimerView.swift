@@ -122,17 +122,6 @@ struct ScheduleTimerFace: View {
             Text("\(clock(slot.end))에 끝납니다")
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
-
-            // 계획보다 늦게 앉았을 때. 일정 기준을 버리고 '지금부터' 온전한 길이를 센다.
-            Button {
-                timer.start(token: slot.id, title: slot.title,
-                            plannedSeconds: slot.duration,
-                            iconName: slot.iconName, colorName: slot.colorName)
-            } label: {
-                Label("지금부터 \(formatDuration(slot.hours)) 세기", systemImage: "timer")
-            }
-            .controlSize(.small)
-            .help("늦게 시작했을 때 — 일정에 적힌 끝 시각 대신 지금부터의 길이를 셉니다")
         }
     }
 
@@ -240,7 +229,8 @@ private struct SlotRow: View {
             .strokeBorder(tint.opacity(isNow ? 0.5 : 0), lineWidth: 1))
         .contextMenu {
             TimerMenuItems(token: slot.id, title: slot.title, hours: slot.hours,
-                           iconName: slot.iconName, colorName: slot.colorName)
+                           iconName: slot.iconName, colorName: slot.colorName,
+                           scheduledStart: slot.start)
         }
     }
 }
@@ -353,7 +343,7 @@ struct RunningTimerFace: View {
                 .multilineTextAlignment(.center)
 
             if let planned = timer.target?.plannedSeconds {
-                Text(String(localized: "지금부터 \(formatDuration(planned / 3600))"))
+                Text(formatDuration(planned / 3600))
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
@@ -482,10 +472,14 @@ struct TimerPill: View {
         } else if let slot {
             // 1초마다 숫자만 다시 그린다. 주간 화면 전체를 다시 그리지 않게 여기서 가둔다.
             TimelineView(.periodic(from: .now, by: 1)) { ctx in
-                pill(icon: slot.iconName,
-                     title: slot.title,
-                     tint: slot.colorName.map(paletteColor) ?? .accentColor) {
-                    Text(formatCountdown(slot.remaining(at: ctx.date)))
+                // 바깥은 분마다만 새 조각을 준다. 그 사이에 끝난 조각은 여기서 바로 내린다 —
+                // 끝난 일정이 다음 분까지 알약에 남아 있으면 안 된다.
+                if slot.contains(ctx.date) {
+                    pill(icon: slot.iconName,
+                         title: slot.title,
+                         tint: slot.colorName.map(paletteColor) ?? .accentColor) {
+                        Text(formatCountdown(slot.remaining(at: ctx.date)))
+                    }
                 }
             }
         }
@@ -525,6 +519,23 @@ struct TimerMenuItems: View {
     let hours: Double
     var iconName: String = "timer"
     var colorName: String? = nil
+    /// 이 일정이 적힌 시작 시각. 지금이 그 안이면 이미 흐른 만큼 지난 채로 센다.
+    var scheduledStart: Date? = nil
+
+    @Environment(\.openWindow) private var openWindow
+
+    private var isInProgress: Bool {
+        guard let scheduledStart else { return false }
+        let now = Date()
+        return now >= scheduledStart && now < scheduledStart.addingTimeInterval(hours * 3600)
+    }
+
+    private var isOverToday: Bool {
+        guard let scheduledStart else { return false }
+        let now = Date()
+        return Calendar.current.isDate(scheduledStart, inSameDayAs: now)
+            && scheduledStart.addingTimeInterval(hours * 3600) <= now
+    }
 
     @State private var timer = TaskTimer.shared
 
@@ -537,12 +548,27 @@ struct TimerMenuItems: View {
             Button { timer.stop() } label: {
                 Label("일정 기준으로 되돌리기", systemImage: "arrow.uturn.backward")
             }
+        } else if isOverToday {
+            // 오늘 이미 끝난 일정 — 켜 봐야 타임라인이 곧바로 거둔다 (→ TaskTimer.reconcile).
+            EmptyView()
+        } else if isInProgress {
+            // 지금 진행 중 — 타임라인이 이미 세고 있다. 따로 켜지 않고 그걸 보여 준다.
+            Button { openWindow(id: WeekBlocksWindow.timer) } label: {
+                Label("타이머 보기", systemImage: "timer")
+            }
         } else {
+            let bind = TaskTimer.binding(scheduledStart: scheduledStart, planned: hours * 3600)
             Button {
                 timer.start(token: token, title: title, plannedSeconds: hours * 3600,
+                            scheduledStart: scheduledStart,
                             iconName: iconName, colorName: colorName)
             } label: {
-                Label("지금부터 \(formatDuration(hours)) 세기", systemImage: "timer")
+                if let bind {
+                    Label("타이머 켜기 · \(formatHour(hourOfDay(bind.end)))에 끝",
+                          systemImage: "timer")
+                } else {
+                    Label("지금부터 \(formatDuration(hours)) 세기", systemImage: "timer")
+                }
             }
         }
     }

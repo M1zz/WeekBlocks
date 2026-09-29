@@ -1,9 +1,7 @@
 {
   "sourceLanguage" : "ko",
   "strings" : {
-    "" : {
-
-    },
+    "" : {},
     " · %lld회" : {
       "localizations" : {
         "en" : {
@@ -2029,6 +2027,27 @@
         }
       }
     },
+    "그동안 찍어 둔 회고 %lld개로 잘 되는 요일과 시간대, 자주 미루는 일을 보여 드립니다." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your %lld reviews so far show which days and times work for you, and what you keep putting off."
+          }
+        }
+      }
+    },
+    "글쓰기·구현·설계처럼 맥락을 다시 불러와야 하는 일은 조각 크기로 잡아두면 시동만 걸다 끝납니다. 시간을 늘리거나, 그 앞에 '준비' 조각 단계를 따로 두세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing, building, designing — anything where you have to load the context back in will spend the whole fragment just spinning up. Give them more time, or put a separate “get ready” fragment in front."
+          }
+        }
+      }
+    },
     "금" : {
       "comment" : "요일 한 글자",
       "localizations" : {
@@ -2047,27 +2066,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stays visible."
-          }
-        }
-      }
-    },
-    "그동안 찍어 둔 회고 %lld개로 잘 되는 요일과 시간대, 자주 미루는 일을 보여 드립니다." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your %lld reviews so far show which days and times work for you, and what you keep putting off."
-          }
-        }
-      }
-    },
-    "글쓰기·구현·설계처럼 맥락을 다시 불러와야 하는 일은 조각 크기로 잡아두면 시동만 걸다 끝납니다. 시간을 늘리거나, 그 앞에 '준비' 조각 단계를 따로 두세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Writing, building, designing — anything where you have to load the context back in will spend the whole fragment just spinning up. Give them more time, or put a separate “get ready” fragment in front."
           }
         }
       }
@@ -2719,6 +2717,7 @@
       }
     },
     "늦게 시작했을 때 — 일정에 적힌 끝 시각 대신 지금부터의 길이를 셉니다" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2738,9 +2737,7 @@
         }
       }
     },
-    "다 하면" : {
-
-    },
+    "다 하면" : {},
     "다 하면 %@" : {
       "localizations" : {
         "en" : {
@@ -3363,16 +3360,6 @@
         }
       }
     },
-    "모든 날의 기본 시각입니다. 시간표에서 그날만 옮긴 것은 그날만 따로 섭니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "These are the defaults for every day. Anything you moved on a single day in the timeline stays as it is for that day."
-          }
-        }
-      }
-    },
     "목" : {
       "comment" : "요일 한 글자",
       "localizations" : {
@@ -3380,6 +3367,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thu"
+          }
+        }
+      }
+    },
+    "모든 날의 기본 시각입니다. 시간표에서 그날만 옮긴 것은 그날만 따로 섭니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These are the defaults for every day. Anything you moved on a single day in the timeline stays as it is for that day."
           }
         }
       }
@@ -5694,6 +5691,38 @@
         }
       }
     },
+    "이메일로 문의하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email the developer"
+          }
+        }
+      }
+    },
+    "이번 주 회고와 타이머" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week’s review and the timer"
+          }
+        }
+      }
+    },
+    "일" : {
+      "comment" : "요일 한 글자",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
+          }
+        }
+      }
+    },
     "이름" : {
       "comment" : "루틴을 저장하려면 채워야 하는 칸",
       "localizations" : {
@@ -5711,16 +5740,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Untitled"
-          }
-        }
-      }
-    },
-    "이메일로 문의하기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email the developer"
           }
         }
       }
@@ -5751,17 +5770,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copies this week’s review as text"
-          }
-        }
-      }
-    },
-    "이번 주 회고와 타이머" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This week’s review and the timer"
           }
         }
       }
@@ -5862,17 +5870,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instagram DM (@lee25_ios)"
-          }
-        }
-      }
-    },
-    "일" : {
-      "comment" : "요일 한 글자",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sun"
           }
         }
       }
@@ -6771,6 +6768,7 @@
       }
     },
     "지금부터 %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7371,6 +7369,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open the timer window (⇧⌘R)"
+          }
+        }
+      }
+    },
+    "타이머 켜기 · %@에 끝" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start timer · ends %@"
           }
         }
       }
@@ -8363,6 +8371,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something that happens inside time you've already secured, like a work meeting. It doesn't spend any extra free time, and it's drawn on top of the routine in the timeline."
+          }
+        }
+      }
+    },
+    "타이머 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show timer"
+          }
+        }
+      }
+    },
+    "끝냈나요?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done?"
+          }
+        }
+      }
+    },
+    "시간이 지났는데 아직 안 찍은 일정 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld past plans not marked yet"
+          }
+        }
+      }
+    },
+    "시간이 지났습니다. 끝냈는지 골라 주세요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its time has passed. Mark how it went."
           }
         }
       }

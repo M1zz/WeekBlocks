@@ -114,12 +114,15 @@ enum ScheduleClock {
                                            quotaPlacement: placeMap,
                                            quotaHidden: quotaHidden)
 
+        // 계획 블록은 그날 무지개에서 차지한 칸의 색으로 센다 — 칩·자와 같은 색 (→ TodoLoad.colorNames).
+        let lanes = TodoLoad(dayBlocks, routineNames: Set(routines.map(\.name)))
+
         let midnight = Calendar.current.startOfDay(for: date)
         var seen = Set<String>()
         var result: [ScheduleSlot] = []
 
         for seg in segs where !seg.isGhost {
-            guard let info = identity(of: seg, fixed: fixed, quota: quota) else { continue }
+            guard let info = identity(of: seg, fixed: fixed, quota: quota, lanes: lanes) else { continue }
             // 자정을 넘겨 두 조각으로 잘린 것은 하나로 되돌린다 — 사람이 하는 일은 하나다.
             let key = "\(info.token)@\(seg.logicalStart)"
             guard seen.insert(key).inserted else { continue }
@@ -138,11 +141,11 @@ enum ScheduleClock {
     }
 
     /// 조각이 가리키는 원본에서 열쇠·아이콘·색을 꺼낸다.
-    private static func identity(of seg: TimeSegment, fixed: [Routine], quota: [Routine])
+    private static func identity(of seg: TimeSegment, fixed: [Routine], quota: [Routine], lanes: TodoLoad)
     -> (token: String, iconName: String, colorName: String?)? {
         switch seg.source {
         case .planBlock(let blk):
-            return (blk.dragToken, "square.stack.3d.up", nil)
+            return (blk.dragToken, "square.stack.3d.up", lanes.colorName(for: blk))
         case .fixedRoutine(let name):
             guard let r = fixed.first(where: { $0.name == name }) else { return nil }
             return (TaskTimer.token(for: r), r.iconName, r.colorName)

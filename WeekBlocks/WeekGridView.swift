@@ -285,7 +285,8 @@ struct DayColumn: View {
                         dragToken: item.dragToken(on: day),
                         delete: deleteAction(item, isMeal: true)) { onEditRoutine(routine) }
         case .block(let block, _):
-            BlockChip(block: block, currentSlot: liveSlot(for: item)) { onEdit(block) }
+            BlockChip(block: block, colorName: todoLoad?.colorName(for: block),
+                      currentSlot: liveSlot(for: item)) { onEdit(block) }
         }
     }
 
@@ -492,7 +493,8 @@ struct RoutineChip: View {
                                title: routine.name,
                                hours: timerHours,
                                iconName: routine.iconName,
-                               colorName: routine.colorName)
+                               colorName: routine.colorName,
+                               scheduledStart: currentSlot?.start)
                 // 시간축·일간과 같은 글자, 같은 일 (→ SegmentActions.delete). 되살리기는 시간축의 '숨긴 것'에서.
                 if let delete {
                     Divider()
@@ -565,6 +567,9 @@ func shortHours(_ hours: Double) -> String {
 
 struct BlockChip: View {
     let block: PlanBlock
+    /// 그날 무지개에서 이 블록이 차지한 칸의 색 이름 (→ TodoLoad.colorNames). nil이면 예전 색.
+    var colorName: String? = nil
+    private var tint: Color? { colorName.map(paletteColor) }
     /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).
     var currentSlot: ScheduleSlot? = nil
     let onTap: () -> Void
@@ -572,7 +577,9 @@ struct BlockChip: View {
     @State private var hovering = false
 
     private var palette: (bg: Color, fg: Color, stroke: Color) {
-        if block.concreteVerified {
+        if let tint {
+            return (tint.opacity(0.22), tint, tint.opacity(0.55))
+        } else if block.concreteVerified {
             return (Color.accentColor.opacity(0.22), Color.accentColor, Color.accentColor.opacity(0.55))
         } else {
             return (Color.orange.opacity(0.22), Color.orange, Color.orange.opacity(0.6))
@@ -600,7 +607,8 @@ struct BlockChip: View {
             .contextMenu {
                 // 종일은 잴 시간이 없다 — 길이 0짜리 타이머는 켜자마자 끝난다.
                 if !block.isAllDay {
-                    TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours)
+                    TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours,
+                                   colorName: colorName, scheduledStart: currentSlot?.start)
                 }
             }
             // 내리는 길이 생겼으니 말해 준다 — 손짓은 있는데 아무도 모르면 없는 것과 같다.

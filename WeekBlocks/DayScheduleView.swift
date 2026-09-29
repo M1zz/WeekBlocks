@@ -67,6 +67,13 @@ struct DayScheduleView: View {
     var onReturnToBacklog: (PlanBlock) -> Void = { _ in }
     /// 블록을 오늘의 계획 판에 놓았다 — 시각만 무르고 그날에는 남긴다.
     var onClearTime: (PlanBlock) -> Void = { _ in }
+    /// 그날의 무지개. 블록은 무지개에서 차지한 칸의 색으로 선다 (→ TodoLoad.colors).
+    var todoLoad: TodoLoad? = nil
+
+    /// 종일 한 줄의 색. 무지개 칸이 있으면 그 색, 없으면 예전처럼 검증 여부로.
+    private func allDayTint(_ block: PlanBlock) -> Color {
+        todoLoad?.color(for: block) ?? (block.concreteVerified ? .accentColor : .orange)
+    }
 
     /// 한 시간의 키. 알약과 글씨가 숨 쉴 자리가 있어야 말랑하게 읽힌다 —
     /// 30pt에 눌러 담았더니 30분짜리가 가는 띠가 되어 무엇인지보다 몇 칸인지가 먼저 보였다.
@@ -124,6 +131,8 @@ struct DayScheduleView: View {
     @State private var landing = LandingTracker()
     /// 일정이 다 드러났는가. 하루가 설 때 위에서부터 하나씩 톡톡 선다.
     @State private var drawn = false
+    /// 분마다 바뀌는 '지금'. "끝냈나요?"가 일정이 끝나는 분에 서도록 다시 그리게 한다.
+    @State private var minuteTick = Date()
 
     private var isToday: Bool { Calendar.current.isDateInToday(date) }
 
@@ -148,7 +157,8 @@ struct DayScheduleView: View {
         return TimelineLayout.segments(routines: routines, blocks: blocks, quota: quotaRoutines,
                                        routineStartOverride: startOverride,
                                        quotaPlacement: placement, quotaHidden: hidden,
-                                       hiddenRoutines: hiddenRoutines)
+                                       hiddenRoutines: hiddenRoutines,
+                                       blockColors: todoLoad?.colors ?? [:])
     }
 
     var body: some View {
@@ -170,6 +180,14 @@ struct DayScheduleView: View {
         }
         // 다른 날로 넘어가면 잡아 둔 시간은 놓는다 — 그 빈자리의 경계였다.
         .onChange(of: date) { _, _ in selection = nil; openGap = nil }
+        // 오늘이면 분이 바뀔 때마다 다시 본다 — 일정이 끝나는 그 분에 "끝냈나요?"가 선다.
+        .task(id: isToday) {
+            while isToday, !Task.isCancelled {
+                let second = Calendar.current.component(.second, from: Date())
+                try? await Task.sleep(for: .seconds(60 - second))
+                minuteTick = Date()
+            }
+        }
     }
 
     // MARK: 머리
@@ -222,10 +240,10 @@ struct DayScheduleView: View {
                                         .lineLimit(1)
                                 }
                                 .font(.body.weight(.medium))
-                                .foregroundStyle(block.concreteVerified ? Color.accentColor : Color.orange)
+                                .foregroundStyle(allDayTint(block))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 4)
-                                .background((block.concreteVerified ? Color.accentColor : Color.orange).opacity(0.14),
+                                .background(allDayTint(block).opacity(0.14),
                                             in: Capsule())
                                 .contentShape(Capsule())
                             }
@@ -1164,6 +1182,8 @@ struct DayScheduleView: View {
         // 넓으면 알약 + 시각·제목 + 동그라미, 좁으면 알약 + 제목, 아주 좁으면 알약만.
         let showsText = size.width >= Self.pillWidth + 44
         let showsCheck = block != nil && !seg.isGhost && size.width >= Self.pillWidth + 120
+        // 끝 시각이 지났는데 안 찍었다 — 동그라미 옆에서 끝냈는지 묻는다.
+        let asks = showsCheck && isOverdue(seg) && size.width >= Self.pillWidth + 220
 
         ZStack(alignment: .topTrailing) {
             HStack(alignment: .top, spacing: 10) {
@@ -1199,7 +1219,7 @@ struct DayScheduleView: View {
                         }
                     }
                     .contentTransition(.numericText())
-                    .padding(.trailing, showsCheck ? 30 : 4)
+                    .padding(.trailing, asks ? 130 : (showsCheck ? 30 : 4))
                 }
                 Spacer(minLength: 0)
             }
@@ -1308,9 +1328,16 @@ struct DayScheduleView: View {
             )
 
             if showsCheck, let block {
-                checkButton(block, color: seg.color)
-                    .padding(.top, size.height >= 38 ? 7 : max(0, (size.height - 22) / 2))
-                    .padding(.trailing, 2)
+                HStack(spacing: 6) {
+                    if asks {
+                        overdueAsk(block)
+                            .transition(.pop)
+                    }
+                    checkButton(block, color: seg.color)
+                }
+                .padding(.top, size.height >= 38 ? 7 : max(0, (size.height - 22) / 2))
+                .padding(.trailing, 2)
+                .animation(Motion.squish, value: asks)
             }
         }
         // 받는 판 위에 올라가면 알약이 작게 오므라든다 — 여기 놓으면 시간표에서 빠진다는 뜻.
@@ -1352,7 +1379,9 @@ struct DayScheduleView: View {
                 Divider()
                 if let target = actions.timerTarget(seg) {
                     TimerMenuItems(token: target.token, title: target.title, hours: target.hours,
-                                   iconName: target.iconName, colorName: target.colorName)
+                                   iconName: target.iconName,
+                                   colorName: target.colorName ?? seg.rainbowColorName(in: todoLoad),
+                                   scheduledStart: seg.scheduledStart(on: date))
                     Divider()
                 }
                 Button(role: .destructive) { actions.delete(seg) } label: {
@@ -1568,6 +1597,44 @@ struct DayScheduleView: View {
         }
         start = min(max(start, head), max(head, tail - 0.25))
         return (start, min(1, max(0.25, tail - start)))
+    }
+
+    /// 이 조각의 계획이 끝 시각을 지났는데 안 찍혔는가. 루틴 이름의 블록은 묻지 않는다 —
+    /// 무지개 칸을 차지한 것만 해야 할 일이다 (→ TodoLoad.colorNames).
+    private func isOverdue(_ seg: TimeSegment) -> Bool {
+        guard let block = planBlock(seg), block.reviewStatus == nil,
+              todoLoad?.colorName(for: block) != nil else { return false }
+        let end = seg.scheduledStart(on: date).addingTimeInterval(seg.logicalDuration * 3600)
+        return end <= max(minuteTick, Date())
+    }
+
+    /// "끝냈나요?" — 누르면 달성 · 부분 달성 · 건너뜀을 고른다. 상단 뱃지와 같은 물음 (→ OverdueAskBadge).
+    private func overdueAsk(_ block: PlanBlock) -> some View {
+        Menu {
+            ForEach(ReviewStatus.allCases) { status in
+                Button {
+                    Haptic.tick()
+                    withAnimation(Motion.squish) {
+                        block.reviewStatus = status
+                        try? context.save()
+                    }
+                } label: {
+                    Label(status.label, systemImage: status.systemImage)
+                }
+            }
+        } label: {
+            Label("끝냈나요?", systemImage: "questionmark.circle.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.orange)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.orange.opacity(0.14), in: Capsule())
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help("시간이 지났습니다. 끝냈는지 골라 주세요")
     }
 
     /// 오른쪽 동그라미 — 누르면 끝낸 것이 되고, 다시 누르면 풀린다 (→ SoftCheck, ReflectionRow의 같은 손짓).

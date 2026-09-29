@@ -79,7 +79,7 @@ struct ReflectionView: View {
         weekBlocks.filter { !$0.isRoutineKind(routineNames) }
     }
 
-    /// **아직 안 찍은 것.** 지나간 날만 센다.
+    /// **아직 안 찍은 것.** 지나간 날과, 오늘 끝 시각이 지난 것 (→ PlanBlock.isUnreviewedPast).
     private var unreviewed: [PlanBlock] {
         weekBlocks.filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames) }
     }
@@ -682,6 +682,66 @@ struct ReflectionRow: View {
                 withAnimation(Motion.row) { block.reviewStatus = nil }
                 onChange()
             }
+        }
+    }
+}
+
+
+// MARK: - 끝났나요?
+
+/// **지나간 일정 중 아직 안 찍은 것을 묻는다.** 맨 위 줄, 타이머 알약 옆에 선다.
+///
+/// 끝나자마자 찍으라고 창을 띄우지 않는다 — 인터뷰가 끝난 그 순간에는 다음 일로 넘어가는 중이다.
+/// 대신 주황 뱃지로 남아 있다가, 누르면 일정마다 달성 · 부분 달성 · 건너뜀을 바로 고른다.
+/// 하나도 없으면 아무것도 서지 않는다.
+struct OverdueAskBadge: View {
+    /// 지나갔는데 안 찍은 블록 (시각 순).
+    let blocks: [PlanBlock]
+
+    @Environment(\.modelContext) private var context
+
+    var body: some View {
+        if !blocks.isEmpty {
+            Menu {
+                Section("끝냈나요?") {
+                    ForEach(blocks, id: \.dragToken) { block in
+                        Menu {
+                            ForEach(ReviewStatus.allCases) { status in
+                                Button {
+                                    Haptic.tick()
+                                    withAnimation(Motion.squish) {
+                                        block.reviewStatus = status
+                                        try? context.save()
+                                    }
+                                } label: {
+                                    Label(status.label, systemImage: status.systemImage)
+                                }
+                            }
+                        } label: {
+                            Text(verbatim: "\(block.title) · \(block.whenLabel)")
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "questionmark.circle.fill")
+                    Text("끝냈나요?")
+                    Text(verbatim: "\(blocks.count)")
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                }
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.orange)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 4)
+                .background(Color.orange.opacity(0.14), in: Capsule())
+            }
+            .menuStyle(.button)
+            .buttonStyle(.plain)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .help(String(localized: "시간이 지났는데 아직 안 찍은 일정 \(blocks.count)개"))
+            .transition(.pop)
         }
     }
 }
