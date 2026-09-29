@@ -277,11 +277,12 @@ final class CalendarBridge {
             // 가져온 적 있는데 블록이 없다 = 사람이 앱에서 지웠다. 되살리지 않는다.
             if byKey[key] == nil, seen.contains(key) { continue }
             seen.insert(key)
-            if event.isAllDay { result.allDay += 1 }
+            let allDay = Self.isWholeDay(event)
+            if allDay { result.allDay += 1 }
 
             // 종일 일정은 '종일' 블록으로 — 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
             // 캘린더의 종일은 대개 공휴일·생일·휴가 같은 '그날이 어떤 날'이다 — 배경으로 들인다 (→ PlanBlock.isBackground).
-            let hour = event.isAllDay ? PlanBlock.backgroundHour : Self.hourOfDay(start, calendar: cal)
+            let hour = allDay ? PlanBlock.backgroundHour : Self.hourOfDay(start, calendar: cal)
             let duration = Self.duration(of: event, startHour: hour)
             let title = (event.title ?? "").isEmpty ? String(localized: "(제목 없는 일정)") : event.title!
 
@@ -289,14 +290,14 @@ final class CalendarBridge {
                 var changed = false
                 if block.day != day { block.day = day; changed = true }
                 // 종일끼리는 시각을 건드리지 않는다 — 사람이 배경 ↔ 할 일로 바꿔 둔 것을 덮지 않게.
-                if block.startHour != hour, !(event.isAllDay && block.isAllDay) { block.startHour = hour; changed = true }
+                if block.startHour != hour, !(allDay && block.isAllDay) { block.startHour = hour; changed = true }
                 if block.durationHours != duration { block.durationHours = duration; changed = true }
                 // 합친 블록의 제목은 사람 것이다 — 캘린더 제목으로 덮지 않는다 (→ CalendarMerge).
                 if block.title != title, !CalendarMerge.hasOwnTitle(key) { block.title = title; changed = true }
                 let band = TimeBand.containing(hour >= 0 ? hour : 9)
                 if block.timeBand != band { block.timeBand = band; changed = true }
                 if changed { result.updated += 1 }
-            } else if !event.isAllDay,
+            } else if !allDay,
                       let match = CalendarMerge.autoMatch(title: title, day: day, startHour: hour, among: mine) {
                 // 사람이 이미 같은 일을 세워 두었다 — 새로 만들지 않고 그 블록이 이 일정을 맡는다.
                 // 시각은 캘린더를 따르고, 제목과 사람이 적은 것은 그대로 둔다.
@@ -402,7 +403,7 @@ final class CalendarBridge {
         if let cached = spanCache[key] { return cached }
         guard hasAccess, let id = key.split(separator: "|").first,
               let event = store.event(withIdentifier: String(id)),
-              event.isAllDay, let start = event.startDate, let end = event.endDate else { return nil }
+              Self.isWholeDay(event), let start = event.startDate, let end = event.endDate else { return nil }
         let cal = Calendar.current
         let last = end.addingTimeInterval(-1)
         let days = (cal.dateComponents([.day], from: cal.startOfDay(for: start),
@@ -410,6 +411,19 @@ final class CalendarBridge {
         let result = max(1, days)
         spanCache[key] = result
         return result
+    }
+
+    /// **종일로 보는가.** 캘린더에서 '종일'로 체크한 것뿐 아니라, 자정에 시작해 자정에 끝나는 일정
+    /// (00:00–24:00, 여러 날이면 00:00–다음 날 00:00…)도 종일이다. 23:59에 끝나는 것도 같게 본다.
+    /// 그대로 두면 24시간짜리 블록이 되어 그날 남은 시간이 통째로 사라진다.
+    static func isWholeDay(_ event: EKEvent) -> Bool {
+        if event.isAllDay { return true }
+        guard let start = event.startDate, let end = event.endDate, end > start else { return false }
+        let cal = Calendar.current
+        guard cal.startOfDay(for: start) == start else { return false }
+        if cal.startOfDay(for: end) == end { return true }
+        let c = cal.dateComponents([.hour, .minute], from: end)
+        return c.hour == 23 && c.minute == 59
     }
 
     private static func key(for event: EKEvent) -> String? {
@@ -438,7 +452,7 @@ final class CalendarBridge {
     /// 기념일 하나가 할 일 한 시간을 밀어냈다 (레딧 피드백). 종일은 '이 날의 일'이지
     /// '시간을 쓰는 일'이 아니므로 길이 0으로 들인다 (→ `PlanBlock.makeAllDay`).
     private static func duration(of event: EKEvent, startHour: Double) -> Double {
-        if event.isAllDay { return 0 }
+        if isWholeDay(event) { return 0 }
         guard let start = event.startDate, let end = event.endDate else { return 1 }
         let hours = end.timeIntervalSince(start) / 3600
         guard hours > 0 else { return 1 }
