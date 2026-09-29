@@ -138,6 +138,8 @@ struct DayColumn: View {
     var onOpenDay: (() -> Void)? = nil
     /// 그날 해야 할 일의 수 — 머리 밑 무지개로 선다 (→ TodoRainbow).
     var todoLoad: TodoLoad? = nil
+    /// 칸 맨 위에 종일 칩을 세우는가. 요일 칸 위에 종일 막대 줄이 따로 서면 끈다.
+    var showsAllDay = true
 
     @State private var isDropTargeted = false
     /// 요일 머리를 가리키는 중. 누르면 그날로 들어간다는 것을 동그라미가 부풀어 말한다.
@@ -364,7 +366,8 @@ struct DayColumn: View {
             // 오늘 칸에는 지나간 것과 남은 것 사이에 붉은 '지금' 선이 끼어든다.
             // 컬럼이 시각 순으로 서 있으므로, 선 위는 이미 지난 계획이고 아래가 남은 계획이다.
             // 종일 — 시간을 차지하지 않는 것은 시각 순 목록 위에 따로.
-            if !allDayItems.isEmpty {
+            // 주간 위에 종일 막대 줄(→ AllDayLane)이 서 있으면 여기서는 안 세운다 — 두 번 보인다.
+            if showsAllDay, !allDayItems.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(allDayItems) { item in
                         chip(for: item)
@@ -579,6 +582,9 @@ struct BlockChip: View {
     private var palette: (bg: Color, fg: Color, stroke: Color) {
         if let tint {
             return (tint.opacity(0.22), tint, tint.opacity(0.55))
+        } else if block.isBackground {
+            // 배경 종일 — 할 일이 아니므로 무지개도, '미검증' 주황도 입히지 않는다.
+            return (Color.secondary.opacity(0.12), Color.secondary, Color.secondary.opacity(0.35))
         } else if block.concreteVerified {
             return (Color.accentColor.opacity(0.22), Color.accentColor, Color.accentColor.opacity(0.55))
         } else {
@@ -605,6 +611,7 @@ struct BlockChip: View {
             .animation(Motion.hover, value: hovering)
             // 계획을 보는 자리에서 바로 세기 시작한다 — 창을 열러 갈 필요 없이 (→ TimerView.swift).
             .contextMenu {
+                if block.isAllDay { AllDayKindMenu(block: block) }
                 // 종일은 잴 시간이 없다 — 길이 0짜리 타이머는 켜자마자 끝난다.
                 if !block.isAllDay {
                     TimerMenuItems(token: block.dragToken, title: block.title, hours: block.durationHours,
@@ -690,6 +697,28 @@ struct BlockChip: View {
         case .done: .green
         case .partial: .yellow
         case .skipped: .red
+        }
+    }
+}
+
+
+/// 종일 칩의 우클릭 — 배경 ↔ 그날 할 일 (→ PlanBlock.isBackground). 주간 칩 · 일간 종일 줄 · 종일 막대가 같이 쓴다.
+struct AllDayKindMenu: View {
+    let block: PlanBlock
+    @Environment(\.modelContext) private var context
+
+    var body: some View {
+        Button {
+            withAnimation(Motion.squish) {
+                block.setBackground(!block.isBackground)
+                try? context.save()
+            }
+        } label: {
+            if block.isBackground {
+                Label("그날 할 일로 세기", systemImage: "checklist")
+            } else {
+                Label("배경으로 두기 (할 일로 안 셈)", systemImage: "calendar")
+            }
         }
     }
 }

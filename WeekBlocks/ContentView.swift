@@ -876,7 +876,8 @@ struct ContentView: View {
                             try? context.save()
                         }
                     },
-                    todoLoad: todoLoad(on: selectedDay)
+                    todoLoad: todoLoad(on: selectedDay),
+                    allDaySpans: allDaySpans(on: selectedDay)
                 )
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
@@ -1031,6 +1032,17 @@ struct ContentView: View {
     /// 그 요일에 해야 할 일의 수 — 일간 요일 줄과 주간 두 보기의 무지개가 같은 값을 본다 (→ TodoRainbow).
     private func todoLoad(on day: DayOfWeek) -> TodoLoad {
         TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames)
+    }
+
+    /// 보는 주의 종일 막대 (→ AllDaySpan). 캘린더에서 온 여러 날 일정은 끝나는 날을 캘린더에서 읽는다.
+    private var allDaySpans: [AllDaySpan] {
+        AllDaySpan.spans(from: weekBlocks) { Calendar.current.startOfDay(for: dayDate($0.day)) }
+    }
+
+    /// 그날에 걸친 종일 막대들 — 앞날에 시작한 여러 날 일정도 들어온다.
+    private func allDaySpans(on day: DayOfWeek) -> [AllDaySpan] {
+        let date = dayDate(day)
+        return allDaySpans.filter { $0.covers(date) }
     }
 
     /// 보는 주에서 지나갔는데 안 찍은 블록 (→ OverdueAskBadge). 요일 → 시각 순.
@@ -1446,7 +1458,8 @@ struct ContentView: View {
                             routineSheet = RoutineSheetContext(routine: routine)
                         },
                         onOpenDay: { openDay(day) },
-                        todoLoad: todoLoad(on: day)
+                        todoLoad: todoLoad(on: day),
+                        allDaySpans: allDaySpans(on: day)
                     )
                     .background {
                         GeometryReader { geo in
@@ -1475,6 +1488,15 @@ struct ContentView: View {
         // 분이 바뀌면 '지금 하고 있는 것'이 달라질 수 있다. 그때 칩의 남은 시간도 자리를 옮긴다.
         TimelineView(.everyMinute) { ctx in
             VStack(alignment: .leading, spacing: 10) {
+                // 종일 — 요일 칸을 가로지르는 막대. 사흘짜리 출장은 세 칸에 걸친 막대 하나다.
+                if !allDaySpans.isEmpty {
+                    AllDayLane(spans: allDaySpans,
+                               dates: shownDays.map { Calendar.current.startOfDay(for: dayDate($0)) },
+                               spacing: 10) { block in
+                        blockSheet = BlockSheetContext(day: block.day, block: block)
+                    }
+                    .transition(.disclose)
+                }
                 HStack(alignment: .top, spacing: 10) {
                     ForEach(shownDays) { day in
                         DayColumn(
@@ -1504,7 +1526,8 @@ struct ContentView: View {
                                 dropIntoGap(token: token, day: day, startHour: start, gap: gap)
                             },
                             onOpenDay: { openDay(day) },
-                            todoLoad: todoLoad(on: day)
+                            todoLoad: todoLoad(on: day),
+                            showsAllDay: false
                         )
                         .frame(maxWidth: .infinity, alignment: .top)
                     }

@@ -44,6 +44,8 @@ final class CalendarBridge {
     /// 않으므로, 켜는 자리로 곧장 보낸다.
     static let privacySettingsURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars")!
 
+    /// 종일 일정의 날 수 (→ allDaySpanDays). 캘린더가 바뀌면 비운다.
+    @ObservationIgnored private var spanCache: [String: Int] = [:]
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var storeObserver: NSObjectProtocol?
 
@@ -102,7 +104,10 @@ final class CalendarBridge {
         storeObserver = NotificationCenter.default.addObserver(
             forName: .EKEventStoreChanged, object: store, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.changeTick += 1 }
+            MainActor.assumeIsolated {
+                self?.spanCache = [:]
+                self?.changeTick += 1
+            }
         }
     }
 
@@ -244,6 +249,7 @@ final class CalendarBridge {
 
         let predicate = store.predicateForEvents(withStart: weekStart, end: weekEnd, calendars: chosen)
         let events = store.events(matching: predicate)
+        Self.migrateAllDayToBackground(in: context)
 
         // 이 주의 블록들. 캘린더에서 온 것은 맞춰 갈 대상, 사람이 세운 것은 짝지을 후보다.
         let weekBlocks = ((try? context.fetch(FetchDescriptor<PlanBlock>())) ?? [])
@@ -274,14 +280,16 @@ final class CalendarBridge {
             if event.isAllDay { result.allDay += 1 }
 
             // 종일 일정은 '종일' 블록으로 — 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
-            let hour = event.isAllDay ? PlanBlock.allDayHour : Self.hourOfDay(start, calendar: cal)
+            // 캘린더의 종일은 대개 공휴일·생일·휴가 같은 '그날이 어떤 날'이다 — 배경으로 들인다 (→ PlanBlock.isBackground).
+            let hour = event.isAllDay ? PlanBlock.backgroundHour : Self.hourOfDay(start, calendar: cal)
             let duration = Self.duration(of: event, startHour: hour)
             let title = (event.title ?? "").isEmpty ? String(localized: "(제목 없는 일정)") : event.title!
 
             if let block = byKey.removeValue(forKey: key) {
                 var changed = false
                 if block.day != day { block.day = day; changed = true }
-                if block.startHour != hour { block.startHour = hour; changed = true }
+                // 종일끼리는 시각을 건드리지 않는다 — 사람이 배경 ↔ 할 일로 바꿔 둔 것을 덮지 않게.
+                if block.startHour != hour, !(event.isAllDay && block.isAllDay) { block.startHour = hour; changed = true }
                 if block.durationHours != duration { block.durationHours = duration; changed = true }
                 // 합친 블록의 제목은 사람 것이다 — 캘린더 제목으로 덮지 않는다 (→ CalendarMerge).
                 if block.title != title, !CalendarMerge.hasOwnTitle(key) { block.title = title; changed = true }
@@ -375,6 +383,35 @@ final class CalendarBridge {
     ///
     /// ⚠️ `eventIdentifier` 하나로는 모자란다. **반복 일정은 모든 회차가 같은 값**을 갖기
     ///    때문에, 매주 회의가 한 블록으로 뭉개진다. 시작 시각을 붙여 회차를 가른다.
+    /// 배경 종일(→ PlanBlock.backgroundHour)이 생기기 전에 가져온 종일 일정을 한 번만 배경으로 옮긴다.
+    /// 그 전에는 생일·공휴일이 할 일로 세여 무지개 칸을 차지하고 '끝냈나요?'까지 물었다.
+    private static func migrateAllDayToBackground(in context: ModelContext) {
+        let flag = "calendar.allDayBackgroundMigrated"
+        guard !UserDefaults.standard.bool(forKey: flag) else { return }
+        let all = (try? context.fetch(FetchDescriptor<PlanBlock>())) ?? []
+        for block in all where block.calendarEventID != nil && block.isAllDay && !block.isBackground {
+            block.setBackground(true)
+        }
+        try? context.save()
+        UserDefaults.standard.set(true, forKey: flag)
+    }
+
+    /// **캘린더에서 가져온 종일 일정이 며칠에 걸치는가.** 가져오기는 첫날에만 블록을 세우므로,
+    /// 한 주를 가로지르는 막대를 그리려면 끝나는 날을 캘린더에서 다시 읽는다. 모르면 nil.
+    func allDaySpanDays(forKey key: String) -> Int? {
+        if let cached = spanCache[key] { return cached }
+        guard hasAccess, let id = key.split(separator: "|").first,
+              let event = store.event(withIdentifier: String(id)),
+              event.isAllDay, let start = event.startDate, let end = event.endDate else { return nil }
+        let cal = Calendar.current
+        let last = end.addingTimeInterval(-1)
+        let days = (cal.dateComponents([.day], from: cal.startOfDay(for: start),
+                                       to: cal.startOfDay(for: last)).day ?? 0) + 1
+        let result = max(1, days)
+        spanCache[key] = result
+        return result
+    }
+
     private static func key(for event: EKEvent) -> String? {
         guard let id = event.eventIdentifier, let start = event.startDate else { return nil }
         return "\(id)|\(Int(start.timeIntervalSince1970))"

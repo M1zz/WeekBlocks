@@ -76,7 +76,7 @@ struct ReflectionView: View {
 
     /// 점검해야 하는 줄들. 숫자 넷은 이것만 센다.
     private var reviewableBlocks: [PlanBlock] {
-        weekBlocks.filter { !$0.isRoutineKind(routineNames) }
+        weekBlocks.filter { $0.isTodo(routineNames) }
     }
 
     /// **아직 안 찍은 것.** 지나간 날과, 오늘 끝 시각이 지난 것 (→ PlanBlock.isUnreviewedPast).
@@ -135,7 +135,7 @@ struct ReflectionView: View {
                             Section {
                                 ForEach(blocks(on: day)) { block in
                                     ReflectionRow(block: block, showsDay: false,
-                                                  reviewable: !block.isRoutineKind(routineNames)) {
+                                                  reviewable: block.isTodo(routineNames)) {
                                         try? context.save()
                                     }
                                     Divider()
@@ -231,7 +231,9 @@ struct ReflectionView: View {
             for block in blocks(on: day) {
                 let mark: String
                 // 루틴은 안 찍는 줄이다. `[ ]`로 내보내면 붙여넣은 글에서 '안 한 일'로 읽힌다.
-                if block.isRoutineKind(routineNames) {
+                if block.isBackground {
+                    mark = "[·]"
+                } else if block.isRoutineKind(routineNames) {
                     mark = "[↻]"
                 } else {
                     switch block.reviewStatus {
@@ -285,7 +287,7 @@ struct ReflectionView: View {
 
     private func dayHeader(_ day: DayOfWeek) -> some View {
         // 루틴은 세지 않는다 — '3/8'의 8에 수면·끼니가 들어가면 달성률이 흐려진다.
-        let stats = ReflectionStats(blocks(on: day).filter { !$0.isRoutineKind(routineNames) })
+        let stats = ReflectionStats(blocks(on: day).filter { $0.isTodo(routineNames) })
         return HStack(spacing: 8) {
             Text(day.longLabel)
                 .font(.subheadline.weight(.semibold))
@@ -333,7 +335,7 @@ struct DayReflectionPanel: View {
 
     /// **점검해야 하는 줄들.** 뱃지의 셈도 이것만 본다 —
     /// 루틴이 섞이면 '미회고 5개'가 사실은 아무것도 안 밀린 날일 수 있다.
-    private var reviewable: [PlanBlock] { sorted.filter { !$0.isRoutineKind(routineNames) } }
+    private var reviewable: [PlanBlock] { sorted.filter { $0.isTodo(routineNames) } }
 
     private var isPast: Bool {
         let cal = Calendar.current
@@ -434,7 +436,7 @@ struct DayReflectionPanel: View {
                 VStack(spacing: 0) {
                     ForEach(sorted) { block in
                         ReflectionRow(block: block, showsDay: false, compact: true,
-                                      reviewable: !block.isRoutineKind(routineNames)) {
+                                      reviewable: block.isTodo(routineNames)) {
                             try? context.save()
                         }
                         if block.persistentModelID != sorted.last?.persistentModelID {
@@ -680,11 +682,12 @@ struct ReflectionRow: View {
 
     /// 루틴 줄의 표시. 체크 동그라미 자리를 비워 두면 줄이 어긋나므로 같은 크기로 세운다.
     private var routineMark: some View {
-        Image(systemName: "repeat")
+        Image(systemName: block.isBackground ? "calendar" : "repeat")
             .font(.system(size: compact ? 10 : 11, weight: .bold))
             .foregroundStyle(.tertiary)
             .frame(width: compact ? 20 : 22, height: compact ? 20 : 22)
-            .help("루틴입니다 — 했는지 묻지 않습니다")
+            .help(block.isBackground ? "그날의 배경 일정입니다 — 했는지 묻지 않습니다"
+                                     : "루틴입니다 — 했는지 묻지 않습니다")
     }
 
     /// 누르면 끝낸 것이 되고, 다시 누르면 도로 안 본 것이 된다.

@@ -423,6 +423,8 @@ struct DayTimelineRow: View {
     /// 그날 해야 할 일의 수 — 띠와 남은 시간 사이에 무지개로 선다 (→ TodoRainbow).
     /// 요일 줄이 위아래로 쌓이므로 일곱 줄의 무지개가 아이폰 '욕망의 무지개'와 같은 모양이 된다.
     var todoLoad: TodoLoad? = nil
+    /// 그날에 걸친 종일 일정 (→ AllDaySpan). 띠 왼쪽 위에 작은 꼬리표로 선다.
+    var allDaySpans: [AllDaySpan] = []
     /// 무지개 칸의 폭. 위의 시각 자(HourAxis)가 같은 만큼 비워야 띠와 눈금이 맞는다.
     static let rainbowWidth: CGFloat = 84
 
@@ -603,6 +605,8 @@ struct DayTimelineRow: View {
                     }
                 }
                 .clipShape(Capsule(style: .continuous))
+                // 종일 — 시간을 차지하지 않으므로 띠 **위에** 꼬리표로 건다. 휴가인 날이 한 주 줄에서 바로 읽힌다.
+                .overlay(alignment: .leading) { allDayTags }
                 // 끄는 띠가 내려앉을 시각 — 껍질 밖에 얹어 양끝에서도 안 잘린다.
                 .overlay(alignment: .leading) { dropGuide(rowWidth: w) }
                 .overlay {
@@ -649,6 +653,40 @@ struct DayTimelineRow: View {
                 // 방금 한 손짓이 어디에 닿았는지가 눈에 붙는다.
                 .contentTransition(.numericText())
                 .animation(Motion.number, value: freeHours)
+        }
+    }
+
+    /// 띠 왼쪽 끝에 서는 종일 꼬리표. 둘까지 이름을, 그 위는 수로.
+    @ViewBuilder
+    private var allDayTags: some View {
+        if !allDaySpans.isEmpty {
+            HStack(spacing: 4) {
+                ForEach(allDaySpans.prefix(2)) { span in
+                    HStack(spacing: 3) {
+                        Image(systemName: span.looksLikeDayOff ? "sun.max" : (span.isBackground ? "calendar" : "checklist"))
+                        Text(span.label(on: date))
+                            .lineLimit(1)
+                    }
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(span.isBackground ? Color.primary.opacity(0.75)
+                                                       : (todoLoad?.color(for: span.block) ?? .accentColor))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 2)
+                    .background(.regularMaterial, in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1))
+                    .fixedSize()
+                    .contextMenu { AllDayKindMenu(block: span.block) }
+                    .help(span.isBackground
+                          ? String(localized: "그날의 배경 일정 — 할 일로 세지 않습니다. 우클릭해서 바꿀 수 있습니다")
+                          : String(localized: "그날 해야 할 일 (시각 없음)"))
+                }
+                if allDaySpans.count > 2 {
+                    Text(verbatim: "+\(allDaySpans.count - 2)")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.leading, 6)
         }
     }
 

@@ -57,7 +57,7 @@ struct PreDecisionBanner: View {
     private var firstOpenToday: PlanBlock? {
         let midnight = Calendar.current.startOfDay(for: now)
         return todayBlocks.first { block in
-            guard block.reviewStatus == nil else { return false }
+            guard block.reviewStatus == nil, !block.isBackground else { return false }
             guard block.startHour >= 0, !block.isAllDay else { return true }
             let end = midnight.addingTimeInterval((block.startHour + block.durationHours) * 3600)
             return end > now

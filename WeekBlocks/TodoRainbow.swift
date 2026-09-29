@@ -23,7 +23,7 @@ struct TodoLoad: Equatable {
 
     init(_ blocks: [PlanBlock], routineNames: Set<String>) {
         // 칸 차례 = 하루에 놓인 차례. 찍어도 칸이 옮겨 가지 않아야 블록 색이 그대로 머문다.
-        let todos = blocks.filter { !$0.isRoutineKind(routineNames) }
+        let todos = blocks.filter { $0.isTodo(routineNames) }
             .sorted { ($0.sortHour, $0.createdAt) < ($1.sortHour, $1.createdAt) }
         total = todos.count
         marks = todos.map { $0.reviewStatus != nil }

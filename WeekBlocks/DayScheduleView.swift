@@ -69,10 +69,13 @@ struct DayScheduleView: View {
     var onClearTime: (PlanBlock) -> Void = { _ in }
     /// 그날의 무지개. 블록은 무지개에서 차지한 칸의 색으로 선다 (→ TodoLoad.colors).
     var todoLoad: TodoLoad? = nil
+    /// 그날에 걸친 종일 막대 (→ AllDaySpan) — 앞날에 시작한 여러 날 일정도 들어온다.
+    var allDaySpans: [AllDaySpan] = []
 
     /// 종일 한 줄의 색. 무지개 칸이 있으면 그 색, 없으면 예전처럼 검증 여부로.
     private func allDayTint(_ block: PlanBlock) -> Color {
-        todoLoad?.color(for: block) ?? (block.concreteVerified ? .accentColor : .orange)
+        if block.isBackground { return .secondary }
+        return todoLoad?.color(for: block) ?? (block.concreteVerified ? .accentColor : .orange)
     }
 
     /// 한 시간의 키. 알약과 글씨가 숨 쉴 자리가 있어야 말랑하게 읽힌다 —
@@ -231,39 +234,114 @@ struct DayScheduleView: View {
     /// 캘린더의 기념일·마감일이 한 시간을 잡아먹던 것을 풀었다 — 누르면 다듬고, 자 위로 끌면 그 시각의 일이 된다.
     @ViewBuilder
     private var allDayStrip: some View {
-        let allDay = blocks.filter(\.isAllDay)
-        if !allDay.isEmpty {
-            HStack(spacing: 8) {
-                Text("종일")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(allDay, id: \.dragToken) { block in
-                            Button { onEditBlock(block) } label: {
-                                HStack(spacing: 5) {
-                                    Image(systemName: block.symbol)
-                                    Text(block.title)
-                                        .lineLimit(1)
-                                }
-                                .font(.body.weight(.medium))
-                                .foregroundStyle(allDayTint(block))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(allDayTint(block).opacity(0.14),
-                                            in: Capsule())
-                                .contentShape(Capsule())
+        // 앞날에 시작해 오늘까지 이어지는 여러 날 일정도 여기 선다 (→ AllDaySpan). 막대가 없으면(미리보기 등) 그날 블록만.
+        let spans = allDaySpans.isEmpty
+            ? AllDaySpan.spans(from: blocks) { _ in Calendar.current.startOfDay(for: date) }
+            : allDaySpans
+        if !spans.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Text("종일")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            ForEach(spans) { span in
+                                allDayChip(span)
                             }
-                            .buttonStyle(.plain)
-                            .draggable(block.dragToken)
-                            .pointingCursor()
-                            .help(String(localized: "시간을 차지하지 않는 종일 일정 — 눌러서 다듬기 · 자 위로 끌면 그 시각에 세움"))
                         }
                     }
                 }
+                dayOffAsk(spans)
             }
             .transition(.pop)
         }
+    }
+
+    /// 종일 한 알. 배경은 회색 달력, 할 일은 무지개 색 체크리스트.
+    private func allDayChip(_ span: AllDaySpan) -> some View {
+        let block = span.block
+        let tint = allDayTint(block)
+        let onThisDay = blocks.contains { $0 === block }
+        return Button { onEditBlock(block) } label: {
+            HStack(spacing: 5) {
+                Image(systemName: span.looksLikeDayOff ? "sun.max" : (span.isBackground ? "calendar" : "checklist"))
+                Text(span.label(on: date))
+                    .lineLimit(1)
+                if !span.isBackground {
+                    Text("오늘 안에")
+                        .opacity(0.7)
+                }
+            }
+            .font(.body.weight(.medium))
+            .foregroundStyle(span.isBackground ? Color.primary.opacity(0.75) : tint)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(tint.opacity(0.14), in: Capsule())
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        // 자 위로 끌어 시각을 주는 것은 그날에 선 블록만 — 앞날에서 이어져 온 막대는 옮기지 않는다.
+        .modifier(OptionalDraggableToken(token: onThisDay ? block.dragToken : nil))
+        .contextMenu { AllDayKindMenu(block: block) }
+        .pointingCursor()
+        .help(span.isBackground
+              ? String(localized: "그날의 배경 일정 — 할 일로 세지 않습니다. 우클릭해서 바꿀 수 있습니다")
+              : String(localized: "시간을 차지하지 않는 종일 일정 — 눌러서 다듬기 · 자 위로 끌면 그 시각에 세움"))
+    }
+
+    // MARK: 쉬는 날
+
+    /// **휴가·출장인 날에 회사가 서 있으면 묻는다.** 그대로 두면 없는 9시간이 남은 시간을 깎는다.
+    /// 뺄 후보는 그날 선 고정 루틴 중 수면이 아닌 긴 것(3시간 이상). 한 번 '그대로 두기'를 고르면 그날은 다시 안 묻는다.
+    @ViewBuilder
+    private func dayOffAsk(_ spans: [AllDaySpan]) -> some View {
+        if let off = spans.first(where: \.looksLikeDayOff), !keptDayOff.contains(dayOffKey) {
+            let candidates = segments.filter { seg in
+                guard !seg.isGhost, case .fixedRoutine(let name) = seg.source else { return false }
+                guard !(routines.first { $0.name == name }?.isSleepRoutine ?? false) else { return false }
+                return seg.logicalDuration >= 3
+            }
+            // 자정을 넘겨 둘로 그려진 것은 한 번만.
+            let unique = candidates.reduce(into: [TimeSegment]()) { acc, seg in
+                if !acc.contains(where: { $0.title == seg.title }) { acc.append(seg) }
+            }
+            if !unique.isEmpty {
+                HStack(spacing: 8) {
+                    Image(systemName: "sun.max.fill")
+                        .foregroundStyle(Color.orange)
+                    Text("‘\(off.title)’인 날이에요. 이 날은 빼 둘까요?")
+                        .font(.body)
+                        .lineLimit(1)
+                    Spacer(minLength: 4)
+                    ForEach(unique) { seg in
+                        Button("\(seg.title) 빼기") {
+                            actions.delete(seg)
+                        }
+                        .buttonStyle(.bordered)
+                        .help("이 날만 뺍니다. 루틴은 그대로이고, '숨긴 것'에서 되살릴 수 있습니다")
+                    }
+                    Button("그대로 두기") {
+                        var kept = keptDayOff
+                        kept.insert(dayOffKey)
+                        keptDayOffRaw = Array(kept).sorted().suffix(200).joined(separator: "\n")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.orange.opacity(0.08), in: .soft(Corner.chip))
+                .transition(.disclose)
+            }
+        }
+    }
+
+    @AppStorage("dayOffKept") private var keptDayOffRaw = ""
+    private var keptDayOff: Set<String> { Set(keptDayOffRaw.split(separator: "\n").map(String.init)) }
+    private var dayOffKey: String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: date)
     }
 
     /// **숨긴 것 N개.** 뺀 루틴·끼니가 여기 모인다 — 눌러서 되살린다.
@@ -2496,4 +2574,15 @@ extension View {
 /// 모든 알약이 자리를 적고, 그때마다 하루 시간표 전체를 다시 그린다. 누른 순간에만 읽으면 되는 값이다.
 final class GlyphFrames {
     var frames: [String: CGRect] = [:]
+}
+
+
+/// 표가 있을 때만 끌 수 있게 한다 (종일 한 알 — 앞날에서 이어져 온 막대는 못 끈다).
+private struct OptionalDraggableToken: ViewModifier {
+    let token: String?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let token { content.draggable(token) } else { content }
+    }
 }
