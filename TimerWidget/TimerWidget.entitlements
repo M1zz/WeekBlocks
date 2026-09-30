@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- 앱이 적어 둔 오늘의 타임라인을 읽는 통로 (→ TimerWidgetSnapshot.swift).
+	     ⚠️ 앱 타깃(WeekBlocks.entitlements)의 값과 반드시 같아야 한다. -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>QGAQ3AY3R3.group.com.devkoan.ScheduleDensity</string>
+	</array>
+</dict>
+</plist>

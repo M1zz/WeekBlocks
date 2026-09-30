@@ -76,10 +76,10 @@ struct ReflectionView: View {
 
     /// 점검해야 하는 줄들. 숫자 넷은 이것만 센다.
     private var reviewableBlocks: [PlanBlock] {
-        weekBlocks.filter { !$0.isRoutineKind(routineNames) }
+        weekBlocks.filter { $0.isTodo(routineNames) }
     }
 
-    /// **아직 안 찍은 것.** 지나간 날만 센다.
+    /// **아직 안 찍은 것.** 지나간 날과, 오늘 끝 시각이 지난 것 (→ PlanBlock.isUnreviewedPast).
     private var unreviewed: [PlanBlock] {
         weekBlocks.filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames) }
     }
@@ -135,7 +135,7 @@ struct ReflectionView: View {
                             Section {
                                 ForEach(blocks(on: day)) { block in
                                     ReflectionRow(block: block, showsDay: false,
-                                                  reviewable: !block.isRoutineKind(routineNames)) {
+                                                  reviewable: block.isTodo(routineNames)) {
                                         try? context.save()
                                     }
                                     Divider()
@@ -231,7 +231,9 @@ struct ReflectionView: View {
             for block in blocks(on: day) {
                 let mark: String
                 // 루틴은 안 찍는 줄이다. `[ ]`로 내보내면 붙여넣은 글에서 '안 한 일'로 읽힌다.
-                if block.isRoutineKind(routineNames) {
+                if block.isBackground {
+                    mark = "[·]"
+                } else if block.isRoutineKind(routineNames) {
                     mark = "[↻]"
                 } else {
                     switch block.reviewStatus {
@@ -285,7 +287,7 @@ struct ReflectionView: View {
 
     private func dayHeader(_ day: DayOfWeek) -> some View {
         // 루틴은 세지 않는다 — '3/8'의 8에 수면·끼니가 들어가면 달성률이 흐려진다.
-        let stats = ReflectionStats(blocks(on: day).filter { !$0.isRoutineKind(routineNames) })
+        let stats = ReflectionStats(blocks(on: day).filter { $0.isTodo(routineNames) })
         return HStack(spacing: 8) {
             Text(day.longLabel)
                 .font(.subheadline.weight(.semibold))
@@ -333,7 +335,7 @@ struct DayReflectionPanel: View {
 
     /// **점검해야 하는 줄들.** 뱃지의 셈도 이것만 본다 —
     /// 루틴이 섞이면 '미회고 5개'가 사실은 아무것도 안 밀린 날일 수 있다.
-    private var reviewable: [PlanBlock] { sorted.filter { !$0.isRoutineKind(routineNames) } }
+    private var reviewable: [PlanBlock] { sorted.filter { $0.isTodo(routineNames) } }
 
     private var isPast: Bool {
         let cal = Calendar.current
@@ -434,7 +436,7 @@ struct DayReflectionPanel: View {
                 VStack(spacing: 0) {
                     ForEach(sorted) { block in
                         ReflectionRow(block: block, showsDay: false, compact: true,
-                                      reviewable: !block.isRoutineKind(routineNames)) {
+                                      reviewable: block.isTodo(routineNames)) {
                             try? context.save()
                         }
                         if block.persistentModelID != sorted.last?.persistentModelID {
@@ -531,6 +533,12 @@ struct ReflectionRow: View {
     let onChange: () -> Void
 
     @State private var hovering = false
+    /// 한 줄 회고를 적는 중인가. **찍는다고 저절로 열지 않는다** — 찍을 때마다 칸이 열려 줄이 길어지고
+    /// 목록이 들썩였다. '회고하기'를 눌러야 열린다.
+    @State private var writing = false
+    @FocusState private var noteFocused: Bool
+
+    private var note: String { block.reviewNote ?? "" }
 
     /// 다 한 것으로 보는가. 줄을 흐리고 제목에 줄을 긋는 기준이다.
     private var isDone: Bool { block.reviewStatus == .done }
@@ -570,6 +578,21 @@ struct ReflectionRow: View {
 
                 Spacer()
 
+                // 찍었고 아직 안 적었으면 버튼 하나만 선다 — 줄 높이는 그대로.
+                if reviewable, block.reviewStatus != nil, note.isEmpty, !writing {
+                    Button {
+                        withAnimation(Motion.row) { writing = true }
+                    } label: {
+                        Label("회고하기", systemImage: "square.and.pencil")
+                            .font(.body)
+                    }
+                    // 글자만 있는 단추는 눌러도 되는지 안 읽힌다 — 도드라진 단추로 세운다.
+                    .buttonStyle(.bordered)
+                    .fixedSize()
+                    .help("무엇이 잘 됐고 무엇이 안 됐는지 한 줄로 남깁니다")
+                    .transition(.pop)
+                }
+
                 // 부분·건너뜀은 자주 쓰는 손짓이 아니다. 늘 세워 두면 '끝냄' 하나를
                 // 누르러 온 사람이 셋 중에 고르는 일이 되므로, 가리키기 전에는 숨긴다.
                 // (마우스를 안 쓰는 사람을 위해 줄 전체에 같은 메뉴를 우클릭으로도 단다.)
@@ -601,7 +624,7 @@ struct ReflectionRow: View {
                     .padding(.leading, detailIndent)
             }
 
-            if block.reviewStatus != nil {
+            if writing {
                 TextField(
                     "한 줄 회고 — 무엇이 잘 됐고 무엇이 안 됐는지",
                     text: Binding(
@@ -612,6 +635,31 @@ struct ReflectionRow: View {
                 )
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(1...3)
+                .focused($noteFocused)
+                .onSubmit { finishWriting() }
+                .onExitCommand { finishWriting() }
+                .onChange(of: noteFocused) { _, focused in if !focused { finishWriting() } }
+                .onAppear { noteFocused = true }
+                .padding(.leading, detailIndent)
+                .transition(.disclose)
+            } else if !note.isEmpty {
+                // 적어 둔 회고는 글로만 선다. 누르면 다시 고친다.
+                Button {
+                    withAnimation(Motion.row) { writing = true }
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Image(systemName: "text.quote")
+                        Text(note)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("눌러서 고치기")
                 .padding(.leading, detailIndent)
                 .transition(.disclose)
             }
@@ -620,19 +668,26 @@ struct ReflectionRow: View {
         .padding(.vertical, compact ? 9 : 14)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
-        // 표시를 찍으면 회고 칸이 아래로 열리고, 제목에 줄이 그어진다. 한 결로 묶는다.
+        // 표시를 찍으면 제목에 줄이 그어지고 옆에 '회고하기'가 선다. 한 결로 묶는다.
         .animation(Motion.row, value: block.reviewStatus)
+        .animation(Motion.row, value: writing)
         .animation(Motion.hover, value: hovering)
         .contextMenu { if reviewable { stateButtons } }
     }
 
+    private func finishWriting() {
+        guard writing else { return }
+        withAnimation(Motion.row) { writing = false }
+    }
+
     /// 루틴 줄의 표시. 체크 동그라미 자리를 비워 두면 줄이 어긋나므로 같은 크기로 세운다.
     private var routineMark: some View {
-        Image(systemName: "repeat")
+        Image(systemName: block.isBackground ? "calendar" : "repeat")
             .font(.system(size: compact ? 10 : 11, weight: .bold))
             .foregroundStyle(.tertiary)
             .frame(width: compact ? 20 : 22, height: compact ? 20 : 22)
-            .help("루틴입니다 — 했는지 묻지 않습니다")
+            .help(block.isBackground ? "그날의 배경 일정입니다 — 했는지 묻지 않습니다"
+                                     : "루틴입니다 — 했는지 묻지 않습니다")
     }
 
     /// 누르면 끝낸 것이 되고, 다시 누르면 도로 안 본 것이 된다.
@@ -682,6 +737,66 @@ struct ReflectionRow: View {
                 withAnimation(Motion.row) { block.reviewStatus = nil }
                 onChange()
             }
+        }
+    }
+}
+
+
+// MARK: - 끝났나요?
+
+/// **지나간 일정 중 아직 안 찍은 것을 묻는다.** 맨 위 줄, 타이머 알약 옆에 선다.
+///
+/// 끝나자마자 찍으라고 창을 띄우지 않는다 — 인터뷰가 끝난 그 순간에는 다음 일로 넘어가는 중이다.
+/// 대신 주황 뱃지로 남아 있다가, 누르면 일정마다 달성 · 부분 달성 · 건너뜀을 바로 고른다.
+/// 하나도 없으면 아무것도 서지 않는다.
+struct OverdueAskBadge: View {
+    /// 지나갔는데 안 찍은 블록 (시각 순).
+    let blocks: [PlanBlock]
+
+    @Environment(\.modelContext) private var context
+
+    var body: some View {
+        if !blocks.isEmpty {
+            Menu {
+                Section("끝냈나요?") {
+                    ForEach(blocks, id: \.dragToken) { block in
+                        Menu {
+                            ForEach(ReviewStatus.allCases) { status in
+                                Button {
+                                    Haptic.tick()
+                                    withAnimation(Motion.squish) {
+                                        block.reviewStatus = status
+                                        try? context.save()
+                                    }
+                                } label: {
+                                    Label(status.label, systemImage: status.systemImage)
+                                }
+                            }
+                        } label: {
+                            Text(verbatim: "\(block.title) · \(block.whenLabel)")
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "questionmark.circle.fill")
+                    Text("끝냈나요?")
+                    Text(verbatim: "\(blocks.count)")
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                }
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.orange)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 4)
+                .background(Color.orange.opacity(0.14), in: Capsule())
+            }
+            .menuStyle(.button)
+            .buttonStyle(.plain)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .help(String(localized: "시간이 지났는데 아직 안 찍은 일정 \(blocks.count)개"))
+            .transition(.pop)
         }
     }
 }

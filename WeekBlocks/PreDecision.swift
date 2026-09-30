@@ -52,8 +52,16 @@ struct PreDecisionBanner: View {
     private var hour: Int { Calendar.current.component(.hour, from: now) }
 
     /// 오늘 아직 안 끝낸 것 중 가장 이른 것 = 지금의 첫 걸음.
+    /// **적힌 시각이 이미 지나간 것은 보낸다** — 09:30–11:00 인터뷰를 11:12에 "지금 시작"하라고 권하면 거짓말이다.
+    /// 찍지 않은 것은 회고가 따로 챙긴다.
     private var firstOpenToday: PlanBlock? {
-        todayBlocks.first { $0.reviewStatus == nil }
+        let midnight = Calendar.current.startOfDay(for: now)
+        return todayBlocks.first { block in
+            guard block.reviewStatus == nil, !block.isBackground else { return false }
+            guard block.startHour >= 0, !block.isAllDay else { return true }
+            let end = midnight.addingTimeInterval((block.startHour + block.durationHours) * 3600)
+            return end > now
+        }
     }
 
     private var kind: Kind? {

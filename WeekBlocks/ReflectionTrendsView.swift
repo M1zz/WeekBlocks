@@ -82,7 +82,7 @@ enum ReflectionTrends {
         let cal = Calendar(identifier: .iso8601)
         return all.filter { b in
             b.calendarEventID == nil
-                && !b.isRoutineKind(routineNames)
+                && b.isTodo(routineNames)
                 && starts.contains { cal.isDate($0, inSameDayAs: b.weekStartDate) }
         }
     }

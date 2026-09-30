@@ -131,7 +131,7 @@ struct SettingsView: View {
                     Text("요일별 하루")
                 } footer: {
                     Text("하루 양끝의 수면 시간을 잘라내 남은 시간을 더 넓게 봅니다. 이름에 '수면·잠·취침'이 들어간 고정 루틴을 수면으로 봅니다. 잘라낼 자리에 다른 일정이 걸쳐 있으면 그 일정이 보이도록 범위를 도로 넓힙니다.")
-                        .font(.caption)
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
 

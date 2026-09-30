@@ -146,8 +146,29 @@ extension PlanBlock {
     ///    '시각 없음'으로 읽고, 길이가 0이라 어디서도 시간을 차지하지 않는다.
     static let allDayHour: Double = -2
 
+    /// **배경 종일** — 공휴일 · 생일 · 휴가 · 출장처럼 '그날이 어떤 날인지'를 말할 뿐 할 일이 아닌 것.
+    /// 무지개 칸을 안 차지하고, 회고·'끝냈나요?'도 묻지 않는다.
+    ///
+    /// ⚠️ 종일(-2)과 같은 까닭으로 필드를 늘리지 않고 한 칸 더 아래(-3)에 적는다. 아이폰은 둘 다
+    ///    '시각 없음'으로 읽으므로 거기서는 전과 똑같다.
+    static let backgroundHour: Double = -3
+
     /// 시간을 차지하지 않고 그날 맨 위에 서는 블록인가. 루틴 안 일정은 늘 시각을 갖는다.
     var isAllDay: Bool { startHour <= Self.allDayHour + 0.5 && !withinRoutine }
+
+    /// 배경 종일인가 (→ backgroundHour). 캘린더에서 가져온 종일은 이것이 기본이다.
+    var isBackground: Bool { isAllDay && startHour <= Self.backgroundHour + 0.5 }
+
+    /// 종일을 배경 ↔ 그날 할 일로 바꾼다.
+    func setBackground(_ on: Bool) {
+        guard isAllDay else { return }
+        startHour = on ? Self.backgroundHour : Self.allDayHour
+    }
+
+    /// **해야 할 일인가** — 무지개 칸 · 회고 · '끝냈나요?'가 세는 것. 루틴 이름의 블록과 배경 종일은 아니다.
+    func isTodo(_ routineNames: Set<String>) -> Bool {
+        !isRoutineKind(routineNames) && !isBackground
+    }
 
     /// 시각이 정해진 블록은 시각을, 종일은 '종일'을, 아니면 시간대를.
     var whenLabel: String {
@@ -155,8 +176,9 @@ extension PlanBlock {
         return startHour >= 0 ? formatHour(startHour) : timeBand.shortLabel
     }
 
-    /// 종일로 만든다 — 시각은 비우고 길이는 0.
+    /// 종일로 만든다 — 시각은 비우고 길이는 0. 이미 배경 종일이면 배경 그대로.
     func makeAllDay() {
+        if isBackground { durationHours = 0; return }
         startHour = Self.allDayHour
         durationHours = 0
     }
@@ -216,11 +238,18 @@ extension PlanBlock {
         weekStartDate = DayOfWeek.storedWeek(of: newDay, shownWeek: shown, sundayFirst: sundayFirst)
     }
 
+    ///
+    /// **오늘도 센다 — 적힌 끝 시각이 지났으면.** 09:30–11:00 인터뷰를 12시까지 안 찍었으면 이미 지나간 줄이다.
+    /// 바로 찍으라고 다그치지는 않지만, 끝났는지는 물어야 한다 (→ OverdueAskBadge).
+    /// 시각이 없는 것(시간대 · 종일)은 그날이 지나야 센다.
     func isUnreviewedPast(weekStart: Date, routineNames: Set<String>, now: Date = Date()) -> Bool {
-        guard reviewStatus == nil, !isRoutineKind(routineNames) else { return false }
+        guard reviewStatus == nil, isTodo(routineNames) else { return false }
         let cal = Calendar(identifier: .iso8601)
         guard let d = cal.date(byAdding: .day, value: day.rawValue, to: weekStart) else { return false }
-        return cal.startOfDay(for: d) < cal.startOfDay(for: now)
+        let dayStart = cal.startOfDay(for: d)
+        if dayStart < cal.startOfDay(for: now) { return true }
+        guard cal.isDate(dayStart, inSameDayAs: now), startHour >= 0, !isAllDay else { return false }
+        return dayStart.addingTimeInterval((startHour + durationHours) * 3600) <= now
     }
 }
 

@@ -136,6 +136,16 @@
         }
       }
     },
+    "‘%@’인 날이에요. 이 날은 빼 둘까요?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's ‘%@’. Drop these for the day?"
+          }
+        }
+      }
+    },
     "'구체성 검사'를 눌러 주세요" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -451,6 +461,16 @@
         }
       }
     },
+    "%@ · %lld일 중 %lld일째" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · day %3$lld of %2$lld"
+          }
+        }
+      }
+    },
     "%@ · 종일" : {
       "localizations" : {
         "en" : {
@@ -523,6 +543,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bring back %@"
+          }
+        }
+      }
+    },
+    "%@ 빼기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop %@"
           }
         }
       }
@@ -621,6 +651,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@h/week"
+          }
+        }
+      }
+    },
+    "%@로 미루기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Push to %@"
           }
         }
       }
@@ -952,6 +992,16 @@
         }
       }
     },
+    "%lld일" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days"
+          }
+        }
+      }
+    },
     "%lld일 무료로 써 보고, 그 뒤에 결제됩니다." : {
       "localizations" : {
         "en" : {
@@ -998,6 +1048,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "in %lld weeks"
+          }
+        }
+      }
+    },
+    "%lld줄 · 2줄로 줄이기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld columns · make it 2"
+          }
+        }
+      }
+    },
+    "%lld줄로 겹쳤어요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld plans side by side"
           }
         }
       }
@@ -1482,6 +1552,26 @@
         }
       }
     },
+    "같은 시간에 겹친 일정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlapping at this time"
+          }
+        }
+      }
+    },
+    "같은 시간에 겹친 일정 %lld개를 펼쳐 봅니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the %lld plans that overlap here"
+          }
+        }
+      }
+    },
     "같은 일이면 합치세요. 내 계획이 남고, 시각은 캘린더를 따라갑니다. 다른 일이면 따로 두면 다시 묻지 않습니다." : {
       "localizations" : {
         "en" : {
@@ -1555,16 +1645,6 @@
         }
       }
     },
-    "건너뜀" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skipped"
-          }
-        }
-      }
-    },
     "건너뛰고 다음" : {
       "localizations" : {
         "en" : {
@@ -1595,6 +1675,16 @@
         }
       }
     },
+    "건너뜀" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
+          }
+        }
+      }
+    },
     "결정이 작업 뒤에 있습니다" : {
       "localizations" : {
         "en" : {
@@ -1621,6 +1711,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Which one should the overlap count toward? Your free time is the same either way; only the length of the outer event changes. You can change this anytime in Settings."
+          }
+        }
+      }
+    },
+    "겹침 %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld overlap"
           }
         }
       }
@@ -1897,6 +1997,16 @@
         }
       }
     },
+    "공휴일·생일·휴가처럼 그날이 어떤 날인지 알려 주는 배경입니다. 무지개 칸을 차지하지 않고, 했는지 묻지 않습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background that says what kind of day it is — a holiday, birthday or vacation. It doesn't take a rainbow slot and isn't checked off."
+          }
+        }
+      }
+    },
     "구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 같은 요금으로 자동 갱신되며, Apple 계정으로 결제됩니다. 무료 체험 중에 해지하면 요금이 나가지 않습니다. 해지와 관리는 App Store의 계정 설정에서 합니다." : {
       "localizations" : {
         "en" : {
@@ -2009,22 +2119,12 @@
         }
       }
     },
-    "그대로" : {
+    "그날 할 일로 세기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No change"
-          }
-        }
-      }
-    },
-    "그대로 무료인 것" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Still free"
+            "value" : "Count as a to-do for the day"
           }
         }
       }
@@ -2036,6 +2136,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fri"
+          }
+        }
+      }
+    },
+    "그날 해야 할 일 (시각 없음)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To-do for the day (no set time)"
+          }
+        }
+      }
+    },
+    "그날의 배경 일정 — 할 일로 세지 않습니다. 우클릭해서 바꿀 수 있습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background for the day — not counted as a to-do. Right-click to change."
+          }
+        }
+      }
+    },
+    "그날의 배경 일정입니다 — 했는지 묻지 않습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background for the day — nothing to check off"
+          }
+        }
+      }
+    },
+    "그대로" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No change"
+          }
+        }
+      }
+    },
+    "그대로 두기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep"
+          }
+        }
+      }
+    },
+    "그대로 무료인 것" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still free"
           }
         }
       }
@@ -2083,6 +2243,7 @@
       }
     },
     "기념일·마감일처럼 그날의 일이지만 시간을 차지하지 않습니다. 남은 시간에서 빠지지 않고, 그날 맨 위에 따로 섭니다." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2161,6 +2322,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Length (h)"
+          }
+        }
+      }
+    },
+    "꼭 함께여야 하면" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If they must overlap"
           }
         }
       }
@@ -2271,6 +2442,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Finished Projects"
+          }
+        }
+      }
+    },
+    "끝냈나요?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done?"
           }
         }
       }
@@ -2698,6 +2879,16 @@
         }
       }
     },
+    "눌러서 고치기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click to edit"
+          }
+        }
+      }
+    },
     "눌러서 이 프로젝트 열기" : {
       "localizations" : {
         "en" : {
@@ -2719,6 +2910,7 @@
       }
     },
     "늦게 시작했을 때 — 일정에 적힌 끝 시각 대신 지금부터의 길이를 셉니다" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3210,6 +3402,16 @@
         }
       }
     },
+    "마감·제출처럼 시각은 없지만 그날 해야 하는 일입니다. 무지개 칸을 차지하고, 날이 지나면 했는지 묻습니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something due that day with no set time, like a deadline. It takes a rainbow slot and asks whether it's done once the day passes."
+          }
+        }
+      }
+    },
     "마무리해서 보내기" : {
       "localizations" : {
         "en" : {
@@ -3380,17 +3582,6 @@
         }
       }
     },
-    "목" : {
-      "comment" : "요일 한 글자",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thu"
-          }
-        }
-      }
-    },
     "모든 단계 완료" : {
       "localizations" : {
         "en" : {
@@ -3437,6 +3628,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All Projects"
+          }
+        }
+      }
+    },
+    "목" : {
+      "comment" : "요일 한 글자",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu"
           }
         }
       }
@@ -3518,6 +3720,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Decide what to do"
+          }
+        }
+      }
+    },
+    "무엇이 잘 됐고 무엇이 안 됐는지 한 줄로 남깁니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave one line on what went well and what didn't"
           }
         }
       }
@@ -3644,6 +3856,16 @@
         }
       }
     },
+    "바탕 루틴 — 그대로 둡니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background routine — stays as is"
+          }
+        }
+      }
+    },
     "밖에 있을 때 다음 일정이 몇 시인지, 오늘 남은 시간이 얼마인지 아이폰을 꺼내 바로 봅니다." : {
       "localizations" : {
         "en" : {
@@ -3670,6 +3892,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type"
+          }
+        }
+      }
+    },
+    "배경으로 두기 (할 일로 안 셈)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep as background (not a to-do)"
           }
         }
       }
@@ -4135,6 +4367,16 @@
         }
       }
     },
+    "시각 무르기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear time"
+          }
+        }
+      }
+    },
     "시각·길이·자세한 내용 정하기" : {
       "localizations" : {
         "en" : {
@@ -4151,6 +4393,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plan blocks with a set time appear in the “Rainbow Craft” calendar. Move or delete them here and the calendar follows; edits made in Calendar are replaced by your plan. Routines and imported events aren't written, and your other calendars are never touched."
+          }
+        }
+      }
+    },
+    "시각을 지우고 시간대 자리로 돌려놓습니다 (그날 계획에는 남습니다)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clears the time and puts it back in its part of the day (stays on that day's plan)"
           }
         }
       }
@@ -4211,6 +4463,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "It's less that you have no time and more that you can't see where it went.\nLay down the hours you can't take back first, and what's left becomes time you can actually use."
+          }
+        }
+      }
+    },
+    "시간이 지났는데 아직 안 찍은 일정 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld past plans not marked yet"
+          }
+        }
+      }
+    },
+    "시간이 지났습니다. 끝냈는지 골라 주세요" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its time has passed. Mark how it went."
           }
         }
       }
@@ -5021,6 +5293,16 @@
         }
       }
     },
+    "오늘 안에" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "today"
+          }
+        }
+      }
+    },
     "오늘로" : {
       "localizations" : {
         "en" : {
@@ -5037,6 +5319,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hide for today"
+          }
+        }
+      }
+    },
+    "오늘은 빼기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop for this day"
           }
         }
       }
@@ -5416,6 +5708,26 @@
         }
       }
     },
+    "이 날만 뺍니다. 루틴은 그대로이고, '숨긴 것'에서 되살릴 수 있습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drops it for this day only. The routine stays, and you can bring it back from Hidden."
+          }
+        }
+      }
+    },
+    "이 날만 뺍니다. 루틴은 그대로입니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drops it for this day only. The routine stays."
+          }
+        }
+      }
+    },
     "이 날은 계획한 블록이 없습니다" : {
       "localizations" : {
         "en" : {
@@ -5681,12 +5993,33 @@
         }
       }
     },
+    "일" : {
+      "comment" : "요일 한 글자",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
+          }
+        }
+      }
+    },
     "이건 할 일이 아니라 조각이 새어 나가는 곳입니다. 단계로 두면 진행률만 부풉니다." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This isn't a to-do, it's where your fragments leak away. Kept as a step, it only inflates your progress bar."
+          }
+        }
+      }
+    },
+    "이대로 두기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep as is"
           }
         }
       }
@@ -5869,17 +6202,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instagram DM (@lee25_ios)"
-          }
-        }
-      }
-    },
-    "일" : {
-      "comment" : "요일 한 글자",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sun"
           }
         }
       }
@@ -6778,6 +7100,7 @@
       }
     },
     "지금부터 %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7352,6 +7675,16 @@
         }
       }
     },
+    "타이머 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show timer"
+          }
+        }
+      }
+    },
     "타이머 이어서" : {
       "localizations" : {
         "en" : {
@@ -7378,6 +7711,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open the timer window (⇧⌘R)"
+          }
+        }
+      }
+    },
+    "타이머 켜기 · %@에 끝" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start timer · ends %@"
           }
         }
       }
@@ -7748,6 +8091,26 @@
         }
       }
     },
+    "한 시간에 셋 이상 나란히 서 있습니다 — 옮기거나 빼면 두 줄로 돌아옵니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three or more plans share this time — move or drop one to get back to two"
+          }
+        }
+      }
+    },
+    "한 시간에 셋 이상 나란히 서면 글자가 좁아져 읽기 어렵습니다. 옮기거나 빼서 두 줄로 줄여 보세요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With three or more side by side, the text gets too narrow to read. Move or drop one to get back to two."
+          }
+        }
+      }
+    },
     "한 자리에서 닫히는 크기로" : {
       "localizations" : {
         "en" : {
@@ -7974,6 +8337,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shows the advice you dismissed on the To-dos screen — labels, weights, splitting tips — from the start again."
+          }
+        }
+      }
+    },
+    "할 일로 되돌리기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to To-dos"
           }
         }
       }
@@ -8293,6 +8666,16 @@
         }
       }
     },
+    "회고하기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflect"
+          }
+        }
+      }
+    },
     "회고한 블록" : {
       "localizations" : {
         "en" : {
@@ -8370,6 +8753,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something that happens inside time you've already secured, like a work meeting. It doesn't spend any extra free time, and it's drawn on top of the routine in the timeline."
+          }
+        }
+      }
+    },
+    "함께 진행 중" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also happening now"
+          }
+        }
+      }
+    },
+    "이 일정으로 타이머 바꾸기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch the timer to this"
+          }
+        }
+      }
+    },
+    "타이머로 셀 일정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer counts"
+          }
+        }
+      }
+    },
+    "겹친 일정 중 타이머로 셀 것 고르기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose which overlapping item the timer counts"
+          }
+        }
+      }
+    },
+    "이름에 '수면'이 들어간 고정 루틴이 없어 수면을 접지 못했어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep isn't hidden because no fixed routine has “sleep” in its name."
+          }
+        }
+      }
+    },
+    "수면 루틴이 0시나 24시에 닿지 않아 접지 못했어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep isn't hidden because the sleep routine doesn't touch midnight."
+          }
+        }
+      }
+    },
+    "수면을 접으면 남는 시간이 너무 짧아 하루 전체를 보여 줘요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Showing the whole day because hiding sleep would leave too little."
+          }
+        }
+      }
+    },
+    "%@이(가) 수면 시간에 걸쳐 있어 그만큼 펼쳐 두었어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept part of sleep visible because %@ overlaps it."
           }
         }
       }

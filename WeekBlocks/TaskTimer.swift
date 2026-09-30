@@ -7,6 +7,7 @@
 //  한 주를 짜는 일과 하루를 사는 일은 다르다. 계획은 "운동 1시간"이라고 적혀 있지만,
 //  막상 시작하면 그 한 시간이 어디까지 왔는지는 아무 데도 적혀 있지 않았다.
 //  타이머는 계획에 적힌 길이를 그대로 가져와 거꾸로 센다 — 60:00 에서 0:00 으로.
+//  일정에 묶어 켜면 **끝나는 시각이 일정의 끝과 같다** — 늦게 켜든 일찍 켜든 멈췄다 이어가든 (→ binding).
 //
 //  ⚠️ **기기에만 남는다.** CloudKit으로 오가는 SwiftData 스키마에는 손대지 않는다.
 //     "지금 이 자리에서 하고 있다"는 사실은 다른 기기로 건너갈 이유가 없고,
@@ -32,6 +33,9 @@ struct TimerTarget: Codable, Equatable {
     var iconName: String
     /// 일정에 적힌 길이(초). 여기서부터 거꾸로 센다.
     var plannedSeconds: Double
+    /// 일정 한가운데서 켠 타이머가 따르는 **일정의 끝.** 이 시각이 지나면 타이머는 스스로 물러난다 —
+    /// 끝난 일정을 계속 세고 있으면 지금 하는 일을 가린다. nil이면 일정과 묶이지 않은 타이머.
+    var scheduledEnd: Date? = nil
 }
 
 // MARK: - 스토어
@@ -86,13 +90,28 @@ final class TaskTimer {
 
     /// 새로 시작한다. 이미 다른 일을 세고 있었다면 그건 그대로 끝난다 —
     /// 한 번에 하나만 센다. 두 개를 동시에 세면 어느 쪽도 믿을 수 없다.
+    ///
+    /// `scheduledStart` — 이 일정이 적힌 시작 시각. 오늘 아직 안 끝난 일정이면 타이머가 **그 일정의 끝**에
+    /// 묶인다: 90분 일정에 45분 남았다면 90분 중 45분이 흐른 타이머로, 시작 전에 켜면 끝까지 남은 만큼으로 선다.
     func start(token: String, title: String, plannedSeconds: Double,
+               scheduledStart: Date? = nil,
                iconName: String = "timer", colorName: String? = nil) {
+        let t0 = Date()
+        let bind = Self.binding(scheduledStart: scheduledStart, planned: plannedSeconds, now: t0)
+        // **지금 진행 중인 일정은 따로 세지 않는다.** 타임라인이 이미 세고 있다 (→ ScheduleClock).
+        // 따로 세는 타이머를 하나 더 세우면 그게 알약을 차지하고, 일정과 어긋나기 시작한다.
+        if bind != nil, let scheduledStart, t0 >= scheduledStart {
+            stop()
+            return
+        }
+        let planned = bind?.planned ?? max(60, plannedSeconds)
         target = TimerTarget(token: token, title: title, colorName: colorName,
-                             iconName: iconName, plannedSeconds: max(60, plannedSeconds))
-        accumulated = 0
-        now = Date()
-        runningSince = now
+                             iconName: iconName, plannedSeconds: planned,
+                             scheduledEnd: bind?.end)
+        now = t0
+        runningSince = t0
+        // 남은 시간 = 일정의 끝 − 지금. 같은 t0으로 셈해야 끝이 한 치도 안 어긋난다.
+        accumulated = bind.map { planned - $0.end.timeIntervalSince(t0) } ?? 0
         didRingZero = false
         persist()
         startTicking()
@@ -111,6 +130,10 @@ final class TaskTimer {
         guard isActive, runningSince == nil else { return }
         now = Date()
         runningSince = now
+        // 일정에 묶인 타이머는 멈춘 동안에도 일정이 흘렀다 — 끝은 그대로, 남은 시간을 다시 맞춘다.
+        if let end = target?.scheduledEnd, let planned = target?.plannedSeconds {
+            accumulated = planned - end.timeIntervalSince(now)
+        }
         persist()
         startTicking()
     }
@@ -131,6 +154,8 @@ final class TaskTimer {
     func extend(minutes: Double) {
         guard var t = target else { return }
         t.plannedSeconds += minutes * 60
+        // 일부러 더 준 시간이다 — 일정의 끝도 그만큼 밀어야 곧바로 물러나지 않는다.
+        t.scheduledEnd = t.scheduledEnd?.addingTimeInterval(minutes * 60)
         target = t
         // 다시 0 위로 올라왔으면 종이 한 번 더 울릴 자격이 있다.
         if remaining > 0 { didRingZero = false }
@@ -140,6 +165,8 @@ final class TaskTimer {
     /// 처음부터 다시 센다.
     func restart() {
         guard isActive else { return }
+        // 처음부터 세겠다는 것은 일정을 떠나겠다는 것이다.
+        target?.scheduledEnd = nil
         accumulated = 0
         now = Date()
         runningSince = now
@@ -173,6 +200,53 @@ final class TaskTimer {
             NSSound(named: "Glass")?.play()
             Telemetry.record(.timerFinished)
         }
+        releaseIfScheduleEnded()
+    }
+
+    /// 따르던 일정이 끝났으면 물러난다. 그 뒤로는 일정 기준 얼굴이 다음 것을 센다.
+    private func releaseIfScheduleEnded() {
+        guard let end = target?.scheduledEnd, Date() >= end else { return }
+        stop()
+    }
+
+    /// **타임라인에 맞춘다.** 세고 있는 일이 오늘 일정에 서 있다면 타이머는 그 일정을 따른다:
+    /// - 지금 그 일정 안이면 → 따로 세던 것을 거둔다. 타임라인이 센다.
+    /// - 오늘 아직 안 온 일정이면(일찍 시작) → 그 일정의 끝에 묶는다.
+    /// - 오늘 그 일정이 이미 다 끝났으면 → 물러난다. 끝난 인터뷰를 다음 인터뷰 시간에 세고 있으면 안 된다.
+    /// 일정에 없는 일(다른 날의 블록 등)은 건드리지 않는다. 우측 상단 알약이 매분 부른다.
+    func reconcile(with slots: [ScheduleSlot], now date: Date = Date()) {
+        guard let t = target else { return }
+        // 열쇠로 먼저 찾고, 못 찾으면 이름으로. 블록 열쇠(persistentModelID)는 앱을 다시 켜면 글자가
+        // 달라질 수 있다 — 그러면 되살아난 타이머가 제 일정을 못 찾아 '일정에 없는 일'로 남아
+        // 다음 일정 시간까지 끝난 일을 세고 있었다.
+        var mine = slots.filter { $0.id == t.token }
+        if mine.isEmpty {
+            let today = slots.filter { Calendar.current.isDate($0.start, inSameDayAs: date) || $0.contains(date) }
+            mine = today.filter { $0.title == t.title }
+        }
+        guard !mine.isEmpty else { return }
+        // 그 일정이 시작됐다 — 이제 타임라인이 센다. 따로 세던 것은 물러난다.
+        if mine.contains(where: { $0.contains(date) }) {
+            stop()
+            return
+        }
+        let live = mine.filter { $0.start > date && Calendar.current.isDate($0.start, inSameDayAs: date) }
+            .min { $0.start < $1.start }
+        guard let slot = live else {
+            // 오늘 서 있던 자리가 전부 지나갔다.
+            if mine.contains(where: { $0.end <= date }) { stop() }
+            return
+        }
+        if let end = t.scheduledEnd, abs(end.timeIntervalSince(slot.end)) < 1 { return }
+        // 묶이지 않았거나 다른 자리에 묶여 있었다 — 이 일정의 끝으로 다시 맞춘다.
+        guard let bind = Self.binding(scheduledStart: slot.start, planned: slot.duration, now: date) else { return }
+        target?.scheduledEnd = bind.end
+        target?.plannedSeconds = bind.planned
+        now = date
+        if isRunning { runningSince = date }
+        accumulated = bind.planned - bind.end.timeIntervalSince(date)
+        didRingZero = remaining <= 0
+        persist()
     }
 
     // MARK: 남겨두기
@@ -217,6 +291,11 @@ final class TaskTimer {
             stop()
             return
         }
+        // 꺼져 있는 동안 따르던 일정이 끝났다.
+        if let end = snap.target.scheduledEnd, Date() >= end {
+            stop()
+            return
+        }
         if isRunning { startTicking() }
     }
 }
@@ -224,12 +303,30 @@ final class TaskTimer {
 // MARK: - 계획에서 바로 시작하기
 
 extension TaskTimer {
-    /// 계획 블록을 센다. 길이는 블록에 적힌 그대로.
-    func start(block: PlanBlock) {
+    /// 계획 블록을 센다. 길이는 블록에 적힌 그대로, 일정이 이미 흘렀으면 그만큼 지난 채로.
+    func start(block: PlanBlock, scheduledStart: Date? = nil, colorName: String? = nil) {
+        let planned = block.durationHours * 3600
         start(token: block.dragToken,
               title: block.title,
-              plannedSeconds: block.durationHours * 3600,
-              iconName: "square.stack.3d.up")
+              plannedSeconds: planned,
+              scheduledStart: scheduledStart,
+              iconName: "square.stack.3d.up",
+              colorName: colorName)
+    }
+
+    /// 이 일정에 묶어 켜면 타이머가 어떻게 서는가. 묶을 수 없으면 nil — 적힌 길이를 지금부터 센다.
+    ///
+    /// - 지금이 일정 안: 길이는 적힌 그대로, 끝은 일정의 끝 (이미 흐른 몫은 지난 채로).
+    /// - 오늘 아직 안 온 일정: 끝은 일정의 끝, 길이는 지금부터 그 끝까지.
+    /// - 끝난 일정 · 다른 날 일정: 묶지 않는다.
+    static func binding(scheduledStart start: Date?, planned: TimeInterval, now: Date = Date())
+    -> (planned: TimeInterval, end: Date)? {
+        guard let start, planned > 0 else { return nil }
+        let end = start.addingTimeInterval(planned)
+        guard end > now else { return nil }
+        if now >= start { return (planned, end) }
+        guard Calendar.current.isDate(start, inSameDayAs: now) else { return nil }
+        return (end.timeIntervalSince(now), end)
     }
 
     /// 고정 루틴을 센다. 길이는 루틴 한 번의 길이.

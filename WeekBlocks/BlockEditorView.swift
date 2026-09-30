@@ -55,6 +55,8 @@ struct BlockEditorView: View {
     /// **종일** — 그날의 일이지만 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
     /// 켜 두면 시각·시간대·길이는 묻지 않는다.
     @State private var isAllDay: Bool = false
+    /// 종일이면서 **배경**인가 — 공휴일·생일·휴가처럼 할 일로 세지 않는 것 (→ PlanBlock.isBackground).
+    @State private var isBackgroundAllDay: Bool = false
     /// 루틴 안 일정은 늘 시각을 갖는다 — 두 토글이 함께 켜지면 루틴 쪽을 따른다.
     private var savesAllDay: Bool { isAllDay && !withinRoutine }
 
@@ -206,6 +208,10 @@ struct BlockEditorView: View {
                     if !withinRoutine {
                         Toggle("종일", isOn: $isAllDay)
                     }
+                    if savesAllDay {
+                        Toggle("그날 할 일로 세기", isOn: Binding(get: { !isBackgroundAllDay },
+                                                            set: { isBackgroundAllDay = !$0 }))
+                    }
                     if !savesAllDay {
                         if !withinRoutine {
                             Toggle("몇 시에 할지 정하기", isOn: $hasExactTime)
@@ -236,7 +242,9 @@ struct BlockEditorView: View {
                     Text("시간")
                 } footer: {
                     if savesAllDay {
-                        Text("기념일·마감일처럼 그날의 일이지만 시간을 차지하지 않습니다. 남은 시간에서 빠지지 않고, 그날 맨 위에 따로 섭니다.")
+                        Text(isBackgroundAllDay
+                             ? "공휴일·생일·휴가처럼 그날이 어떤 날인지 알려 주는 배경입니다. 무지개 칸을 차지하지 않고, 했는지 묻지 않습니다."
+                             : "마감·제출처럼 시각은 없지만 그날 해야 하는 일입니다. 무지개 칸을 차지하고, 날이 지나면 했는지 묻습니다.")
                             .font(.body)
                             .foregroundStyle(.secondary)
                     }
@@ -492,6 +500,7 @@ struct BlockEditorView: View {
         withinRoutine = existing.withinRoutine
         hasExactTime = existing.withinRoutine || existing.startHour >= 0
         isAllDay = existing.isAllDay
+        isBackgroundAllDay = existing.isBackground
         // 종일을 끄면 길이를 다시 물어야 한다 — 0에서 시작하면 자 위에 설 폭이 없다.
         if isAllDay { durationHours = 1 }
         if existing.startHour >= 0 { startHour = existing.startHour }
@@ -526,7 +535,10 @@ struct BlockEditorView: View {
             // 시각이 있으면 시간대는 거기서 따라 나온다 — 둘이 어긋나면 칩의 부제가 거짓말을 한다.
             existing.timeBand = keepsExactTime ? TimeBand.containing(startHour) : timeBand
             existing.concreteVerified = verified
-            if savesAllDay { existing.makeAllDay() }
+            if savesAllDay {
+                existing.makeAllDay()
+                existing.setBackground(isBackgroundAllDay)
+            }
         } else {
             let block = PlanBlock(
                 day: day,
@@ -541,7 +553,10 @@ struct BlockEditorView: View {
                 startHour: keepsExactTime ? startHour : -1
             )
             block.nextAction = na.isEmpty ? nil : na
-            if savesAllDay { block.makeAllDay() }
+            if savesAllDay {
+                block.makeAllDay()
+                block.setBackground(isBackgroundAllDay)
+            }
             context.insert(block)
             Telemetry.record(.planBlockAdded)
         }

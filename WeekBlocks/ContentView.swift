@@ -55,6 +55,8 @@ struct ContentView: View {
     @State private var onboarding = OnboardingPresenter.shared
     /// '다음 한 걸음' 줄을 아주 닫았는가. 다 아는 사람에게 계속 말을 걸지 않는다.
     @AppStorage("didDismissNextStep") private var didDismissNextStep = false
+    /// 겹친 일정 중 타이머로 고른 것 (→ ScheduleFocus). 바뀌면 알약·위젯이 다시 맞춘다.
+    @AppStorage(ScheduleFocus.storageKey) private var scheduleFocus = ""
     /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 겹침이 처음 생겼을 때 배너가 한 번 묻는다.
     @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
     @AppStorage(OverlapRule.decidedKey) private var overlapRuleDecided = false
@@ -531,21 +533,61 @@ struct ContentView: View {
     }
 
     /// 타임라인에 그릴 시간 범위. 수면 숨김이 꺼져 있으면 하루 전체.
-    private var timelineWindow: HourWindow {
+    /// 한 주 시간축은 일곱 줄이 자 하나를 같이 쓰므로 한 주를 본다.
+    private var timelineWindow: HourWindow { timelineWindow(on: DayOfWeek.allCases) }
+
+    /// 그 요일들만 보고 정한 범위. **일간은 그날 하나만 본다** — 한 주를 보면 목요일 새벽의 캘린더 일정
+    /// 하나 때문에 월요일 일간까지 수면이 도로 펼쳐졌다.
+    private func timelineWindow(on days: [DayOfWeek]) -> HourWindow {
         guard hideSleepInTimeline else { return .full }
         let fixed = routines.filter { $0.kind == .fixed }
         // 하루하루 **실제로 그려진 자리**를 지킨다 — 옮겨 둔 루틴·끼니, 시각 없이 빈 구간에 놓인 블록까지.
         // 기본 시각만 보고 자르면 그런 것들이 창 밖으로 밀려 요일 칸에만 서 있게 된다.
         let sleepNames = Set(fixed.filter { $0.isSleepRoutine }.map(\.name))
-        let drawn = DayOfWeek.allCases.flatMap { daySegments(on: $0) }
+        let drawn = days.flatMap { daySegments(on: $0) }
             .filter { seg in
                 guard !seg.isGhost else { return false }
                 if case .fixedRoutine(let name) = seg.source { return !sleepNames.contains(name) }
                 return true
             }
             .map { ($0.start, $0.end) }
-        return TimelineLayout.visibleWindow(fixedRoutines: fixed, blocks: weekBlocks,
+        // 수면 아닌 루틴은 **그려진 자리(drawn)**로만 지킨다. 루틴 목록을 통째로 넘기면 그 요일에 없는 루틴까지
+        // 지켜서 — 토요일에만 있는 06:00 운동 하나가 월요일 일간의 새벽을 도로 펼쳤다.
+        return TimelineLayout.visibleWindow(fixedRoutines: fixed.filter(\.isSleepRoutine),
+                                            blocks: weekBlocks.filter { days.contains($0.day) },
                                             extraProtected: drawn, hideSleep: true)
+    }
+
+    /// 수면을 숨기라고 했는데 그날 다 접지 못했다면 **왜인지** 한 줄로. 다 접었으면 nil.
+    /// 말없이 도로 펼쳐 두면 설정이 안 먹는 것처럼 보인다.
+    private func sleepFoldNote(on day: DayOfWeek) -> String? {
+        guard hideSleepInTimeline else { return nil }
+        let sleep = routines.filter { $0.kind == .fixed && $0.isSleepRoutine }
+        guard !sleep.isEmpty else {
+            return String(localized: "이름에 '수면'이 들어간 고정 루틴이 없어 수면을 접지 못했어요.")
+        }
+        let bare = TimelineLayout.visibleWindow(fixedRoutines: sleep, blocks: [], hideSleep: true)
+        guard bare != .full else {
+            return String(localized: "수면 루틴이 0시나 24시에 닿지 않아 접지 못했어요.")
+        }
+        let actual = timelineWindow(on: [day])
+        guard actual != bare else { return nil }
+
+        let sleepNames = Set(sleep.map(\.name))
+        var seen = Set<String>()
+        let blockers = daySegments(on: day)
+            .filter { seg in
+                guard !seg.isGhost else { return false }
+                if case .fixedRoutine(let name) = seg.source, sleepNames.contains(name) { return false }
+                return seg.start < bare.start - 1e-6 || seg.end > bare.end + 1e-6
+            }
+            .sorted { $0.start < $1.start }
+            .map { "\(formatHour($0.start)) \($0.title)" }
+            .filter { seen.insert($0).inserted }
+        guard !blockers.isEmpty else {
+            return String(localized: "수면을 접으면 남는 시간이 너무 짧아 하루 전체를 보여 줘요.")
+        }
+        return String(localized: "\(blockers.prefix(3).joined(separator: ", "))이(가) 수면 시간에 걸쳐 있어 그만큼 펼쳐 두었어요.")
     }
 
     /// 루틴 구성이 바뀌면 onChange가 감지하도록 만드는 시그니처(이름·종류·요일).
@@ -614,9 +656,25 @@ struct ContentView: View {
             // 지금 세고 있는 일이 있으면 남은 시간이 여기 늘 서 있다.
             // 타이머 창을 닫아 두어도 "무엇을 하는 중이고 얼마 남았는지"는 사라지지 않는다.
             TimelineView(.everyMinute) { ctx in
-                TimerPill(slot: currentSlot(at: ctx.date)) {
-                    openWindow(id: WeekBlocksWindow.timer)
+                let slots = ScheduleClock.slots(routines: routines, blocks: allBlocks,
+                                                occurrences: allOccurrences, placements: allQuotaPlacements,
+                                                around: ctx.date)
+                let overdue = overdueBlocks(at: ctx.date)
+                HStack(spacing: 8) {
+                    // 지나갔는데 안 찍은 일정 — 바로 찍지 않아도 되지만, 끝났는지는 묻는다.
+                    OverdueAskBadge(blocks: overdue)
+                    TimerPill(slot: ScheduleClock.current(slots, at: ctx.date, focus: scheduleFocus),
+                              overlapping: ScheduleClock.overlapping(slots, at: ctx.date)) {
+                        openWindow(id: WeekBlocksWindow.timer)
+                    }
+                    // 매분, 그리고 새로 켤 때마다 타임라인에 맞춘다 — 끝난 일정의 타이머는 여기서 물러난다.
+                    .task(id: "\(ctx.date.timeIntervalSince1970)-\(taskTimer.target?.token ?? "")-\(taskTimer.isRunning)-\(scheduleFocus)") {
+                        taskTimer.reconcile(with: slots)
+                        // 위젯에도 같은 타임라인을 건넨다 — 바뀌었을 때만 (→ TimerWidgetBridge).
+                        TimerWidgetBridge.publish(slots: slots, timer: taskTimer, focus: scheduleFocus)
+                    }
                 }
+                .animation(Motion.row, value: overdue.count)
             }
 
             // 블록·시간축과 요약은 **한 주를 볼 때만**. 일간은 하루 한 장뿐이라 고를 것이 없다.
@@ -776,7 +834,10 @@ struct ContentView: View {
                     tomorrowBlocks: blocks(on: tomorrow),
                     isViewingToday: dayOffset == 0,
                     onStart: { block in
-                        TaskTimer.shared.start(block: block)
+                        let slot = slotNow(of: block)
+                        TaskTimer.shared.start(block: block, scheduledStart: slot?.start,
+                                               colorName: slot?.colorName
+                                                   ?? todoLoad(on: block.day).colorName(for: block))
                         openWindow(id: WeekBlocksWindow.timer)
                     },
                     onOpenTomorrow: { shiftDay(by: 1) }
@@ -803,7 +864,8 @@ struct ContentView: View {
                         $0.day == selectedDay && cal.isDate($0.weekStartDate, inSameDayAs: storedWeek(for: selectedDay))
                     },
                     weekStart: storedWeek(for: selectedDay),
-                    window: timelineWindow,
+                    window: timelineWindow(on: [selectedDay]),
+                    sleepNote: sleepFoldNote(on: selectedDay),
                     canPlan: hasFixedRoutines,
                     
                     onDropBacklog: { token, hour in
@@ -851,7 +913,9 @@ struct ContentView: View {
                             block.startHour = -1
                             try? context.save()
                         }
-                    }
+                    },
+                    todoLoad: todoLoad(on: selectedDay),
+                    allDaySpans: allDaySpans(on: selectedDay)
                 )
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
@@ -1006,6 +1070,24 @@ struct ContentView: View {
     /// 그 요일에 해야 할 일의 수 — 일간 요일 줄과 주간 두 보기의 무지개가 같은 값을 본다 (→ TodoRainbow).
     private func todoLoad(on day: DayOfWeek) -> TodoLoad {
         TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames)
+    }
+
+    /// 보는 주의 종일 막대 (→ AllDaySpan). 캘린더에서 온 여러 날 일정은 끝나는 날을 캘린더에서 읽는다.
+    private var allDaySpans: [AllDaySpan] {
+        AllDaySpan.spans(from: weekBlocks) { Calendar.current.startOfDay(for: dayDate($0.day)) }
+    }
+
+    /// 그날에 걸친 종일 막대들 — 앞날에 시작한 여러 날 일정도 들어온다.
+    private func allDaySpans(on day: DayOfWeek) -> [AllDaySpan] {
+        let date = dayDate(day)
+        return allDaySpans.filter { $0.covers(date) }
+    }
+
+    /// 보는 주에서 지나갔는데 안 찍은 블록 (→ OverdueAskBadge). 요일 → 시각 순.
+    private func overdueBlocks(at date: Date) -> [PlanBlock] {
+        weekBlocks
+            .filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames, now: date) }
+            .sorted { ($0.day.rawValue, $0.sortHour) < ($1.day.rawValue, $1.sortHour) }
     }
 
     /// 지나간 날인데 아직 안 찍은 것이 남았는가 — 요일 줄에 점으로 세운다.
@@ -1184,7 +1266,8 @@ struct ContentView: View {
             routineStartOverride: startOverride,
             quotaPlacement: quotaPlace,
             quotaHidden: quotaHiddenMap,
-            hiddenRoutines: hiddenFixedRoutines(on: day)
+            hiddenRoutines: hiddenFixedRoutines(on: day),
+            blockColors: todoLoad(on: day).colors
         )
     }
 
@@ -1413,7 +1496,8 @@ struct ContentView: View {
                             routineSheet = RoutineSheetContext(routine: routine)
                         },
                         onOpenDay: { openDay(day) },
-                        todoLoad: todoLoad(on: day)
+                        todoLoad: todoLoad(on: day),
+                        allDaySpans: allDaySpans(on: day)
                     )
                     .background {
                         GeometryReader { geo in
@@ -1442,6 +1526,15 @@ struct ContentView: View {
         // 분이 바뀌면 '지금 하고 있는 것'이 달라질 수 있다. 그때 칩의 남은 시간도 자리를 옮긴다.
         TimelineView(.everyMinute) { ctx in
             VStack(alignment: .leading, spacing: 10) {
+                // 종일 — 요일 칸을 가로지르는 막대. 사흘짜리 출장은 세 칸에 걸친 막대 하나다.
+                if !allDaySpans.isEmpty {
+                    AllDayLane(spans: allDaySpans,
+                               dates: shownDays.map { Calendar.current.startOfDay(for: dayDate($0)) },
+                               spacing: 10) { block in
+                        blockSheet = BlockSheetContext(day: block.day, block: block)
+                    }
+                    .transition(.disclose)
+                }
                 HStack(alignment: .top, spacing: 10) {
                     ForEach(shownDays) { day in
                         DayColumn(
@@ -1471,7 +1564,8 @@ struct ContentView: View {
                                 dropIntoGap(token: token, day: day, startHour: start, gap: gap)
                             },
                             onOpenDay: { openDay(day) },
-                            todoLoad: todoLoad(on: day)
+                            todoLoad: todoLoad(on: day),
+                            showsAllDay: false
                         )
                         .frame(maxWidth: .infinity, alignment: .top)
                     }
@@ -1617,6 +1711,21 @@ struct ContentView: View {
             text += "\n" + String(localized: "… 외 \(pendingRemovals.count - names.count)개")
         }
         return text
+    }
+
+    /// 이 블록이 오늘 서 있는 자리 중 아직 안 끝난 것. 없으면 nil — 타이머가 적힌 길이를 처음부터 센다.
+    /// 시작 전이어도 돌려준다 — 타이머의 끝을 일정의 끝에 맞추려면 그 자리를 알아야 한다.
+    private func slotNow(of block: PlanBlock, at date: Date = Date()) -> ScheduleSlot? {
+        ScheduleClock.slots(routines: routines, blocks: allBlocks,
+                            occurrences: allOccurrences, placements: allQuotaPlacements,
+                            around: date)
+            .filter { slot in
+                guard slot.id == block.dragToken else { return false }
+                // 지금 그 안이거나(자정 넘긴 것 포함), 오늘 아직 안 온 것.
+                return slot.contains(date)
+                    || (slot.start > date && Calendar.current.isDate(slot.start, inSameDayAs: date))
+            }
+            .min { $0.start < $1.start }
     }
 
     /// 일정 기준으로 지금 하고 있는 조각 (→ ScheduleClock.swift).

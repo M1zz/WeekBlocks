@@ -53,21 +53,24 @@ extension Routine {
 /// 팔레트 색상 이름 → SwiftUI Color (Routine·BacklogCategory 공용)
 /// iOS '욕망의 무지개' 팔레트(Apple 시스템 색)와 hex까지 통일.
 func paletteColor(_ name: String) -> Color {
-    let hex: String
+    paletteHex(name).flatMap { Color(hex: $0) } ?? .accentColor
+}
+
+/// 팔레트 이름 → hex. 모르는 이름이면 nil(= 액센트). 위젯처럼 색을 글자로 건네야 하는 곳이 쓴다.
+func paletteHex(_ name: String) -> String? {
     switch name {
-    case "red":    hex = Rainbow.red
-    case "orange": hex = Rainbow.orange
-    case "yellow": hex = Rainbow.yellow
-    case "green":  hex = Rainbow.green
-    case "blue":   hex = Rainbow.blue
-    case "indigo": hex = Rainbow.indigo
-    case "purple": hex = Rainbow.purple
-    case "pink":   hex = "#FF2D55"   // systemPink (레거시 데이터 호환)
-    case "teal":   hex = "#30B0C7"   // systemTeal
-    case "cyan":   hex = "#32ADE6"   // systemCyan
-    default:       return .accentColor
+    case "red":    Rainbow.red
+    case "orange": Rainbow.orange
+    case "yellow": Rainbow.yellow
+    case "green":  Rainbow.green
+    case "blue":   Rainbow.blue
+    case "indigo": Rainbow.indigo
+    case "purple": Rainbow.purple
+    case "pink":   "#FF2D55"   // systemPink (레거시 데이터 호환)
+    case "teal":   "#30B0C7"   // systemTeal
+    case "cyan":   "#32ADE6"   // systemCyan
+    default:       nil
     }
-    return Color(hex: hex) ?? .accentColor
 }
 
 // 컬러 피커 옵션 — iOS와 동일한 7색 무지개를 스펙트럼 순서로 노출.
