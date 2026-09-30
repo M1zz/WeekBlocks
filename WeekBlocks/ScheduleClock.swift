@@ -66,9 +66,23 @@ enum ScheduleClock {
 
     /// 지금 하고 있는 것. 겹쳐 있으면 **가장 짧은 것**을 고른다 —
     /// 09:00–18:00 회사 안의 13:00 식사라면, 지금 하고 있는 일은 식사다.
-    static func current(_ slots: [ScheduleSlot], at now: Date = Date()) -> ScheduleSlot? {
-        slots.filter { $0.contains(now) }
-            .min { $0.duration < $1.duration }
+    /// 다만 사람이 겹친 것 중 하나를 골라 두었으면(→ ScheduleFocus) 그 일정이 끝날 때까지 그것을 센다.
+    static func current(_ slots: [ScheduleSlot], at now: Date = Date(),
+                        focus: String = ScheduleFocus.stored) -> ScheduleSlot? {
+        let live = overlapping(slots, at: now)
+        if !focus.isEmpty, let chosen = live.first(where: { ScheduleFocus.key(of: $0) == focus }) {
+            return chosen
+        }
+        return live.first
+    }
+
+    /// 지금 함께 진행 중인 것들. 짧은 것부터 — 첫째가 기본으로 세는 것이다.
+    /// 자정을 넘긴 잠처럼 같은 일정이 두 번 오면 하나로.
+    static func overlapping(_ slots: [ScheduleSlot], at now: Date = Date()) -> [ScheduleSlot] {
+        var seen = Set<String>()
+        return slots.filter { $0.contains(now) }
+            .sorted { $0.duration < $1.duration }
+            .filter { seen.insert(ScheduleFocus.key(of: $0)).inserted }
     }
 
     /// 다음에 올 것. 지금 하는 것이 없을 때 "그럼 언제부터"에 답한다.
@@ -155,5 +169,26 @@ enum ScheduleClock {
         case .none:
             return nil
         }
+    }
+}
+
+// MARK: - 겹친 일정 중 고른 것
+
+/// 회사 안에 회의가 있으면 둘 다 '지금'이다. 기본은 짧은 쪽을 세지만, 사람이 다른 쪽을 고를 수 있다.
+///
+/// 고른 것은 **그 일정 한 번**에만 붙는다 (열쇠 + 시작 시각). 그 일정이 끝나면 저절로 풀려
+/// 다음부터는 다시 기본 규칙을 따른다 — 어제 고른 회의가 오늘 회사를 가리면 안 된다.
+/// 기기에만 남는다 (→ TaskTimer와 같은 이유).
+enum ScheduleFocus {
+    static let storageKey = "scheduleClock.focus"
+
+    static var stored: String { UserDefaults.standard.string(forKey: storageKey) ?? "" }
+
+    static func key(of slot: ScheduleSlot) -> String {
+        "\(slot.id)@\(Int(slot.start.timeIntervalSince1970))"
+    }
+
+    static func choose(_ slot: ScheduleSlot) {
+        UserDefaults.standard.set(key(of: slot), forKey: storageKey)
     }
 }

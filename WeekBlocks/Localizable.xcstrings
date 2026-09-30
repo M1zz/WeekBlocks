@@ -8749,6 +8749,86 @@
           }
         }
       }
+    },
+    "함께 진행 중" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also happening now"
+          }
+        }
+      }
+    },
+    "이 일정으로 타이머 바꾸기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch the timer to this"
+          }
+        }
+      }
+    },
+    "타이머로 셀 일정" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer counts"
+          }
+        }
+      }
+    },
+    "겹친 일정 중 타이머로 셀 것 고르기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose which overlapping item the timer counts"
+          }
+        }
+      }
+    },
+    "이름에 '수면'이 들어간 고정 루틴이 없어 수면을 접지 못했어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep isn't hidden because no fixed routine has “sleep” in its name."
+          }
+        }
+      }
+    },
+    "수면 루틴이 0시나 24시에 닿지 않아 접지 못했어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep isn't hidden because the sleep routine doesn't touch midnight."
+          }
+        }
+      }
+    },
+    "수면을 접으면 남는 시간이 너무 짧아 하루 전체를 보여 줘요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Showing the whole day because hiding sleep would leave too little."
+          }
+        }
+      }
+    },
+    "%@이(가) 수면 시간에 걸쳐 있어 그만큼 펼쳐 두었어요." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept part of sleep visible because %@ overlaps it."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

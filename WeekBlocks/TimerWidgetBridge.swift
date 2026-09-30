@@ -12,7 +12,7 @@ import Foundation
 import WidgetKit
 
 enum TimerWidgetBridge {
-    static func publish(slots: [ScheduleSlot], timer: TaskTimer, now: Date = Date()) {
+    static func publish(slots: [ScheduleSlot], timer: TaskTimer, focus: String = "", now: Date = Date()) {
         // 지금부터 내일 끝까지. 지나간 조각은 위젯이 쓸 일이 없다.
         let items = slots
             .filter { $0.end > now }
@@ -34,7 +34,15 @@ enum TimerWidgetBridge {
                 pausedRemaining: timer.isRunning ? nil : timer.remaining.rounded())
         }
 
-        let snap = TimerWidgetSnapshot(items: unique, direct: direct)
+        // 겹친 것 중 사람이 고른 것 — 위젯도 같은 것을 센다. 그 일정이 끝나면 위젯이 스스로 기본 규칙으로 돌아간다.
+        let chosen = ScheduleClock.current(slots, at: now, focus: focus).flatMap { slot -> TimerWidgetSnapshot.Item? in
+            guard !focus.isEmpty, ScheduleFocus.key(of: slot) == focus else { return nil }
+            return TimerWidgetSnapshot.Item(title: slot.title, iconName: slot.iconName,
+                                            colorHex: slot.colorName.flatMap(paletteHex),
+                                            start: slot.start, end: slot.end)
+        }
+
+        let snap = TimerWidgetSnapshot(items: unique, direct: direct, chosen: chosen)
         if snap.save() {
             WidgetCenter.shared.reloadTimelines(ofKind: TimerWidgetSnapshot.widgetKind)
         }

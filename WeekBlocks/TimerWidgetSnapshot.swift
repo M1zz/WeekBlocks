@@ -43,14 +43,17 @@ struct TimerWidgetSnapshot: Codable, Equatable {
 
     var items: [Item]
     var direct: Direct?
+    /// 겹친 일정 중 사람이 고른 것 (→ ScheduleFocus). 그 일정 안에서는 이것을 센다.
+    var chosen: Item? = nil
 
     static let empty = TimerWidgetSnapshot(items: [], direct: nil)
 
     // MARK: 읽기 — 앱의 ScheduleClock과 같은 규칙
 
-    /// 지금 하고 있는 것. 겹쳐 있으면 가장 짧은 것 (→ ScheduleClock.current).
+    /// 지금 하고 있는 것. 고른 것이 있으면 그것, 아니면 겹친 것 중 가장 짧은 것 (→ ScheduleClock.current).
     func current(at date: Date) -> Item? {
-        items.filter { $0.contains(date) }.min { $0.duration < $1.duration }
+        if let chosen, chosen.contains(date) { return chosen }
+        return items.filter { $0.contains(date) }.min { $0.duration < $1.duration }
     }
 
     /// 그 뒤에 올 것들 (시작 순).

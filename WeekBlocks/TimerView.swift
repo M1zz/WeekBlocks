@@ -27,6 +27,8 @@ struct TimerWindowView: View {
     @Query private var allQuotaPlacements: [QuotaPlacement]
 
     @State private var timer = TaskTimer.shared
+    /// 겹친 일정 중 고른 것 (→ ScheduleFocus). 바뀌면 얼굴을 다시 그린다.
+    @AppStorage(ScheduleFocus.storageKey) private var focus = ""
 
     var body: some View {
         Group {
@@ -37,7 +39,7 @@ struct TimerWindowView: View {
             } else {
                 // 1초마다 다시 그린다. 세는 주체가 따로 없고, 계산은 '지금'에서 바로 나온다.
                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
-                    ScheduleTimerFace(slots: slots, now: ctx.date)
+                    ScheduleTimerFace(slots: slots, now: ctx.date, focus: focus)
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
@@ -60,10 +62,15 @@ struct TimerWindowView: View {
 struct ScheduleTimerFace: View {
     let slots: [ScheduleSlot]
     let now: Date
+    var focus: String = ""
 
     @State private var timer = TaskTimer.shared
 
-    private var current: ScheduleSlot? { ScheduleClock.current(slots, at: now) }
+    private var current: ScheduleSlot? { ScheduleClock.current(slots, at: now, focus: focus) }
+    /// 지금 세는 것 말고 함께 진행 중인 것들. 회사 안의 회의처럼.
+    private var others: [ScheduleSlot] {
+        ScheduleClock.overlapping(slots, at: now).filter { $0.id != current?.id || $0.start != current?.start }
+    }
     private var upcoming: ScheduleSlot? { ScheduleClock.next(slots, at: now) }
 
     var body: some View {
@@ -102,7 +109,8 @@ struct ScheduleTimerFace: View {
             ZStack {
                 Circle().stroke(tint.opacity(0.14), lineWidth: 13)
                 Circle()
-                    .trim(from: 0, to: slot.progress(at: now))
+                    // 남은 몫을 그린다 — 9시간 중 6시간 반이 남았으면 고리의 72%가 차 있다.
+                    .trim(from: 0, to: 1 - slot.progress(at: now))
                     .stroke(tint, style: StrokeStyle(lineWidth: 13, lineCap: .round))
                     .rotationEffect(.degrees(-90))
 
@@ -122,7 +130,31 @@ struct ScheduleTimerFace: View {
             Text("\(clock(slot.end))에 끝납니다")
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
+
+            if !others.isEmpty { switcher }
         }
+    }
+
+    /// 함께 진행 중인 다른 일정으로 바꾸는 줄. 회사 한가운데 회의가 시작되면 회의를 센다.
+    private var switcher: some View {
+        VStack(spacing: 6) {
+            Text("함께 진행 중")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.secondary)
+            ForEach(others) { other in
+                Button {
+                    withAnimation(Motion.screen) { ScheduleFocus.choose(other) }
+                } label: {
+                    Label("\(other.title) · \(clock(other.start))–\(clock(other.end))",
+                          systemImage: "arrow.left.arrow.right")
+                        .font(.system(size: 13))
+                        .lineLimit(1)
+                }
+                .buttonStyle(.bordered)
+                .help("이 일정으로 타이머 바꾸기")
+            }
+        }
+        .padding(.top, 2)
     }
 
     // MARK: 지금은 비어 있을 때
@@ -175,7 +207,8 @@ struct ScheduleTimerFace: View {
                 ScrollView {
                     VStack(spacing: 5) {
                         ForEach(rest) { slot in
-                            SlotRow(slot: slot, now: now)
+                            SlotRow(slot: slot, now: now,
+                                    isCounted: slot.id == current?.id && slot.start == current?.start)
                                 .transition(.row)
                         }
                     }
@@ -195,6 +228,8 @@ struct ScheduleTimerFace: View {
 private struct SlotRow: View {
     let slot: ScheduleSlot
     let now: Date
+    /// 타이머가 지금 세고 있는 줄인가. 겹친 일정은 둘 다 '지금'이지만 세는 것은 하나다.
+    var isCounted = false
 
     @State private var timer = TaskTimer.shared
 
@@ -228,6 +263,11 @@ private struct SlotRow: View {
         .overlay(RoundedRectangle.soft(Corner.chip)
             .strokeBorder(tint.opacity(isNow ? 0.5 : 0), lineWidth: 1))
         .contextMenu {
+            if isNow && !isCounted {
+                Button { ScheduleFocus.choose(slot) } label: {
+                    Label("이 일정으로 타이머 바꾸기", systemImage: "arrow.left.arrow.right")
+                }
+            }
             TimerMenuItems(token: slot.id, title: slot.title, hours: slot.hours,
                            iconName: slot.iconName, colorName: slot.colorName,
                            scheduledStart: slot.start)
@@ -301,7 +341,8 @@ struct RunningTimerFace: View {
                 // 다 쓴 만큼 고리가 채워진다. 초과해도 두 바퀴 돌지 않는다.
                 Circle().stroke(tint.opacity(0.14), lineWidth: 14)
                 Circle()
-                    .trim(from: 0, to: timer.progress)
+                    // 남은 몫을 그린다 — 일정 기준 얼굴과 같은 읽기. 초과하면 비어 있다.
+                    .trim(from: 0, to: 1 - timer.progress)
                     .stroke(tint, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.5), value: timer.progress)
@@ -458,11 +499,42 @@ struct RunningTimerFace: View {
 struct TimerPill: View {
     /// 일정 기준으로 지금 하고 있는 것. 직접 센 타이머가 있으면 그쪽이 이긴다.
     let slot: ScheduleSlot?
+    /// 지금 함께 진행 중인 일정들 (→ ScheduleClock.overlapping). 둘 이상이면 바꾸기 메뉴가 선다.
+    var overlapping: [ScheduleSlot] = []
     let onOpen: () -> Void
 
     @State private var timer = TaskTimer.shared
 
     var body: some View {
+        HStack(spacing: 4) {
+            face
+            if timer.target == nil, let slot, overlapping.count > 1 {
+                Menu {
+                    Section("타이머로 셀 일정") {
+                        ForEach(overlapping) { other in
+                            let counted = other.id == slot.id && other.start == slot.start
+                            Button { ScheduleFocus.choose(other) } label: {
+                                if counted {
+                                    Label(other.title, systemImage: "checkmark")
+                                } else {
+                                    Text(other.title)
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    Image(systemName: "arrow.left.arrow.right")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
+                .help("겹친 일정 중 타이머로 셀 것 고르기")
+            }
+        }
+    }
+
+    @ViewBuilder private var face: some View {
         if let target = timer.target {
             pill(icon: timer.isRunning ? target.iconName : "pause.fill",
                  title: target.title,

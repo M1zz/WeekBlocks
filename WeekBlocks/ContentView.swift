@@ -55,6 +55,8 @@ struct ContentView: View {
     @State private var onboarding = OnboardingPresenter.shared
     /// '다음 한 걸음' 줄을 아주 닫았는가. 다 아는 사람에게 계속 말을 걸지 않는다.
     @AppStorage("didDismissNextStep") private var didDismissNextStep = false
+    /// 겹친 일정 중 타이머로 고른 것 (→ ScheduleFocus). 바뀌면 알약·위젯이 다시 맞춘다.
+    @AppStorage(ScheduleFocus.storageKey) private var scheduleFocus = ""
     /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 겹침이 처음 생겼을 때 배너가 한 번 묻는다.
     @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
     @AppStorage(OverlapRule.decidedKey) private var overlapRuleDecided = false
@@ -549,9 +551,43 @@ struct ContentView: View {
                 return true
             }
             .map { ($0.start, $0.end) }
-        return TimelineLayout.visibleWindow(fixedRoutines: fixed,
+        // 수면 아닌 루틴은 **그려진 자리(drawn)**로만 지킨다. 루틴 목록을 통째로 넘기면 그 요일에 없는 루틴까지
+        // 지켜서 — 토요일에만 있는 06:00 운동 하나가 월요일 일간의 새벽을 도로 펼쳤다.
+        return TimelineLayout.visibleWindow(fixedRoutines: fixed.filter(\.isSleepRoutine),
                                             blocks: weekBlocks.filter { days.contains($0.day) },
                                             extraProtected: drawn, hideSleep: true)
+    }
+
+    /// 수면을 숨기라고 했는데 그날 다 접지 못했다면 **왜인지** 한 줄로. 다 접었으면 nil.
+    /// 말없이 도로 펼쳐 두면 설정이 안 먹는 것처럼 보인다.
+    private func sleepFoldNote(on day: DayOfWeek) -> String? {
+        guard hideSleepInTimeline else { return nil }
+        let sleep = routines.filter { $0.kind == .fixed && $0.isSleepRoutine }
+        guard !sleep.isEmpty else {
+            return String(localized: "이름에 '수면'이 들어간 고정 루틴이 없어 수면을 접지 못했어요.")
+        }
+        let bare = TimelineLayout.visibleWindow(fixedRoutines: sleep, blocks: [], hideSleep: true)
+        guard bare != .full else {
+            return String(localized: "수면 루틴이 0시나 24시에 닿지 않아 접지 못했어요.")
+        }
+        let actual = timelineWindow(on: [day])
+        guard actual != bare else { return nil }
+
+        let sleepNames = Set(sleep.map(\.name))
+        var seen = Set<String>()
+        let blockers = daySegments(on: day)
+            .filter { seg in
+                guard !seg.isGhost else { return false }
+                if case .fixedRoutine(let name) = seg.source, sleepNames.contains(name) { return false }
+                return seg.start < bare.start - 1e-6 || seg.end > bare.end + 1e-6
+            }
+            .sorted { $0.start < $1.start }
+            .map { "\(formatHour($0.start)) \($0.title)" }
+            .filter { seen.insert($0).inserted }
+        guard !blockers.isEmpty else {
+            return String(localized: "수면을 접으면 남는 시간이 너무 짧아 하루 전체를 보여 줘요.")
+        }
+        return String(localized: "\(blockers.prefix(3).joined(separator: ", "))이(가) 수면 시간에 걸쳐 있어 그만큼 펼쳐 두었어요.")
     }
 
     /// 루틴 구성이 바뀌면 onChange가 감지하도록 만드는 시그니처(이름·종류·요일).
@@ -627,14 +663,15 @@ struct ContentView: View {
                 HStack(spacing: 8) {
                     // 지나갔는데 안 찍은 일정 — 바로 찍지 않아도 되지만, 끝났는지는 묻는다.
                     OverdueAskBadge(blocks: overdue)
-                    TimerPill(slot: ScheduleClock.current(slots, at: ctx.date)) {
+                    TimerPill(slot: ScheduleClock.current(slots, at: ctx.date, focus: scheduleFocus),
+                              overlapping: ScheduleClock.overlapping(slots, at: ctx.date)) {
                         openWindow(id: WeekBlocksWindow.timer)
                     }
                     // 매분, 그리고 새로 켤 때마다 타임라인에 맞춘다 — 끝난 일정의 타이머는 여기서 물러난다.
-                    .task(id: "\(ctx.date.timeIntervalSince1970)-\(taskTimer.target?.token ?? "")-\(taskTimer.isRunning)") {
+                    .task(id: "\(ctx.date.timeIntervalSince1970)-\(taskTimer.target?.token ?? "")-\(taskTimer.isRunning)-\(scheduleFocus)") {
                         taskTimer.reconcile(with: slots)
                         // 위젯에도 같은 타임라인을 건넨다 — 바뀌었을 때만 (→ TimerWidgetBridge).
-                        TimerWidgetBridge.publish(slots: slots, timer: taskTimer)
+                        TimerWidgetBridge.publish(slots: slots, timer: taskTimer, focus: scheduleFocus)
                     }
                 }
                 .animation(Motion.row, value: overdue.count)
@@ -828,6 +865,7 @@ struct ContentView: View {
                     },
                     weekStart: storedWeek(for: selectedDay),
                     window: timelineWindow(on: [selectedDay]),
+                    sleepNote: sleepFoldNote(on: selectedDay),
                     canPlan: hasFixedRoutines,
                     
                     onDropBacklog: { token, hour in

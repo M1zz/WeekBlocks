@@ -34,6 +34,8 @@ struct DayScheduleView: View {
     var weekStart: Date = .currentWeekStart
     /// 그릴 시간 범위. 수면을 숨기면 양끝이 잘린 창이 들어온다.
     var window: HourWindow = .full
+    /// 수면을 숨기라고 했는데 다 접지 못한 까닭 (→ ContentView.sleepFoldNote). 다 접었으면 nil.
+    var sleepNote: String? = nil
     var canPlan: Bool = true
 
     
@@ -181,6 +183,12 @@ struct DayScheduleView: View {
 
         VStack(alignment: .leading, spacing: 14) {
             header(free: free, overbooked: overbooked)
+            if let sleepNote {
+                Label(sleepNote, systemImage: "moon.zzz")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             allDayStrip
             timeline(segs)
         }
