@@ -14,6 +14,9 @@ struct SettingsView: View {
     var onReplayOnboarding: () -> Void = { }
 
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
+    @AppStorage(ColumnMode.storageKey) private var columnMode: ColumnMode = .auto
+    /// 타이머 숫자를 어떻게 적는가 (→ CountdownFormat).
+    @AppStorage(CountdownFormat.storageKey) private var countdownFormat: CountdownFormat = .hms
     /// 설정 위의 아이폰 앱 권유를 닫았는가 (→ IPhoneNudge).
     @AppStorage(IPhoneNudge.dismissedKey) private var iphoneNudgeDismissed = false
     /// 한 주를 무슨 요일부터 보이는가 (→ WeekStartSetting).
@@ -127,10 +130,29 @@ struct SettingsView: View {
 
                 Section {
                     Toggle("타임라인에서 수면 시간 숨기기", isOn: $hideSleepInTimeline)
+                    Picker("겹친 일정 열 배치", selection: $columnMode) {
+                        ForEach(ColumnMode.allCases) { m in
+                            Text(m.label).tag(m)
+                        }
+                    }
                 } header: {
                     Text("요일별 하루")
                 } footer: {
-                    Text("하루 양끝의 수면 시간을 잘라내 남은 시간을 더 넓게 봅니다. 이름에 '수면·잠·취침'이 들어간 고정 루틴을 수면으로 봅니다. 잘라낼 자리에 다른 일정이 걸쳐 있으면 그 일정이 보이도록 범위를 도로 넓힙니다.")
+                    Text("하루 양끝의 수면 시간을 잘라내 남은 시간을 더 넓게 봅니다. 이름에 '수면·잠·취침'이 들어간 고정 루틴을 수면으로 봅니다. 잘라낼 자리에 다른 일정이 걸쳐 있으면 그 일정이 보이도록 범위를 도로 넓힙니다.\n\n열 배치 — 자동: 회사 안에 혼자 선 일정은 회사 막대 위로. 가능한 좁게: 겹치지 않는 한 모두 막대 위로. 가능한 넓게: 겹친 일정마다 제 열. 일정을 우클릭해 열을 하나씩 고를 수도 있습니다.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+
+                Section {
+                    Picker("남은 시간 표시", selection: $countdownFormat) {
+                        ForEach(CountdownFormat.allCases) { f in
+                            Text(f.label).tag(f)
+                        }
+                    }
+                } header: {
+                    Text("타이머")
+                } footer: {
+                    Text("타이머 창 · 맨 위 알약 · 계획 칩에 남은 시간을 적는 방식입니다. 위젯은 시스템이 세므로 시:분:초로 보입니다.")
                         .font(.body)
                         .foregroundStyle(.secondary)
                 }

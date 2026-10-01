@@ -344,15 +344,50 @@ extension TaskTimer {
 
 // MARK: - 표기
 
-/// 남은 시간을 타이머 숫자로. 두 시간 미만은 분:초(1시간 → `60:00`),
-/// 그 위는 시:분:초로 적는다 — `180:00`은 사람이 한눈에 읽지 못한다.
+/// 타이머 숫자를 어떻게 적는가. 설정에서 고른다.
+enum CountdownFormat: String, CaseIterable, Identifiable {
+    /// 한 시간부터 시:분:초 — `1:00:00`, `45:00`. 기본.
+    case hms
+    /// 언제나 분:초 — `60:00`, `125:30`.
+    case minutes
+    /// 글로, 초 없이 — `1시간 5분`, `45분`. 숫자가 매초 움직이는 게 거슬리는 사람에게.
+    case words
+
+    static let storageKey = "timer.countdownFormat"
+    var id: String { rawValue }
+
+    static var current: CountdownFormat {
+        UserDefaults.standard.string(forKey: storageKey).flatMap(Self.init(rawValue:)) ?? .hms
+    }
+
+    var label: String {
+        switch self {
+        case .hms: String(localized: "시:분:초 (1:00:00)")
+        case .minutes: String(localized: "분:초 (60:00)")
+        case .words: String(localized: "글로 (1시간 0분)")
+        }
+    }
+}
+
+/// 남은 시간을 타이머 숫자로 (→ CountdownFormat, 설정에서 고름).
+/// 기본은 한 시간부터 시:분:초 — `60:00`은 한 시간인지 한눈에 안 읽힌다.
 /// 계획을 넘겼으면 앞에 `+`를 달아 초과분을 센다.
-func formatCountdown(_ seconds: Double) -> String {
+func formatCountdown(_ seconds: Double, format: CountdownFormat = .current) -> String {
     let over = seconds < 0
     let total = Int(abs(seconds).rounded())
     let h = total / 3600, m = (total % 3600) / 60, s = total % 60
-    let body = abs(seconds) < 7200
-        ? String(format: "%d:%02d", total / 60, s)
-        : String(format: "%d:%02d:%02d", h, m, s)
+    let body: String
+    switch format {
+    case .hms:
+        body = h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%d:%02d", m, s)
+    case .minutes:
+        body = String(format: "%d:%02d", total / 60, s)
+    case .words:
+        // 초는 올려 센다 — 30초 남았는데 '0분'이라 하면 끝난 줄 안다.
+        let mins = Int((abs(seconds) / 60).rounded(.up))
+        body = mins >= 60
+            ? String(localized: "\(mins / 60)시간 \(mins % 60)분")
+            : String(localized: "\(mins)분")
+    }
     return over ? "+" + body : body
 }
