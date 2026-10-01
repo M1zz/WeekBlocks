@@ -22,7 +22,7 @@
 //      1.1.7(24) → "train version '1.1.7' is closed" (2026-09-28) — 1.1.7 승인 뒤 버전을 안 올렸다
 
 // 사람이 읽는 버전 (App Store 에 보이는 번호)
-MARKETING_VERSION = 1.1.9
+MARKETING_VERSION = 1.1.10
 
 // 빌드 번호 — 업로드마다 올린다 (1.1.7(23) 업로드됨)
-CURRENT_PROJECT_VERSION = 26
+CURRENT_PROJECT_VERSION = 27
