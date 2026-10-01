@@ -1,10 +1,13 @@
 # 앱스토어 스크린샷
 
 App Store Connect ▸ 앱 스토어 ▸ 각 언어의 미리보기·스크린샷 칸에 올리는 맥 스크린샷.
-이 앱이 말하는 두 언어를 각각 여섯 장씩 냅니다.
+이 앱이 말하는 네 언어를 각각 여섯 장씩 냅니다. 그림은 **`docs/screenshots/marketing/<로케일>/`** 에
+쓰이고, DeployBar 가 배포할 때 그 폴더를 그 언어 칸에 그대로 올립니다.
 
-- 한국어 — [`ko/`](ko)
-- English (U.S.) — [`en/`](en)
+- 한국어 — [`ko/`](../docs/screenshots/marketing/ko)
+- English (U.S.) — [`en-US/`](../docs/screenshots/marketing/en-US)
+- 繁體中文 — [`zh-Hant/`](../docs/screenshots/marketing/zh-Hant)
+- 简体中文 — [`zh-Hans/`](../docs/screenshots/marketing/zh-Hans)
 
 전부 **2880 × 1800** PNG 입니다. 맥 스크린샷은 1280×800 · 1440×900 · 2560×1600 ·
 2880×1800 중 하나여야 하고 **한 벌 안에서는 크기가 같아야 합니다.**
@@ -22,14 +25,14 @@ App Store Connect ▸ 앱 스토어 ▸ 각 언어의 미리보기·스크린샷
 
 ```sh
 cd appstore
-node build.mjs           # index-{en,ko}.html 을 쓰고 en/*.png · ko/*.png 를 그린다
+node build.mjs           # index-<언어>.html 을 쓰고 docs/screenshots/marketing/<로케일>/*.png 를 그린다
 node build.mjs --html    # 브라우저로 들여다볼 HTML 만
 ```
 
-Playwright 의 Chromium 으로 그립니다. 전역 설치본을 쓰려면
-`NPM_GLOBAL_ROOT=$(npm root -g) node build.mjs`.
+Playwright 로 그립니다. 전역 설치본을 쓰려면 `NPM_GLOBAL_ROOT=$(npm root -g) node build.mjs`,
+깔린 Chrome 으로 그리려면 `PW_CHANNEL=chrome` 을 붙입니다.
 
-말은 `build.mjs` 의 `STRINGS` 한 곳에만 있습니다. 화면을 그리는 코드는 두 언어가
+말은 `build.mjs` 의 `STRINGS` 한 곳에만 있습니다. 화면을 그리는 코드는 네 언어가
 같은 것을 쓰므로, 배치를 고치면 양쪽이 함께 따라옵니다.
 
 ## 이것은 실행 화면이 아니다
@@ -50,6 +53,8 @@ Playwright 의 Chromium 으로 그립니다. 전역 설치본을 쓰려면
 
 글꼴은 SF Pro 와 Apple SD Gothic Neo 를 못 담으므로 대신 Inter(라틴)와
 Pretendard(한글)를 받아 씁니다. 둘 다 SIL OFL 이고, 저장소에는 안 담습니다.
+중국어는 맥의 시스템 글꼴(PingFang TC · SC)로 그리므로 **맥에서만** 제대로 나옵니다.
+중국어 화면 낱말은 카탈로그의 `zh-Hant` · `zh-Hans` 값을 그대로 옮겼습니다.
 
 **맥에서 실제로 찍을 수 있게 되면 이걸로 갈아 끼우는 것이 낫습니다.**
 그때까지는 화면이 바뀌면 `build.mjs` 의 해당 자리도 같이 고쳐야 어긋나지 않습니다.

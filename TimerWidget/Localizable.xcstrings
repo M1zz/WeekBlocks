@@ -8,6 +8,18 @@
             "state" : "translated",
             "value" : "Focus"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "专注"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "專注"
+          }
         }
       }
     },
@@ -17,6 +29,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ends %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 结束"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 結束"
           }
         }
       }
@@ -28,6 +52,18 @@
             "state" : "translated",
             "value" : "Paused"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已暂停"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已暫停"
+          }
         }
       }
     },
@@ -37,6 +73,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nothing scheduled right now"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前没有日程"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前沒有行程"
           }
         }
       }
@@ -48,6 +96,18 @@
             "state" : "translated",
             "value" : "Next"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接下来"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接下來"
+          }
         }
       }
     },
@@ -57,6 +117,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nothing left today"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天没有其他日程了"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天沒有其他行程了"
           }
         }
       }
@@ -68,6 +140,18 @@
             "state" : "translated",
             "value" : "Now Timer"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前计时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前計時"
+          }
         }
       }
     },
@@ -77,6 +161,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shows what you're on now and how long is left, straight from your timeline."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按照你的时间轴，显示当前正在进行的日程和剩余时间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "依照你的時間軸，顯示目前正在進行的行程和剩餘時間。"
           }
         }
       }

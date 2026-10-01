@@ -1,5 +1,6 @@
 // Builds the App Store screenshot mockups for Rainbow Craft / 무지개 공방 (macOS),
-// in both languages the app speaks: English (en/) and Korean (ko/).
+// in every language the app speaks: English, Korean, Traditional and Simplified Chinese.
+// Output goes to docs/screenshots/marketing/<App Store locale>/ — DeployBar uploads that folder.
 //
 // The Mac app cannot be built or run here (no macOS/Xcode), so these are pixel
 // mockups drawn from the real SwiftUI views: the layout, the strings and the
@@ -15,7 +16,8 @@
 // Meals 17.5h/week in 3 flexible sessions, Work weekdays 09:00+9h, Exercise
 // Mon/Wed/Fri 07:00+1h.  Routines 121.5h → 46.5h free of 168.
 //
-//   node build.mjs          write index-<locale>.html and render en/*.png, ko/*.png
+//   node build.mjs          write index-<locale>.html and render docs/screenshots/marketing/<locale>/*.png
+//   PW_CHANNEL=chrome node build.mjs   draw with the installed Chrome instead of Playwright's Chromium
 //   node build.mjs --html   write the HTML only
 
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
@@ -224,6 +226,136 @@ const STRINGS = {
        '타이머가 계획에 적힌 시각을 따라갑니다. 무엇을 하는 중이고 얼마 남았는지 짐작하지 않아도 됩니다.'],
       ['한 주를 체크리스트로 닫습니다',
        '한 것과 하다 만 것과 건너뛴 것을 표시하고, 그 답으로 다음 주를 세웁니다.'],
+    ],
+  },
+  'zh-Hant': {
+    lang:'zh-Hant', app:'彩虹工坊',
+    timer:'計時器', review:'回顧', settings:'設定', more:'更多',
+    weekRange:'3月3日 – 3月9日', thisWeek:'本週',
+    lensPlan:'區塊檢視', lensDay:'時間軸檢視',
+    summary:'摘要', hideSummary:'收起摘要',
+    mWeek:'這一週', mWeekSub:'一天 24 小時',
+    mFixed:'固定作息', mFixedSub:'每天約 17.4 小時',
+    mFree:'剩餘空閒時間', mFreeSub:'每天約 6.6 小時',
+    legRoutines:'作息 122h', legPlanned:'計畫 10h', legFree:'空閒（未排計畫）37h',
+    days:['週一','週二','週三','週四','週五','週六','週日'],
+    rSleep:'睡眠', rMeals:'用餐', rWork:'工作', rGym:'運動',
+    rSleepWhen:'每天 · 23:00 · 8 小時', rSleepSum:'每週 56 小時',
+    rMealsWhen:'每週 17.5 小時 · 每天 3 次', rMealsSum:'時間彈性',
+    rWorkWhen:'週一至週五 · 09:00 · 9 小時', rWorkSum:'每週 45 小時',
+    rGymWhen:'週一、三、五 · 07:00 · 1 小時', rGymSum:'每週 3 小時',
+    routinesHead:'固定作息 · 不能動的事', addRoutine:'新增作息',
+    todos:'待辦事項', newTodo:'新增待辦', showAll:'顯示全部', todoCount:'4 件 · 11 小時 30 分',
+    hoursLeft: v => `剩 ${v}h`,
+    blocks:['學習 Swift Combine', '撰寫第二季提案初稿', '檢查積壓的 PR',
+            '打電話預約牙醫', '重寫新手引導文案', '發布版本說明',
+            '《深度工作》第 4 章', '採買本週食材', '規劃下週'],
+    todoList:[
+      { t:'學習 Swift Combine', step:'整理 sink 與 assign 的差異', hrs:'4 小時', on:'星期一' },
+      { t:'撰寫第二季提案初稿', step:'整理上一季的數字', hrs:'6 小時', on:'星期二' },
+      { t:'發布版本說明', step:'放上網站', hrs:'1 小時', frag:'5 分鐘' },
+      { t:'打電話預約牙醫', hrs:'30 分鐘' },
+    ],
+    currentStep:'目前步驟', done:'完成', allDone:v => `全部完成需 ${v}`,
+    splitAcross:'= 100%，由 4 個步驟分擔', steps:'步驟',
+    fragment:'有 5 分鐘時就做', addStep:'新增步驟', splitHelper:'拆分助手',
+    stepList:[['ok','收集範例專案','1','25'],
+              ['cur','整理 sink 與 assign 的差異','1.5','38'],
+              ['','讓範例跑起來','1','25'],
+              ['frag','把筆記推上儲存庫','0.5','12']],
+    totalHours:'4 小時',
+    tRange:'20:00–21:00 · 1 小時', tLeft:'剩餘', tEnds:'於 21:00 結束',
+    tPause:'暫停', tPlus5:'+5 分鐘', tPlus10:'+10 分鐘', tStop:'停止',
+    tRest:'從這裡起剩下的一天',
+    tUpNext:[['calendar', C.orange, '打電話預約牙醫', '21:30 · 30 分鐘'],
+             ['moon', C.indigo, '睡眠', '23:00 · 8 小時']],
+    rvTitle:'每週回顧', rvDone:'完成', rvPartial:'部分',
+    rvSkipped:'已略過', rvPending:'未回顧',
+    rvNotePlaceholder:'一句話回顧 — 哪些順利、哪些不順',
+    rvRows:[['done',0,0,'晚上 · 1.5h','筆記整理好，範例也跑起來了'],
+            ['done',1,1,'晚上 · 2.0h','架構和數字章節都完成'],
+            ['part',2,2,'晚上 · 1.0h','11 個看完 6 個'],
+            ['skip',2,3,'晚上 · 0.5h',''],
+            ['done',3,4,'晚上 · 1.5h','第一個畫面改好了'],
+            ['done',4,5,'晚上 · 1.0h','已放上網站']],
+    caps:[
+      ['先排好拿不走的時間',
+       '一週有 168 小時。睡眠、用餐、工作先占去它們的份，剩下的才是你這週真正能用的時間。'],
+      ['把待辦拖到某天，就成了計畫',
+       '可以移到別天、塞進行程之間的空檔，也能拖回清單。'],
+      ['把一天攤在 24 小時的尺規上',
+       '左右拖曳改時間，上下拖曳換日子。空檔和重疊一目了然。'],
+      ['拆成能收尾的大小',
+       '每個步驟只問兩件事：能不能馬上開始？能不能在 5 分鐘內做完？'],
+      ['正在做什麼，還剩多久',
+       '計時器跟著計畫裡的時間走，不必再猜自己在做什麼、還剩多少。'],
+      ['用檢查清單收尾這一週',
+       '標出做完的、做一半的、跳過的，再用這些答案排下一週。'],
+    ],
+  },
+  'zh-Hans': {
+    lang:'zh-Hans', app:'彩虹工坊',
+    timer:'计时器', review:'复盘', settings:'设置', more:'更多',
+    weekRange:'3月3日 – 3月9日', thisWeek:'本周',
+    lensPlan:'块视图', lensDay:'时间轴视图',
+    summary:'摘要', hideSummary:'收起摘要',
+    mWeek:'这一周', mWeekSub:'一天 24 小时',
+    mFixed:'固定作息', mFixedSub:'每天约 17.4 小时',
+    mFree:'剩余空闲时间', mFreeSub:'每天约 6.6 小时',
+    legRoutines:'作息 122h', legPlanned:'计划 10h', legFree:'空闲（未安排）37h',
+    days:['周一','周二','周三','周四','周五','周六','周日'],
+    rSleep:'睡眠', rMeals:'用餐', rWork:'工作', rGym:'运动',
+    rSleepWhen:'每天 · 23:00 · 8 小时', rSleepSum:'每周 56 小时',
+    rMealsWhen:'每周 17.5 小时 · 每天 3 次', rMealsSum:'时间灵活',
+    rWorkWhen:'周一至周五 · 09:00 · 9 小时', rWorkSum:'每周 45 小时',
+    rGymWhen:'周一、三、五 · 07:00 · 1 小时', rGymSum:'每周 3 小时',
+    routinesHead:'固定作息 · 不能动的事', addRoutine:'添加作息',
+    todos:'待办事项', newTodo:'新建待办', showAll:'显示全部', todoCount:'4 件 · 11 小时 30 分',
+    hoursLeft: v => `剩 ${v}h`,
+    blocks:['学习 Swift Combine', '写第二季度提案初稿', '处理积压的 PR',
+            '打电话预约牙医', '重写新手引导文案', '发布版本说明',
+            '《深度工作》第 4 章', '采购本周食材', '规划下周'],
+    todoList:[
+      { t:'学习 Swift Combine', step:'整理 sink 和 assign 的区别', hrs:'4 小时', on:'星期一' },
+      { t:'写第二季度提案初稿', step:'整理上季度的数据', hrs:'6 小时', on:'星期二' },
+      { t:'发布版本说明', step:'发到网站上', hrs:'1 小时', frag:'5 分钟' },
+      { t:'打电话预约牙医', hrs:'30 分钟' },
+    ],
+    currentStep:'当前步骤', done:'完成', allDone:v => `全部完成需 ${v}`,
+    splitAcross:'= 100%，由 4 个步骤分担', steps:'步骤',
+    fragment:'有 5 分钟时就做', addStep:'添加步骤', splitHelper:'拆分助手',
+    stepList:[['ok','收集示例项目','1','25'],
+              ['cur','整理 sink 和 assign 的区别','1.5','38'],
+              ['','把示例跑通','1','25'],
+              ['frag','把笔记推到仓库','0.5','12']],
+    totalHours:'4 小时',
+    tRange:'20:00–21:00 · 1 小时', tLeft:'剩余', tEnds:'于 21:00 结束',
+    tPause:'暂停', tPlus5:'+5 分钟', tPlus10:'+10 分钟', tStop:'停止',
+    tRest:'从这里起剩下的一天',
+    tUpNext:[['calendar', C.orange, '打电话预约牙医', '21:30 · 30 分钟'],
+             ['moon', C.indigo, '睡眠', '23:00 · 8 小时']],
+    rvTitle:'每周复盘', rvDone:'完成', rvPartial:'部分',
+    rvSkipped:'已跳过', rvPending:'未复盘',
+    rvNotePlaceholder:'一句话复盘 — 哪些顺利、哪些不顺',
+    rvRows:[['done',0,0,'晚上 · 1.5h','笔记整理好了，示例也跑通了'],
+            ['done',1,1,'晚上 · 2.0h','框架和数据部分都写完了'],
+            ['part',2,2,'晚上 · 1.0h','11 个处理了 6 个'],
+            ['skip',2,3,'晚上 · 0.5h',''],
+            ['done',3,4,'晚上 · 1.5h','第一个页面改好了'],
+            ['done',4,5,'晚上 · 1.0h','已发到网站']],
+    caps:[
+      ['先排好拿不走的时间',
+       '一周有 168 小时。睡眠、吃饭、工作先占去它们的份额，剩下的才是你这周真正能用的时间。'],
+      ['把待办拖到某天，就变成计划',
+       '可以挪到别的日子、塞进日程之间的空档，也能拖回清单。'],
+      ['把一天摊在 24 小时的标尺上',
+       '左右拖动改时间，上下拖动换日子。空档和重叠一目了然。'],
+      ['拆成能收尾的大小',
+       '每个步骤只问两件事：能不能马上开始？能不能在 5 分钟内做完？'],
+      ['正在做什么，还剩多久',
+       '计时器跟着计划里的时间走，不用再猜自己在做什么、还剩多少。'],
+      ['用检查清单收尾这一周',
+       '标出做完的、做一半的、跳过的，再用这些答案排下一周。'],
     ],
   },
 }
@@ -605,6 +737,8 @@ ${list.map((s, i) => `<section class="shot" id="${s.id}"
 }
 
 const LOCALES = Object.keys(STRINGS)
+// App Store Connect 의 로케일 이름. 이 폴더를 DeployBar 가 그대로 그 언어 칸에 올린다.
+const STORE_LOCALE = { en:'en-US', ko:'ko', 'zh-Hant':'zh-Hant', 'zh-Hans':'zh-Hans' }
 for (const loc of LOCALES) {
   writeFileSync(join(HERE, `index-${loc}.html`), page(STRINGS[loc]))
   console.log(`wrote index-${loc}.html`)
@@ -614,10 +748,11 @@ if (!process.argv.includes('--html')) {
   // Local install first; fall back to a global one (NPM_GLOBAL_ROOT=$(npm root -g)).
   const { chromium } = await import('playwright')
     .catch(() => import(join(process.env.NPM_GLOBAL_ROOT || '', 'playwright/index.mjs')))
-  const browser = await chromium.launch()
+  // PW_CHANNEL=chrome 이면 브라우저를 따로 받지 않고 깔린 Chrome 으로 그린다.
+  const browser = await chromium.launch(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {})
   const page_ = await browser.newPage({ viewport:{ width:1440, height:900 }, deviceScaleFactor:2 })
   for (const loc of LOCALES) {
-    const outDir = join(HERE, loc)
+    const outDir = join(HERE, '..', 'docs', 'screenshots', 'marketing', STORE_LOCALE[loc])
     mkdirSync(outDir, { recursive: true })
     await page_.goto('file://' + join(HERE, `index-${loc}.html`))
     await page_.waitForTimeout(700)

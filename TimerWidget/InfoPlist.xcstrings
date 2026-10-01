@@ -15,6 +15,18 @@
             "state" : "translated",
             "value" : "무지개 공방 타이머"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊计时器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊計時器"
+          }
         }
       }
     },

@@ -275,3 +275,8 @@ body { font-family:UI, KR, system-ui, sans-serif; -webkit-font-smoothing:antiali
 .uprow .ut { margin-left:auto; font-size:12px; color:var(--ink2); font-variant-numeric:tabular-nums }
 
 .icb { width:13px; height:13px }
+
+/* 중국어 — Inter 에는 한자가 없고 Pretendard 의 한자는 한국 자형이다.
+   그 나라 맥이 쓰는 시스템 글꼴(PingFang)로 그린다. 저장소에는 담지 않는다. */
+html[lang="zh-Hant"] body { font-family:UI, "PingFang TC", system-ui, sans-serif; word-break:normal }
+html[lang="zh-Hans"] body { font-family:UI, "PingFang SC", system-ui, sans-serif; word-break:normal }

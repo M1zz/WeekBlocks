@@ -1,9 +1,7 @@
 {
   "sourceLanguage" : "ko",
   "strings" : {
-    "" : {
-
-    },
+    "" : {},
     " · %lld회" : {
       "localizations" : {
         "en" : {
@@ -8142,13 +8140,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "四"
+            "value" : "周四"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "四"
+            "value" : "週四"
           }
         }
       }
@@ -9738,13 +9736,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "三"
+            "value" : "周三"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "三"
+            "value" : "週三"
           }
         }
       }
@@ -10694,7 +10692,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhone App「慾望彩虹」"
+            "value" : "iPhone App「欲望彩虹」"
           }
         }
       }
@@ -10716,7 +10714,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhone App「慾望彩虹」會直接開啟你在這裡排好的一週，不在 Mac 前也能看到今天還剩什麼。"
+            "value" : "iPhone App「欲望彩虹」會直接開啟你在這裡排好的一週，不在 Mac 前也能看到今天還剩什麼。"
           }
         }
       }
@@ -11761,7 +11759,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你在這裡排好的一週，會原封不動出現在 iPhone App「慾望彩虹」中。"
+            "value" : "你在這裡排好的一週，會原封不動出現在 iPhone App「欲望彩虹」中。"
           }
         }
       }
@@ -12713,7 +12711,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "慾望彩虹 · 彩虹工坊"
+            "value" : "欲望彩虹 · 彩虹工坊"
           }
         }
       }
@@ -16648,7 +16646,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你排好的這一週會原封不動地出現在 iPhone App「慾望彩虹」中。下一個安排幾點開始，從口袋裡就能馬上看到。"
+            "value" : "你排好的這一週會原封不動地出現在 iPhone App「欲望彩虹」中。下一個安排幾點開始，從口袋裡就能馬上看到。"
           }
         }
       }
@@ -17701,13 +17699,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "六"
+            "value" : "周六"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "六"
+            "value" : "週六"
           }
         }
       }
@@ -19403,13 +19401,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "二"
+            "value" : "周二"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "二"
+            "value" : "週二"
           }
         }
       }
