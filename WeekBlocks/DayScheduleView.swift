@@ -36,6 +36,12 @@ struct DayScheduleView: View {
     var window: HourWindow = .full
     /// 수면을 숨기라고 했는데 다 접지 못한 까닭 (→ ContentView.sleepFoldNote). 다 접었으면 nil.
     var sleepNote: String? = nil
+    /// 사람이 정한 열 — 1열(회사 막대 안) / 2열(오른쪽) (→ ColumnPin). 바뀌면 다시 놓는다.
+    @AppStorage(ColumnPin.storageKey) private var columnPinsRaw = ""
+    /// 열을 얼마나 아껴 쓰는가 — 자동 / 가능한 좁게 / 가능한 넓게 (→ ColumnMode).
+    @AppStorage(ColumnMode.storageKey) private var columnMode: ColumnMode = .auto
+    /// '아직 하는 중'이라고 답한 것 (→ StillGoing). 바뀌면 '끝냈나요?'를 거둔다.
+    @AppStorage(StillGoing.storageKey) private var stillGoingRaw = ""
     var canPlan: Bool = true
 
     
@@ -232,6 +238,8 @@ struct DayScheduleView: View {
 
             hiddenChip
 
+            columnModeMenu
+
             Spacer()
             // '블록 추가' 단추는 두지 않는다 — 요일에 일을 올리는 건 주간이 하는 일이다.
             // 여기서는 이미 올린 것을 실제로 한 시각으로 옮기는 것까지만 한다.
@@ -357,6 +365,24 @@ struct DayScheduleView: View {
     /// 자 위에 유령으로 세워 두는 대신이다. 뺐는데 그 자리에 계속 서 있으면 안 지워진 것으로
     /// 읽히고, 하루 세 번인 끼니에서는 그 줄이 쌓인다. 되살릴 길은 잃지 않으면서 자 위에는
     /// 실제로 할 일만 남게 한다.
+    /// 열을 얼마나 아껴 쓸지. 머리 오른쪽에 작게 — 설정에도 같은 것이 있다.
+    private var columnModeMenu: some View {
+        Menu {
+            Picker("열 배치", selection: $columnMode.animation(Motion.squish)) {
+                ForEach(ColumnMode.allCases) { m in
+                    Label(m.label, systemImage: m.symbol).tag(m)
+                }
+            }
+            .pickerStyle(.inline)
+        } label: {
+            Label(columnMode.label, systemImage: columnMode.symbol)
+                .font(.body)
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help("겹친 일정을 몇 열로 세울지")
+    }
+
     @ViewBuilder
     private var hiddenChip: some View {
         let ghosts = restorableGhosts
@@ -424,9 +450,16 @@ struct DayScheduleView: View {
         // **오른쪽 자리(45%~)에 서는 것은 모두 한데 모아 칸을 나눈다.** 루틴 안 일정, 다른 일정 위에 얹힌 끼니,
         // 둘로 갈린 칸의 오른쪽 블록이 각자 다른 규칙으로 같은 자리에 섰더니, 13시 점심(끼니)과 회사와 겹친
         // '런치' 블록이 한 자리에 포개져 글자까지 겹쳤다.
-        let right = Self.lanes(segs.filter { seg in
-            isOverlay(seg, laned: laned) || lanes[seg.id].map { $0.count == 2 && $0.index == 1 } == true
-        })
+        // 갈린 칸이 셋 이상이어도 같다 — 첫 칸만 왼쪽, 나머지는 모두 오른쪽 자리에서 저희끼리 나눈다.
+        let rightSet = segs.filter { seg in
+            isOverlay(seg, laned: laned) || lanes[seg.id].map { $0.count >= 2 && $0.index >= 1 } == true
+        }
+        // 회사 막대에 파고드는 것을 먼저 고르고, 남은 것끼리만 오른쪽을 나눈다 — 하나가 막대로 들어가면
+        // 오른쪽에 남은 것은 폭을 다 쓴다.
+        let digging = dugIn(rightSet, laned: laned, lanes: lanes)
+        let dug = digging.dug
+        let right = Self.pinnedLanes(rightSet.filter { !dug.contains($0.id) },
+                                     pins: rightPins(rightSet))
         let order = Dictionary(uniqueKeysWithValues: segs.sorted { $0.start < $1.start }
             .enumerated().map { ($1.id, $0) })
         let conns = connectors(segs, laned: laned, lanes: lanes)
@@ -457,7 +490,7 @@ struct DayScheduleView: View {
                 ForEach(segs.filter { host in
                     guard hostsNested(host) else { return false }
                     guard let lane = lanes[host.id] else { return true }
-                    return lane.count == 1 || (lane.count == 2 && lane.index == 0)
+                    return lane.count == 1 || lane.index == 0
                 }) { host in
                     if let hf = frame(for: host, lanes: lanes, laned: laned, trackWidth: trackWidth) {
                         let x = trackWidth * Self.nestSplit
@@ -468,7 +501,7 @@ struct DayScheduleView: View {
                 }
 
                 // **세 줄로 겹친 곳** — 두 줄로 줄이자고 권한다. 그대로 두기로 한 곳은 보통 '겹침 N'으로.
-                let crowds = crowdedSpans(segs)
+                let crowds = crowdedSpans(segs, dug: dug)
                 ForEach(crowds, id: \.key) { crowd in
                     if keptCrowds.contains(crowd.key) {
                         overlapBadge(crowd.items, trackWidth: trackWidth)
@@ -487,12 +520,16 @@ struct DayScheduleView: View {
                 }
 
                 ForEach(segs) { seg in
-                    if let frame = frame(for: seg, lanes: lanes, laned: laned, right: right, trackWidth: trackWidth) {
+                    if let frame = frame(for: seg, lanes: lanes, laned: laned, right: right,
+                                         dug: dug, trackWidth: trackWidth) {
                         let i = order[seg.id] ?? 0
-                        segmentView(seg, size: frame.size)
+                        segmentView(seg, size: frame.size, dugIn: dug.contains(seg.id),
+                                    labelDrop: digging.labelDrop[seg.id] ?? 0,
+                                    columns: digging.inside.contains(seg.id)
+                                        ? columnChoice(seg, dug: dug, right: right) : nil)
                             .offset(x: Self.gutter + frame.minX + (seg.id == dragId ? dragPx : 0),
                                     y: frame.minY + (seg.id == dragId ? dragPy : 0))
-                            .zIndex(seg.id == dragId ? 3 : (seg.isGhost ? 0 : (seg.isNested || seg.isFlexible ? 2 : 1)))
+                            .zIndex(seg.id == dragId ? 3 : (seg.isGhost ? 0 : (seg.isNested || seg.isFlexible || dug.contains(seg.id) ? 2 : 1)))
                             // 하루가 설 때 위에서부터 하나씩 톡톡 튀어 오른다.
                             .scaleEffect(drawn ? 1 : 0.92, anchor: .leading)
                             .opacity(drawn ? 1 : 0)
@@ -1291,7 +1328,10 @@ struct DayScheduleView: View {
     }
 
     @ViewBuilder
-    private func segmentView(_ seg: TimeSegment, size: CGSize) -> some View {
+    /// - Parameter labelDrop: 머리 글씨를 이만큼 내린다. 회사 시작에 파고든 일정이 있으면 회사 글씨는 그 아래로 (→ `dugIn`).
+    /// - Parameter columns: 회사 같은 일정 안에 들어 있으면 (지금 열, 고를 수 있는 열 수) — 우클릭에 'N열로 옮기기'가 선다.
+    private func segmentView(_ seg: TimeSegment, size: CGSize, dugIn: Bool = false,
+                             labelDrop: CGFloat = 0, columns: (current: Int, count: Int)? = nil) -> some View {
         let dragging = seg.id == dragId
         let hovering = hoverId == seg.id
         let block = planBlock(seg)
@@ -1302,10 +1342,25 @@ struct DayScheduleView: View {
         let showsCheck = block != nil && !seg.isGhost && size.width >= Self.pillWidth + 120
         // 끝 시각이 지났는데 안 찍었다 — 동그라미 옆에서 끝냈는지 묻는다.
         let asks = showsCheck && isOverdue(seg) && size.width >= Self.pillWidth + 220
+        // **다 지나간 일정은 흐리게** — 알약까지 빛을 빼야 '이미 지나간 것'이 한눈에 갈린다.
+        // 글씨만 옅어지던 때는 색 알약이 그대로 또렷해서 지난 것과 남은 것이 한 무게로 읽혔다.
+        // 가리키거나 끄는 동안에는 또렷하게. 끝냈나요?·동그라미는 흐리지 않는다 — 아직 할 일이 남았다.
+        let faded = hasEnded(seg) && !hovering && !dragging
 
         ZStack(alignment: .topTrailing) {
             HStack(alignment: .top, spacing: 10) {
                 pill(seg, height: size.height, dragging: dragging, hovering: hovering, done: done)
+                    .saturation(faded ? 0.25 : 1)
+                    .opacity(faded ? 0.45 : 1)
+                    // 회사 막대에 파고든 것은 바탕색 고리를 둘러 막대를 끊는다 — 그 시간만큼 회사를 비우고
+                    // 이것을 하는 중이라는 모양. 고리가 없으면 두 알약이 한 덩어리로 뭉개진다.
+                    .background {
+                        if dugIn {
+                            Capsule(style: .continuous)
+                                .fill(Color.surface)
+                                .padding(-3)
+                        }
+                    }
 
                 if showsText {
                     let title = Text(seg.title)
@@ -1315,28 +1370,36 @@ struct DayScheduleView: View {
                     // 끄는 동안에는 **놓일 시각**을 적는다. 알약은 내려가는데 글씨는 그대로면
                     // 둘 중 하나는 거짓말이고, 사람은 놓아 보는 쪽으로 확인하게 된다.
                     let moving = dragging ? dragHour : nil
-                    let when = Text(timeRange(seg, start: moving))
+                    // 글씨가 설 폭에 맞춰 시각을 줄인다 — '07:00–08:00 · 1h' → '07:00–08:00' → '07:00'.
+                    // 한때 폭이 모자라면 시각을 통째로 뺐다. 회사 옆 오른쪽 칸의 일정들은 제목만 남아
+                    // 몇 시 일인지 알 수 없었다.
+                    let textRoom = size.width - Self.pillWidth - 10 - (asks ? 130 : (showsCheck ? 30 : 4))
+                    let when = Text(timeRange(seg, start: moving, room: textRoom))
                         .font(.system(size: 10.5, weight: moving != nil ? .bold : .medium, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(moving != nil ? Color.accentColor : .secondary)
 
                     Group {
-                        // 낮은 줄(30분 안팎)에서는 시각과 제목을 한 줄에 나란히 — 두 줄을 욱여넣으면 잘린다.
-                        if size.height >= 38 {
+                        // 시각 아래 제목 — 두 줄은 30pt면 들어간다(40분 일정부터). 한때 38pt를 기준으로 삼아
+                        // 50분 일정이 '제목 · 시각' 한 줄로 서서 이웃 줄들과 읽는 차례가 달랐다.
+                        // 그보다 낮은 줄(30분 안팎)만 한 줄에 나란히 — 그때도 시각이 먼저다.
+                        if size.height >= 30 {
                             VStack(alignment: .leading, spacing: 1) {
-                                if size.width >= Self.pillWidth + 110 { when.lineLimit(1) }
+                                when.lineLimit(1)
                                 title.lineLimit(size.height >= 62 ? 2 : 1)
                             }
-                            .padding(.top, 3)
+                            .padding(.top, size.height >= 38 ? 3 : 0)
                         } else {
                             HStack(spacing: 6) {
+                                when.lineLimit(1).fixedSize()
                                 title.lineLimit(1)
-                                if size.width >= Self.pillWidth + 150 { when.lineLimit(1) }
                             }
                             .frame(height: max(Self.minRowHeight, size.height), alignment: .center)
                         }
                     }
                     .contentTransition(.numericText())
+                    .padding(.top, labelDrop)
+                    .opacity(faded ? 0.5 : 1)
                     .padding(.trailing, asks ? 130 : (showsCheck ? 30 : 4))
                 }
                 Spacer(minLength: 0)
@@ -1471,6 +1534,28 @@ struct DayScheduleView: View {
             } else {
                 Button { edit(seg) } label: {
                     Label(seg.editLabel, systemImage: "pencil")
+                }
+                // 회사 안에 든 일정 — 막대 위(1열)에 둘지, 오른쪽(2열)에 둘지 손으로 고른다 (→ ColumnPin).
+                if let columns {
+                    Divider()
+                    ForEach(1...columns.count, id: \.self) { col in
+                        if col != columns.current {
+                            Button { setColumn(seg, col) } label: {
+                                if col == 1 {
+                                    Label("1열로 옮기기 (\(hostTitle(of: seg) ?? "") 안에)", systemImage: "rectangle.lefthalf.inset.filled")
+                                } else {
+                                    Label("\(col)열로 옮기기", systemImage: col == 2 ? "rectangle.center.inset.filled"
+                                                                                 : "rectangle.righthalf.inset.filled")
+                                }
+                            }
+                        }
+                    }
+                    if ColumnPin.load(columnPinsRaw)[ColumnPin.key(seg, on: date)] != nil {
+                        Button { setColumn(seg, nil) } label: {
+                            Label("열을 앱에 맡기기", systemImage: "arrow.uturn.backward")
+                        }
+                    }
+                    Divider()
                 }
                 if case .fixedRoutine(let name) = seg.source,
                    let r = routines.first(where: { $0.name == name }) {
@@ -1719,8 +1804,53 @@ struct DayScheduleView: View {
 
     /// 이 조각의 계획이 끝 시각을 지났는데 안 찍혔는가. 루틴 이름의 블록은 묻지 않는다 —
     /// 무지개 칸을 차지한 것만 해야 할 일이다 (→ TodoLoad.colorNames).
+    /// 오른쪽 자리에서 사람이 고른 칸 (2열 → 0, 3열 → 1 …).
+    private func rightPins(_ segs: [TimeSegment]) -> [String: Int] {
+        let pins = ColumnPin.load(columnPinsRaw)
+        var result: [String: Int] = [:]
+        for seg in segs {
+            if let col = pins[ColumnPin.key(seg, on: date)], col >= 2 { result[seg.id] = col - 2 }
+        }
+        return result
+    }
+
+    /// 지금 몇 열에 서 있고, 몇 열까지 고를 수 있는가.
+    /// 오른쪽에 둘 이상 나란히 서는 묶음이면 3열까지(그 이상이면 그만큼), 혼자면 2열까지.
+    /// 3열에 고정해 둔 것은 혼자여도 3열을 계속 보여 준다 — 되돌릴 길이 있어야 한다.
+    private func columnChoice(_ seg: TimeSegment, dug: Set<String>, right: [String: Lane]) -> (current: Int, count: Int) {
+        if dug.contains(seg.id) {
+            return (1, 2)
+        }
+        let lane = right[seg.id] ?? Lane(index: 0, count: 1)
+        return (lane.index + 2, max(2, lane.count + 1, lane.index + 2))
+    }
+
+    private func setColumn(_ seg: TimeSegment, _ column: Int?) {
+        Haptic.tick()
+        withAnimation(Motion.squish) {
+            columnPinsRaw = ColumnPin.set(columnPinsRaw, key: ColumnPin.key(seg, on: date), column: column)
+        }
+    }
+
+    /// 이 일정을 품고 있는 긴 일정의 이름 (회사).
+    private func hostTitle(of seg: TimeSegment) -> String? {
+        segments.first { h in
+            h.id != seg.id && hostsNested(h) && !h.isGhost
+                && h.start <= seg.start + 1e-6 && seg.end <= h.end + 1e-6
+        }?.title
+    }
+
+    /// 끝 시각이 이미 지났는가 — 지난 날은 전부, 오늘은 끝난 것만.
+    private func hasEnded(_ seg: TimeSegment) -> Bool {
+        guard !seg.isGhost else { return false }
+        let end = seg.scheduledStart(on: date).addingTimeInterval(seg.logicalDuration * 3600)
+        return end <= max(minuteTick, Date())
+    }
+
     private func isOverdue(_ seg: TimeSegment) -> Bool {
+        _ = stillGoingRaw
         guard let block = planBlock(seg), block.reviewStatus == nil,
+              !(StillGoing.contains(block) && Calendar.current.isDateInToday(date)),
               todoLoad?.colorName(for: block) != nil else { return false }
         let end = seg.scheduledStart(on: date).addingTimeInterval(seg.logicalDuration * 3600)
         return end <= max(minuteTick, Date())
@@ -1729,6 +1859,12 @@ struct DayScheduleView: View {
     /// "끝냈나요?" — 누르면 달성 · 부분 달성 · 건너뜀을 고른다. 상단 뱃지와 같은 물음 (→ OverdueAskBadge).
     private func overdueAsk(_ block: PlanBlock) -> some View {
         Menu {
+            Button {
+                StillGoing.mark(block)
+            } label: {
+                Label("아직 하는 중", systemImage: "play.fill")
+            }
+            Divider()
             ForEach(ReviewStatus.allCases) { status in
                 Button {
                     Haptic.tick()
@@ -1797,9 +1933,12 @@ struct DayScheduleView: View {
     /// - Parameter start: 이 시각에 선 것처럼 적는다. 끄는 동안에는 **놓일 시각**을 넣는다 —
     ///   알약은 손을 따라 내려가는데 옆의 글씨는 원래 시각을 그대로 말하고 있어서,
     ///   몇 시에 놓이는지는 놓아 본 뒤에야 알 수 있었다.
-    private func timeRange(_ seg: TimeSegment, start: Double? = nil) -> String {
+    /// - Parameter room: 글씨가 설 폭(pt). 모자라면 길이를, 그래도 모자라면 끝 시각을 뗀다.
+    private func timeRange(_ seg: TimeSegment, start: Double? = nil, room: CGFloat = .infinity) -> String {
         let from = start ?? seg.logicalStart
         let end = (from + seg.logicalDuration).truncatingRemainder(dividingBy: 24)
+        if room < 72 { return formatHour(from) }
+        if room < 100 { return "\(formatHour(from))–\(formatHour(end))" }
         // 시각은 그대로, 길이만 규칙을 따른다 — 09–18시 회사가 점심을 빼면 8h다.
         let inner = overlapRule == .subtractInner ? TimelineLayout.innerOverlap(of: seg, among: segments) : 0
         return "\(formatHour(from))–\(formatHour(end)) · \(shortHours(max(0, seg.logicalDuration - inner)))"
@@ -1818,11 +1957,15 @@ struct DayScheduleView: View {
     }
 
     private func frame(for seg: TimeSegment, lanes: [String: Lane], laned: [TimeSegment],
-                       right: [String: Lane] = [:], trackWidth w: CGFloat) -> CGRect? {
+                       right: [String: Lane] = [:], dug: Set<String> = [],
+                       trackWidth w: CGFloat) -> CGRect? {
         guard let vis = window.clamp(seg.start, seg.end) else { return nil }
         let top = y(vis.start)
         // 짧은 일도 알약 하나와 글씨 한 줄은 들어간다. 겹칠 몫은 칸 나누기가 미리 셌다.
         let height = max(Self.minRowHeight, y(vis.end) - y(vis.start) - 3)
+
+        // 회사 막대에 파고든 것 — 등뼈 위, 회사 알약과 같은 x에 선다 (→ `dugIn`).
+        if dug.contains(seg.id) { return CGRect(x: 0, y: top, width: w, height: height) }
 
         // 루틴 안 일정, 다른 일정 위에 겹친 끼니는 칸을 따로 갖지 않고 오른쪽에 얹는다.
         /// 오른쪽 자리 — 거기 서는 것끼리 겹치면 나눠 선다 (→ `right`).
@@ -1852,20 +1995,91 @@ struct DayScheduleView: View {
         // ⚠️ 한때 반반 + 틈 8pt로 갈랐다. 회사 위에 얹힌 회의는 45%에 서는데, 회사와 겹친
         //    보통 블록은 50%+8에 서서 오른쪽 칸의 알약들이 한 줄에 안 섰다 — 같은 '회사 옆'인데
         //    어떻게 거기 왔느냐에 따라 x가 달랐다. 오른쪽 칸은 어디서 왔든 한 선에서 시작한다.
-        if lane.count == 2 {
-            let split = w * Self.nestSplit
-            return lane.index == 0
-                ? CGRect(x: 0, y: top, width: split, height: height)
-                : rightSide()
-        }
-        let gap: CGFloat = 8
-        let columnWidth = (w - gap * CGFloat(lane.count - 1)) / CGFloat(lane.count)
-        return CGRect(x: CGFloat(lane.index) * (columnWidth + gap), y: top, width: columnWidth, height: height)
+        //
+        // ⚠️ 셋 이상이면 한때 자를 똑같이 셋으로 갈랐다. 그러면 09:30에 셋이 겹친 것 하나 때문에 회사 09–18에 이어진
+        //    묶음 전체가 세 칸이 되어, 오후의 혼자 선 블록들은 33%에, 회사 위에 얹힌 13시 식사는 45%에 섰다.
+        //    첫 칸만 왼쪽에 두고 나머지는 오른쪽 자리에서 **그 시각에 겹친 것끼리만** 나눈다 (→ `right`).
+        let split = w * Self.nestSplit
+        return lane.index == 0
+            ? CGRect(x: 0, y: top, width: split, height: height)
+            : rightSide()
     }
 
     struct Lane {
         let index: Int
         let count: Int
+    }
+
+    /// **회사 막대에 파고들어 서는 것들.** 회사 09–18 한가운데 13시 식사는 늘 오른쪽 칸을 따로 세워
+    /// 하루가 두 줄로 읽혔다. 그 시간엔 회사를 비우고 식사를 하는 것이니, 회사 막대 위에 겹쳐 세우고
+    /// 그 둘레만 끊는다 — 하루는 한 줄로 남는다.
+    ///
+    /// - 막대 위에 서는 것끼리는 겹치지 않는다. 서로 겹친 묶음(09:00 [6기]와 09:30 [LC])에서는 **먼저 시작한
+    ///   하나**만 들어가고, 나머지는 오른쪽에 — 이제 혼자이니 폭을 다 쓴다. 셋이 나란히 서던 것이 둘로 준다.
+    /// - 회사 시작에 붙은 것도 들어간다. 그러면 회사의 머리 글씨(시각·제목)를 그 아래로 내린다 (`labelDrop`).
+    ///   글씨가 설 40pt 안에서 시작하는 다른 것은 들어가지 않는다 — 글씨와 부딪친다.
+    /// - Returns: `inside` — 회사 같은 일정 안에 들어 있어 열을 고를 수 있는 것 (우클릭 '1열로/2열로').
+    private func dugIn(_ candidates: [TimeSegment], laned: [TimeSegment],
+                       lanes: [String: Lane])
+    -> (dug: Set<String>, labelDrop: [String: CGFloat], inside: Set<String>) {
+        let labelRoom: CGFloat = 40
+        let pins = ColumnPin.load(columnPinsRaw)
+        let mode = columnMode
+        let hosts = laned.filter { h in
+            hostsNested(h) && (lanes[h.id].map { $0.index == 0 } ?? true)
+        }
+        var dug = Set<String>()
+        var drops: [String: CGFloat] = [:]
+        var insideAll = Set<String>()
+        for h in hosts {
+            let inside = candidates
+                .filter { $0.id != h.id && !$0.isGhost && !dug.contains($0.id)
+                    && h.start <= $0.start + 1e-6 && $0.end <= h.end + 1e-6 }
+            insideAll.formUnion(inside.map(\.id))
+            // 사람이 1열로 고른 것이 먼저, 그다음 시작 순. 2열로 고른 것은 들이지 않는다.
+            let pinned = { (seg: TimeSegment) in pins[ColumnPin.key(seg, on: date)] }
+            // 넓게: 사람이 1열로 고른 것만 들인다. 나머지는 모두 제 칸을 갖는다.
+            let order = inside
+                .filter { (pinned($0) ?? 0) < 2 }
+                .filter { mode != .wide || pinned($0) == 1 }
+                .sorted { a, b in
+                    let pa = pinned(a) == 1, pb = pinned(b) == 1
+                    if pa != pb { return pa }
+                    return a.start != b.start ? a.start < b.start : a.end > b.end
+                }
+            // 서로 겹치지 않게 하나씩.
+            var picked: [TimeSegment] = []
+            for seg in order where !picked.contains(where: { $0.start < seg.end - 1e-6 && seg.start < $0.end - 1e-6 }) {
+                picked.append(seg)
+            }
+            picked.sort { $0.start < $1.start }
+            // 회사 글씨 자리 — 시작에 붙은 것들을 건너 그 아래로.
+            var labelY = y(h.start)
+            for seg in picked where y(seg.start) < labelY + labelRoom {
+                labelY = max(labelY, y(seg.end))
+            }
+            // 글씨가 막대 끝을 넘어가면 내리지 않는다 — 시작에 붙은 것들은 오른쪽에 둔다.
+            // 사람이 1열로 고른 것은 글씨와 좀 부딪쳐도 그대로 둔다 — 고른 자리를 앱이 무르면 안 된다.
+            // 좁게: 아무것도 빼지 않는다 — 글씨는 막대 위에서 40pt가 비는 첫 자리로 옮긴다(없으면 맨 위에 겹쳐서).
+            let isPinned = { (seg: TimeSegment) in pinned(seg) == 1 || mode == .compact }
+            if mode == .compact {
+                labelY = y(h.start)
+                for seg in picked {
+                    if y(seg.start) - labelY >= labelRoom { break }
+                    labelY = max(labelY, y(seg.end))
+                }
+                if labelY + labelRoom > y(h.end) { labelY = y(h.start) }
+            }
+            if labelY + labelRoom > y(h.end) {
+                labelY = y(h.start)
+                picked.removeAll { y($0.start) < labelY + labelRoom && !isPinned($0) }
+            }
+            // 글씨 자리와 부딪치는 것은 빼낸다 (내린 글씨 바로 아래에서 시작하는 것).
+            picked.removeAll { y($0.start) >= labelY && y($0.start) < labelY + labelRoom && !isPinned($0) }
+            if labelY > y(h.start) + 0.5 { drops[h.id] = labelY - y(h.start) }
+            dug.formUnion(picked.map(\.id))
+        }
+        return (dug, drops, insideAll)
     }
 
     /// 칸을 따로 갖지 않고 오른쪽에 얹히는가 — 루틴 안 일정, 다른 일정 위에 겹친 끼니.
@@ -1936,13 +2150,14 @@ struct DayScheduleView: View {
     }
 
     /// 칸을 나누는 것 모두(회사 같은 바탕 포함)를 세어, 동시에 셋 이상인 구간을 이어 붙여 돌려준다.
-    private func crowdedSpans(_ segs: [TimeSegment]) -> [Crowd] {
+    /// - Parameter dug: 회사 막대에 파고든 것 (→ `dugIn`). 칸을 따로 차지하지 않으니 줄 수에 안 센다.
+    private func crowdedSpans(_ segs: [TimeSegment], dug: Set<String> = []) -> [Crowd] {
         let marks = Array(Set(segs.flatMap { [$0.start, $0.end] })).sorted()
         guard marks.count > 1 else { return [] }
         var spans: [(start: Double, end: Double, items: [TimeSegment], columns: Int)] = []
         for i in 0..<(marks.count - 1) {
             let mid = (marks[i] + marks[i + 1]) / 2
-            let active = segs.filter { $0.start < mid && mid < $0.end }
+            let active = segs.filter { $0.start < mid && mid < $0.end && !dug.contains($0.id) }
             guard active.count >= 3 else { continue }
             if var last = spans.last, abs(last.end - marks[i]) < 1e-6 {
                 let more = active.filter { a in !last.items.contains { $0.id == a.id } }
@@ -2113,6 +2328,41 @@ struct DayScheduleView: View {
     /// 반쪽이 되지 않게.
     /// - Parameter minHours: 짧은 일도 화면에서는 이만큼 차지한다. 시각으로는 안 겹쳐도
     ///   알약이 겹쳐 보이면 나란히 세운다.
+    /// 오른쪽 자리를 나눈다 — `lanes`와 같되 **사람이 고른 칸**(pins: id → 칸 번호)을 먼저 앉힌다.
+    /// 고른 칸이 그 시각에 이미 차 있으면 앱이 빈 칸을 찾아 준다.
+    static func pinnedLanes(_ segs: [TimeSegment], pins: [String: Int]) -> [String: Lane] {
+        guard !pins.isEmpty else { return lanes(segs) }
+        var result: [String: Lane] = [:]
+        // 서로 이어 겹치는 묶음마다 따로 센다.
+        var clusters: [[TimeSegment]] = []
+        var end = -Double.infinity
+        for seg in segs.sorted(by: { $0.start != $1.start ? $0.start < $1.start : $0.end > $1.end }) {
+            if clusters.isEmpty || seg.start >= end - 1e-6 { clusters.append([]); end = -Double.infinity }
+            clusters[clusters.count - 1].append(seg)
+            end = max(end, seg.end)
+        }
+        for cluster in clusters {
+            var cols: [[(Double, Double)]] = []
+            var assigned: [String: Int] = [:]
+            func free(_ c: Int, _ seg: TimeSegment) -> Bool {
+                c >= cols.count || !cols[c].contains { $0.0 < seg.end - 1e-6 && seg.start < $0.1 - 1e-6 }
+            }
+            func put(_ seg: TimeSegment, _ c: Int) {
+                while cols.count <= c { cols.append([]) }
+                cols[c].append((seg.start, seg.end))
+                assigned[seg.id] = c
+            }
+            for seg in cluster {
+                if let want = pins[seg.id], free(want, seg) { put(seg, want) }
+            }
+            for seg in cluster where assigned[seg.id] == nil {
+                put(seg, (0...cols.count).first { free($0, seg) } ?? cols.count)
+            }
+            for seg in cluster { result[seg.id] = Lane(index: assigned[seg.id] ?? 0, count: cols.count) }
+        }
+        return result
+    }
+
     static func lanes(_ segs: [TimeSegment], minHours: Double = 0) -> [String: Lane] {
         var result: [String: Lane] = [:]
         var cluster: [(id: String, lane: Int)] = []
@@ -2592,5 +2842,71 @@ private struct OptionalDraggableToken: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         if let token { content.draggable(token) } else { content }
+    }
+}
+
+
+// MARK: - 사람이 고른 열
+
+/// 회사 같은 긴 일정 안에 든 것을 **1열(막대 위) / 2열(오른쪽)** 중 어디 둘지 사람이 고른 것.
+///
+/// 기기에만 남는다 (CloudKit 스키마를 건드리지 않는다 — 보는 모양일 뿐이다).
+/// - 끼니·루틴은 날마다 같은 것이라 **날을 가리지 않는다** — 13시 식사를 한 번 1열로 두면 매일 1열.
+/// - 계획 블록은 그날 하루짜리라 **날짜까지** 붙인다.
+enum ColumnPin {
+    static let storageKey = "dayColumn.pins"
+
+    static func key(_ seg: TimeSegment, on date: Date) -> String {
+        switch seg.source {
+        case .quotaSession(let name, let index): return "q|\(name)|\(index)"
+        case .fixedRoutine(let name): return "r|\(name)"
+        default:
+            let f = DateFormatter()
+            f.dateFormat = "yyyy-MM-dd"
+            return "b|\(f.string(from: date))|\(seg.title)"
+        }
+    }
+
+    static func load(_ raw: String) -> [String: Int] {
+        guard let data = raw.data(using: .utf8),
+              let map = try? JSONDecoder().decode([String: Int].self, from: data) else { return [:] }
+        return map
+    }
+
+    static func set(_ raw: String, key: String, column: Int?) -> String {
+        var map = load(raw)
+        map[key] = column
+        let data = (try? JSONEncoder().encode(map)) ?? Data()
+        return String(data: data, encoding: .utf8) ?? "{}"
+    }
+}
+
+
+/// 겹친 일정을 몇 열로 세울지.
+enum ColumnMode: String, CaseIterable, Identifiable {
+    /// 회사 안에 혼자 선 것은 막대 위로, 글씨와 부딪치면 오른쪽에.
+    case auto
+    /// 가능한 좁게 — 겹치지 않는 한 모두 막대 위로. 회사 글씨는 빈 자리로 옮긴다.
+    case compact
+    /// 가능한 넓게 — 막대 위로 들이지 않는다. 겹친 것마다 제 열을 갖는다.
+    case wide
+
+    static let storageKey = "dayColumn.mode"
+    var id: String { rawValue }
+
+    var label: LocalizedStringKey {
+        switch self {
+        case .auto: "열 자동"
+        case .compact: "가능한 좁게"
+        case .wide: "가능한 넓게"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .auto: "rectangle.split.2x1"
+        case .compact: "rectangle.compress.vertical"
+        case .wide: "rectangle.split.3x1"
+        }
     }
 }

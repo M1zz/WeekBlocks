@@ -242,6 +242,24 @@ extension PlanBlock {
     /// **오늘도 센다 — 적힌 끝 시각이 지났으면.** 09:30–11:00 인터뷰를 12시까지 안 찍었으면 이미 지나간 줄이다.
     /// 바로 찍으라고 다그치지는 않지만, 끝났는지는 물어야 한다 (→ OverdueAskBadge).
     /// 시각이 없는 것(시간대 · 종일)은 그날이 지나야 센다.
+    /// **지금 진행 중인가.** 그날 적힌 시각 안이고 아직 안 찍었다. 저장하지 않는다 — 시계가 정한다.
+    /// 끝냈다고 찍는 것은 사람의 몫이라, 찍으면(달성·부분·건너뜀) 진행 중에서 빠진다.
+    /// 시각이 없는 것(시간대 · 종일)은 언제 시작하는지 모르므로 세지 않는다.
+    /// - Returns: 진행 중이면 그 끝 시각, 아니면 nil.
+    func inProgressEnd(on date: Date, now: Date = Date()) -> Date? {
+        guard reviewStatus == nil, let end = scheduledEnd(on: date) else { return nil }
+        let start = end.addingTimeInterval(-durationHours * 3600)
+        // 끝 시각이 지나도 '아직 하는 중'이라고 했으면 진행 중이다. 그날 안에서만.
+        if now >= end, StillGoing.contains(self), Calendar.current.isDate(now, inSameDayAs: date) { return end }
+        return now >= start && now < end ? end : nil
+    }
+
+    /// 그날 적힌 끝 시각. 시각이 없는 것(시간대 · 종일)은 nil.
+    func scheduledEnd(on date: Date) -> Date? {
+        guard startHour >= 0, !isAllDay, durationHours > 0 else { return nil }
+        return Calendar.current.startOfDay(for: date).addingTimeInterval((startHour + durationHours) * 3600)
+    }
+
     func isUnreviewedPast(weekStart: Date, routineNames: Set<String>, now: Date = Date()) -> Bool {
         guard reviewStatus == nil, isTodo(routineNames) else { return false }
         let cal = Calendar(identifier: .iso8601)
@@ -249,6 +267,9 @@ extension PlanBlock {
         let dayStart = cal.startOfDay(for: d)
         if dayStart < cal.startOfDay(for: now) { return true }
         guard cal.isDate(dayStart, inSameDayAs: now), startHour >= 0, !isAllDay else { return false }
+        // 오늘 '아직 하는 중'이라고 답한 것은 묻지 않는다 — 끝나면 사람이 찍는다 (→ StillGoing).
+        // 그날이 지나면 다시 묻는다.
+        if StillGoing.contains(self) { return false }
         return dayStart.addingTimeInterval((startHour + durationHours) * 3600) <= now
     }
 }
@@ -290,5 +311,48 @@ extension PlanBlock {
     func shuffleSymbol() {
         let current = symbol
         iconName = Self.symbolChoices.filter { $0 != current }.randomElement() ?? current
+    }
+}
+
+
+// MARK: - 아직 하는 중
+
+/// **끝 시각이 지났지만 아직 하는 중**이라고 답한 블록들. '끝냈나요?'를 다시 묻지 않고 진행 중으로 둔다.
+///
+/// ⚠️ 기기에만 남는다 (→ TaskTimer와 같은 까닭: CloudKit 스키마를 건드리지 않는다).
+///    열쇠는 `dragToken`이 아니라 주·요일·시각·제목이다 — persistentModelID 글자는 앱을 다시 켜면 달라질 수 있다.
+///    이틀 지난 것은 저절로 지운다.
+enum StillGoing {
+    static let storageKey = "stillGoing.blocks"
+
+    private static func key(_ b: PlanBlock) -> String {
+        "\(Int(b.weekStartDate.timeIntervalSince1970))|\(b.day.rawValue)|\(b.startHour)|\(b.title)"
+    }
+
+    /// 열쇠 → 답한 시각.
+    private static func load() -> [String: Double] {
+        guard let data = UserDefaults.standard.string(forKey: storageKey)?.data(using: .utf8),
+              let map = try? JSONDecoder().decode([String: Double].self, from: data) else { return [:] }
+        return map
+    }
+
+    private static func save(_ map: [String: Double]) {
+        let fresh = map.filter { Date().timeIntervalSince1970 - $0.value < 2 * 86_400 }
+        let data = (try? JSONEncoder().encode(fresh)) ?? Data()
+        UserDefaults.standard.set(String(data: data, encoding: .utf8) ?? "{}", forKey: storageKey)
+    }
+
+    static func contains(_ b: PlanBlock) -> Bool { load()[key(b)] != nil }
+
+    static func mark(_ b: PlanBlock) {
+        var map = load()
+        map[key(b)] = Date().timeIntervalSince1970
+        save(map)
+    }
+
+    static func clear(_ b: PlanBlock) {
+        var map = load()
+        guard map.removeValue(forKey: key(b)) != nil else { return }
+        save(map)
     }
 }

@@ -26,6 +26,8 @@ struct PreDecisionBanner: View {
     let tomorrowBlocks: [PlanBlock]
     /// 지금 보고 있는 날이 오늘인가. 다른 날을 들여다보는 중에는 말을 걸지 않는다.
     let isViewingToday: Bool
+    /// 루틴 이름 — 블록이 그날 무지개에서 받은 색을 셈하는 데 쓴다 (→ TodoLoad).
+    var routineNames: Set<String> = []
     /// 이 블록을 지금 센다 (타이머).
     var onStart: (PlanBlock) -> Void = { _ in }
     /// 내일로 건너간다.
@@ -109,12 +111,32 @@ struct PreDecisionBanner: View {
         }
     }
 
+    /// 안내가 가리키는 블록. 내일이 비어 있으면 없다.
+    private func block(of kind: Kind) -> PlanBlock? {
+        switch kind {
+        case .morning(let b), .tomorrowReady(let b): b
+        case .tomorrowEmpty: nil
+        }
+    }
+
+    /// 그 블록이 시간표에 서는 모양 그대로 — 같은 아이콘, 같은 무지개 색.
+    /// 한때 안내 종류의 그림(해돋이)을 세워서, 같은 일이 여기와 시간표에서 다른 것처럼 보였다.
+    private func blockColor(_ b: PlanBlock, in kind: Kind) -> Color {
+        let day: [PlanBlock] = { if case .morning = kind { todayBlocks } else { tomorrowBlocks } }()
+        return TodoLoad(day, routineNames: routineNames).color(for: b) ?? .accentColor
+    }
+
     private func card(_ kind: Kind, key: String) -> some View {
         HStack(alignment: .center, spacing: 12) {
-            GlyphBadge(symbol: symbol(kind), color: tint(kind), size: 30)
+            if let b = block(of: kind) {
+                GlyphBadge(symbol: b.symbol, color: blockColor(b, in: kind), size: 30)
+            } else {
+                GlyphBadge(symbol: symbol(kind), color: tint(kind), size: 30)
+            }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title(kind))
+                // 안내 종류(아침·저녁)는 제목 앞 작은 그림이 맡는다.
+                Label(title(kind), systemImage: symbol(kind))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(tint(kind))
                 Text(headline(kind))

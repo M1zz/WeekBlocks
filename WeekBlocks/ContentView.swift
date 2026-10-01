@@ -45,6 +45,8 @@ struct ContentView: View {
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: RoutineDetailContext?
     @State private var showingReflection = false
+    /// 일간에서 크게 편 판 (→ DayPanel). nil이면 셋이 제자리에.
+    @State private var expandedPanel: DayPanel?
     /// 다른 주 계획을 보고 있는 주에 깐다 (→ WeekCopyView, Pro).
     @State private var showingWeekCopy = false
     @State private var purchases = PurchaseManager.shared
@@ -57,6 +59,8 @@ struct ContentView: View {
     @AppStorage("didDismissNextStep") private var didDismissNextStep = false
     /// 겹친 일정 중 타이머로 고른 것 (→ ScheduleFocus). 바뀌면 알약·위젯이 다시 맞춘다.
     @AppStorage(ScheduleFocus.storageKey) private var scheduleFocus = ""
+    /// '아직 하는 중'이라고 답한 것 (→ StillGoing). 바뀌면 '끝냈나요?' 수를 다시 센다.
+    @AppStorage(StillGoing.storageKey) private var stillGoingRaw = ""
     /// 겹친 시간을 누구 몫으로 세는가 (→ OverlapRule.swift). 겹침이 처음 생겼을 때 배너가 한 번 묻는다.
     @AppStorage(OverlapRule.storageKey) private var overlapRule: OverlapRule = .keepOuter
     @AppStorage(OverlapRule.decidedKey) private var overlapRuleDecided = false
@@ -833,6 +837,7 @@ struct ContentView: View {
                     todayBlocks: blocks(on: Date()),
                     tomorrowBlocks: blocks(on: tomorrow),
                     isViewingToday: dayOffset == 0,
+                    routineNames: routineNames,
                     onStart: { block in
                         let slot = slotNow(of: block)
                         TaskTimer.shared.start(block: block, scheduledStart: slot?.start,
@@ -843,12 +848,16 @@ struct ContentView: View {
                     onOpenTomorrow: { shiftDay(by: 1) }
                 )
             }
+            // 크게 편 판 밖을 누르면 접는다 — 요일을 눌러 건너가도 함께 접힌다.
+            .simultaneousGesture(TapGesture().onEnded { collapsePanel() })
             dayStrip
+                .simultaneousGesture(TapGesture().onEnded { collapsePanel() })
 
             // **반은 하루, 반은 그날의 회고와 아직 안 정한 할 일.** 하루 옆에 그날 계획해 둔 블록마다
             // 했는지를 찍는 칸을 두고(→ DayReflectionPanel, 주간 회고와 같은 표시), 그 아래에
             // 요일을 아직 안 정한 할 일을 세워 빈 시간에 바로 끌어다 놓게 한다.
             HStack(alignment: .top, spacing: 14) {
+                if shows(.schedule) {
                 ZStack(alignment: .topLeading) {
                     DayScheduleView(
                     day: selectedDay,
@@ -919,6 +928,7 @@ struct ContentView: View {
                 )
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
+                    .expandable(.schedule, expanded: $expandedPanel)
                     // 날이 바뀌면 한 장을 옆으로 넘긴다 — 넘긴 쪽에서 들어온다.
                     .id("\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
                     .transition(.pageSlide(forward: dayForward, distance: 40))
@@ -926,11 +936,15 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 // 알약을 끄는 동안에는 시간표 판이 오른쪽 판들 위로 — 끌려 나간 알약이 가려지지 않게.
                 .zIndex(dayZones.isDragging ? 10 : 0)
+                .transition(.panelAside)
+                }
 
                 // 오른쪽 반: 위에 그날의 회고, 아래에 **아직 요일을 안 정한 할 일**.
                 // 회고만 두었더니 하루를 보다가 빈 시간에 넣을 일을 고르려면 주간으로 돌아가야 했다.
                 // 할 일 카드는 주간과 같은 목록이라, 왼쪽 하루에 끌어다 놓으면 그 높이의 시각에 선다.
+                if shows(.plan) || shows(.backlog) {
                 VStack(alignment: .leading, spacing: 14) {
+                    if shows(.plan) {
                     DayReflectionPanel(
                         day: selectedDay,
                         date: dayDate(selectedDay),
@@ -944,10 +958,13 @@ struct ContentView: View {
                         externallyTargeted: dayZones.hovering == .plan
                     )
                     .dashboardPanel(padding: 14)
+                    .expandable(.plan, expanded: $expandedPanel)
                     .reportGlobalFrame { dayZones.planFrame = $0 }
                     .id("reflection-\(selectedWeek.timeIntervalSince1970)-\(selectedDay.rawValue)")
-                    .transition(.opacity)
+                    .transition(.panelAside)
+                    }
 
+                    if shows(.backlog) {
                     BacklogSection(allItems: backlogItems,
                                    weekStart: selectedWeek,
                                    weekBlocks: weekBlocks,
@@ -956,13 +973,40 @@ struct ContentView: View {
                                    showsCategoryFilter: false)
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
+                    .expandable(.backlog, expanded: $expandedPanel)
                     .reportGlobalFrame { dayZones.backlogFrame = $0 }
+                    .transition(.panelAside)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .transition(.panelAside)
+                }
+            }
+            // 비켜선 판의 자리는 지운다 — 남겨 두면 끌던 알약이 보이지 않는 판에 떨어진다.
+            .onChange(of: expandedPanel) { _, _ in
+                if !shows(.plan) { dayZones.planFrame = .zero }
+                if !shows(.backlog) { dayZones.backlogFrame = .zero }
+            }
+            // 크게 편 판은 Esc로도 접는다.
+            .background {
+                if expandedPanel != nil {
+                    Button("") { collapsePanel() }
+                        .keyboardShortcut(.cancelAction)
+                        .opacity(0)
+                        .allowsHitTesting(false)
+                }
             }
             // 두 판의 키를 긴 쪽에 맞춘다 — 들쭉날쭉하면 한 화면이 아니라 두 조각으로 읽힌다.
             .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    /// 이 판이 지금 서 있는가 — 하나를 크게 펴면 나머지는 비켜선다.
+    private func shows(_ panel: DayPanel) -> Bool { expandedPanel == nil || expandedPanel == panel }
+
+    private func collapsePanel() {
+        guard expandedPanel != nil else { return }
+        withAnimation(.panelSpring) { expandedPanel = nil }
     }
 
     /// 한 걸음 되돌린다. 화면이 툭 바뀌지 않게 결을 붙이고, 되돌린 것도 곧바로 저장한다.
@@ -1085,7 +1129,8 @@ struct ContentView: View {
 
     /// 보는 주에서 지나갔는데 안 찍은 블록 (→ OverdueAskBadge). 요일 → 시각 순.
     private func overdueBlocks(at date: Date) -> [PlanBlock] {
-        weekBlocks
+        _ = stillGoingRaw
+        return weekBlocks
             .filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames, now: date) }
             .sorted { ($0.day.rawValue, $0.sortHour) < ($1.day.rawValue, $1.sortHour) }
     }
