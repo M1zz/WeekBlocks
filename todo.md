@@ -1319,3 +1319,15 @@ sortIndex·createdAt·isCompleted·completedAt. 관계 대신 uuid 문자열로 
 - [ ] App Store Connect: English (U.S.) 현지화 추가, 이름 `Rainbow Craft: Week Planner`
 - [x] 1.1.6 릴리즈 노트
 - [ ] 스크린샷 목업(build.mjs)의 오늘 표시도 파랑으로 맞추기
+
+## 1.1.9 — 번체·간체 중국어, 영어 ASO (2026-09-30)
+근거: 닷새 동안 1,201건 중 98%가 해외(미국 389 · 대만 189 · 중국 179 · 홍콩 83). 맥 다운로드 24%.
+- [x] 앱 문장 951개 zh-Hant(대만식)·zh-Hans(대륙식), 앱 이름 彩虹工坊, 캘린더 권한 문구, 공유 확장 이름
+- [x] 언어 고르개에 繁體中文·简体中文, 메뉴 제목 `Language · 언어 · 語言`. 내보내기 캘린더 이름 목록에 彩虹工坊
+- [x] `deploy.env` LOCALES 에 zh-Hant,zh-Hans. 1.1.9 릴리즈 노트 네 언어
+- [x] `APPSTORE.md` — 중국어 스토어 페이지 전부(이름·부제·설명·키워드·프로모션·URL)와 영어 부제·키워드
+- [x] 영어 ASO: 부제 `Block Schedule` → `Time Blocking & Weekly Routine`, 키워드 공백·중복 정리 (근거는 APPSTORE.md 주석)
+- [ ] 설치된 DeployBar(9/16)에는 `--storemeta`·`--publish` 가 없다 — 새로 빌드해 깔아야 APPSTORE.md 가 올라간다
+- [ ] 1.1.9 배포 때 `--publish 무지개 공방 --overwrite` (영어 칸은 이미 차 있어 덮어써야 바뀐다)
+- [ ] 중국어 원어민 검수 (특히 번체) · 중국어 스크린샷
+- [ ] 출시 1~2주 뒤 미국 순위 다시 재기: week schedule 27 · weekly schedule 45 · weekly time blocking 52 · weekly routine 65 · block schedule 85 · time blocking 150

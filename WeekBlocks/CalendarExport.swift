@@ -23,9 +23,9 @@ import EventKit
 import SwiftData
 
 extension CalendarBridge {
-    /// 앱이 만드는 캘린더의 이름. 언어를 바꿔도 찾을 수 있게 두 이름을 다 알아본다.
+    /// 앱이 만드는 캘린더의 이름. 언어를 바꿔도 찾을 수 있게 모든 언어의 이름을 알아본다.
     static var exportCalendarTitle: String { String(localized: "무지개 공방") }
-    private static let exportCalendarTitles: Set<String> = ["무지개 공방", "Rainbow Craft"]
+    private static let exportCalendarTitles: Set<String> = ["무지개 공방", "Rainbow Craft", "彩虹工坊"]
     private static let urlScheme = "rainbowcraft"
 
     func isExportCalendar(_ calendar: EKCalendar) -> Bool {

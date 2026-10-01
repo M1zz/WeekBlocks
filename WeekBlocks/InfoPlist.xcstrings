@@ -15,6 +15,18 @@
             "state" : "translated",
             "value" : "무지개 공방"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊"
+          }
         }
       }
     },
@@ -32,6 +44,18 @@
             "state" : "translated",
             "value" : "무지개 공방"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊"
+          }
         }
       }
     },
@@ -48,6 +72,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "맥 캘린더의 일정을 주간 계획으로 가져옵니다. 원하면 계획을 앱이 만든 ‘무지개 공방’ 캘린더에 적으며, 다른 캘린더는 고치지 않습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将 Mac 日历中的日程带入每周计划。如果你开启此功能，计划也会写入 App 创建的“彩虹工坊”日历，其他日历一律不会更改。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將 Mac 行事曆中的行程帶入每週計畫。若你開啟此功能，計畫也會寫入 App 建立的「彩虹工坊」行事曆，其他行事曆一律不會更動。"
           }
         }
       }

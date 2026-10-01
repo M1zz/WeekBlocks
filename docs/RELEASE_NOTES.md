@@ -1,5 +1,39 @@
 # 릴리즈 노트
 
+## 1.1.9
+
+### 앱스토어 (한국어)
+
+이제 번체와 간체 중국어로도 쓸 수 있습니다
+시각이 되면 계획이 진행 중으로 바뀌고 지나면 끝냈는지 묻습니다
+지나간 일정을 한 번에 완료로 찍을 수 있습니다
+종일 일정과 여러 날 일정을 막대로 깔끔하게 보여 줍니다
+주간 회고가 요일별 카드로 한눈에 보입니다
+
+### App Store (English)
+
+Now available in Traditional and Simplified Chinese
+Plans turn in progress on time and ask if you finished
+Mark everything that has passed as done in one go
+All-day and multi-day events show as tidy bars
+The weekly review now lays out each day as a card
+
+### App Store (繁體中文, zh-Hant)
+
+現在支援繁體中文與簡體中文
+計畫到點就轉為進行中，時間過了會問你做完沒
+已過去的行程可以一次標記完成
+全天與跨日行程以長條清楚呈現
+每週回顧改以每天一張卡片呈現
+
+### App Store (简体中文, zh-Hans)
+
+现已支持简体中文和繁体中文
+计划到点就变为进行中，时间过了会问你做完没有
+已过去的日程可以一次标记完成
+全天和跨天日程以长条清晰呈现
+每周复盘改为每天一张卡片
+
 ## 1.1.8
 
 ### 앱스토어 (한국어)

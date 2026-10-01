@@ -100,7 +100,7 @@ struct SettingsView: View {
                         .buttonStyle(.plain)
                     }
                 } header: {
-                    Text(verbatim: "Language · 언어")
+                    Text(verbatim: "Language · 언어 · 語言")
                 } footer: {
                     Text(verbatim: "The app restarts to switch. · 고르면 앱이 다시 열립니다.")
                         .font(.body)

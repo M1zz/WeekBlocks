@@ -102,7 +102,7 @@ final class Routine {
     var isSleepRoutine: Bool {
         guard kind == .fixed else { return false }
         let n = name.lowercased().replacingOccurrences(of: " ", with: "")
-        return ["수면", "잠", "취침", "sleep", "bedtime", "nap"].contains { n.contains($0) }
+        return ["수면", "잠", "취침", "sleep", "bedtime", "nap", "睡", "就寢", "就寝"].contains { n.contains($0) }
     }
 
     var scheduleDescription: String {

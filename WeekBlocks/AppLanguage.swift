@@ -7,7 +7,8 @@
 //  맥은 시스템 설정 > 일반 > 언어 및 지역 > 응용 프로그램에서 앱마다 언어를 고를 수 있지만,
 //  거기까지 찾아가는 사람은 드물다. 한국어를 못 읽는 사람이 한국어 화면에 떨어지면 설정 단추조차
 //  못 읽는다 — "Default Korean, cannot find an option to select English." 그래서 앱 안에 두고,
-//  **글자는 늘 두 말로** 적는다 (Language · 언어). 무엇을 고르는 자리인지 어느 쪽이든 읽혀야 한다.
+//  **글자는 늘 여러 말로** 적는다 (Language · 언어 · 語言). 무엇을 고르는 자리인지 어느 쪽이든 읽혀야 한다.
+//  語言은 번체지만 간체를 쓰는 사람도 읽는다 — 글자를 더 늘리면 메뉴가 길어진다.
 //
 //  고른 값은 시스템 설정의 앱별 언어와 **같은 자리**(이 앱의 AppleLanguages)에 적는다.
 //  그래서 어느 쪽에서 바꿔도 서로 맞는다. 언어는 앱이 켜질 때 정해지므로 다시 열어야 바뀐다.
@@ -19,6 +20,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case system
     case english = "en"
     case korean = "ko"
+    case chineseTraditional = "zh-Hant"
+    case chineseSimplified = "zh-Hans"
 
     var id: String { rawValue }
 
@@ -28,6 +31,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         case .system:  "System · 시스템 설정"
         case .english: "English"
         case .korean:  "한국어"
+        case .chineseTraditional: "繁體中文"
+        case .chineseSimplified:  "简体中文"
         }
     }
 
@@ -39,6 +44,9 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         guard let first = (domain?[key] as? [String])?.first else { return .system }
         if first.hasPrefix("ko") { return .korean }
         if first.hasPrefix("en") { return .english }
+        // 시스템 설정의 앱별 언어는 zh-TW·zh-HK·zh-CN 처럼 지역을 붙여 적기도 한다.
+        if ["zh-Hant", "zh-TW", "zh-HK", "zh-MO"].contains(where: first.hasPrefix) { return .chineseTraditional }
+        if ["zh-Hans", "zh-CN", "zh-SG"].contains(where: first.hasPrefix) { return .chineseSimplified }
         return .system
     }
 
@@ -76,7 +84,7 @@ struct AppLanguageMenu: View {
                 }
             }
         } label: {
-            Label { Text(verbatim: "Language · 언어") } icon: { Image(systemName: "globe") }
+            Label { Text(verbatim: "Language · 언어 · 語言") } icon: { Image(systemName: "globe") }
         }
     }
 }
