@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>隐私政策 — 彩虹工坊</title>
+<meta name="description" content="彩虹工坊（macOS）会处理哪些信息、存放在哪里，以及绝对不做的事。" />
+<meta property="og:title" content="彩虹工坊" />
+<meta property="og:description" content="彩虹工坊（macOS）会处理哪些信息、存放在哪里，以及绝对不做的事。" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html" />
+<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html" />
+<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/privacy.html" />
+<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/privacy.html" />
+<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html" />
+<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html" />
+<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/privacy.html" />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
+  nav.langs { padding:14px 16px 0; }
+  nav.pages { padding:8px 16px 0; }
+  nav.langs a, nav.pages a { text-decoration:none; }
+  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
+  footer nav { margin-top:10px; }
+  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
+</style>
+
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+<nav class="langs" aria-label="语言">
+  <a href="../privacy.html" hreflang="ko" lang="ko">한국어</a>
+  <a href="../en/privacy.html" hreflang="en" lang="en">English</a>
+  <a href="../zh-Hans/privacy.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="true">简体中文</a>
+  <a href="../zh-Hant/privacy.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+</nav>
+<nav class="pages" aria-label="页面">
+  <a href="index.html">介绍</a>
+  <a href="support.html">支持</a>
+  <a href="privacy.html" aria-current="page">隐私政策</a>
+</nav>
+
+<main class="wrap">
+
+<header style="padding:28px 0 28px">
+  <h1 style="font-size:34px; text-align:left; margin:0 0 8px">隐私政策</h1>
+  <p class="muted" style="margin:0">彩虹工坊 (macOS) &middot; 最后更新：2026 年 9 月 28 日</p>
+</header>
+
+<section style="border-top:1px solid var(--line); padding-top:28px">
+  <p>彩虹工坊（以下简称“本 App”）是一款本地优先的 App，不设自己的服务器。本文说明本 App 会处理哪些信息、存放在哪里，以及哪些事情绝对不做。</p>
+  <div class="note">
+    简而言之：你写下的内容（待办事项、计划、作息）只保存在你的设备和你本人的 iCloud 私有数据库中，开发者无法访问。为了持续改进 App，本 App 会发送<b>匿名使用统计</b>，也就是 App 版本、启动次数、各类项目的数量这样的数字。其中不含你写下的任何内容，也不含能识别你身份的信息，你可以随时在设置中关闭。
+  </div>
+</section>
+
+<section>
+  <h2>1. 不收集的信息</h2>
+  <p class="lead">本 App 不收集以下信息。</p>
+  <ul class="plain">
+    <li>姓名、电子邮件地址、电话号码等账户或联系信息</li>
+    <li>位置信息</li>
+    <li>广告标识符和追踪数据（使用统计请见第 7 节——不使用广告标识符，也不交给任何第三方）</li>
+    <li>设备上的其他数据，例如通讯录或照片</li>
+  </ul>
+  <p>无需注册，也无需登录。</p>
+  <p class="muted">只有在你亲自选择“从日历导入”时，本 App 才会读取日历。详见第 4 节。</p>
+</section>
+
+<section>
+  <h2>2. 你写下的数据</h2>
+  <p class="lead">为了提供功能，本 App 会把你亲自输入的内容保存在设备上。</p>
+  <ul class="plain">
+    <li>计划块（活动、成功标准、产出、星期与时段、时长）</li>
+    <li>固定作息（时段和每周配额设置）</li>
+    <li>待办事项及其步骤（标题、预计时长、是否完成、顺序，以及你对碎片判断问题的回答）</li>
+    <li>待办分类（名称、颜色、图标）</li>
+    <li>复盘记录（完成、部分完成、跳过、备注）</li>
+    <li>从其他 App 分享进来的内容（标题）</li>
+  </ul>
+  <p>这些数据只用于提供 App 的功能，不会发送给开发者，也不会提供给第三方。</p>
+</section>
+
+<section>
+  <h2>3. 存放位置</h2>
+  <p>所有数据都通过 Apple 的 SwiftData 保存在设备上。如果你已登录 iCloud，数据会保存在你本人的 iCloud 私有数据库（容器 iCloud.com.devkoan.ScheduleDensity）中，并在登录同一 iCloud 账户的设备之间自动同步。</p>
+  <p>通过 iCloud 进行的存储和传输适用 Apple 的隐私政策。开发者无法访问你的 iCloud 私有数据库。</p>
+  <p>从其他 App 分享进来的内容，在本 App 取走之前会暂存在设备上的 App 群组区域。这个文件不会离开你的设备。</p>
+</section>
+
+<section>
+  <h2>4. 读取和写入 Mac 日历</h2>
+  <p>只有当你在设置中选择了日历时，本 App 才会读取这些日历中日程的标题和时间，并把它们变成本周的计划块。你选择的日历只会被读取，不会被写入或修改。开启自动导入后，日历有变动时会重新读取。</p>
+  <p>只有当你在设置中开启“将计划写入‘彩虹工坊’日历”时，本 App 才会新建一个名为“彩虹工坊”的日历，并写入已定好时间的计划块的标题、时间和成功标准。本 App 只会修改或删除自己在这个日历里写入的日程，不会写入其他任何日历。这个日历存放在 macOS 日历的存储位置（通常是你本人的 iCloud），不会发送给开发者。</p>
+  <p>读取到的内容与你写下的其他数据存放在同一个地方（你的设备和你本人的 iCloud），不会发送给开发者。如果你没有选择任何日历，就什么也不会读取。</p>
+  <p class="muted">macOS 要求获得“完全访问”权限才能读取日程。虽然权限叫这个名字，本 App 唯一会写入的只有它自己创建的“彩虹工坊”日历，而且只在你开启该选项时才会写入。</p>
+</section>
+
+<section>
+  <h2>5. 与他人共享</h2>
+  <p>使用“分享我的日程”时，收到你所生成邀请链接的人可以以只读方式查看你的每周日程。共享什么、与谁共享完全由你决定；停止分享后，对方就再也看不到了。</p>
+  <p>任何拿到邀请链接的人都可以加入，所以请只发给你想共享的人。共享直接使用 Apple 的 CloudKit 共享功能，开发者不会在中间保存你的数据。</p>
+</section>
+
+<section>
+  <h2>6. 发送问题和反馈</h2>
+  <p>当你在设置界面向开发者发送问题或反馈时，你当时写下的内容和 App 版本信息会被发送到开发者运营的 iCloud 容器（iCloud.com.Ysoup.FeedbackHub）。这些信息只用于回复你和改进 App。</p>
+  <p>只有在你亲自点击发送时才会传输。如果你通过电子邮件联系，你的邮箱地址只用于回复。无需你操作就会传送的只有第 7 节所说的匿名使用统计，其中不含你写下的任何内容。</p>
+</section>
+
+<section>
+  <h2>7. 匿名使用统计</h2>
+  <p class="lead">不知道哪些功能真正有人在用，就无从知道该改进什么。本 App 只匿名发送回答这个问题所需的最少信息。</p>
+  <p><b>会发送的内容</b></p>
+  <ul class="plain">
+    <li>App 版本、macOS 版本、设备类型（Mac/iPhone）、语言设置</li>
+    <li>App 的累计启动次数、自首次安装以来的天数、最后一次使用的时间</li>
+    <li>待办事项、已完成的待办、分类、计划块、固定作息的<b>数量</b></li>
+    <li>仅限操作的名称（例如“写了一条待办”“从日历导入”“打开了付费页面”）。同一名称每天最多发送一次。</li>
+    <li>你目前是否拥有 Pro——只是一个表示“有”或“没有”的值，不包含你买了哪个商品、何时购买、花了多少钱。用来了解免费用户和付费用户使用 App 的方式有什么不同；在确认你的购买状态之前，不会发送任何内容。</li>
+  </ul>
+  <p><b>不会发送的内容</b></p>
+  <ul class="plain">
+    <li>你在待办、计划、作息中写下的内容和标题——一个字也不发送。</li>
+    <li>你的姓名、电子邮件地址、Apple 账户、设备标识符、位置，或借助 IP 地址进行的身份识别</li>
+  </ul>
+  <p>发送的记录只通过 App 在安装时生成的<b>一个随机编号</b>关联起来。这个编号与你的设备或 Apple 账户毫无关系，删除 App 后随之消失。重新安装后，也不会与之前的记录连在一起。</p>
+  <p>这些记录与反馈存放在同一个开发者 iCloud 容器（iCloud.com.Ysoup.FeedbackHub）中，只用于改进 App。绝不用于广告，绝不提供或出售给第三方，也绝不与其他公司的数据进行比对。</p>
+  <div class="note"><b>如何关闭。</b>在 设置 &rsaquo; 使用统计 中关闭“发送匿名使用统计”，此后这台设备就不会再发出任何统计或操作记录。如需删除已发送的记录，请发邮件到下方地址提出。</div>
+</section>
+
+<section>
+  <h2>8. 购买</h2>
+  <p>Pro 只能通过 Apple 的 App Store 购买。付款由 Apple 处理，开发者既不会收到，也不会保存你的银行卡号或付款方式。</p>
+  <p>本 App 只确认是否已购买，并记录在设备上。在登录同一 Apple 账户的其他 Mac 上，可以通过“恢复购买”重新获得。</p>
+</section>
+
+<section>
+  <h2>9. 保存与删除</h2>
+  <p class="lead">数据会一直保存，直到你删除它或移除 App。</p>
+  <ul class="plain">
+    <li>你可以在 App 内删除单个项目。</li>
+    <li>删除 App 后，这台设备上保存的数据会被移除。</li>
+    <li>同步到 iCloud 的数据，可以在设备的设置中依次进入 Apple 账户、iCloud、管理储存空间进行管理或删除。</li>
+    <li>如需删除已发送的反馈或使用统计，请发邮件到下方地址提出。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>10. 儿童隐私</h2>
+  <p>本 App 并非面向儿童，也不会有意收集儿童的任何个人信息。</p>
+</section>
+
+<section>
+  <h2>11. 政策变更</h2>
+  <p>本政策可能会因法律或 App 功能的变化而更新。如有重要变更，会在本页公布，并更新上方的最后更新日期。</p>
+</section>
+
+<section>
+  <h2>12. 联系我们</h2>
+  <p>如对个人信息的处理有任何疑问或请求，请通过以下方式联系。</p>
+  <p>电子邮件：<a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a></p>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 彩虹工坊</div>
+  <div class="fam">彩虹工坊 (macOS) &middot; 欲望彩虹 (iOS)</div>
+  <nav class="pages"><a href="index.html">介绍</a> <a href="support.html">支持</a> <a href="privacy.html">隐私政策</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">更新说明</a></nav>
+</footer>
+
+</body>
+</html>

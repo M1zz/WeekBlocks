@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>支援 — 彩虹工坊</title>
+<meta name="description" content="彩虹工坊常見問題與聯絡方式。" />
+<meta property="og:title" content="彩虹工坊" />
+<meta property="og:description" content="彩虹工坊常見問題與聯絡方式。" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/zh-Hant/support.html" />
+<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/zh-Hant/support.html" />
+<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/support.html" />
+<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/support.html" />
+<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/support.html" />
+<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/support.html" />
+<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/support.html" />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
+  nav.langs { padding:14px 16px 0; }
+  nav.pages { padding:8px 16px 0; }
+  nav.langs a, nav.pages a { text-decoration:none; }
+  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
+  footer nav { margin-top:10px; }
+  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
+</style>
+
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+<nav class="langs" aria-label="語言">
+  <a href="../support.html" hreflang="ko" lang="ko">한국어</a>
+  <a href="../en/support.html" hreflang="en" lang="en">English</a>
+  <a href="../zh-Hans/support.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+  <a href="../zh-Hant/support.html" hreflang="zh-Hant" lang="zh-Hant" aria-current="true">繁體中文</a>
+</nav>
+<nav class="pages" aria-label="頁面">
+  <a href="index.html">介紹</a>
+  <a href="support.html" aria-current="page">支援</a>
+  <a href="privacy.html">隱私權政策</a>
+</nav>
+
+<main class="wrap">
+
+<header class="hero" style="padding:40px 0 32px">
+  <h1>彩虹工坊支援</h1>
+  <p class="tagline">用到一半卡住時的解答，以及聯絡方式。</p>
+</header>
+
+<section>
+  <h2><span class="dot" style="background:var(--yellow)"></span>常見問題</h2>
+  <details>
+    <summary>一定要登入 iCloud 嗎？</summary>
+    <p>只在一台 Mac 上自己用的話不需要。要和 iPhone 同步，或要分享行程，就需要登入。</p>
+  </details>
+  <details>
+    <summary>更新後，之前寫下的待辦和計畫會怎樣？</summary>
+    <p>原封不動保留。更新不會更改或刪除你寫下的任何內容。</p>
+  </details>
+  <details>
+    <summary>關閉視窗會結束 App 嗎？</summary>
+    <p>不會。關閉視窗後 App 仍在執行，可以從上方選單列的「視窗」重新打開，按一下 Dock 圖示也可以。</p>
+  </details>
+  <details>
+    <summary>App 會更動我的行事曆嗎？</summary>
+    <p>不會更動你原有的行事曆。「從行事曆匯入」只會讀取你選的行事曆。開啟「將計畫寫入『彩虹工坊』行事曆」後，App 會另外建立一個「彩虹工坊」行事曆，只寫入那裡。你隨時可以在「行事曆」App 中刪除這個行事曆。</p>
+  </details>
+  <details>
+    <summary>在 Mac 上寫的待辦沒有出現在 iPhone 上。</summary>
+    <p>請確認兩台裝置登入的是同一個 iCloud 帳號，而且 iPhone 上已安裝「欲望彩虹」。同步要經過 iCloud，可能需要幾分鐘。</p>
+  </details>
+  <details>
+    <summary>想切換介面語言。</summary>
+    <p>在設定最上方的 Language · 언어 · 語言 中選擇，App 會重新打開並切換語言。可選繁體中文、簡體中文、英文與韓文。你自己寫的作息名稱和待辦不會被翻譯。</p>
+  </details>
+</section>
+
+<section>
+  <div class="contact">
+    <h2 style="margin-bottom:6px">聯絡我們</h2>
+    <p class="lead" style="margin-bottom:0">用的時候卡住了，或發現哪裡怪怪的，歡迎告訴我。App 的設定裡也有聯絡入口。</p>
+    <a class="btn" href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--green)"></span>隱私</h2>
+  <p>不需要帳號，也沒有開發者伺服器。你寫下的內容只留在你的裝置和你自己的 iCloud。App 會傳送不含任何書寫內容的匿名使用統計，你可以在設定中關閉。</p>
+  <p><a href="privacy.html">閱讀隱私權政策</a></p>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 彩虹工坊</div>
+  <div class="fam">彩虹工坊 (macOS) &middot; 欲望彩虹 (iOS)</div>
+  <nav class="pages"><a href="index.html">介紹</a> <a href="support.html">支援</a> <a href="privacy.html">隱私權政策</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">更新說明</a></nav>
+</footer>
+
+</body>
+</html>
