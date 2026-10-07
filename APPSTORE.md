@@ -79,7 +79,7 @@ DeployBar 가 이 파일을 읽어 App Store Connect 의 스토어 페이지를 
 
 ### 지원 URL
 
-https://m1zz.github.io/WeekBlocks/
+https://m1zz.github.io/WeekBlocks/support.html
 
 ### 마케팅 URL
 
@@ -169,15 +169,15 @@ schedule,block,todo,list,task,breakdown,steps,timer,focus,deep,work,daily,timeli
 
 ### 지원 URL
 
-https://m1zz.github.io/WeekBlocks/support-en.html
+https://m1zz.github.io/WeekBlocks/en/support.html
 
 ### 마케팅 URL
 
-https://m1zz.github.io/WeekBlocks/support-en.html
+https://m1zz.github.io/WeekBlocks/en/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/privacy-en.html
+https://m1zz.github.io/WeekBlocks/en/privacy.html
 
 ## zh-Hant
 
@@ -249,15 +249,15 @@ https://m1zz.github.io/WeekBlocks/privacy-en.html
 
 ### 지원 URL
 
-https://m1zz.github.io/WeekBlocks/support-en.html
+https://m1zz.github.io/WeekBlocks/zh-Hant/support.html
 
 ### 마케팅 URL
 
-https://m1zz.github.io/WeekBlocks/support-en.html
+https://m1zz.github.io/WeekBlocks/zh-Hant/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/privacy-en.html
+https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html
 
 ## zh-Hans
 
@@ -326,12 +326,12 @@ https://m1zz.github.io/WeekBlocks/privacy-en.html
 
 ### 지원 URL
 
-https://m1zz.github.io/WeekBlocks/support-en.html
+https://m1zz.github.io/WeekBlocks/zh-Hans/support.html
 
 ### 마케팅 URL
 
-https://m1zz.github.io/WeekBlocks/support-en.html
+https://m1zz.github.io/WeekBlocks/zh-Hans/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/privacy-en.html
+https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html
