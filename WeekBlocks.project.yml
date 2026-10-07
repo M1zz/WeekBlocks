@@ -29,7 +29,7 @@ fileGroups:
 packages:
   LeeoKit:
     url: https://github.com/M1zz/LeeoKit.git
-    from: "3.5.1"
+    from: "3.16.1"
 # 버전·빌드번호의 단일 소스 (→ Config/Version.xcconfig). DeployBar 가 배포할 때 그 파일을 고친다.
 # ⚠️ MARKETING_VERSION·CURRENT_PROJECT_VERSION 을 아래 settings.base 에 다시 넣지 말 것.
 #    프로젝트 빌드 설정은 xcconfig 보다 우선해서, 넣는 순간 그 파일이 조용히 무시된다.
