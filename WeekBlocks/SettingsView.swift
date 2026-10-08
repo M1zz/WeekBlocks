@@ -83,24 +83,20 @@ struct SettingsView: View {
             Form {
                 // 맨 위에 둔다 — 화면 글자를 못 읽는 사람이 가장 먼저 찾는 자리다 (→ AppLanguage.swift).
                 // 글자는 번역하지 않고 두 말로 적는다. 어느 쪽 사람이든 여기가 언어 자리인 줄 안다.
+                // 언어가 23개라 한 줄씩 늘어놓으면 설정 첫 화면이 언어로 다 찬다 — 고르개 하나로 접는다.
+                // 이름은 저마다 그 언어로 적혀 있어 못 읽는 화면에서도 자기 말을 찾는다.
                 Section {
-                    ForEach(AppLanguage.allCases) { lang in
-                        Button {
-                            lang.applyAndRelaunch()
-                        } label: {
-                            HStack {
-                                Image(systemName: lang == AppLanguage.chosen ? "largecircle.fill.circle" : "circle")
-                                    .foregroundStyle(lang == AppLanguage.chosen ? Color.accentColor : .secondary)
-                                Text(verbatim: lang.name)
-                                    .font(.body)
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
+                    Picker(selection: Binding(
+                        get: { AppLanguage.chosen },
+                        set: { $0.applyAndRelaunch() }
+                    )) {
+                        ForEach(AppLanguage.allCases) { lang in
+                            Text(verbatim: lang.name).tag(lang)
                         }
-                        .buttonStyle(.plain)
+                    } label: {
+                        Label { Text(verbatim: "Language · 언어 · 語言") } icon: { Image(systemName: "globe") }
                     }
-                } header: {
-                    Text(verbatim: "Language · 언어 · 語言")
+                    .pickerStyle(.menu)
                 } footer: {
                     Text(verbatim: "The app restarts to switch. · 고르면 앱이 다시 열립니다.")
                         .font(.body)

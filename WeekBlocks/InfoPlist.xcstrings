@@ -27,6 +27,120 @@
             "state" : "translated",
             "value" : "彩虹工坊"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
         }
       }
     },
@@ -56,6 +170,120 @@
             "state" : "translated",
             "value" : "彩虹工坊"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
         }
       }
     },
@@ -84,6 +312,120 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "將 Mac 行事曆中的行程帶入每週計畫。若你開啟此功能，計畫也會寫入 App 建立的「彩虹工坊」行事曆，其他行事曆一律不會更動。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernimmt Termine aus deinem Mac-Kalender in deinen Wochenplan. Wenn du es einschaltest, wird dein Plan außerdem in einen separaten Kalender „Rainbow Craft“ geschrieben, den die App anlegt; deine anderen Kalender werden nie verändert."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macのカレンダーの予定を週の予定に読み込みます。オンにすると、アプリが作る「Rainbow Craft」カレンダーにも予定を書き込みます。ほかのカレンダーは変更しません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trae los eventos del calendario del Mac a tu plan semanal. Si lo activas, tu plan también se escribe en un calendario aparte, “Rainbow Craft”, que crea la app; tus otros calendarios nunca se modifican."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe les événements du calendrier de votre Mac dans votre planning de la semaine. Si vous l’activez, votre planning est aussi écrit dans un calendrier distinct « Rainbow Craft » créé par l’app ; vos autres calendriers ne sont jamais modifiés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Porta nel piano settimanale gli eventi del calendario del Mac. Se lo attivi, il piano viene scritto anche in un calendario separato “Rainbow Craft” creato dall’app; gli altri calendari non vengono mai modificati."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traz eventos do calendário do Mac para o seu plano semanal. Se você ativar, seu plano também é gravado num calendário separado, “Rainbow Craft”, criado pelo app; seus outros calendários nunca são alterados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переносит события из Календаря на Mac в план на неделю. Если включить, план также записывается в отдельный календарь «Rainbow Craft», созданный приложением; другие календари никогда не меняются."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přenese události z kalendáře na Macu do týdenního plánu. Pokud to zapnete, bude se váš plán zapisovat i do samostatného kalendáře „Rainbow Craft“, který aplikace vytvoří; vašich ostatních kalendářů se nic nedotkne."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henter begivenheder fra kalenderen på din Mac ind i din ugeplan. Slår du det til, skrives din plan også i en separat kalender, “Rainbow Craft”, som appen opretter; dine andre kalendere bliver aldrig ændret."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Φέρνει τα συμβάντα από το ημερολόγιο του Mac στο εβδομαδιαίο πλάνο σου. Αν το ενεργοποιήσεις, το πλάνο σου γράφεται επίσης σε ξεχωριστό ημερολόγιο «Rainbow Craft» που δημιουργεί η εφαρμογή· τα άλλα ημερολόγιά σου δεν αλλάζουν ποτέ."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuo tapahtumat Macin kalenterista viikkosuunnitelmaasi. Jos laitat sen päälle, suunnitelmasi kirjoitetaan myös erilliseen ”Rainbow Craft” -kalenteriin, jonka appi luo; muihin kalentereihisi ei koskaan kosketa."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Membawa acara dari kalender Mac ke rencana mingguan Anda. Jika dinyalakan, rencana Anda juga ditulis ke kalender “Rainbow Craft” terpisah yang dibuat app; kalender Anda yang lain tidak pernah diubah."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henter hendelser fra kalenderen på Macen inn i ukeplanen din. Slår du det på, skrives planen din også til en egen kalender, «Rainbow Craft», som appen oppretter; de andre kalenderne dine blir aldri endret."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haalt activiteiten uit je Mac-agenda naar je weekplan. Zet je het aan, dan wordt je plan ook gezet in een aparte agenda ‘Rainbow Craft’ die de app aanmaakt; je andere agenda's worden nooit gewijzigd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenosi wydarzenia z Kalendarza na Macu do planu tygodnia. Jeśli to włączysz, plan trafi też do osobnego kalendarza „Rainbow Craft” utworzonego przez aplikację; inne kalendarze nigdy nie są zmieniane."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hämtar händelser från kalendern på din Mac till veckoplanen. Om du slår på det skrivs planen också till en separat kalender, ”Rainbow Craft”, som appen skapar; dina andra kalendrar ändras aldrig."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "นำกิจกรรมจากปฏิทินบน Mac เข้ามาในแผนประจำสัปดาห์ หากเปิดไว้ แผนของคุณจะถูกเขียนลงปฏิทิน “Rainbow Craft” แยกต่างหากที่แอปสร้างขึ้นด้วย ปฏิทินอื่นของคุณจะไม่ถูกเปลี่ยนแปลง"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac takviminizdeki etkinlikleri haftalık planınıza getirir. Açarsanız planınız, uygulamanın oluşturduğu ayrı bir “Rainbow Craft” takvimine de yazılır; diğer takvimleriniz asla değiştirilmez."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đưa sự kiện từ lịch trên Mac vào kế hoạch tuần. Nếu bật, kế hoạch cũng được ghi vào một lịch riêng tên “Rainbow Craft” do ứng dụng tạo; các lịch khác của bạn không bao giờ bị thay đổi."
           }
         }
       }

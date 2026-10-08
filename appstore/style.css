@@ -82,9 +82,9 @@ body { font-family:UI, KR, system-ui, sans-serif; -webkit-font-smoothing:antiali
 .wksub { font-size:13px; font-weight:500; color:var(--red); padding-left:2px }
 .spacer { flex:1 }
 
-.seg { display:flex; background:rgba(0,0,0,.06); border-radius:7px; padding:2px; width:262px }
-.seg > div {
-  flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+.seg { display:flex; background:rgba(0,0,0,.06); border-radius:7px; padding:2px; min-width:262px }
+.seg > div { white-space:nowrap;
+  flex:1 1 auto; padding:0 10px; display:flex; align-items:center; justify-content:center; gap:5px;
   height:24px; font-size:12px; font-weight:500; color:rgba(0,0,0,.68); border-radius:5px;
 }
 .seg > div svg { width:12px; height:12px }
@@ -206,7 +206,7 @@ body { font-family:UI, KR, system-ui, sans-serif; -webkit-font-smoothing:antiali
 .seg2.flex span { color:var(--c); font-weight:600 }
 .seg2.tiny span { font-size:9px; padding:0 2px; letter-spacing:-.01em }
 .nowbar { position:absolute; top:0; bottom:0; width:1.5px; background:var(--red); z-index:3 }
-.tlfree { width:96px; text-align:right; font-size:13px; font-weight:500; color:var(--ink2);
+.tlfree { width:104px; white-space:nowrap; text-align:right; font-size:13px; font-weight:500; color:var(--ink2);
           font-variant-numeric:tabular-nums; flex:0 0 96px }
 .axis { display:flex; align-items:center; gap:10px; margin-top:2px }
 .axis .ruler { flex:1; position:relative; height:14px }
@@ -280,3 +280,5 @@ body { font-family:UI, KR, system-ui, sans-serif; -webkit-font-smoothing:antiali
    그 나라 맥이 쓰는 시스템 글꼴(PingFang)로 그린다. 저장소에는 담지 않는다. */
 html[lang="zh-Hant"] body { font-family:UI, "PingFang TC", system-ui, sans-serif; word-break:normal }
 html[lang="zh-Hans"] body { font-family:UI, "PingFang SC", system-ui, sans-serif; word-break:normal }
+html[lang="ja"] body { font-family:UI, "Hiragino Sans", "Hiragino Kaku Gothic ProN", system-ui, sans-serif; word-break:normal }
+html[lang="th"] body { font-family:UI, "Sukhumvit Set", "Thonburi", system-ui, sans-serif; word-break:normal }

@@ -20,7 +20,7 @@
 //   PW_CHANNEL=chrome node build.mjs   draw with the installed Chrome instead of Playwright's Chromium
 //   node build.mjs --html   write the HTML only
 
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { writeFileSync, mkdirSync, existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -736,9 +736,23 @@ ${list.map((s, i) => `<section class="shot" id="${s.id}"
 </body></html>`
 }
 
-const LOCALES = Object.keys(STRINGS)
+// 1.1.10 에 더한 19개 언어는 strings/<로케일>.json 에 있다 (위 영어 묶음과 같은 열쇠).
+// 함수 자리(hoursLeft·allDone)는 "{v}" 를 넣은 글로, tUpNext 는 [이름, 시각] 둘씩만 적는다 —
+// 아이콘과 색은 언어와 상관없어 여기서 붙인다.
+for (const file of readdirSync(join(HERE, 'strings')).filter(f => f.endsWith('.json')).sort()) {
+  const J = JSON.parse(readFileSync(join(HERE, 'strings', file), 'utf8'))
+  const hl = J.hoursLeft, ad = J.allDone
+  STRINGS[J.lang] = { ...J,
+    hoursLeft: v => hl.replace('{v}', v),
+    allDone: v => ad.replace('{v}', v),
+    tUpNext: [['calendar', C.orange, ...J.tUpNext[0]], ['moon', C.indigo, ...J.tUpNext[1]]] }
+}
+
+const LOCALES = process.env.ONLY ? process.env.ONLY.split(',') : Object.keys(STRINGS)
 // App Store Connect 의 로케일 이름. 이 폴더를 DeployBar 가 그대로 그 언어 칸에 올린다.
-const STORE_LOCALE = { en:'en-US', ko:'ko', 'zh-Hant':'zh-Hant', 'zh-Hans':'zh-Hans' }
+const STORE_LOCALE = { en:'en-US', ko:'ko', 'zh-Hant':'zh-Hant', 'zh-Hans':'zh-Hans',
+  ja:'ja', de:'de-DE', es:'es-ES', fr:'fr-FR', it:'it', 'pt-BR':'pt-BR', ru:'ru', cs:'cs', da:'da',
+  el:'el', fi:'fi', id:'id', nb:'no', nl:'nl-NL', pl:'pl', sv:'sv', th:'th', tr:'tr', vi:'vi' }
 for (const loc of LOCALES) {
   writeFileSync(join(HERE, `index-${loc}.html`), page(STRINGS[loc]))
   console.log(`wrote index-${loc}.html`)

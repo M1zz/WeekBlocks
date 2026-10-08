@@ -9,6 +9,7 @@
 //  못 읽는다 — "Default Korean, cannot find an option to select English." 그래서 앱 안에 두고,
 //  **글자는 늘 여러 말로** 적는다 (Language · 언어 · 語言). 무엇을 고르는 자리인지 어느 쪽이든 읽혀야 한다.
 //  語言은 번체지만 간체를 쓰는 사람도 읽는다 — 글자를 더 늘리면 메뉴가 길어진다.
+//  고르는 목록의 언어 이름은 저마다 그 언어로 적는다(Deutsch, 日本語 …). 1.1.10 부터 23개.
 //
 //  고른 값은 시스템 설정의 앱별 언어와 **같은 자리**(이 앱의 AppleLanguages)에 적는다.
 //  그래서 어느 쪽에서 바꿔도 서로 맞는다. 언어는 앱이 켜질 때 정해지므로 다시 열어야 바뀐다.
@@ -22,6 +23,25 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case korean = "ko"
     case chineseTraditional = "zh-Hant"
     case chineseSimplified = "zh-Hans"
+    case japanese = "ja"
+    case german = "de"
+    case spanish = "es"
+    case french = "fr"
+    case italian = "it"
+    case portugueseBrazil = "pt-BR"
+    case russian = "ru"
+    case czech = "cs"
+    case danish = "da"
+    case greek = "el"
+    case finnish = "fi"
+    case indonesian = "id"
+    case norwegian = "nb"
+    case dutch = "nl"
+    case polish = "pl"
+    case swedish = "sv"
+    case thai = "th"
+    case turkish = "tr"
+    case vietnamese = "vi"
 
     var id: String { rawValue }
 
@@ -33,6 +53,25 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         case .korean:  "한국어"
         case .chineseTraditional: "繁體中文"
         case .chineseSimplified:  "简体中文"
+        case .japanese:   "日本語"
+        case .german:     "Deutsch"
+        case .spanish:    "Español"
+        case .french:     "Français"
+        case .italian:    "Italiano"
+        case .portugueseBrazil: "Português (Brasil)"
+        case .russian:    "Русский"
+        case .czech:      "Čeština"
+        case .danish:     "Dansk"
+        case .greek:      "Ελληνικά"
+        case .finnish:    "Suomi"
+        case .indonesian: "Bahasa Indonesia"
+        case .norwegian:  "Norsk bokmål"
+        case .dutch:      "Nederlands"
+        case .polish:     "Polski"
+        case .swedish:    "Svenska"
+        case .thai:       "ไทย"
+        case .turkish:    "Türkçe"
+        case .vietnamese: "Tiếng Việt"
         }
     }
 
@@ -42,11 +81,13 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     static var chosen: AppLanguage {
         let domain = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")
         guard let first = (domain?[key] as? [String])?.first else { return .system }
-        if first.hasPrefix("ko") { return .korean }
-        if first.hasPrefix("en") { return .english }
-        // 시스템 설정의 앱별 언어는 zh-TW·zh-HK·zh-CN 처럼 지역을 붙여 적기도 한다.
+        // 시스템 설정의 앱별 언어는 zh-TW·zh-HK·zh-CN·pt-BR·nb-NO 처럼 지역을 붙여 적기도 한다.
         if ["zh-Hant", "zh-TW", "zh-HK", "zh-MO"].contains(where: first.hasPrefix) { return .chineseTraditional }
         if ["zh-Hans", "zh-CN", "zh-SG"].contains(where: first.hasPrefix) { return .chineseSimplified }
+        if first.hasPrefix("pt") { return .portugueseBrazil }
+        if first.hasPrefix("nb") || first.hasPrefix("no") || first.hasPrefix("nn") { return .norwegian }
+        let language = first.split(separator: "-").first.map(String.init) ?? first
+        if let match = AppLanguage(rawValue: language), match != .system { return match }
         return .system
     }
 
