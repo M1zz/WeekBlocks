@@ -472,7 +472,7 @@ struct ContentView: View {
         .onChange(of: selectedWeek) { _, _ in
             for w in storedWeeks { reconcileOccurrences(for: w) }
             Task { await autoPublishSharedSchedule() }
-            // 넘겨 간 주도 캘린더와 맞춘다. 가져오기는 보는 주 하나만 한다.
+            // 넘겨 간 주도 캘린더와 맞춘다. 보는 주 + 이번 주부터 넉 주 (→ scheduleCalendarImport).
             scheduleCalendarImport()
         }
         // 캘린더가 바뀌었다(캘린더 앱에서 고쳤거나, 고른 캘린더를 바꿨거나).
@@ -1648,16 +1648,32 @@ struct ContentView: View {
     /// 조용히 한다 — 무엇을 가져왔는지 창을 띄우지 않는다. 블록이 칸에 나타나는 것이 곧 알림이다.
     /// 캘린더에서 사라진 일정만은 **지우기 전에 묻는다**(CloudKit을 타고 아이폰에서도 사라진다).
     /// 다만 창으로 가로막지 않고 배너로 세운다 — 사람이 뭘 하던 중이든 끊지 않는다.
+    /// 보는 주와 별개로 늘 캘린더에서 가져와 두는 주 수 (이번 주 포함).
+    private static let calendarLookaheadWeeks = 4
+
     private func scheduleCalendarImport() {
         calendarImportTask?.cancel()
         guard calendarBridge.isAutoReady else { return }
         calendarImportTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 800_000_000)
             guard !Task.isCancelled, calendarBridge.isAutoReady else { return }
-            let result = calendarBridge.importWeek(selectedWeek, into: context)
-            guard !result.pendingRemovals.isEmpty else { return }
+            // 보는 주 하나만 가져오면, 맥에서 안 열어 본 주의 회의는 아이폰 무지개·하루 화면에만
+            // 서고 맥에는 없다(아이폰은 캘린더를 바로 읽는다). 이번 주부터 넉 주 앞까지는
+            // 늘 가져와 두어 두 기기가 같은 일정을 보게 한다(합집합).
+            let thisWeek = Date().shownWeekStart(sundayFirst: weekStartsOnSunday)
+            var weeks = [selectedWeek]
+            for offset in 0..<Self.calendarLookaheadWeeks {
+                guard let w = Calendar.current.date(byAdding: .day, value: 7 * offset, to: thisWeek) else { continue }
+                if !weeks.contains(where: { Calendar.current.isDate($0, inSameDayAs: w) }) { weeks.append(w) }
+            }
+            var removals: [PlanBlock] = []
+            for week in weeks {
+                guard !Task.isCancelled else { return }
+                removals += calendarBridge.importWeek(week, into: context).pendingRemovals
+            }
+            guard !removals.isEmpty else { return }
             let known = Set(calendarOrphans.map(\.persistentModelID))
-            let fresh = result.pendingRemovals.filter { !known.contains($0.persistentModelID) }
+            let fresh = removals.filter { !known.contains($0.persistentModelID) }
             guard !fresh.isEmpty else { return }
             withAnimation(Motion.banner) { calendarOrphans += fresh }
         }

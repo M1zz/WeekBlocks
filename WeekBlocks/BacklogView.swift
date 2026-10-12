@@ -23,8 +23,10 @@ struct BacklogSection: View {
 
     @AppStorage("didSeedBacklogCategories") private var didSeedCategories = false
 
-    /// '요일에 올린 일'을 펼쳐 두었는가. 기본은 접힘 — 확인하러 갈 때만 연다.
-    @State private var showsPlaced = false
+    /// '요일에 올린 일'을 펼쳐 두었는가. **기본은 펼침** — 아이폰 할 일 목록은 요일에 올린 줄도
+    /// 한 줄기로 다 보여 준다. 맥만 접어 두면 같은 할 일이 한쪽에서만 안 보인다(합집합).
+    /// 접으면 그 뜻을 기억한다.
+    @AppStorage("backlog.showsPlaced") private var showsPlaced = true
 
     /// 요일에서 끌어 내린 블록을 받는 중인가. 받는 자리가 어딘지 보여야 손이 안 헤맨다.
     @State private var isReturnTargeted = false
