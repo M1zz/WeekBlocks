@@ -81,12 +81,21 @@ final class RainbowEvent {
         get {
             guard let data = excludedDatesData,
                   let dates = try? JSONDecoder().decode([Date].self, from: data) else { return [] }
-            return Set(dates.map { Calendar.current.startOfDay(for: $0) })
+            return Set(dates.map(RainbowEvent.day))
         }
         set {
             let days = newValue.map { Calendar.current.startOfDay(for: $0) }.sorted()
             excludedDatesData = try? JSONEncoder().encode(days)
         }
+    }
+
+    /// **적은 기기의 0시를 이 기기의 그날 0시로** 읽는다 — 가장 가까운 0시.
+    ///
+    /// 날짜는 적은 기기의 시간대로 0시가 되어 저장된다. 시간대가 다른 기기가 그 값을 그대로
+    /// startOfDay에 넣으면 전날로 읽혀, 일정이 하루 당겨졌다. 저장 형식은 두 앱·옛 행과 같게 두고
+    /// 읽을 때만 맞춘다. (시간대 차이가 12시간을 넘으면 여전히 하루 어긋날 수 있다)
+    static func day(_ d: Date) -> Date {
+        Calendar.current.startOfDay(for: d.addingTimeInterval(12 * 3600))
     }
 
     /// 무한 반복이면 시작일부터 365일 (아이폰 `Event.effectiveEndDate`와 같다).
@@ -97,7 +106,7 @@ final class RainbowEvent {
     /// 기간 안인가 — 시작일부터 종료일까지, 손으로 뺀 날만 빼고.
     func spans(_ date: Date) -> Bool {
         let d = Calendar.current.startOfDay(for: date)
-        guard d >= startDate, d <= effectiveEndDate else { return false }
+        guard d >= Self.day(startDate), d <= Self.day(effectiveEndDate) else { return false }
         return !excludedDates.contains(d)
     }
 
@@ -105,9 +114,10 @@ final class RainbowEvent {
     func occurs(on date: Date) -> Bool {
         let cal = Calendar.current
         let d = cal.startOfDay(for: date)
-        guard d >= startDate, d <= effectiveEndDate else { return false }
+        let first = Self.day(startDate)
+        guard d >= first, d <= Self.day(effectiveEndDate) else { return false }
         if let pattern = weeklyPattern {
-            let since = cal.dateComponents([.day], from: startDate, to: d).day ?? 0
+            let since = cal.dateComponents([.day], from: first, to: d).day ?? 0
             let i = since % 35
             if i >= 0, i < 35, !pattern[i] { return false }
         } else if let days = selectedWeekdays, !days.isEmpty {

@@ -188,6 +188,8 @@ struct RainbowEventEditor: View {
     @State private var colorHex = Rainbow.spectrum.first?.hex ?? "#FF3B30"
     @State private var importance = "medium"
     @State private var confirmingDelete = false
+    /// 같은 일정이 이미 있다 — 어느 기기에서 만든 것인지.
+    @State private var twinOrigin: String?
 
     private var hasPattern: Bool { event?.weeklyPattern != nil }
 
@@ -264,6 +266,14 @@ struct RainbowEventEditor: View {
         .padding(24)
         .frame(width: 480)
         .onAppear(perform: load)
+        // ⚠️ 막는다, 묻지 않는다. 제목·날짜·색이 같은 두 일정은 아이폰 다리(RainbowBridge)가
+        //    기기 사이에서 하나로 합친다 — '그래도 만들기'를 두면 만든 것이 곧 사라진다.
+        .alert("같은 일정이 이미 있어요", isPresented: Binding(get: { twinOrigin != nil },
+                                                          set: { if !$0 { twinOrigin = nil } })) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("\(twinOrigin ?? "") 만든 일정과 모든 내용이 같습니다. 똑같은 일정은 기기 사이에서 하나로 합쳐지니, 제목이나 날짜를 바꿔 주세요.")
+        }
         .confirmationDialog("이 무지개 일정을 지울까요?", isPresented: $confirmingDelete) {
             Button("지우기", role: .destructive) { remove() }
         } message: {
@@ -285,8 +295,9 @@ struct RainbowEventEditor: View {
             return
         }
         title = event.title
-        start = event.startDate
-        end = event.endDate
+        // 다른 시간대 기기가 적은 날짜도 이 기기의 그날로 읽는다 (→ RainbowEvent.day).
+        start = RainbowEvent.day(event.startDate)
+        end = RainbowEvent.day(event.endDate)
         isInfinite = event.isInfinite
         hours = event.hoursPerDay
         weekdays = Set(event.selectedWeekdays ?? [])
@@ -295,6 +306,11 @@ struct RainbowEventEditor: View {
     }
 
     private func save() {
+        if let twin = twin() {
+            twinOrigin = twin.originInstallID == TodoSharing.installID
+                ? String(localized: "이 맥에서") : String(localized: "다른 기기에서")
+            return
+        }
         let target: RainbowEvent
         if let event {
             target = event
@@ -318,6 +334,35 @@ struct RainbowEventEditor: View {
         target.updatedAt = Date()
         try? context.save()
         onClose()
+    }
+
+    /// 지우지 않은 다른 일정 중 **모든 칸이 같은 것** — 아이폰 다리가 하나로 합치는 기준과 같다
+    /// (→ RainbowBridge.fingerprint). 하루 시간 · 요일 · 중요도 하나라도 다르면 합쳐지지 않으니 막지 않는다.
+    private func twin() -> RainbowEvent? {
+        let cal = Calendar.current
+        let name = title.trimmingCharacters(in: .whitespaces)
+        let first = cal.startOfDay(for: start), last = cal.startOfDay(for: max(end, start))
+        let days: [Int]? = weekdays.isEmpty ? nil : weekdays.sorted()
+        let all = (try? context.fetch(FetchDescriptor<RainbowEvent>())) ?? []
+        return all.first { other in
+            guard other !== event, other.deletedAt == nil,
+                  other.title == name,
+                  RainbowEvent.day(other.startDate) == first,
+                  other.isInfinite == isInfinite,
+                  isInfinite || RainbowEvent.day(other.endDate) == last,
+                  other.colorHex.uppercased() == colorHex.uppercased(),
+                  abs(other.hoursPerDay - hours) < 0.0001,
+                  other.importanceRaw == importance else { return false }
+            // 고치는 중이면 그 일정의 패턴 · 뺀 날 · 이어진 할 일을 그대로 가져가고, 새 일정은 셋 다 없다.
+            let pattern = event?.weeklyPattern, excluded = event?.excludedDates ?? [], todo = event?.todoToken
+            let otherDays = other.selectedWeekdays.map { $0.sorted() }
+            // 패턴이 있는 일정은 요일 칸을 고치지 않으므로 원래 값과 견준다 (→ save).
+            let mine = hasPattern ? event?.selectedWeekdays.map { $0.sorted() } : days
+            return otherDays == mine
+                && other.weeklyPattern == pattern
+                && other.excludedDates == excluded
+                && other.todoToken == todo
+        }
     }
 
     /// 행은 남기고 '지움' 표만 찍는다 (→ RainbowEvent.deletedAt).

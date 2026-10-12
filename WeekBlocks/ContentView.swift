@@ -265,7 +265,10 @@ struct ContentView: View {
                 }
             }
             .padding(.horizontal, 24)
-            .padding(.vertical, 18)
+            .padding(.top, 18)
+            // 판 그림자(반경 14 · 아래로 4 → Surface.swift)가 다 번질 자리를 둔다.
+            // 18이면 그림자가 창 아래 끝에서 잘려, 바닥이 잘린 화면처럼 보였다.
+            .padding(.bottom, 32)
             .frame(maxWidth: .infinity, alignment: .leading)
             // @Query가 스스로 새 값을 물어오는 자리에는 `withAnimation`을 걸 손이 없다.
             // "무엇이 서 있는가"가 바뀌었을 때만 결이 붙도록 값으로 건다.
@@ -1839,19 +1842,30 @@ struct ContentView: View {
     /// 루틴을 편집(이름/요일 변경)하거나 추가/삭제해도 그리드·타임라인이 즉시 반영되도록.
     private func reconcileOccurrences(for week: Date) {
         let cal = Calendar(identifier: .iso8601)
-        let weekOccs = allOccurrences.filter { cal.isDate($0.weekStartDate, inSameDayAs: week) }
+        var weekOccs = allOccurrences.filter { cal.isDate($0.weekStartDate, inSameDayAs: week) }
         let fixedRoutinesList = routines.filter { $0.kind == .fixed }
         let fixedNames = Set(fixedRoutinesList.map(\.name))
 
         var changed = false
 
-        // 1) 고아 occurrence 제거 (현재 고정 루틴 이름과 매칭되지 않는 것 — 이름 변경/삭제/종류 변경)
-        for occ in weekOccs where !fixedNames.contains(occ.routineName) {
-            context.delete(occ)
-            changed = true
+        // 1) 맞는 고정 루틴이 없는 occurrence는 **지우지 않는다** — 화면이 이름으로 걸러 안 그릴 뿐이다
+        //    (→ fixedRoutines(on:) · daySegments).
+        //    ⚠️ 동기화는 순서를 지키지 않는다. 배치가 루틴보다 먼저 내려온 순간 '고아'로 보고 지우면,
+        //       사람이 옮긴 시각(startHourOverride)·숨김(hidden)이 사라지고 그 삭제가 전 기기로 번진다.
+        //       루틴이 도착하면 그대로 다시 붙는다. 이름을 바꾼 루틴의 옛 배치는 남지만 그려지지 않는다.
+
+        // 2) 같은 루틴·주·요일의 배치가 둘 이상이면 하나로 모은다 (두 맥이 같은 주를 처음 열면 각자 만든다).
+        for name in fixedNames {
+            let groups = Dictionary(grouping: weekOccs.filter { $0.routineName == name }, by: \.dayRaw)
+            for (_, copies) in groups where copies.count > 1 {
+                for gone in mergeDuplicateOccurrences(copies) {
+                    weekOccs.removeAll { $0 === gone }
+                }
+                changed = true
+            }
         }
 
-        // 2) 각 고정 루틴의 이번 주 배치를 selectedDays와 정확히 일치시킨다
+        // 3) 각 고정 루틴의 이번 주 배치를 selectedDays와 정확히 일치시킨다
         for routine in fixedRoutinesList {
             let existing = weekOccs.filter { $0.routineName == routine.name }
             let existingDays = Set(existing.map(\.day))
@@ -1868,6 +1882,30 @@ struct ContentView: View {
         }
 
         if changed { try? context.save() }
+    }
+
+    /// 같은 칸(루틴·주·요일)의 배치 사본들을 하나로 모은다. 지운 사본을 돌려준다.
+    ///
+    /// 사람이 손댄 값은 잃지 않게 **먼저 모든 사본에 합친 값을 적는다** — 숨김은 하나라도 숨겼으면 숨김,
+    /// 옮긴 시각은 적힌 것 중 가장 이른 것. 동기화되는 값만으로 정하므로 어느 기기가 모아도 같은 값이 된다.
+    ///
+    /// ⚠️ 합친 값이 **기본값일 때만** 나머지를 지운다. 사본끼리는 동기화되는 값으로 가를 길이 없어
+    ///    (만든 시각·만든 기기를 안 적는다), 두 맥이 동시에 모으면 서로 다른 사본을 지워 둘 다 사라질 수 있다.
+    ///    기본값이면 잃을 것이 없고 다음 맞추기가 다시 세운다. 손댄 값이 있으면 같은 값의 사본으로 둔다 —
+    ///    화면은 이름·값으로 그리므로 하나로 보이고, 옮기기·숨기기는 같은 칸의 사본을 모두 고친다
+    ///    (→ moveRoutine, SegmentActions).
+    private func mergeDuplicateOccurrences(_ copies: [RoutineOccurrence]) -> [RoutineOccurrence] {
+        let hidden = copies.contains(where: \.hidden)
+        let override = copies.map(\.startHourOverride).filter { $0 >= 0 }.min() ?? -1
+        for c in copies {
+            if c.hidden != hidden { c.hidden = hidden }
+            if c.startHourOverride != override { c.startHourOverride = override }
+        }
+        guard !hidden, override < 0 else { return [] }
+        // 이 자리에서는 사본이 모두 같은 내용이라 어느 것을 남겨도 결론이 같다.
+        let gone = Array(copies.dropFirst())
+        gone.forEach { context.delete($0) }
+        return gone
     }
 
     /// 요일 칸(블록으로 보기)과 시간 자(시간축으로 보기)가 함께 쓰는 받는 자리.

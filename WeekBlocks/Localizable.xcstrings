@@ -4,6 +4,142 @@
     "" : {
 
     },
+    "%@ 만든 일정과 모든 내용이 같습니다. 똑같은 일정은 기기 사이에서 하나로 합쳐지니, 제목이나 날짜를 바꿔 주세요." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ve všem se shoduje s plánem vytvořeným %@. Stejné plány se mezi zařízeními sloučí do jednoho, proto prosím změňte název nebo data."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den er helt magen til en plan, der er oprettet %@. Ens planer bliver lagt sammen til én på tværs af enheder, så skift titlen eller datoerne."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Plan, der %@ erstellt wurde, ist in allem gleich. Gleiche Pläne werden zwischen Geräten zu einem zusammengeführt – ändere bitte den Titel oder das Datum."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Είναι ίδιο σε όλα με ένα πρόγραμμα που δημιουργήθηκε %@. Τα ίδια προγράμματα συγχωνεύονται σε ένα ανάμεσα στις συσκευές, γι’ αυτό αλλάξτε τον τίτλο ή τις ημερομηνίες."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It matches a schedule made %@ in every detail. Identical schedules are merged into one across devices, so please change the title or dates."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coincide en todo con un plan creado %@. Los planes idénticos se unen en uno solo entre dispositivos, así que cambia el título o las fechas."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se on kaikilta osin sama kuin %@ tehty suunnitelma. Samanlaiset suunnitelmat yhdistyvät laitteiden välillä yhdeksi, joten vaihda otsikko tai päivämäärät."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il est identique en tout point à un plan créé %@. Les plans identiques sont fusionnés en un seul d’un appareil à l’autre : changez le titre ou les dates."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua isinya sama dengan jadwal yang dibuat %@. Jadwal yang sama persis akan digabung menjadi satu di semua perangkat, jadi ubah judul atau tanggalnya."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È identico in tutto a un piano creato %@. I piani identici vengono uniti in uno solo tra i dispositivi, quindi cambia il titolo o le date."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@作成した予定と内容がすべて同じです。まったく同じ予定はデバイス間で1つにまとめられるため、タイトルか日付を変えてください。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den er helt lik en plan som ble laget %@. Like planer slås sammen til én på tvers av enheter, så endre tittelen eller datoene."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles is gelijk aan een planning die %@ is gemaakt. Identieke planningen worden tussen apparaten samengevoegd tot één, dus wijzig de titel of de datums."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystko zgadza się z planem utworzonym %@. Identyczne plany łączą się między urządzeniami w jeden, więc zmień tytuł lub daty."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É idêntico em tudo a um plano criado %@. Planos idênticos são unidos em um só entre os dispositivos, então mude o título ou as datas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Он во всём совпадает с планом, созданным %@. Одинаковые планы объединяются в один на всех устройствах, поэтому измените название или даты."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den är identisk med en plan som skapats %@. Likadana planer slås ihop till en mellan enheterna, så ändra titeln eller datumen."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เหมือนกับตารางที่สร้าง%@ทุกอย่าง ตารางที่เหมือนกันทุกประการจะถูกรวมเป็นหนึ่งเดียวระหว่างอุปกรณ์ โปรดเปลี่ยนชื่อเรื่องหรือวันที่"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ oluşturulan bir planla her şeyiyle aynı. Birebir aynı planlar cihazlar arasında tek plana birleştirilir; lütfen başlığı veya tarihleri değiştirin."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mọi nội dung đều giống hệt một lịch đã tạo %@. Các lịch giống hệt nhau sẽ được gộp làm một giữa các thiết bị, vì vậy hãy đổi tiêu đề hoặc ngày."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "与%@创建的日程内容完全相同。完全相同的日程会在设备之间合并为一个，请修改标题或日期。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "與%@建立的行程內容完全相同。完全相同的行程會在裝置之間合併為一個，請修改標題或日期。"
+          }
+        }
+      }
+    },
     "~%@" : {
       "localizations" : {
         "cs" : {
@@ -412,6 +548,142 @@
         }
       }
     },
+    "같은 일정이 이미 있어요" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stejný plán už existuje"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den samme plan findes allerede"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesen Plan gibt es schon"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Υπάρχει ήδη το ίδιο πρόγραμμα"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A matching schedule already exists"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya existe un plan igual"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sama suunnitelma on jo olemassa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce plan existe déjà"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jadwal yang sama sudah ada"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esiste già un piano uguale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同じ予定がすでにあります"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den samme planen finnes allerede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze planning bestaat al"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taki plan już istnieje"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Já existe um plano igual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Такой план уже есть"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Samma plan finns redan"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "มีตารางเดียวกันนี้อยู่แล้ว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aynı plan zaten var"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã có một lịch giống hệt"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已有相同的日程"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已有相同的行程"
+          }
+        }
+      }
+    },
     "끝" : {
       "localizations" : {
         "cs" : {
@@ -680,6 +952,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "永久重複"
+          }
+        }
+      }
+    },
+    "다른 기기에서" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "na jiném zařízení"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "på en anden enhed"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "auf einem anderen Gerät"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "σε άλλη συσκευή"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "on another device"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en otro dispositivo"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "toisella laitteella"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sur un autre appareil"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "di perangkat lain"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "su un altro dispositivo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別のデバイスで"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "på en annen enhet"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "op een ander apparaat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "na innym urządzeniu"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "em outro dispositivo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "на другом устройстве"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "på en annan enhet"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "บนอุปกรณ์อื่น"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "başka bir cihazda"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "trên thiết bị khác"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在其他设备上"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在其他裝置上"
           }
         }
       }
@@ -1636,6 +2044,414 @@
         }
       }
     },
+    "업데이트하지 않은 기기가 있습니다. 그 기기에서 일부러 지운 것이라면 그대로 두세요." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Některé zařízení není aktualizované. Pokud jste to na něm smazali záměrně, nechte to tak."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En enhed er ikke opdateret. Hvis du slettede dem med vilje på den enhed, kan du lade det være."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Gerät ist nicht aktualisiert. Wenn du das auf diesem Gerät absichtlich gelöscht hast, lass es so."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Υπάρχει συσκευή που δεν έχει ενημερωθεί. Αν τα διαγράψατε σκόπιμα σε εκείνη τη συσκευή, αφήστε τα έτσι."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One of your devices isn’t up to date. If you deleted these on purpose on that device, leave things as they are."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay un dispositivo sin actualizar. Si lo borraste a propósito en ese dispositivo, déjalo así."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jokin laite on päivittämättä. Jos poistit ne siinä laitteessa tarkoituksella, jätä asia näin."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un appareil n’est pas à jour. Si vous les avez supprimés volontairement sur cet appareil, laissez-les ainsi."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ada perangkat yang belum diperbarui. Jika Anda sengaja menghapusnya di perangkat itu, biarkan saja."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’è un dispositivo non aggiornato. Se li hai eliminati di proposito su quel dispositivo, lascia così."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップデートしていないデバイスがあります。そのデバイスで意図して削除したものなら、そのままにしてください。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En enhet er ikke oppdatert. Hvis du slettet dem med vilje på den enheten, kan du la det være."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een apparaat niet bijgewerkt. Als je ze op dat apparaat bewust hebt verwijderd, laat het dan zo."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedno z urządzeń nie jest zaktualizowane. Jeśli celowo usunięto je na tamtym urządzeniu, zostaw to tak."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Há um dispositivo desatualizado. Se você apagou isso de propósito naquele dispositivo, deixe como está."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Есть необновлённое устройство. Если вы намеренно удалили это на том устройстве, оставьте как есть."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En enhet är inte uppdaterad. Om du raderade dem med flit på den enheten kan du låta det vara."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "มีอุปกรณ์ที่ยังไม่ได้อัปเดต หากคุณตั้งใจลบจากอุปกรณ์นั้น ก็ปล่อยไว้ได้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Güncellenmemiş bir cihaz var. O cihazda bilerek sildiyseniz böyle bırakın."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có thiết bị chưa cập nhật. Nếu bạn cố ý xóa trên thiết bị đó thì cứ để nguyên."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有设备尚未更新。如果是你在那台设备上有意删除的，请保持原样。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有裝置尚未更新。如果是你在那台裝置上有意刪除的，請維持原樣。"
+          }
+        }
+      }
+    },
+    "업데이트하지 않은 기기가 있어요" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Některé zařízení není aktualizované"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En enhed er ikke opdateret"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Gerät ist nicht aktualisiert"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Υπάρχει συσκευή που δεν έχει ενημερωθεί"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One of your devices isn’t up to date"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay un dispositivo sin actualizar"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jokin laite on päivittämättä"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un appareil n’est pas à jour"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ada perangkat yang belum diperbarui"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’è un dispositivo non aggiornato"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップデートしていないデバイスがあります"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En enhet er ikke oppdatert"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een apparaat niet bijgewerkt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedno z urządzeń nie jest zaktualizowane"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Há um dispositivo desatualizado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Есть необновлённое устройство"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En enhet är inte uppdaterad"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "มีอุปกรณ์ที่ยังไม่ได้อัปเดต"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Güncellenmemiş bir cihaz var"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có thiết bị chưa cập nhật"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有设备尚未更新"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有裝置尚未更新"
+          }
+        }
+      }
+    },
+    "이 맥에서" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "na tomto Macu"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "på denne Mac"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "auf diesem Mac"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "σε αυτό το Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "on this Mac"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en este Mac"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tässä Macissa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sur ce Mac"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "di Mac ini"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "su questo Mac"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このMacで"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "på denne Macen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "op deze Mac"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "na tym Macu"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "neste Mac"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "на этом Mac"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "på den här Mac-datorn"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "บน Mac เครื่องนี้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bu Mac’te"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "trên máy Mac này"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在这台 Mac 上"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在這台 Mac 上"
+          }
+        }
+      }
+    },
     "이 무지개 일정을 지울까요?" : {
       "localizations" : {
         "cs" : {
@@ -2040,6 +2856,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重要程度"
+          }
+        }
+      }
+    },
+    "최근 이 iCloud 계정에서 옛 버전 앱이 쓰였습니다. 그 기기에서 지운 것은 다른 기기에서 '되살릴까요?'로 물어 올 수 있어요. 모든 아이폰과 맥의 앱을 최신 버전으로 업데이트해 주세요." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na tomto účtu iCloud byla nedávno použita starší verze aplikace. U věcí smazaných na tom zařízení se vás jiná zařízení mohou ptát „Vrátit zpět?“. Aktualizujte prosím aplikaci na všech iPhonech a Macích na nejnovější verzi."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En ældre version af appen er for nylig blevet brugt på denne iCloud-konto. Det, der blev slettet på den enhed, kan dukke op på dine andre enheder med spørgsmålet »Hent dem tilbage?«. Opdater appen til den nyeste version på alle dine iPhones og Mac-computere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vor Kurzem wurde mit diesem iCloud-Account eine ältere Version der App verwendet. Was auf diesem Gerät gelöscht wurde, kann auf deinen anderen Geräten mit „Zurückholen?“ wieder auftauchen. Aktualisiere bitte die App auf allen deinen iPhones und Macs auf die neueste Version."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Πρόσφατα χρησιμοποιήθηκε παλιότερη έκδοση της εφαρμογής σε αυτόν τον λογαριασμό iCloud. Όσα διαγράφηκαν σε εκείνη τη συσκευή μπορεί να εμφανιστούν στις άλλες συσκευές με την ερώτηση «Επαναφορά;». Ενημερώστε την εφαρμογή στην πιο πρόσφατη έκδοση σε όλα τα iPhone και Mac σας."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An older version of the app was recently used on this iCloud account. Things deleted on that device may come up on your other devices with “Bring them back?” Please update the app to the latest version on all your iPhones and Macs."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hace poco se usó una versión antigua de la app en esta cuenta de iCloud. Lo que se borró en ese dispositivo puede aparecer en los demás con la pregunta «¿Recuperarlo?». Actualiza la app a la última versión en todos tus iPhone y Mac."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tällä iCloud-tilillä käytettiin äskettäin sovelluksen vanhaa versiota. Siinä laitteessa poistetut asiat voivat tulla muilla laitteilla esiin kysymyksellä ”Palautetaanko?”. Päivitä sovellus uusimpaan versioon kaikissa iPhoneissa ja Maceissa."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une ancienne version de l’app a récemment été utilisée sur ce compte iCloud. Ce qui a été supprimé sur cet appareil peut réapparaître sur les autres avec la question « Les rétablir ? ». Mettez à jour l’app vers la dernière version sur tous vos iPhone et Mac."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baru-baru ini versi lama app dipakai di akun iCloud ini. Yang dihapus di perangkat itu bisa muncul di perangkat lain dengan pertanyaan “Kembalikan?”. Perbarui app ke versi terbaru di semua iPhone dan Mac Anda."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Di recente su questo account iCloud è stata usata una versione precedente dell’app. Ciò che è stato eliminato su quel dispositivo potrebbe ricomparire sugli altri con la domanda «Ripristinare?». Aggiorna l’app all’ultima versione su tutti i tuoi iPhone e Mac."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近、このiCloudアカウントで古いバージョンのアプリが使われました。そのデバイスで削除したものについて、ほかのデバイスで「元に戻しますか？」と聞かれることがあります。すべてのiPhoneとMacのアプリを最新バージョンにアップデートしてください。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En eldre versjon av appen ble nylig brukt på denne iCloud-kontoen. Det som ble slettet på den enheten, kan dukke opp på de andre enhetene dine med spørsmålet «Hente tilbake?». Oppdater appen til nyeste versjon på alle iPhone- og Mac-enhetene dine."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onlangs is er een oudere versie van de app gebruikt met dit iCloud-account. Wat op dat apparaat is verwijderd, kan op je andere apparaten opduiken met de vraag ‘Terugzetten?’. Werk de app bij naar de nieuwste versie op al je iPhones en Macs."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niedawno na tym koncie iCloud użyto starszej wersji aplikacji. To, co usunięto na tamtym urządzeniu, może pojawić się na innych z pytaniem „Przywrócić?”. Zaktualizuj aplikację do najnowszej wersji na wszystkich swoich iPhone’ach i Macach."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uma versão antiga do app foi usada nesta conta do iCloud recentemente. O que foi apagado naquele dispositivo pode aparecer nos outros com a pergunta “Restaurar?”. Atualize o app para a versão mais recente em todos os seus iPhones e Macs."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недавно с этой учётной записью iCloud использовалась старая версия приложения. То, что удалили на том устройстве, может появиться на других с вопросом «Вернуть?». Обновите приложение до последней версии на всех своих iPhone и Mac."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nyligen användes en äldre version av appen på det här iCloud-kontot. Det som raderades på den enheten kan dyka upp på dina andra enheter med frågan ”Ta tillbaka?”. Uppdatera appen till den senaste versionen på alla dina iPhone och Mac-datorer."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เมื่อไม่นานนี้มีการใช้แอปเวอร์ชันเก่าในบัญชี iCloud นี้ สิ่งที่ลบจากอุปกรณ์นั้นอาจขึ้นถามในอุปกรณ์อื่นว่า “นำกลับมาไหม” โปรดอัปเดตแอปใน iPhone และ Mac ทุกเครื่องเป็นเวอร์ชันล่าสุด"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu iCloud hesabında yakın zamanda uygulamanın eski bir sürümü kullanıldı. O cihazda silinenler, diğer cihazlarda “Geri getirilsin mi?” sorusuyla karşınıza çıkabilir. Lütfen tüm iPhone ve Mac’lerinizdeki uygulamayı en son sürüme güncelleyin."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gần đây có một phiên bản ứng dụng cũ được dùng trên tài khoản iCloud này. Những gì đã xóa trên thiết bị đó có thể hiện lên ở thiết bị khác kèm câu hỏi “Khôi phục không?”. Hãy cập nhật ứng dụng lên phiên bản mới nhất trên tất cả iPhone và máy Mac của bạn."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个 iCloud 账户最近用过旧版 App。在那台设备上删除的内容，可能会在其他设备上弹出“要恢复吗？”的询问。请将所有 iPhone 和 Mac 上的 App 更新到最新版本。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個 iCloud 帳號最近用過舊版 App。在那台裝置上刪除的內容，可能會在其他裝置上跳出「要救回來嗎？」的詢問。請將所有 iPhone 和 Mac 上的 App 更新到最新版本。"
           }
         }
       }

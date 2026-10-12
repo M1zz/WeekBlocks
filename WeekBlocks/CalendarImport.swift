@@ -258,42 +258,99 @@ final class CalendarBridge {
         var mine = weekBlocks.filter { $0.calendarEventID == nil }
         var byKey = Dictionary(existing.map { ($0.calendarEventID!, $0) }, uniquingKeysWith: { a, _ in a })
         var seen = importedKeys
+        // 다른 기기에서 사람이 지운 캘린더 블록 (→ DeletionMark.swift). importedKeys는 이 맥에만 있어서,
+        // 저쪽 맥에서 지운 일정을 이쪽이 처음 가져오면 도로 세웠다.
+        let deletedElsewhere = DeletionLog.marks(in: context)
         // 이 기능 전에 들어온 블록도 '가져온 것'으로 적어 둔다 — 그래야 지우면 안 돌아온다.
         seen.formUnion(byKey.keys)
 
+        // ── 1차: 이름(키)으로 짝짓는다. ──
+        // ⚠️ 모든 일정을 이름으로 먼저 짝지은 뒤에야 2차(같은 날·시각·제목)로 넘어간다.
+        //    섞어 돌리면 앞 일정이 뒤 일정의 '제 이름 블록'을 제목만 보고 가로챈다.
+        var matches: [Match] = []
         for event in events {
-            guard let key = Self.key(for: event), let start = event.startDate else { continue }
-            guard let day = Self.day(of: start, in: weekStart) else { continue }
+            guard let key = Self.key(for: event), let start = event.startDate,
+                  let day = Self.day(of: start, in: weekStart) else { continue }
+            let legacy = Self.legacyKey(for: event)
+            let allDay = Self.isWholeDay(event)
+            let hour = allDay ? PlanBlock.backgroundHour : Self.hourOfDay(start, calendar: cal)
+            let title = (event.title ?? "").isEmpty ? String(localized: "(제목 없는 일정)") : event.title!
 
+            var block = byKey.removeValue(forKey: key)
+            // 옛 이름(이 맥의 eventIdentifier)으로 적힌 블록 → 새 이름으로 옮겨 적는다 (한 번뿐인 이행).
+            if block == nil, let legacy, legacy != key, let old = byKey.removeValue(forKey: legacy) {
+                Self.relink(old, to: key)
+                block = old
+            }
             // 시각을 옮긴 일정은 이름(= id + 시작 시각)이 바뀐다. 반복 일정이 아니면 같은 id의
             // 블록을 찾아 그 블록을 옮긴다 — 안 그러면 새 블록 하나와 '사라진 일정' 하나로 갈린다.
-            if byKey[key] == nil, !event.hasRecurrenceRules, let id = event.eventIdentifier,
-               let moved = byKey.first(where: { $0.key.hasPrefix(id + "|") }) {
+            if block == nil, !event.hasRecurrenceRules,
+               let moved = byKey.first(where: { Self.names($0.key, event) }) {
                 byKey.removeValue(forKey: moved.key)
-                if CalendarMerge.hasOwnTitle(moved.key) { CalendarMerge.keepOwnTitle(for: key) }
-                moved.value.calendarEventID = key
-                byKey[key] = moved.value
+                Self.relink(moved.value, to: key)
+                block = moved.value
             }
+            // 옛 이름에 붙어 있던 '사람이 지은 제목' 표시도 새 이름으로 넘긴다.
+            if let legacy, legacy != key, CalendarMerge.hasOwnTitle(legacy) { CalendarMerge.keepOwnTitle(for: key) }
+            matches.append(Match(event: event, key: key, legacy: legacy, day: day, hour: hour,
+                                 allDay: allDay, title: title, block: block))
+        }
+
+        // ── 2차: 같은 날 · 같은 시작 분 · 같은 제목으로 한 번 더 맞춘다. ──
+        // 다른 맥이 가져온 블록은 그 맥의 이름이 적혀 있어 1차에 안 걸린다 (옛 이름은 기기마다 다르다).
+        // 이것을 안 하면 맥마다 한 벌씩 두 벌이 서고, 서로 상대 것을 '사라진 일정'으로 지우자고 한다.
+        // 이미 두 벌이 선 것도 여기서 하나로 줄인다.
+        for i in matches.indices {
+            let slot = Self.slot(day: matches[i].day, minute: Self.minute(matches[i].hour, allDay: matches[i].allDay),
+                                 title: matches[i].title)
+            let twins = byKey.filter { Self.slot(of: $0.value) == slot }
+            guard !twins.isEmpty else { continue }
+            for k in twins.keys { byKey.removeValue(forKey: k) }
+            let all = (matches[i].block.map { [$0] } ?? []) + twins.values
+            // ⚠️ 남길 쪽은 **동기화되는 값으로만** 고른다 — 두 맥이 각자 골라도 같은 블록이 남아야
+            //    서로 상대가 남긴 것을 지우는 일이 없다.
+            //    이름으로 짝지은 블록이 사람 것이면 그것이 남는다 (사람 것은 어차피 안 지운다).
+            let named = matches[i].block.flatMap { Self.isPrecious($0, eventTitle: matches[i].title) ? $0 : nil }
+            guard let keeper = named ?? all.min(by: { Self.keeps($0, over: $1, eventTitle: matches[i].title) })
+            else { continue }
+            for loser in all where loser !== keeper {
+                // 사람이 손댄 것(또는 제목을 바꿔 둔 것)은 지우지 않는다. 손 안 댄 사본만 치운다 —
+                // 같은 일정을 베낀 것이라 잃는 것이 없다.
+                guard !Self.isPrecious(loser, eventTitle: matches[i].title) else { continue }
+                context.delete(loser)
+                mine.removeAll { $0 === loser }
+                result.removed += 1
+            }
+            // 이름이 기기와 무관할 때만 옮겨 적는다. 이 맥에만 있는 id로 덮으면 다른 맥이 다시 못 찾는다.
+            if Self.isPortable(matches[i].key) { Self.relink(keeper, to: matches[i].key) }
+            matches[i].block = keeper
+        }
+
+        // ── 맞춘 대로 반영한다. ──
+        for m in matches {
+            let key = m.key, day = m.day, hour = m.hour, title = m.title, allDay = m.allDay
             // 가져온 적 있는데 블록이 없다 = 사람이 앱에서 지웠다. 되살리지 않는다.
-            if byKey[key] == nil, seen.contains(key) { continue }
+            if m.block == nil, seen.contains(key) || m.legacy.map(seen.contains) == true { continue }
+            if m.block == nil, deletedElsewhere.contains("calendar:\(key)") { seen.insert(key); continue }
             seen.insert(key)
-            let allDay = Self.isWholeDay(event)
             if allDay { result.allDay += 1 }
 
             // 종일 일정은 '종일' 블록으로 — 시간을 차지하지 않는다 (→ PlanBlock.isAllDay).
             // 캘린더의 종일은 대개 공휴일·생일·휴가 같은 '그날이 어떤 날'이다 — 배경으로 들인다 (→ PlanBlock.isBackground).
-            let hour = allDay ? PlanBlock.backgroundHour : Self.hourOfDay(start, calendar: cal)
-            let duration = Self.duration(of: event, startHour: hour)
-            let title = (event.title ?? "").isEmpty ? String(localized: "(제목 없는 일정)") : event.title!
+            let duration = Self.duration(of: m.event, startHour: hour)
 
-            if let block = byKey.removeValue(forKey: key) {
+            if let block = m.block {
                 var changed = false
                 if block.day != day { block.day = day; changed = true }
                 // 종일끼리는 시각을 건드리지 않는다 — 사람이 배경 ↔ 할 일로 바꿔 둔 것을 덮지 않게.
                 if block.startHour != hour, !(allDay && block.isAllDay) { block.startHour = hour; changed = true }
                 if block.durationHours != duration { block.durationHours = duration; changed = true }
                 // 합친 블록의 제목은 사람 것이다 — 캘린더 제목으로 덮지 않는다 (→ CalendarMerge).
-                if block.title != title, !CalendarMerge.hasOwnTitle(key) { block.title = title; changed = true }
+                // ⚠️ '사람이 지은 제목' 표시는 기기마다 따로 적힌다. 다른 기기에서 난 블록은 그 표시를
+                //    이 맥이 모르므로 제목을 건드리지 않는다 — 제목 맞추기는 난 자리가 한다.
+                if block.title != title, !CalendarMerge.hasOwnTitle(key), TodoSharing.isMine(block) {
+                    block.title = title; changed = true
+                }
                 let band = TimeBand.containing(hour >= 0 ? hour : 9)
                 if block.timeBand != band { block.timeBand = band; changed = true }
                 if changed { result.updated += 1 }
@@ -332,7 +389,15 @@ final class CalendarBridge {
         // ⚠️ **여기서 지우지 않는다.** 지우면 그 삭제가 CloudKit을 타고 아이폰까지 건너가
         //    거기서도 사라진다. 되돌릴 수 없는 일이라, 무엇을 지울 참인지 사람에게
         //    보여주고 물어본 뒤에 지운다 (→ ContentView.importFromCalendar).
-        for (_, orphan) in byKey {
+        let chosenIDs = Set(chosen.map(\.calendarIdentifier))
+        for (key, orphan) in byKey {
+            // ⚠️ **다른 기기에서 가져온 블록은 그 기기가 판정한다.** 캘린더 고르기는 기기마다 따로라,
+            //    이 맥이 안 읽는 캘린더(또는 이 맥에 없는 계정)의 일정은 여기서 늘 '사라진' 것으로 보인다.
+            //    이 맥이 그 일정의 캘린더를 읽고 있는데도 없을 때만(= 확실히 사라졌을 때만) 묻는다.
+            if !TodoSharing.isMine(orphan) {
+                let homes = Set(linkedEvents(forKey: key).compactMap { $0.calendar?.calendarIdentifier })
+                guard !homes.isDisjoint(with: chosenIDs) else { continue }
+            }
             if Self.wasTouchedByPerson(orphan) {
                 orphan.calendarEventID = nil   // 연결만 끊고 글은 남긴다.
                 result.keptOrphans += 1
@@ -346,6 +411,18 @@ final class CalendarBridge {
         // 고르기만 하고 아무것도 안 들어온 주가 흔하다. '가져왔다'는 들어왔을 때만이다.
         if result.added > 0 || result.updated > 0 { Telemetry.record(.calendarImported) }
         return result
+    }
+
+    /// 이번 가져오기에서 캘린더 일정 하나와, 그 일정을 맡을 블록.
+    private struct Match {
+        let event: EKEvent
+        let key: String
+        let legacy: String?
+        let day: DayOfWeek
+        let hour: Double
+        let allDay: Bool
+        let title: String
+        var block: PlanBlock?
     }
 
     /// 물어본 뒤에 지운다 (→ `ImportResult.pendingRemovals`).
@@ -380,10 +457,6 @@ final class CalendarBridge {
             || block.reviewStatus != nil
     }
 
-    /// 일정 하나를 가리키는 이름.
-    ///
-    /// ⚠️ `eventIdentifier` 하나로는 모자란다. **반복 일정은 모든 회차가 같은 값**을 갖기
-    ///    때문에, 매주 회의가 한 블록으로 뭉개진다. 시작 시각을 붙여 회차를 가른다.
     /// 배경 종일(→ PlanBlock.backgroundHour)이 생기기 전에 가져온 종일 일정을 한 번만 배경으로 옮긴다.
     /// 그 전에는 생일·공휴일이 할 일로 세여 무지개 칸을 차지하고 '끝냈나요?'까지 물었다.
     private static func migrateAllDayToBackground(in context: ModelContext) {
@@ -401,8 +474,11 @@ final class CalendarBridge {
     /// 한 주를 가로지르는 막대를 그리려면 끝나는 날을 캘린더에서 다시 읽는다. 모르면 nil.
     func allDaySpanDays(forKey key: String) -> Int? {
         if let cached = spanCache[key] { return cached }
-        guard hasAccess, let id = key.split(separator: "|").first,
-              let event = store.event(withIdentifier: String(id)),
+        let found = linkedEvents(forKey: key)
+        // 반복 종일(생일 등)은 회차마다 같은 길이다. 시작이 맞는 회차가 없으면 아무 회차나 쓴다.
+        let start0 = Self.parse(key)?.start
+        guard hasAccess,
+              let event = found.first(where: { $0.startDate.map { Int($0.timeIntervalSince1970) } == start0 }) ?? found.first,
               Self.isWholeDay(event), let start = event.startDate, let end = event.endDate else { return nil }
         let cal = Calendar.current
         let last = end.addingTimeInterval(-1)
@@ -426,9 +502,103 @@ final class CalendarBridge {
         return c.hour == 23 && c.minute == 59
     }
 
+    // MARK: - 일정의 이름
+
+    /// 일정 하나를 가리키는 이름 — `"ext:<calendarItemExternalIdentifier>|<시작 시각 초>"`.
+    ///
+    /// ⚠️ 예전에는 `eventIdentifier`를 썼다. 그것은 **이 기기의 캘린더 DB 안에서만 통하는 id**라
+    ///    아이맥과 맥북이 같은 회의에 서로 다른 이름을 붙였다 → 맥마다 한 벌씩 두 벌이 서고,
+    ///    서로 상대 것을 '캘린더에서 사라진 일정'으로 지우자고 했다. 외부 id(CalDAV의 UID)는
+    ///    같은 계정의 기기끼리 같다.
+    /// ⚠️ id 하나로는 모자란다. **반복 일정은 모든 회차가 같은 값**을 갖기 때문에, 매주 회의가
+    ///    한 블록으로 뭉개진다. 시작 시각을 붙여 회차를 가른다.
+    /// 외부 id가 없는 캘린더(드물다)는 옛 이름을 쓴다 — 그때는 같은 날·시각·제목 맞추기가 받친다.
     private static func key(for event: EKEvent) -> String? {
+        guard let start = event.startDate else { return nil }
+        if let ext = event.calendarItemExternalIdentifier, !ext.isEmpty {
+            return "\(externalPrefix)\(ext)|\(Int(start.timeIntervalSince1970))"
+        }
+        return legacyKey(for: event)
+    }
+
+    private static let externalPrefix = "ext:"
+
+    /// 옛 이름 `"<eventIdentifier>|<시작 시각 초>"`. 이미 저장된 블록·importedKeys를 알아보는 데만 쓴다.
+    /// ⚠️ 아이폰(CalendarMirror.PlannedCopies)도 이 꼴을 읽는다 — 새 이름은 거기서 같은 날·시각·제목으로 걸린다.
+    private static func legacyKey(for event: EKEvent) -> String? {
         guard let id = event.eventIdentifier, let start = event.startDate else { return nil }
         return "\(id)|\(Int(start.timeIntervalSince1970))"
+    }
+
+    /// 이름을 id와 시작 시각으로 나눈다. ⚠️ 외부 id에 `|`가 들어 있을 수 있어 **마지막** `|`로 자른다.
+    private static func parse(_ key: String) -> (id: String, start: Int, external: Bool)? {
+        guard let bar = key.lastIndex(of: "|"), let start = Int(key[key.index(after: bar)...]) else { return nil }
+        let head = String(key[..<bar])
+        return head.hasPrefix(externalPrefix)
+            ? (String(head.dropFirst(externalPrefix.count)), start, true)
+            : (head, start, false)
+    }
+
+    /// 기기와 무관한 이름인가 (외부 id로 지은 것). 이런 이름만 남의 블록에 옮겨 적는다.
+    private static func isPortable(_ key: String) -> Bool { key.hasPrefix(externalPrefix) }
+
+    /// 이름(시작 시각은 빼고)이 이 일정을 가리키는가 — 시각을 옮긴 일정을 찾을 때.
+    private static func names(_ key: String, _ event: EKEvent) -> Bool {
+        guard let p = parse(key) else { return false }
+        return p.external ? p.id == event.calendarItemExternalIdentifier : p.id == event.eventIdentifier
+    }
+
+    /// 이 이름이 가리키는 일정들 (이 기기 캘린더에서). 반복 일정은 여러 회차가 나올 수 있다.
+    private func linkedEvents(forKey key: String) -> [EKEvent] {
+        guard let p = Self.parse(key) else { return [] }
+        if p.external {
+            return store.calendarItems(withExternalIdentifier: p.id).compactMap { $0 as? EKEvent }
+        }
+        return store.event(withIdentifier: p.id).map { [$0] } ?? []
+    }
+
+    /// 블록의 이름을 바꿔 적는다. 옛 이름에 붙은 '사람이 지은 제목' 표시도 따라간다.
+    private static func relink(_ block: PlanBlock, to key: String) {
+        guard let old = block.calendarEventID, old != key else { return }
+        if CalendarMerge.hasOwnTitle(old) { CalendarMerge.keepOwnTitle(for: key) }
+        block.calendarEventID = key
+    }
+
+    // MARK: - 같은 날 · 같은 시작 분 · 같은 제목
+    //
+    // 이름이 안 맞을 때 받치는 기준 (아이폰 CalendarMirror.PlannedCopies와 같은 기준).
+    // 시각까지 같아야 하므로 이름만 같은 다른 날·다른 시각 일정은 안 걸린다.
+
+    private static func slot(day: DayOfWeek, minute: Int, title: String) -> String {
+        "\(day.rawValue)|\(minute)|\(title)"
+    }
+
+    /// 종일은 시각이 없으니 -1 자리 하나로 — 같은 날 · 같은 제목으로만 맞춘다.
+    private static func minute(_ hour: Double, allDay: Bool) -> Int {
+        allDay ? -1 : Int((hour * 60).rounded())
+    }
+
+    private static func slot(of block: PlanBlock) -> String {
+        slot(day: block.day, minute: minute(block.startHour, allDay: block.isAllDay), title: block.title)
+    }
+
+    /// 사람 것으로 볼 블록 — 손댔거나 제목을 캘린더와 다르게 바꿔 두었다. 사본 치우기에서 지우지 않는다.
+    /// ⚠️ 기기마다 따로 적히는 '사람이 지은 제목' 표시(UserDefaults) 대신 **동기화되는 제목**을 본다 —
+    ///    두 맥이 같은 결론을 내야 한다.
+    private static func isPrecious(_ block: PlanBlock, eventTitle: String) -> Bool {
+        wasTouchedByPerson(block) || block.title != eventTitle
+    }
+
+    /// 같은 일정의 사본 중 무엇을 남기나. 사람 것 → 먼저 만든 것 → 이름 순.
+    /// ⚠️ 동기화되는 값만 쓴다. 시각은 밀리초로 자른다 — CloudKit을 건너온 Date는 정밀도가 줄어,
+    ///    만든 기기와 받은 기기가 미세하게 다른 값을 들고 있을 수 있다.
+    private static func keeps(_ a: PlanBlock, over b: PlanBlock, eventTitle: String) -> Bool {
+        let pa = isPrecious(a, eventTitle: eventTitle), pb = isPrecious(b, eventTitle: eventTitle)
+        if pa != pb { return pa }
+        let ta = Int64((a.createdAt.timeIntervalSince1970 * 1000).rounded())
+        let tb = Int64((b.createdAt.timeIntervalSince1970 * 1000).rounded())
+        if ta != tb { return ta < tb }
+        return (a.calendarEventID ?? "") < (b.calendarEventID ?? "")
     }
 
     private static func day(of date: Date, in weekStart: Date) -> DayOfWeek? {

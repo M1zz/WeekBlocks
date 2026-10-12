@@ -46,6 +46,14 @@ struct VaultRecoverySheet: View {
                     .font(.body)
                     .fixedSize(horizontal: false, vertical: true)
 
+                if !VaultMonitor.shared.outdatedDevices.isEmpty {
+                    Label("업데이트하지 않은 기기가 있습니다. 그 기기에서 일부러 지운 것이라면 그대로 두세요.",
+                          systemImage: "exclamationmark.triangle")
+                        .font(.callout)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
                         group("프로젝트", m.projects.map(\.name))
@@ -64,12 +72,14 @@ struct VaultRecoverySheet: View {
                     .foregroundStyle(.secondary)
 
                 HStack {
+                    // Enter가 되살리기로 가지 않게 한다. 다른 기기에서 일부러 지운 것이 섞여 있을 수 있어서,
+                    // 습관처럼 누른 한 번이 네 기기 모두에 그것을 되돌려 놓는다.
                     Button("그대로 두기") { onClose() }
+                        .keyboardShortcut(.cancelAction)
                     Spacer()
                     Button("모두 되살리기") {
-                        restoredCount = VaultMonitor.shared.restore(m)
+                        restoredCount = VaultMonitor.shared.restore(m, cause: finding.cause)
                     }
-                    .keyboardShortcut(.defaultAction)
                 }
             }
         }
@@ -116,6 +126,15 @@ struct VaultPrompt: ViewModifier {
     func body(content: Content) -> some View {
         content.sheet(item: $monitor.finding) { finding in
             VaultRecoverySheet(finding: finding) { monitor.finding = nil }
+        }
+        // 일이 나기 **전에** 알린다. 옛 버전 기기에서 지운 것은 다른 기기마다 되살릴지 물어 오는데,
+        // 그때 가서 고르게 하는 것보다 그 기기를 업데이트하는 편이 낫다.
+        .alert("업데이트하지 않은 기기가 있어요",
+               isPresented: Binding(get: { monitor.shouldWarnOutdated && monitor.finding == nil },
+                                    set: { if !$0 { monitor.acknowledgeOutdated() } })) {
+            Button("확인", role: .cancel) { monitor.acknowledgeOutdated() }
+        } message: {
+            Text("최근 이 iCloud 계정에서 옛 버전 앱이 쓰였습니다. 그 기기에서 지운 것은 다른 기기에서 '되살릴까요?'로 물어 올 수 있어요. 모든 아이폰과 맥의 앱을 최신 버전으로 업데이트해 주세요.")
         }
     }
 }

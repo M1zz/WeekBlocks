@@ -69,6 +69,7 @@
 		A14391170989592054428F6E /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 557E8F32612BE4E8BC96E369 /* InfoPlist.xcstrings */; };
 		A2A0A55F465DF4893B6A6A40 /* Affordance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162BD316D362F2B5D760A08 /* Affordance.swift */; };
 		A5D14A64C111AEB156208155 /* RainbowLane.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD00AB53FC2B979E2266396D /* RainbowLane.swift */; };
+		A958AF45D346B2BDA38B9869 /* DeletionMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EBBF057E9FC39FB6C47955 /* DeletionMark.swift */; };
 		AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */; };
 		AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526E2EF2A25551766D802F91 /* TodoSharing.swift */; };
 		ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */; };
@@ -178,6 +179,7 @@
 		7937982B85D41EB42E3064BE /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		7970A4DA39D1705294090BDC /* TodoShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodoShare.entitlements; sourceTree = "<group>"; };
 		799F5A31A8D7F0BF9EA76E5B /* TimerWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerWidgetSnapshot.swift; sourceTree = "<group>"; };
+		86EBBF057E9FC39FB6C47955 /* DeletionMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletionMark.swift; sourceTree = "<group>"; };
 		8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSplitAdvisor.swift; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
 		88EFB1A15FCF0B7D66E1FACD /* DayPanelExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayPanelExpansion.swift; sourceTree = "<group>"; };
@@ -322,6 +324,7 @@
 				88EFB1A15FCF0B7D66E1FACD /* DayPanelExpansion.swift */,
 				C06D3FF3319912A6918EB19F /* DayScheduleView.swift */,
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
+				86EBBF057E9FC39FB6C47955 /* DeletionMark.swift */,
 				9FF423295556BDAC9E8FB687 /* DurationPicker.swift */,
 				C368657EE69104A4BA70BA52 /* Info.plist */,
 				B8983B46095E5A0B4F39CE60 /* InfoPlist.xcstrings */,
@@ -679,6 +682,7 @@
 				586490733E576A0AF28E9E91 /* DayPanelExpansion.swift in Sources */,
 				3F5C7F3913BDECC04F331C9E /* DayScheduleView.swift in Sources */,
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
+				A958AF45D346B2BDA38B9869 /* DeletionMark.swift in Sources */,
 				6A311E412B547607487C976E /* DurationPicker.swift in Sources */,
 				76C915985969A27F69724084 /* IPhoneCompanionView.swift in Sources */,
 				8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */,

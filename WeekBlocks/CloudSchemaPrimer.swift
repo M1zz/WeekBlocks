@@ -26,7 +26,7 @@
 //     지금 채우는 것: BacklogItem·PlanBlock의 옵셔널 전부, 세 모델
 //     (BacklogItem·PlanBlock·Routine)의 함께 쓰기 칸(isShared·originInstallID),
 //     ProMark 타입 자체와 그 옵셔널(validUntil), Project 타입 자체와 그 옵셔널(completedAt),
-//     BacklogItem.projectID, 그리고 RainbowEvent 타입 자체와 그 옵셔널 다섯 칸.
+//     BacklogItem.projectID, RainbowEvent 타입 자체와 그 옵셔널 다섯 칸, 그리고 DeletionMark 타입.
 //
 
 #if DEBUG
@@ -115,7 +115,11 @@ enum CloudSchemaPrimer {
         let mark = ProMark(platform: .current, productID: marker,
                            validUntil: Date(timeIntervalSince1970: 0))
 
-        for model in [category as any PersistentModel, project, item, block, routine, mark, rainbow] {
+        // 지운 것의 표 (→ DeletionMark.swift). 무엇을 지워 봐야 생기는 타입이라 표본으로 세운다.
+        // 열쇠가 실제 것과 겹치지 않게 표본 이름을 쓴다.
+        let tomb = DeletionMark(key: "item:\(marker)", originInstallID: "schema-sample-install")
+
+        for model in [category as any PersistentModel, project, item, block, routine, mark, rainbow, tomb] {
             context.insert(model)
         }
         do {
@@ -129,13 +133,13 @@ enum CloudSchemaPrimer {
 
         // ── 치운다. 스키마는 남는다. ────────────────────────────────────────
         var deleted = 0
-        for model in [category as any PersistentModel, project, item, block, routine, mark, rainbow] {
+        for model in [category as any PersistentModel, project, item, block, routine, mark, rainbow, tomb] {
             context.delete(model)
             deleted += 1
         }
         try? context.save()
 
-        return Report(created: 7, deleted: deleted,
+        return Report(created: 8, deleted: deleted,
                       note: "표본을 올렸다 지웠습니다. 콘솔의 Development 스키마에 칸이 생겼는지 확인한 뒤 Production으로 배포하세요.")
     }
 }

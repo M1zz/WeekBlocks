@@ -541,8 +541,11 @@ enum DataVault {
 
         /// 블록에는 따로 붙은 이름표가 없다. 만든 시각(밀리초)이 사실상 이름표다.
         var identityKey: String { String(Int64((createdAt.timeIntervalSinceReferenceDate * 1000).rounded())) }
-        /// 같은 주 · 같은 요일 · 같은 제목 — 겹친 것 정리(dedupeBlocks)와 같은 기준.
-        var placeKey: String { "\(title)|\(dayRaw)|\(Int64(weekStartDate.timeIntervalSinceReferenceDate))" }
+        /// 같은 주 · 같은 요일 · 같은 제목 · **같은 시각** — 겹친 것 정리(dedupeBlocks)와 같은 기준.
+        /// 시각을 빼면 같은 날 10시·15시 "회의" 중 하나가 정말 없어져도 남은 쪽에 가려 못 본다.
+        var placeKey: String {
+            "\(title)|\(dayRaw)|\(Int64(weekStartDate.timeIntervalSinceReferenceDate))|\(Int((startHour * 60).rounded()))"
+        }
 
         func model() -> PlanBlock {
             let m = PlanBlock(day: .mon, timeBand: .evening, durationHours: durationHours, title: title,

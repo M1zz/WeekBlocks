@@ -1,5 +1,191 @@
 # 릴리즈 노트
 
+## 1.1.11
+
+### 앱스토어 (한국어)
+
+기록을 자동으로 백업하고 사라지면 되살려 줍니다
+아이폰의 무지개 일정과 기한을 맥에서도 고칩니다
+맥과 아이폰에 같은 할 일과 캘린더 일정이 보입니다
+여러 기기에서 써도 지운 것이 돌아오지 않습니다
+업데이트하지 않은 기기가 있으면 미리 알려 줍니다
+
+### App Store (English)
+
+Automatic backups bring back lost items
+Rainbow Schedules and due dates on Mac
+See the same to-dos and events as iPhone
+Deleted items stay gone on all devices
+Warns you about devices not yet updated
+
+### App Store (繁體中文, zh-Hant)
+
+自動備份紀錄，遺失時可以救回
+在 Mac 上也能編輯 iPhone 的彩虹行程與期限
+Mac 和 iPhone 顯示相同的待辦事項與行事曆
+多台裝置一起用，刪除的項目也不會再出現
+有裝置尚未更新時會事先提醒你
+
+### App Store (简体中文, zh-Hans)
+
+自动备份记录，丢失时可以恢复
+在 Mac 上也能编辑 iPhone 的彩虹日程和期限
+Mac 和 iPhone 显示相同的待办事项和日历
+多台设备一起用，删掉的内容也不会再出现
+有设备尚未更新时会提前提醒你
+
+### App Store (日本語, ja)
+
+記録を自動でバックアップし、消えても戻せます
+iPhoneの虹の予定と期限をMacでも編集できます
+MacとiPhoneで同じやることと予定を表示します
+複数の端末で使っても、消したものは戻りません
+アップデートしていない端末を事前にお知らせします
+
+### App Store (Deutsch, de)
+
+Sicherung holt verlorene Einträge zurück
+Regenbogen-Pläne und Fristen auch am Mac
+Dieselben Aufgaben und Termine überall
+Gelöschtes bleibt auf allen Geräten weg
+Warnt vor Geräten ohne neueste Version
+
+### App Store (Español, es)
+
+Copias automáticas para recuperar datos
+Planes arcoíris y plazos también en Mac
+Mismas tareas y eventos en Mac e iPhone
+Lo borrado no reaparece en otros equipos
+Avisa de dispositivos sin actualizar
+
+### App Store (Français, fr)
+
+Vos données sauvegardées et récupérables
+Plans arc-en-ciel et échéances sur Mac
+Mêmes tâches et agenda sur Mac et iPhone
+Ce qui est supprimé ne revient plus
+Alerte si un appareil n’est pas à jour
+
+### App Store (Italiano, it)
+
+Backup automatico per recuperare i dati
+Piani arcobaleno e scadenze anche su Mac
+Stesse attività e calendario ovunque
+Ciò che elimini non ricompare più
+Avviso sui dispositivi non aggiornati
+
+### App Store (Português (Brasil), pt-BR)
+
+Backup automático para recuperar dados
+Planos arco-íris e prazos também no Mac
+Mesmas tarefas e eventos no Mac e iPhone
+O que você apaga não volta mais
+Aviso sobre aparelhos não atualizados
+
+### App Store (Русский, ru)
+
+Автокопии помогут вернуть пропавшее
+Радужные планы и сроки теперь и на Mac
+Одни и те же задачи и события везде
+Удалённое больше не возвращается
+Предупредим о необновлённых устройствах
+
+### App Store (Čeština, cs)
+
+Automatické zálohy vrátí ztracená data
+Duhové plány a termíny i na Macu
+Stejné úkoly a události na Macu i iPhonu
+Smazané položky se už nevracejí
+Upozorní na zařízení bez aktualizace
+
+### App Store (Dansk, da)
+
+Automatisk backup henter tabte data
+Regnbueplaner og frister også på Mac
+Samme opgaver og aftaler på alle enheder
+Det, du sletter, kommer ikke igen
+Besked om enheder, der ikke er opdateret
+
+### App Store (Ελληνικά, el)
+
+Αυτόματα αντίγραφα, τίποτα δεν χάνεται
+Προγράμματα ουράνιου τόξου και στο Mac
+Ίδιες εργασίες και ημερολόγιο παντού
+Ό,τι διαγράφεις δεν επιστρέφει πια
+Ειδοποίηση για συσκευές χωρίς ενημέρωση
+
+### App Store (Suomi, fi)
+
+Varmuuskopiot palauttavat kadonneen
+Sateenkaarisuunnitelmat myös Macissa
+Samat tehtävät ja tapahtumat kaikkialla
+Poistettu ei enää palaa takaisin
+Varoitus päivittämättömistä laitteista
+
+### App Store (Bahasa Indonesia, id)
+
+Cadangan otomatis memulihkan data hilang
+Jadwal pelangi dan tenggat kini di Mac
+Tugas dan acara sama di Mac dan iPhone
+Yang dihapus tidak muncul lagi
+Pemberitahuan perangkat belum diperbarui
+
+### App Store (Norsk bokmål, nb)
+
+Sikkerhetskopi henter tilbake tapte data
+Regnbueplaner og frister også på Mac
+Samme oppgaver og avtaler overalt
+Det du sletter, kommer ikke tilbake
+Varsel om enheter som ikke er oppdatert
+
+### App Store (Nederlands, nl)
+
+Back-ups halen verloren items terug
+Regenboogplanningen en deadlines op Mac
+Dezelfde taken en afspraken overal
+Wat je verwijdert, komt niet meer terug
+Melding over apparaten zonder update
+
+### App Store (Polski, pl)
+
+Kopie zapasowe przywrócą utracone dane
+Plany tęczowe i terminy także na Macu
+Te same zadania i wydarzenia wszędzie
+Usunięte rzeczy już nie wracają
+Ostrzeżenie o nieaktualnych urządzeniach
+
+### App Store (Svenska, sv)
+
+Säkerhetskopior tar tillbaka förlorat
+Regnbågsplaner och deadlines även på Mac
+Samma uppgifter och händelser överallt
+Det du raderar kommer inte tillbaka
+Varnar för enheter som inte uppdaterats
+
+### App Store (ไทย, th)
+
+สำรองข้อมูลอัตโนมัติ กู้คืนได้เมื่อหาย
+ดูและแก้ตารางสายรุ้งกับกำหนดส่งบน Mac ได้
+Mac และ iPhone แสดงงานและปฏิทินเหมือนกัน
+ใช้หลายเครื่อง สิ่งที่ลบก็ไม่กลับมาอีก
+แจ้งเตือนเมื่อมีเครื่องที่ยังไม่อัปเดต
+
+### App Store (Türkçe, tr)
+
+Otomatik yedekle kaybolanı geri getirin
+Gökkuşağı planları artık Mac’te de
+Her cihazda aynı görevler ve etkinlikler
+Silinenler artık geri gelmiyor
+Güncellenmemiş cihazlar için uyarı
+
+### App Store (Tiếng Việt, vi)
+
+Tự động sao lưu, khôi phục khi bị mất
+Lịch cầu vồng và hạn chót có trên Mac
+Cùng việc cần làm và lịch trên mọi máy
+Mục đã xóa không còn tự quay lại
+Báo trước thiết bị chưa cập nhật
+
 ## 1.1.10
 
 ### 앱스토어 (한국어)

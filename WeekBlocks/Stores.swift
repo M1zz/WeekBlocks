@@ -58,6 +58,8 @@ enum StoreBootstrap {
         PlanStore.shared.dedupeBlocks()
         TodoStore.shared.dedupeCategoriesByName()
         TodoStore.shared.dedupeByDragToken()
+        TodoStore.shared.dedupeProjectsByUUID()
+        PlanStore.shared.dedupeRainbowEvents()
     }
 }
 
@@ -72,10 +74,11 @@ final class PlanStore {
     /// ⚠️ `ProMark`는 일곱 번째 타입이다 — "한쪽에서 샀다"는 표 (→ ProMark.swift).
     /// ⚠️ `Project`는 여덟 번째 — 할 일을 끝이 있는 일로 묶는다 (→ BacklogCategory.swift).
     /// ⚠️ `RainbowEvent`는 아홉 번째 — 아이폰 무지개 일정을 맥과 함께 쓰는 사본 (→ RainbowEvent.swift).
+    /// ⚠️ `DeletionMark`는 열 번째 — 사람이 지운 것의 표 (→ DeletionMark.swift).
     ///    아이폰 스토어의 같은 목록과 **글자 하나까지 같아야 한다.**
     static let schema = Schema([Routine.self, PlanBlock.self, BacklogItem.self,
                                 RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self,
-                                ProMark.self, Project.self, RainbowEvent.self])
+                                ProMark.self, Project.self, RainbowEvent.self, DeletionMark.self])
 
     let container: ModelContainer
     var context: ModelContext { container.mainContext }
@@ -118,23 +121,29 @@ final class PlanStore {
 
     func save() { try? context.save() }
 
-    /// **같은 주·같은 요일·같은 제목**의 블록이 둘 이상이면 먼저 만든 것만 남긴다.
+    /// **같은 주·같은 요일·같은 제목·같은 시각**의 블록이 둘 이상이면 먼저 만든 것만 남긴다.
     ///
     /// 동기화가 멈춰 있는 동안 두 기기가 같은 할 일을 각자 요일에 올리면, 다시 이어졌을 때
     /// 서로 다른 레코드로 둘 다 내려온다. 사람이 보기엔 같은 일이 두 번 잡힌 것이라
     /// 남은 시간 계산까지 어긋난다.
     /// 회고(reviewStatus)가 적힌 쪽이 있으면 그쪽을 남긴다 — 사람이 손댄 흔적이 우선이다.
+    ///
+    /// ⚠️ **시각까지 열쇠에 넣는다.** 예전에는 제목만 보아서, 같은 날 10시·15시 "회의"처럼
+    ///    일부러 둘 세운 것 중 하나를 켤 때마다 지웠고, 그 지우기가 모든 기기로 퍼졌다.
+    ///    (분 단위로 본다 — 두 기기가 같은 일을 올리면 시각도 같다. 금고의 placeKey와 같은 기준)
     func dedupeBlocks() {
-        struct Key: Hashable { let title: String; let day: Int; let week: Date }
+        struct Key: Hashable { let title: String; let day: Int; let week: Date; let minute: Int }
         var keep: [Key: PlanBlock] = [:]
         var victims: [PlanBlock] = []
         for block in fetch(PlanBlock.self) {
-            let key = Key(title: block.title, day: block.dayRaw, week: block.weekStartDate)
+            let key = Key(title: block.title, day: block.dayRaw, week: block.weekStartDate,
+                          minute: Int((block.startHour * 60).rounded()))
             guard let kept = keep[key] else { keep[key] = block; continue }
             let keptHasReview = kept.reviewStatusRaw != nil
             let thisHasReview = block.reviewStatusRaw != nil
             let thisWins = (thisHasReview && !keptHasReview)
-                || (thisHasReview == keptHasReview && block.createdAt < kept.createdAt)
+                || (thisHasReview == keptHasReview
+                    && (block.createdAt, Self.tieBreak(block)) < (kept.createdAt, Self.tieBreak(kept)))
             if thisWins {
                 keep[key] = block
                 victims.append(kept)
@@ -146,6 +155,41 @@ final class PlanStore {
         for v in victims { context.delete(v) }
         save()
         print("🧹 [Dedupe] 겹쳐 있던 계획 블록 \(victims.count)개를 정리했다")
+    }
+
+    /// 만든 때까지 같을 때 고르는 기준. 기기마다 다른 가져온 순서가 아니라 내용으로 가른다.
+    static func tieBreak(_ b: PlanBlock) -> String {
+        "\(b.durationHours)|\(b.successCriteria)|\(b.deliverable)|\(b.nextAction ?? "")|\(b.calendarEventID ?? "")"
+    }
+
+    /// **같은 uuid의 무지개 일정**이 둘 이상이면 하나만 남긴다.
+    ///
+    /// 금고 되살리기나 공용 스토어 다시 받기가 겹치면 같은 일정이 행 둘로 선다. 화면은 uuid로
+    /// 그려서 둘이 부딪히고, 아이폰은 그중 아무 하나를 집어 기기마다 다른 행을 볼 수 있다.
+    /// '지움' 표가 있는 행이 이긴다 — 사람이 지운 것이 겹친 행 때문에 되살아나면 안 된다.
+    /// 그다음은 나중에 고친 것, 그래도 같으면 내용으로 가른다 — 어느 기기가 정리해도 같은 행이 남는다.
+    func dedupeRainbowEvents() {
+        func rank(_ e: RainbowEvent) -> (Int, Date, String) {
+            (e.deletedAt != nil ? 1 : 0, e.updatedAt, "\(e.title)|\(e.startDate.timeIntervalSince1970)|\(e.endDate.timeIntervalSince1970)|\(e.colorHex)")
+        }
+        var keep: [String: RainbowEvent] = [:]
+        var victims: [RainbowEvent] = []
+        for e in fetch(RainbowEvent.self) {
+            guard let kept = keep[e.uuid] else { keep[e.uuid] = e; continue }
+            if rank(e) > rank(kept) {
+                // 지움 표는 진 쪽에 있었어도 이긴 쪽으로 옮긴다.
+                if e.deletedAt == nil, let d = kept.deletedAt { e.deletedAt = d }
+                keep[e.uuid] = e
+                victims.append(kept)
+            } else {
+                if kept.deletedAt == nil, let d = e.deletedAt { kept.deletedAt = d }
+                victims.append(e)
+            }
+        }
+        guard !victims.isEmpty else { return }
+        for v in victims { context.delete(v) }
+        save()
+        print("🧹 [Dedupe] 겹쳐 있던 무지개 일정 \(victims.count)개를 정리했다")
     }
 }
 
@@ -170,6 +214,7 @@ final class TodoStore {
     /// 앱이 스토어를 열고 있는 동안에는 파일을 지울 수 없어서 **다음 실행**으로 미룬다.
     func requestRefetchFromCloud() {
         LegacyTodoArchive.write(items: allItems(), categories: categories(), projects: projects())
+        LegacyTodoArchive.reconcilePending = true
         VaultMonitor.shared.snapshotNow(reason: "before-refetch", force: true)
         UserDefaults.standard.set(true, forKey: TodoStore.refetchKey)
     }
@@ -262,12 +307,18 @@ final class TodoStore {
     ///
     /// 채울 때는 dragToken이 없는 것만 넣고, 마지막에 같은 토큰이 둘이면 정리한다.
     /// 같은 할 일이 둘로 보이는 것이 데이터가 안 보이는 것만큼 나쁘기 때문이다.
+    ///
+    /// ⚠️ **떠 둔 직후 한 번만 돈다** (다시 받아오기 · 갈라 둔 스토어 흡수 → `reconcilePending`).
+    ///    예전에는 파일이 있는 맥에서 켤 때마다 돌아서, 아이폰에서 가장 최근 할 일을 지우면
+    ///    '떠 둔 쪽이 더 최신'이 되어 그사이 다른 기기에서 지운 것까지 모두 되살렸다.
+    ///    평소의 안전망은 이제 금고(→ DataVault)가 맡는다.
     func scheduleArchiveReconcile() {
-        guard LegacyTodoArchive.exists else { return }
+        guard LegacyTodoArchive.exists, LegacyTodoArchive.reconcilePending else { return }
         Task { @MainActor in
             // 처음 내려받기가 자리 잡을 시간을 준다. 내려오는 중에 판단하면 항상 '떠 둔 쪽이 최신'이 된다.
             try? await Task.sleep(nanoseconds: 90_000_000_000)
             reconcileWithArchive()
+            LegacyTodoArchive.reconcilePending = false
             StoreBootstrap.dedupeAll()
         }
     }
@@ -301,15 +352,19 @@ final class TodoStore {
         let known = Set(items.map(\.dragToken))
         let knownCategories = Set(categories().map(\.uuid))
         let knownProjects = Set(projects().map(\.uuid))
+        // 어느 기기에서든 사람이 지운 것은 세우지 않는다 (→ DeletionMark.swift).
+        let marked = DeletionLog.marks(in: context)
         var added = 0
-        for row in archive.categories where !knownCategories.contains(row.uuid) {
+        for row in archive.categories where !knownCategories.contains(row.uuid)
+            && !marked.contains("category:\(row.uuid)") {
             context.insert(row.model())
         }
         // 프로젝트도 uuid 그대로 — 할 일이 projectID로 붙잡고 있다. 옛 스냅샷에는 없다(nil).
-        for row in archive.projects ?? [] where !knownProjects.contains(row.uuid) {
+        for row in archive.projects ?? [] where !knownProjects.contains(row.uuid)
+            && !marked.contains("project:\(row.uuid)") {
             context.insert(row.model())
         }
-        for row in archive.items where !known.contains(row.dragToken) {
+        for row in archive.items where !known.contains(row.dragToken) && !marked.contains("item:\(row.dragToken)") {
             context.insert(row.model())
             added += 1
         }
@@ -369,7 +424,11 @@ final class TodoStore {
         var victims: [BacklogItem] = []
         for item in allItems() {
             guard let kept = seen[item.dragToken] else { seen[item.dragToken] = item; continue }
-            if TodoStore.touched(item) > TodoStore.touched(kept) {
+            // 손댄 때가 같으면 내용으로 가른다. 가져온 순서는 기기마다 달라서, 그것으로 고르면
+            // 두 맥이 서로 다른 쪽을 지워 결국 둘 다 사라질 수 있다.
+            let a = (TodoStore.touched(item), TodoStore.tieBreak(item))
+            let b = (TodoStore.touched(kept), TodoStore.tieBreak(kept))
+            if a > b {
                 seen[item.dragToken] = item
                 victims.append(kept)
             } else {
@@ -380,6 +439,34 @@ final class TodoStore {
         for v in victims { context.delete(v) }
         save()
         print("🧹 [Split] 같은 할 일이 겹쳐 있던 \(victims.count)개를 정리했다")
+    }
+
+    /// **같은 uuid의 프로젝트**가 둘 이상이면 하나만 남긴다.
+    /// 할 일은 projectID(uuid)로 붙잡고 있어서 어느 쪽을 지워도 할 일은 떨어지지 않는다.
+    /// 끝낸 표가 있는 쪽 → 먼저 만든 쪽 → 이름 순으로 고른다 — 어느 기기가 정리해도 같은 쪽이 남는다.
+    func dedupeProjectsByUUID() {
+        func rank(_ p: Project) -> (Int, Double, String) {
+            (p.isCompleted ? 1 : 0, -p.createdAt.timeIntervalSince1970, "\(p.name)|\(p.colorName)|\(p.sortIndex)")
+        }
+        var keep: [String: Project] = [:]
+        var victims: [Project] = []
+        for p in projects() {
+            guard let kept = keep[p.uuid] else { keep[p.uuid] = p; continue }
+            if rank(p) > rank(kept) {
+                keep[p.uuid] = p
+                victims.append(kept)
+            } else {
+                victims.append(p)
+            }
+        }
+        guard !victims.isEmpty else { return }
+        for v in victims { context.delete(v) }
+        save()
+        print("🧹 [Dedupe] 겹쳐 있던 프로젝트 \(victims.count)개를 정리했다")
+    }
+
+    static func tieBreak(_ item: BacklogItem) -> String {
+        "\(item.title)|\(item.durationHours)|\(item.isCompleted)|\(item.weekStartDate.timeIntervalSince1970)"
     }
 
     static func touched(_ item: BacklogItem) -> Date {
@@ -408,6 +495,12 @@ enum LegacyTodoArchive {
         FileManager.default.fileExists(atPath: archiveURL.path)
     }
 
+    /// 떠 둔 것을 아직 견주지 않았다. 다시 받아오기·스토어 흡수 때만 켜지고, 한 번 견주면 꺼진다.
+    static var reconcilePending: Bool {
+        get { UserDefaults.standard.bool(forKey: "legacyArchive.reconcilePending") }
+        set { UserDefaults.standard.set(newValue, forKey: "legacyArchive.reconcilePending") }
+    }
+
     /// 갈라 두었던 `WeekBlocksTodos.store`가 아직 남아 있으면, 그 안의 할 일을 떠 온다.
     ///
     /// 스토어를 도로 한 채로 합치면서 그 파일은 더 이상 열지 않는다. 대부분은 클라우드에도
@@ -433,6 +526,7 @@ enum LegacyTodoArchive {
             let items = try context.fetch(FetchDescriptor<BacklogItem>())
             let categories = try context.fetch(FetchDescriptor<BacklogCategory>())
             write(items: items, categories: categories)
+            reconcilePending = true
             defaults.set(true, forKey: key)
             print("✅ [Merge] 갈라 두었던 스토어에서 할 일 \(items.count)개를 떠 왔다")
         } catch {
