@@ -74,6 +74,7 @@
 		AC3B06F246AC9D100F00622B /* TodoSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526E2EF2A25551766D802F91 /* TodoSharing.swift */; };
 		ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */; };
 		B121540A19F0977281258CD9 /* TodoAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB645C90135FC303A3A31FA0 /* TodoAccess.swift */; };
+		B29198694128215DD60B4046 /* RainbowDensityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF43AE5A1D15A524000873FD /* RainbowDensityView.swift */; };
 		B4EBE209685DBC43D266A4BE /* AllDaySpans.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502517D08C4AA9A117B81DA7 /* AllDaySpans.swift */; };
 		B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */; };
 		B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD35C8D5A757450762EFDC34 /* TodoTips.swift */; };
@@ -215,6 +216,7 @@
 		D6183EE446A51250EA08A859 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTimer.swift; sourceTree = "<group>"; };
 		DE20311F927F785DA2C6677B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
+		DF43AE5A1D15A524000873FD /* RainbowDensityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainbowDensityView.swift; sourceTree = "<group>"; };
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E9F2729111E0B1DEA68C05EA /* TodoRainbow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRainbow.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
@@ -340,6 +342,7 @@
 				FAB8A8D7902B2D88193F5F44 /* PreDecision.swift */,
 				C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */,
 				4BB63220172F9C5247AE8F96 /* ProMark.swift */,
+				DF43AE5A1D15A524000873FD /* RainbowDensityView.swift */,
 				CDE15F8BA4B4842B4D0B8733 /* RainbowEvent.swift */,
 				BD00AB53FC2B979E2266396D /* RainbowLane.swift */,
 				693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */,
@@ -694,6 +697,7 @@
 				7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */,
 				7D757422C991FA2C9B300591 /* PreDecision.swift in Sources */,
 				933AE7374F5C1FF842BC9D04 /* ProMark.swift in Sources */,
+				B29198694128215DD60B4046 /* RainbowDensityView.swift in Sources */,
 				CFD440C439AD4242E63002A2 /* RainbowEvent.swift in Sources */,
 				A5D14A64C111AEB156208155 /* RainbowLane.swift in Sources */,
 				995871F5986FE5C82D0852D5 /* ReflectionTrendsView.swift in Sources */,

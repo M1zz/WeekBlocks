@@ -92,6 +92,8 @@ struct ContentView: View {
 
     /// 한 주 요약(총량·고정 루틴·남은 자유 시간)을 펼쳐 두었는가. 기본은 접힘.
     @AppStorage("showsWeekSummary") private var showsWeekSummary = false
+    /// 무지개(겹친 무지개 일정의 밀도)를 펼쳐 두었는가. 타이머 옆 단추로 여닫고, 상태를 기억한다.
+    @AppStorage("showsRainbow") private var showsRainbow = false
 
     /// 마지막으로 보던 자리. 앱을 다시 켜도 하던 일을 이어서 한다.
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
@@ -175,6 +177,15 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 weekHeader
+                // 무지개는 날짜 줄 바로 아래로 **위에서 내려온다** (타이머 옆 단추 · ⌘3).
+                // 요약과 같은 결로 여닫고, 내려오는 동안 날짜 줄을 덮지 않게 자른다 (그림자는 남긴다).
+                if showsRainbow {
+                    rainbowSection
+                        .transition(.disclose)
+                        .padding(20)
+                        .clipped()
+                        .padding(-20)
+                }
                 // 지금 화면에서 다음에 할 일 하나. 흐름을 다 지나면 사라진다.
                 if let step = nextStep {
                     NextStepBanner(step: step,
@@ -278,6 +289,7 @@ struct ContentView: View {
             //    돌아 돌아오는 사이에 애니메이션이 떨어져 나가서, 요약이 늘고 줄 때 아래 화면이 툭
             //    끊겨 올라왔다. 값 자체에 결을 건다 — 어디서 바꾸든(단추·다른 창·다음 실행) 같은 결로 움직인다.
             .animation(Motion.disclose, value: showsWeekSummary)
+            .animation(Motion.disclose, value: showsRainbow)
             .animation(Motion.screen, value: weekLensRaw)
             .animation(Motion.screen, value: scopeRaw)
         }
@@ -696,6 +708,7 @@ struct ContentView: View {
                         // 위젯에도 같은 타임라인을 건넨다 — 바뀌었을 때만 (→ TimerWidgetBridge).
                         TimerWidgetBridge.publish(slots: slots, timer: taskTimer, focus: scheduleFocus)
                     }
+                    rainbowToggle
                 }
                 .animation(Motion.row, value: overdue.count)
             }
@@ -1159,6 +1172,52 @@ struct ContentView: View {
         weekBlocks.contains {
             $0.day == day && $0.isUnreviewedPast(weekStart: storedWeek(for: day), routineNames: routineNames)
         }
+    }
+
+    /// 무지개 보기가 한 번에 보이는 주 수.
+    private static let rainbowWeeks = 8
+
+    /// 타이머 오른쪽의 무지개 단추. 누르면 날짜 줄 바로 아래로 무지개가 내려온다.
+    private var rainbowToggle: some View {
+        Button {
+            withAnimation(Motion.disclose) { showsRainbow.toggle() }
+        } label: {
+            Image(systemName: "rainbow")
+                .symbolRenderingMode(.multicolor)
+                .font(.system(size: 15, weight: .semibold))
+                .frame(width: 30, height: 26)
+                .background {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color.primary.opacity(showsRainbow ? 0.12 : 0.05))
+                }
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut("3", modifiers: .command)
+        .help("무지개")
+        .accessibilityLabel(Text("무지개"))
+    }
+
+    /// 날짜를 가로로, 겹친 무지개 일정을 줄로 (→ RainbowDensityView).
+    private var rainbowSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if rainbowEvents.isEmpty {
+                HStack(spacing: 10) {
+                    Text("아직 무지개 일정이 없습니다. 아이폰에서 만든 일정도 여기에 보입니다.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Button("무지개 일정 추가") {
+                        rainbowSheet = RainbowEditContext(event: nil, defaultStart: Calendar.current.startOfDay(for: Date()))
+                    }
+                    .controlSize(.small)
+                }
+            }
+            RainbowDensityView(events: rainbowEvents,
+                               start: selectedWeek,
+                               weeks: Self.rainbowWeeks,
+                               onOpen: { rainbowSheet = RainbowEditContext(event: $0) },
+                               onAdd: { rainbowSheet = RainbowEditContext(event: nil, defaultStart: $0) })
+        }
+        .dashboardPanel()
     }
 
     private var weekRangeString: String {
