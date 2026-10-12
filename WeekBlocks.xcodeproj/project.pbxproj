@@ -10,6 +10,7 @@
 		000C681D2D7046529311197E /* CalendarImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11B625903C69DAA3D0BC27A /* CalendarImport.swift */; };
 		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
 		036EB7835818A13F6ED0AD7A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7937982B85D41EB42E3064BE /* SwiftUI.framework */; };
+		04A776160C01F496DBB176CF /* DataVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352BBAC09C0B86084BEAE372 /* DataVault.swift */; };
 		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
 		0B6B259A6790F4A36E517BC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */; };
 		105555A9BADE77C379BEB722 /* CalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AADC0BCF03A5E947E84D020 /* CalendarExport.swift */; };
@@ -55,6 +56,7 @@
 		83DE0994DCC6B215222A482D /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DAA819E703DC5BE377B3688 /* Routine.swift */; };
 		8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7826FECD3C214B59C8E531EB /* MacEntitlement.swift */; };
 		885ED0917CD0F523548B558B /* TaskTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC96A7645BAA33F62A6D73A8 /* TaskTimer.swift */; };
+		90473F78CC811E3C434B4601 /* VaultViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156753551C5150A4259616D5 /* VaultViews.swift */; };
 		90BC854F87FC9F04A197A040 /* TimerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D569F56C0A7784A89F05A9A7 /* TimerWidget.swift */; };
 		918CBF8DCF52F9FB73FCD5C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F3CC1DA110ECC169D3A4A /* OnboardingView.swift */; };
 		92A5845ED8EA12BAB7A35237 /* SharedScheduleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */; };
@@ -73,6 +75,7 @@
 		B4EBE209685DBC43D266A4BE /* AllDaySpans.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502517D08C4AA9A117B81DA7 /* AllDaySpans.swift */; };
 		B5CF26C54CC4A6E6131F1167 /* TodoShareIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */; };
 		B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD35C8D5A757450762EFDC34 /* TodoTips.swift */; };
+		BC35BB60FFEF1185CB71A744 /* VaultMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127F0D8287DD0A7171DB18CE /* VaultMonitor.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
 		BFC8522E06BD4CF008D7AB0B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B72BFAC893324616AC725BF2 /* Localizable.xcstrings */; };
 		C2A5B375AC8D47ACC6A8421C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C3EA522C75FCE62158E9E4F8 /* PrivacyInfo.xcprivacy */; };
@@ -131,6 +134,8 @@
 		0DAA819E703DC5BE377B3688 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		10227076947BFE4B02E2B004 /* Soft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Soft.swift; sourceTree = "<group>"; };
 		1162BD316D362F2B5D760A08 /* Affordance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Affordance.swift; sourceTree = "<group>"; };
+		127F0D8287DD0A7171DB18CE /* VaultMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultMonitor.swift; sourceTree = "<group>"; };
+		156753551C5150A4259616D5 /* VaultViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultViews.swift; sourceTree = "<group>"; };
 		1F980F3D31ED4C9848AEEE85 /* TodoShareIntake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoShareIntake.swift; sourceTree = "<group>"; };
 		2340D10FF0EF585F50AC4BD4 /* CloudSchemaPrimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSchemaPrimer.swift; sourceTree = "<group>"; };
 		24C4619A64470934AEBEC25A /* TimerWidgetBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerWidgetBridge.swift; sourceTree = "<group>"; };
@@ -138,6 +143,7 @@
 		295B1036D16FB52A4E7D0C74 /* BacklogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogView.swift; sourceTree = "<group>"; };
 		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
 		30CD73EF7D52999BFEC85767 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
+		352BBAC09C0B86084BEAE372 /* DataVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataVault.swift; sourceTree = "<group>"; };
 		366AC4444055F42F3587B1AE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOccurrence.swift; sourceTree = "<group>"; };
 		3C7DA6B68AC7163ACA0B879E /* CalendarMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMerge.swift; sourceTree = "<group>"; };
@@ -308,6 +314,7 @@
 				ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */,
 				E29F659737698D0D348D6468 /* ContentView.swift */,
 				0B332338ED7B9E880F7FBE51 /* Corner.swift */,
+				352BBAC09C0B86084BEAE372 /* DataVault.swift */,
 				88EFB1A15FCF0B7D66E1FACD /* DayPanelExpansion.swift */,
 				C06D3FF3319912A6918EB19F /* DayScheduleView.swift */,
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
@@ -355,6 +362,8 @@
 				C30E146DBAE0FA73CB0D8D32 /* TodoStepsView.swift */,
 				CD35C8D5A757450762EFDC34 /* TodoTips.swift */,
 				FA390F91431BF7C5CAE06EF5 /* TodoTree.swift */,
+				127F0D8287DD0A7171DB18CE /* VaultMonitor.swift */,
+				156753551C5150A4259616D5 /* VaultViews.swift */,
 				FE2891429087F31216F7F774 /* WeekBlocks.entitlements */,
 				77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */,
 				9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */,
@@ -473,20 +482,18 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
-				en,
-				ko,
-				"zh-Hans",
-				"zh-Hant",
 				cs,
 				da,
 				de,
 				el,
+				en,
 				es,
 				fi,
 				fr,
 				id,
 				it,
 				ja,
+				ko,
 				nb,
 				nl,
 				pl,
@@ -496,6 +503,8 @@
 				th,
 				tr,
 				vi,
+				"zh-Hans",
+				"zh-Hant",
 			);
 			mainGroup = C7495016D461ABB1DF0D0252;
 			minimizedProjectReferenceProxies = 1;
@@ -660,6 +669,7 @@
 				EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */,
 				55195D69441F0EC3E3DA6E21 /* ContentView.swift in Sources */,
 				F732F7B42572DDAE53A1BCCF /* Corner.swift in Sources */,
+				04A776160C01F496DBB176CF /* DataVault.swift in Sources */,
 				586490733E576A0AF28E9E91 /* DayPanelExpansion.swift in Sources */,
 				3F5C7F3913BDECC04F331C9E /* DayScheduleView.swift in Sources */,
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
@@ -703,6 +713,8 @@
 				ACAF69F8BD3236DFA4DF7CCF /* TodoStepsView.swift in Sources */,
 				B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */,
 				4AD3E0852C409C709566599A /* TodoTree.swift in Sources */,
+				BC35BB60FFEF1185CB71A744 /* VaultMonitor.swift in Sources */,
+				90473F78CC811E3C434B4601 /* VaultViews.swift in Sources */,
 				58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */,
 				D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */,
 				AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */,

@@ -36,10 +36,16 @@ enum StoreBootstrap {
         // 스토어를 열기 전에 해야 하는 일이 둘 있다.
         //  ① '다시 받아오기' 요청이 걸려 있으면 로컬 사본을 먼저 버린다.
         //  ② 한때 갈라 두었던 할 일 스토어가 남아 있으면, 그 안의 할 일을 떠 온다.
+        // ⓪ 무엇보다 먼저, 스토어 파일을 통째로 떠 둔다 (→ DataVault.swift).
+        //    업데이트 뒤 첫 실행이면 반드시. 아래 무엇이 잘못되든 이 순간의 바이트로 돌아갈 수 있다.
+        DataVault.copyStoreFilesBeforeOpen(PlanStore.storeFileURLs)
         TodoStore.consumeRefetchRequestIfNeeded()
         LegacyTodoArchive.captureFromSplitStoreIfNeeded()
 
         _ = PlanStore.shared
+        // 연 **직후**, 무엇을 정리하기도 전에 지난번 마지막 벌과 견준다 (→ VaultMonitor.swift).
+        // 아래 정리들이 지우는 것까지 '사라짐'으로 보지 않게, 견준 뒤에 이번 벌을 뜬다.
+        VaultMonitor.shared.start(container: PlanStore.shared.container)
         TodoStore.shared.pullForwardOverdueWeeks()
         // 동기화가 막혀 있던 동안 두 기기가 각자 만든 같은 것이 한꺼번에 내려온다.
         // 켤 때 한 번 정리하고, 늦게 도착하는 것은 아래 판정이 한 번 더 본다.
@@ -163,6 +169,7 @@ final class TodoStore {
     /// 앱이 스토어를 열고 있는 동안에는 파일을 지울 수 없어서 **다음 실행**으로 미룬다.
     func requestRefetchFromCloud() {
         LegacyTodoArchive.write(items: allItems(), categories: categories(), projects: projects())
+        VaultMonitor.shared.snapshotNow(reason: "before-refetch", force: true)
         UserDefaults.standard.set(true, forKey: TodoStore.refetchKey)
     }
 
@@ -177,10 +184,13 @@ final class TodoStore {
         guard defaults.bool(forKey: refetchKey) else { return }
         defaults.set(false, forKey: refetchKey)
 
-        for url in PlanStore.storeFileURLs {
-            try? FileManager.default.removeItem(at: url)
+        // ⚠️ **지우지 않고 금고로 옮긴다.** 아직 iCloud에 못 올라간 것이 이 파일에만 있을 수 있다.
+        //    옮기지 못하면 아무것도 버리지 않고 그대로 연다 — 다시 받기를 못 하는 편이 잃는 것보다 낫다.
+        guard DataVault.moveStoreFilesAside(PlanStore.storeFileURLs, reason: "refetch") else {
+            print("⚠️ [Store] 로컬 사본을 금고로 옮기지 못해 다시 받기를 그만둔다")
+            return
         }
-        print("🔄 [Store] 로컬 사본을 버렸다 — iCloud에서 처음부터 받는다")
+        print("🔄 [Store] 로컬 사본을 금고로 옮겼다 — iCloud에서 처음부터 받는다")
     }
 
     // MARK: 계획 화면이 물어보는 것들

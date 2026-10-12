@@ -49,6 +49,9 @@
 	<key>com.apple.developer.icloud-services</key>
 	<array>
 		<string>CloudKit</string>
+		<!-- 백업 JSON을 iCloud Drive에도 둔다 (→ DataVault.swift). CloudKit 미러링과 다른 길이라
+		     미러가 지운 것도 여기는 남는다. -->
+		<string>CloudDocuments</string>
 	</array>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>

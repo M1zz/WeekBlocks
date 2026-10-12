@@ -83,6 +83,8 @@ struct WeekBlocksApp: App {
                 // 서체를 따로 고른 글씨(`design:` 지정)는 그대로 둔다.
                 .fontDesign(.rounded)
                 .leeoSatisfactionCheck(WeekBlocksSpec.self)
+                // 사람이 지우지 않았는데 없어진 것이 있으면 되살릴지 묻는다 (→ VaultMonitor.swift).
+                .vaultRecoveryPrompt()
                 // 다른 앱에서 공유한 할 일 받기. 공유 익스텐션은 SwiftData에 직접 못 쓰고
                 // App Group에 쌓아만 두므로, 앱이 켜지고 앞으로 나올 때 그 상자를 비운다.
                 // 받은 할 일은 할 일 스토어로 들어간다.
@@ -103,6 +105,8 @@ struct WeekBlocksApp: App {
                     Telemetry.recordOpen()
                 }
                 .onChange(of: scenePhase) { _, phase in
+                    // 뒤로 갈 때 한 벌 떠 둔다 — 같은 내용이면 금고가 알아서 건너뛴다.
+                    if phase == .background { VaultMonitor.shared.snapshotNow(reason: "background") }
                     guard phase == .active else { return }
                     // 켜 둔 채 날이 바뀌고 다시 앞으로 온 날도 '연 날'이다 (→ Telemetry.recordOpen).
                     Telemetry.recordOpen()

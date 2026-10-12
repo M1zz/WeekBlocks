@@ -2146,6 +2146,8 @@ struct ContentView: View {
     ///    지우면, 안 그려진 것이 스토어에 남아 다음 실행에 되살아난 것처럼 보인다.
     ///    '보이는 것'과 '있는 것'을 가르는 자리라 여기서만 예외를 둔다.
     private func deleteAllData() {
+        // 사람이 고른 일이지만 되돌릴 길은 남긴다 (→ DataVault.swift).
+        VaultMonitor.shared.snapshotNow(reason: "before-delete-all", force: true)
         for b in allBlocksRaw { context.delete(b) }
         for r in routinesRaw { context.delete(r) }
         for o in allOccurrences { context.delete(o) }
