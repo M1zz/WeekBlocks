@@ -1,0 +1,215 @@
+{
+ "lang": "fi",
+ "app": "Rainbow Craft",
+ "timer": "Ajastin",
+ "review": "Katsaus",
+ "settings": "Asetukset",
+ "more": "Lisää",
+ "weekRange": "3.–9.3.",
+ "thisWeek": "Tämä viikko",
+ "lensPlan": "Lohkonäkymä",
+ "lensDay": "Aikajananäkymä",
+ "summary": "Yhteenveto",
+ "hideSummary": "Piilota yhteenveto",
+ "mWeek": "Viikko",
+ "mWeekSub": "24 t päivässä",
+ "mFixed": "Kiinteät rutiinit",
+ "mFixedSub": "noin 17,4 t päivässä",
+ "mFree": "Vapaata aikaa jäljellä",
+ "mFreeSub": "noin 6,6 t päivässä",
+ "legRoutines": "Rutiinit 122 t",
+ "legPlanned": "Suunniteltu 10 t",
+ "legFree": "Vapaa (suunnittelematon) 37 t",
+ "days": [
+  "ma",
+  "ti",
+  "ke",
+  "to",
+  "pe",
+  "la",
+  "su"
+ ],
+ "rSleep": "Uni",
+ "rMeals": "Ateriat",
+ "rWork": "Työ",
+ "rGym": "Liikunta",
+ "rSleepWhen": "Joka päivä · 23.00 · 8 t",
+ "rSleepSum": "56 t viikossa",
+ "rMealsWhen": "17,5 t viikossa · 3× päivässä",
+ "rMealsSum": "joustavat ajat",
+ "rWorkWhen": "ma–pe · 9.00 · 9 t",
+ "rWorkSum": "45 t viikossa",
+ "rGymWhen": "ma, ke, pe · 7.00 · 1 t",
+ "rGymSum": "3 t viikossa",
+ "routinesHead": "Kiinteät rutiinit · mikä ei liiku",
+ "addRoutine": "Lisää rutiini",
+ "todos": "Tehtävät",
+ "newTodo": "Uusi tehtävä",
+ "showAll": "Näytä kaikki",
+ "todoCount": "4 · 11 t 30 min",
+ "hoursLeft": "{v} t jäljellä",
+ "blocks": [
+  "Opettele Swift Combine",
+  "Luonnostele Q2-tarjous",
+  "Käy PR-jono läpi",
+  "Soita hammaslääkärille",
+  "Kirjoita perehdytysteksti uusiksi",
+  "Julkaise julkaisutiedot",
+  "Deep Work, luku 4",
+  "Viikon ruokaostokset",
+  "Suunnittele ensi viikko"
+ ],
+ "todoList": [
+  {
+   "t": "Opettele Swift Combine",
+   "step": "Kirjoita sink vs. assign auki",
+   "hrs": "4 t",
+   "on": "maanantai"
+  },
+  {
+   "t": "Luonnostele Q2-tarjous",
+   "step": "Hae viime neljänneksen luvut",
+   "hrs": "6 t",
+   "on": "tiistai"
+  },
+  {
+   "t": "Julkaise julkaisutiedot",
+   "step": "Vie ne sivustolle",
+   "hrs": "1 t",
+   "frag": "5 min"
+  },
+  {
+   "t": "Soita hammaslääkärille",
+   "hrs": "0,5 t"
+  }
+ ],
+ "currentStep": "Nykyinen vaihe",
+ "done": "Valmis",
+ "allDone": "{v}, kun kaikki on tehty",
+ "splitAcross": "= 100 %, jaettuna 4 vaiheelle",
+ "steps": "Vaiheet",
+ "fragment": "5 minuutin pätkä",
+ "addStep": "Lisää vaihe",
+ "splitHelper": "Pilkkomisapuri",
+ "stepList": [
+  [
+   "ok",
+   "Kerää esimerkkiprojektit",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "Kirjoita sink vs. assign auki",
+   "1,5",
+   "38"
+  ],
+  [
+   "",
+   "Saa esimerkki toimimaan",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Vie muistiinpanot repoon",
+   "0,5",
+   "12"
+  ]
+ ],
+ "totalHours": "4 t",
+ "tRange": "20.00–21.00 · 1 tunti",
+ "tLeft": "jäljellä",
+ "tEnds": "Päättyy klo 21.00",
+ "tPause": "Tauko",
+ "tPlus5": "+5 min",
+ "tPlus10": "+10 min",
+ "tStop": "Lopeta",
+ "tRest": "Loppupäivä tästä eteenpäin",
+ "tUpNext": [
+  [
+   "Soita hammaslääkärille",
+   "21.30 · 30 min"
+  ],
+  [
+   "Uni",
+   "23.00 · 8 t"
+  ]
+ ],
+ "rvTitle": "Viikkokatsaus",
+ "rvDone": "Valmis",
+ "rvPartial": "Osittain",
+ "rvSkipped": "Ohitettu",
+ "rvPending": "Arvioimatta",
+ "rvNotePlaceholder": "Yhden rivin katsaus – mikä meni hyvin, mikä ei",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Ilta · 1,5 t",
+   "Muistiinpanot tehty, esimerkki toimii"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Ilta · 2,0 t",
+   "Runko ja lukuosio valmiina"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Ilta · 1,0 t",
+   "6/11 käyty läpi"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Ilta · 0,5 t",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Ilta · 1,5 t",
+   "Ensimmäinen näkymä kirjoitettu uusiksi"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Ilta · 1,0 t",
+   "Julkaistu sivustolla"
+  ]
+ ],
+ "caps": [
+  [
+   "Aseta ensin tunnit, joita et saa takaisin",
+   "Viikossa on 168 tuntia. Uni, ateriat ja työ vievät osansa – appi näyttää, mitä oikeasti jää jäljelle."
+  ],
+  [
+   "Vedä tehtävä sille sopivalle päivälle",
+   "Siitä tulee suunnitelmalohko. Siirrä se toiselle päivälle, pudota rakoon tai vedä takaisin listaan."
+  ],
+  [
+   "Koko päivä 24 tunnin viivaimella",
+   "Vaihda aikaa vetämällä sivuttain ja päivää ylös tai alas. Raot ja päällekkäisyydet näkyvät heti."
+  ],
+  [
+   "Pilko työ vaiheiksi, jotka valmistuvat",
+   "Kaksi kysymystä joka vaiheesta: pääsetkö alkuun ilman lämmittelyä, ja valmistuuko se viidessä minuutissa?"
+  ],
+  [
+   "Tiedät aina, paljonko on jäljellä",
+   "Ajastin seuraa suunnitelmasi aikoja, joten sinun ei tarvitse arvailla, mitä teet nyt ja paljonko siitä on jäljellä."
+  ],
+  [
+   "Päätä viikko tarkistuslistalla",
+   "Merkitse, minkä teit, minkä teit osittain ja minkä ohitit – ja rakenna vastauksista seuraava viikko."
+  ]
+ ]
+}

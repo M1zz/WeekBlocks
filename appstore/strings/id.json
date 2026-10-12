@@ -1,0 +1,215 @@
+{
+ "lang": "id",
+ "app": "Rainbow Craft",
+ "timer": "Timer",
+ "review": "Tinjauan",
+ "settings": "Pengaturan",
+ "more": "Lainnya",
+ "weekRange": "3–9 Mar",
+ "thisWeek": "Minggu ini",
+ "lensPlan": "Tampilan blok",
+ "lensDay": "Tampilan linimasa",
+ "summary": "Ringkasan",
+ "hideSummary": "Sembunyikan ringkasan",
+ "mWeek": "Satu minggu",
+ "mWeekSub": "24 j sehari",
+ "mFixed": "Rutinitas tetap",
+ "mFixedSub": "sekitar 17,4 j sehari",
+ "mFree": "Sisa waktu luang",
+ "mFreeSub": "sekitar 6,6 j sehari",
+ "legRoutines": "Rutinitas 122 j",
+ "legPlanned": "Direncanakan 10 j",
+ "legFree": "Luang (tanpa rencana) 37 j",
+ "days": [
+  "Sen",
+  "Sel",
+  "Rab",
+  "Kam",
+  "Jum",
+  "Sab",
+  "Min"
+ ],
+ "rSleep": "Tidur",
+ "rMeals": "Makan",
+ "rWork": "Kerja",
+ "rGym": "Olahraga",
+ "rSleepWhen": "Setiap hari · 23.00 · 8 j",
+ "rSleepSum": "56 j per minggu",
+ "rMealsWhen": "17,5 j per minggu · 3× sehari",
+ "rMealsSum": "jam fleksibel",
+ "rWorkWhen": "Sen–Jum · 09.00 · 9 j",
+ "rWorkSum": "45 j per minggu",
+ "rGymWhen": "Sen, Rab, Jum · 07.00 · 1 j",
+ "rGymSum": "3 j per minggu",
+ "routinesHead": "Rutinitas tetap · yang tidak bisa digeser",
+ "addRoutine": "Tambah Rutinitas",
+ "todos": "Tugas",
+ "newTodo": "Tugas baru",
+ "showAll": "Tampilkan Semua",
+ "todoCount": "4 · 11 j 30 mnt",
+ "hoursLeft": "Sisa {v} j",
+ "blocks": [
+  "Belajar Swift Combine",
+  "Buat draf proposal Q2",
+  "Periksa antrean PR",
+  "Telepon dokter gigi",
+  "Tulis ulang teks onboarding",
+  "Terbitkan catatan rilis",
+  "Deep Work, bab 4",
+  "Belanja mingguan",
+  "Rencanakan minggu depan"
+ ],
+ "todoList": [
+  {
+   "t": "Belajar Swift Combine",
+   "step": "Tulis beda sink dan assign",
+   "hrs": "4 j",
+   "on": "Senin"
+  },
+  {
+   "t": "Buat draf proposal Q2",
+   "step": "Ambil angka kuartal lalu",
+   "hrs": "6 j",
+   "on": "Selasa"
+  },
+  {
+   "t": "Terbitkan catatan rilis",
+   "step": "Unggah ke situs",
+   "hrs": "1 j",
+   "frag": "5 mnt"
+  },
+  {
+   "t": "Telepon dokter gigi",
+   "hrs": "0,5 j"
+  }
+ ],
+ "currentStep": "Langkah saat ini",
+ "done": "Selesai",
+ "allDone": "{v} jika semuanya selesai",
+ "splitAcross": "= 100%, dibagi ke 4 langkah",
+ "steps": "Langkah",
+ "fragment": "Ambil dalam lima menit",
+ "addStep": "Tambah langkah",
+ "splitHelper": "Bantuan memecah",
+ "stepList": [
+  [
+   "ok",
+   "Kumpulkan contoh proyek",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "Tulis beda sink dan assign",
+   "1,5",
+   "38"
+  ],
+  [
+   "",
+   "Jalankan contohnya",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Unggah catatan ke repo",
+   "0,5",
+   "12"
+  ]
+ ],
+ "totalHours": "4 j",
+ "tRange": "20.00–21.00 · 1 jam",
+ "tLeft": "tersisa",
+ "tEnds": "Selesai pukul 21.00",
+ "tPause": "Jeda",
+ "tPlus5": "+5 mnt",
+ "tPlus10": "+10 mnt",
+ "tStop": "Hentikan",
+ "tRest": "Sisa hari dari sini",
+ "tUpNext": [
+  [
+   "Telepon dokter gigi",
+   "21.30 · 30 mnt"
+  ],
+  [
+   "Tidur",
+   "23.00 · 8 j"
+  ]
+ ],
+ "rvTitle": "Tinjauan mingguan",
+ "rvDone": "Selesai",
+ "rvPartial": "Sebagian",
+ "rvSkipped": "Dilewati",
+ "rvPending": "Belum ditinjau",
+ "rvNotePlaceholder": "Satu baris tinjauan — yang berjalan baik, yang tidak",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Malam · 1,5 j",
+   "Catatan rampung dan contohnya jalan"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Malam · 2,0 j",
+   "Kerangka plus bagian angka"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Malam · 1,0 j",
+   "Baru 6 dari 11"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Malam · 0,5 j",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Malam · 1,5 j",
+   "Layar pertama sudah ditulis ulang"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Malam · 1,0 j",
+   "Sudah terbit di situs"
+  ]
+ ],
+ "caps": [
+  [
+   "Letakkan dulu jam yang tak bisa diganggu",
+   "Satu minggu itu 168 jam. Tidur, makan, dan kerja mengambil bagiannya — app menunjukkan sisa yang sebenarnya."
+  ],
+  [
+   "Seret tugas ke hari yang pas",
+   "Tugas jadi blok rencana. Pindahkan ke hari lain, taruh di celah, atau seret kembali ke daftar."
+  ],
+  [
+   "Lihat sehari penuh di penggaris 24 jam",
+   "Seret ke samping untuk mengubah jam, ke atas atau bawah untuk mengubah hari. Celah dan bentrokan langsung terlihat."
+  ],
+  [
+   "Pecah pekerjaan jadi langkah yang tuntas",
+   "Dua pertanyaan per langkah: bisa mulai tanpa pemanasan, dan selesai dalam lima menit?"
+  ],
+  [
+   "Selalu tahu sisa waktunya",
+   "Timer mengikuti jam di rencana Anda, jadi apa yang sedang dikerjakan dan berapa sisanya tak perlu ditebak."
+  ],
+  [
+   "Tutup minggu dengan daftar periksa",
+   "Tandai yang selesai, setengah jalan, dan dilewati, lalu susun minggu depan dari jawabannya."
+  ]
+ ]
+}

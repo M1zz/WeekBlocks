@@ -1,0 +1,215 @@
+{
+ "lang": "es",
+ "app": "Rainbow Craft",
+ "timer": "Temporizador",
+ "review": "Revisión",
+ "settings": "Ajustes",
+ "more": "Más",
+ "weekRange": "3 mar – 9 mar",
+ "thisWeek": "Esta semana",
+ "lensPlan": "Vista de bloques",
+ "lensDay": "Vista cronológica",
+ "summary": "Resumen",
+ "hideSummary": "Ocultar resumen",
+ "mWeek": "La semana",
+ "mWeekSub": "24 h al día",
+ "mFixed": "Rutinas fijas",
+ "mFixedSub": "unas 17,4 h al día",
+ "mFree": "Tiempo libre restante",
+ "mFreeSub": "unas 6,6 h al día",
+ "legRoutines": "Rutinas 122 h",
+ "legPlanned": "Planificado 10 h",
+ "legFree": "Libre (sin planificar) 37 h",
+ "days": [
+  "lun",
+  "mar",
+  "mié",
+  "jue",
+  "vie",
+  "sáb",
+  "dom"
+ ],
+ "rSleep": "Sueño",
+ "rMeals": "Comidas",
+ "rWork": "Trabajo",
+ "rGym": "Ejercicio",
+ "rSleepWhen": "Todos los días · 23:00 · 8 h",
+ "rSleepSum": "56 h a la semana",
+ "rMealsWhen": "17,5 h a la semana · 3× al día",
+ "rMealsSum": "horario flexible",
+ "rWorkWhen": "lun–vie · 09:00 · 9 h",
+ "rWorkSum": "45 h a la semana",
+ "rGymWhen": "lun, mié, vie · 07:00 · 1 h",
+ "rGymSum": "3 h a la semana",
+ "routinesHead": "Rutinas fijas · lo que no se mueve",
+ "addRoutine": "Añadir rutina",
+ "todos": "Tareas",
+ "newTodo": "Nueva tarea",
+ "showAll": "Mostrar todo",
+ "todoCount": "4 · 11 h 30 min",
+ "hoursLeft": "Quedan {v} h",
+ "blocks": [
+  "Aprender Swift Combine",
+  "Redactar la propuesta del T2",
+  "Revisar los PR pendientes",
+  "Llamar al dentista",
+  "Reescribir los textos de bienvenida",
+  "Publicar las notas de la versión",
+  "Deep Work, capítulo 4",
+  "Compra de la semana",
+  "Planificar la semana que viene"
+ ],
+ "todoList": [
+  {
+   "t": "Aprender Swift Combine",
+   "step": "Resumir sink frente a assign",
+   "hrs": "4 h",
+   "on": "lunes"
+  },
+  {
+   "t": "Redactar la propuesta del T2",
+   "step": "Sacar las cifras del último trimestre",
+   "hrs": "6 h",
+   "on": "martes"
+  },
+  {
+   "t": "Publicar las notas de la versión",
+   "step": "Subirlas a la web",
+   "hrs": "1 h",
+   "frag": "5 min"
+  },
+  {
+   "t": "Llamar al dentista",
+   "hrs": "0,5 h"
+  }
+ ],
+ "currentStep": "Paso actual",
+ "done": "Hecho",
+ "allDone": "{v} cuando esté todo hecho",
+ "splitAcross": "= 100%, repartido en 4 pasos",
+ "steps": "Pasos",
+ "fragment": "Para cinco minutos",
+ "addStep": "Añadir un paso",
+ "splitHelper": "Divídelo por mí",
+ "stepList": [
+  [
+   "ok",
+   "Reunir los proyectos de ejemplo",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "Resumir sink frente a assign",
+   "1,5",
+   "38"
+  ],
+  [
+   "",
+   "Hacer funcionar el ejemplo",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Subir los apuntes al repositorio",
+   "0,5",
+   "12"
+  ]
+ ],
+ "totalHours": "4 h",
+ "tRange": "20:00–21:00 · 1 hora",
+ "tLeft": "restante",
+ "tEnds": "Termina a las 21:00",
+ "tPause": "Pausa",
+ "tPlus5": "+5 min",
+ "tPlus10": "+10 min",
+ "tStop": "Detener",
+ "tRest": "Lo que queda del día a partir de aquí",
+ "tUpNext": [
+  [
+   "Llamar al dentista",
+   "21:30 · 30 min"
+  ],
+  [
+   "Sueño",
+   "23:00 · 8 h"
+  ]
+ ],
+ "rvTitle": "Revisión semanal",
+ "rvDone": "Hecho",
+ "rvPartial": "En parte",
+ "rvSkipped": "Omitida",
+ "rvPending": "Sin revisar",
+ "rvNotePlaceholder": "Una línea de revisión: qué salió bien y qué no",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Noche · 1,5 h",
+   "Apuntes escritos y el ejemplo funciona"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Noche · 2,0 h",
+   "Esquema y apartado de cifras"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Noche · 1,0 h",
+   "Revisados 6 de 11"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Noche · 0,5 h",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Noche · 1,5 h",
+   "Primera pantalla reescrita"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Noche · 1,0 h",
+   "Publicadas en la web"
+  ]
+ ],
+ "caps": [
+  [
+   "Primero, las horas que no se tocan",
+   "Una semana tiene 168 horas. Sueño, comidas y trabajo se llevan su parte; la app te enseña lo que de verdad queda."
+  ],
+  [
+   "Arrastra cada tarea al día que le va",
+   "Se convierte en un bloque de plan. Muévelo a otro día, encájalo en un hueco o devuélvelo a la lista."
+  ],
+  [
+   "Todo el día en una regla de 24 horas",
+   "Arrastra a los lados para cambiar la hora y arriba o abajo para cambiar el día. Huecos y choques, de un vistazo."
+  ],
+  [
+   "Divide el trabajo en pasos que se cierran",
+   "Dos preguntas por paso: ¿puedes empezar sin calentar motores? ¿Se termina en cinco minutos?"
+  ],
+  [
+   "Siempre sabrás cuánto te queda",
+   "El temporizador sigue las horas de tu plan: lo que haces ahora y cuánto le queda nunca son una suposición."
+  ],
+  [
+   "Cierra la semana con una lista",
+   "Marca lo que hiciste, lo que hiciste a medias y lo que omitiste, y construye con ello la semana siguiente."
+  ]
+ ]
+}

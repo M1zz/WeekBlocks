@@ -1,5 +1,172 @@
 # 릴리즈 노트
 
+## 1.1.10
+
+### 앱스토어 (한국어)
+
+일본어 독일어 프랑스어 등 19개 언어가 새로 들어왔습니다
+설정에서 새 언어를 바로 고를 수 있습니다
+위젯과 공유 메뉴도 고른 언어로 보입니다
+작은 문제를 고치고 더 안정적으로 다듬었습니다
+
+### App Store (English)
+
+Now available in 19 more languages
+Pick your language right in Settings
+The widget and Share menu follow it too
+Small fixes and better stability
+
+### App Store (繁體中文, zh-Hant)
+
+新增日文、德文、法文等 19 種語言
+可在設定中直接選擇新語言
+小工具與分享選單也會跟著換語言
+修正小問題，運作更穩定
+
+### App Store (简体中文, zh-Hans)
+
+新增日语、德语、法语等 19 种语言
+可在设置中直接选择新语言
+小组件和共享菜单也会跟着切换语言
+修复小问题，运行更稳定
+
+### App Store (日本語, ja)
+
+日本語など19の言語に新しく対応しました
+設定からすぐに言語を選べます
+ウィジェットと共有メニューも選んだ言語に
+細かな問題を直し、安定性を高めました
+
+### App Store (Deutsch, de)
+
+Neu in 19 Sprachen, darunter Deutsch
+Sprache bequem in Einstellungen wählen
+Widget und Teilen folgen der Sprache
+Kleine Korrekturen, mehr Stabilität
+
+### App Store (Español, es)
+
+Ahora en español y 18 idiomas más
+Elige tu idioma directamente en Ajustes
+El widget y el menú Compartir lo siguen
+Pequeñas correcciones y más estabilidad
+
+### App Store (Français, fr)
+
+19 nouvelles langues, dont le français
+Changez de langue dans les Réglages
+Le widget et le menu Partager suivent
+Petites corrections et stabilité accrue
+
+### App Store (Italiano, it)
+
+Ora in italiano e in altre 18 lingue
+Scegli la lingua subito in Impostazioni
+Anche widget e menu Condividi la seguono
+Piccole correzioni e più stabilità
+
+### App Store (Português (Brasil), pt-BR)
+
+Agora em português e em mais 18 idiomas
+Escolha o idioma direto nos Ajustes
+O widget e o menu Compartilhar seguem
+Pequenas correções e mais estabilidade
+
+### App Store (Русский, ru)
+
+Добавлены русский и ещё 18 языков
+Язык теперь можно выбрать в Настройках
+Виджет и меню Поделиться тоже на нём
+Мелкие исправления и больше стабильности
+
+### App Store (Čeština, cs)
+
+Nově v češtině a dalších 18 jazycích
+Jazyk si vyberete přímo v Nastavení
+Widget i nabídka Sdílet ho převezmou
+Drobné opravy a vyšší stabilita
+
+### App Store (Dansk, da)
+
+Nu på dansk og 18 andre nye sprog
+Vælg dit sprog direkte i Indstillinger
+Widgetten og Del-menuen følger med
+Små rettelser og bedre stabilitet
+
+### App Store (Ελληνικά, el)
+
+Ελληνικά και άλλες 18 νέες γλώσσες
+Διάλεξε γλώσσα από τις Ρυθμίσεις
+Widget και Κοινή χρήση στη γλώσσα σου
+Μικρές διορθώσεις, πιο σταθερή εφαρμογή
+
+### App Store (Suomi, fi)
+
+Uutena suomi ja 18 muuta kieltä
+Valitse kieli suoraan asetuksista
+Widget ja jakovalikko seuraavat valintaa
+Pieniä korjauksia ja parempi vakaus
+
+### App Store (Bahasa Indonesia, id)
+
+Hadir 19 bahasa baru termasuk Indonesia
+Pilih bahasa langsung di Pengaturan
+Widget dan menu Bagikan ikut bahasa itu
+Perbaikan kecil dan lebih stabil
+
+### App Store (Norsk bokmål, nb)
+
+Nå på norsk og 18 andre nye språk
+Velg språk direkte i Innstillinger
+Widgeten og Del-menyen følger med
+Små rettelser og bedre stabilitet
+
+### App Store (Nederlands, nl)
+
+Nieuw: Nederlands en 18 andere talen
+Kies je taal direct in Instellingen
+Ook de widget en het deelmenu volgen
+Kleine verbeteringen en meer stabiliteit
+
+### App Store (Polski, pl)
+
+Polski i 18 innych języków już dostępne
+Język wybierzesz od razu w Ustawieniach
+Widżet i menu udostępniania też go użyją
+Drobne poprawki i większa stabilność
+
+### App Store (Svenska, sv)
+
+Nu på svenska och 18 andra nya språk
+Välj språk direkt i Inställningar
+Widgeten och Dela-menyn följer valet
+Små buggfixar och bättre stabilitet
+
+### App Store (ไทย, th)
+
+เพิ่มภาษาใหม่ 19 ภาษา รวมถึงภาษาไทย
+เลือกภาษาได้ทันทีในการตั้งค่า
+วิดเจ็ตและเมนูแชร์ก็ใช้ภาษาที่เลือกด้วย
+แก้ไขปัญหาเล็กน้อยและทำงานเสถียรขึ้น
+
+### App Store (Türkçe, tr)
+
+Türkçe dahil 19 yeni dil eklendi
+Ayarlar bölümünden dil seçebilirsiniz
+Widget ve Paylaş menüsü de bu dili izler
+Küçük düzeltmeler, daha kararlı çalışma
+
+### App Store (Tiếng Việt, vi)
+
+Nay có tiếng Việt và 18 ngôn ngữ khác
+Chọn ngôn ngữ ngay trong Cài đặt
+Tiện ích và menu Chia sẻ cũng đổi theo
+Sửa lỗi nhỏ và chạy ổn định hơn
+
+### 개발 메모 (노출 안 함)
+
+열아홉 개 언어(ja, de, es, fr, it, pt-BR, ru, cs, da, el, fi, id, nb, nl, pl, sv, th, tr, vi)를 더했다. 앱·위젯·공유 확장의 문자열 카탈로그, 스토어 문구, 스크린샷, 지원·개인정보 페이지까지 언어마다 갖췄다. 설정의 언어 고르개는 23개라 목록 대신 메뉴로 접었다.
+
 ## 1.1.9
 
 ### 앱스토어 (한국어)

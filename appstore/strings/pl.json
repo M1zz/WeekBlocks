@@ -1,0 +1,215 @@
+{
+ "lang": "pl",
+ "app": "Rainbow Craft",
+ "timer": "Timer",
+ "review": "Podsumowanie",
+ "settings": "Ustawienia",
+ "more": "Więcej",
+ "weekRange": "3–9 mar",
+ "thisWeek": "Ten tydzień",
+ "lensPlan": "Widok bloków",
+ "lensDay": "Oś czasu",
+ "summary": "Podsumowanie",
+ "hideSummary": "Ukryj podsumowanie",
+ "mWeek": "Tydzień",
+ "mWeekSub": "24 h na dobę",
+ "mFixed": "Stałe rutyny",
+ "mFixedSub": "ok. 17,4 h dziennie",
+ "mFree": "Pozostały wolny czas",
+ "mFreeSub": "ok. 6,6 h dziennie",
+ "legRoutines": "Rutyny 122 h",
+ "legPlanned": "Zaplanowane 10 h",
+ "legFree": "Wolne (bez planu) 37 h",
+ "days": [
+  "Pn",
+  "Wt",
+  "Śr",
+  "Cz",
+  "Pt",
+  "So",
+  "Nd"
+ ],
+ "rSleep": "Sen",
+ "rMeals": "Posiłki",
+ "rWork": "Praca",
+ "rGym": "Ćwiczenia",
+ "rSleepWhen": "Codziennie · 23:00 · 8 h",
+ "rSleepSum": "56 h tygodniowo",
+ "rMealsWhen": "17,5 h tygodniowo · 3× dziennie",
+ "rMealsSum": "elastyczne godziny",
+ "rWorkWhen": "Pn–Pt · 09:00 · 9 h",
+ "rWorkSum": "45 h tygodniowo",
+ "rGymWhen": "Pn, Śr, Pt · 07:00 · 1 h",
+ "rGymSum": "3 h tygodniowo",
+ "routinesHead": "Stałe rutyny · to, czego nie przesuniesz",
+ "addRoutine": "Dodaj rutynę",
+ "todos": "Zadania",
+ "newTodo": "Nowe zadanie",
+ "showAll": "Pokaż wszystko",
+ "todoCount": "4 · 11 h 30 min",
+ "hoursLeft": "Zostało {v} h",
+ "blocks": [
+  "Nauka Swift Combine",
+  "Szkic propozycji na II kwartał",
+  "Przejrzeć zaległe PR-y",
+  "Zadzwonić do dentysty",
+  "Przepisać teksty onboardingu",
+  "Wydać informacje o wersji",
+  "„Praca głęboka”, rozdz. 4",
+  "Zakupy na tydzień",
+  "Zaplanować następny tydzień"
+ ],
+ "todoList": [
+  {
+   "t": "Nauka Swift Combine",
+   "step": "Opisać sink i assign",
+   "hrs": "4 h",
+   "on": "Poniedziałek"
+  },
+  {
+   "t": "Szkic propozycji na II kwartał",
+   "step": "Zebrać liczby z ostatniego kwartału",
+   "hrs": "6 h",
+   "on": "Wtorek"
+  },
+  {
+   "t": "Wydać informacje o wersji",
+   "step": "Opublikować na stronie",
+   "hrs": "1 h",
+   "frag": "5 min"
+  },
+  {
+   "t": "Zadzwonić do dentysty",
+   "hrs": "0,5 h"
+  }
+ ],
+ "currentStep": "Bieżący krok",
+ "done": "Gotowe",
+ "allDone": "{v} po zrobieniu wszystkiego",
+ "splitAcross": "= 100%, po równo na kroki: 4",
+ "steps": "Kroki",
+ "fragment": "Do zrobienia w pięć minut",
+ "addStep": "Dodaj krok",
+ "splitHelper": "Pomocnik dzielenia",
+ "stepList": [
+  [
+   "ok",
+   "Zebrać przykładowe projekty",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "Opisać sink i assign",
+   "1,5",
+   "38"
+  ],
+  [
+   "",
+   "Uruchomić przykład",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Wrzucić notatki do repo",
+   "0,5",
+   "12"
+  ]
+ ],
+ "totalHours": "4 h",
+ "tRange": "20:00–21:00 · 1 godzina",
+ "tLeft": "zostało",
+ "tEnds": "Kończy się o 21:00",
+ "tPause": "Wstrzymaj",
+ "tPlus5": "+5 min",
+ "tPlus10": "+10 min",
+ "tStop": "Zatrzymaj",
+ "tRest": "Reszta dnia od teraz",
+ "tUpNext": [
+  [
+   "Zadzwonić do dentysty",
+   "21:30 · 30 min"
+  ],
+  [
+   "Sen",
+   "23:00 · 8 h"
+  ]
+ ],
+ "rvTitle": "Podsumowanie tygodnia",
+ "rvDone": "Zrobione",
+ "rvPartial": "Częściowo",
+ "rvSkipped": "Pominięte",
+ "rvPending": "Bez podsumowania",
+ "rvNotePlaceholder": "Podsumowanie w jednej linijce — co się udało, a co nie",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Wieczór · 1,5 h",
+   "Notatki gotowe, przykład działa"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Wieczór · 2,0 h",
+   "Konspekt i część z liczbami"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Wieczór · 1,0 h",
+   "Przejrzane 6 z 11"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Wieczór · 0,5 h",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Wieczór · 1,5 h",
+   "Pierwszy ekran przepisany"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Wieczór · 1,0 h",
+   "Opublikowane na stronie"
+  ]
+ ],
+ "caps": [
+  [
+   "Najpierw godziny, których nie odzyskasz",
+   "Tydzień ma 168 godzin. Sen, posiłki i praca biorą swoje — aplikacja pokazuje, ile naprawdę zostaje."
+  ],
+  [
+   "Przeciągnij zadanie na pasujący dzień",
+   "Stanie się blokiem planu. Przenieś na inny dzień, wstaw w lukę albo odeślij z powrotem na listę."
+  ],
+  [
+   "Cały dzień na 24-godzinnej osi",
+   "W bok zmieniasz godzinę, w górę lub w dół dzień. Luki i kolizje widać od razu."
+  ],
+  [
+   "Dziel pracę na kroki, które się domykają",
+   "Dwa pytania do każdego kroku: da się zacząć bez rozruchu? skończy się w pięć minut?"
+  ],
+  [
+   "Zawsze wiesz, ile zostało",
+   "Timer idzie za godzinami z planu, więc nie zgadujesz, czym się zajmujesz i ile jeszcze zostało."
+  ],
+  [
+   "Zamknij tydzień listą kontrolną",
+   "Zaznacz, co zrobione, co w połowie, a co pominięte, i na tym zbuduj następny tydzień."
+  ]
+ ]
+}

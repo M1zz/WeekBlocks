@@ -1327,7 +1327,11 @@ sortIndex·createdAt·isCompleted·completedAt. 관계 대신 uuid 문자열로 
 - [x] `deploy.env` LOCALES 에 zh-Hant,zh-Hans. 1.1.9 릴리즈 노트 네 언어
 - [x] `APPSTORE.md` — 중국어 스토어 페이지 전부(이름·부제·설명·키워드·프로모션·URL)와 영어 부제·키워드
 - [x] 영어 ASO: 부제 `Block Schedule` → `Time Blocking & Weekly Routine`, 키워드 공백·중복 정리 (근거는 APPSTORE.md 주석)
-- [ ] 설치된 DeployBar(9/16)에는 `--storemeta`·`--publish` 가 없다 — 새로 빌드해 깔아야 APPSTORE.md 가 올라간다
 - [ ] 1.1.9 배포 때 `--publish 무지개 공방 --overwrite` (영어 칸은 이미 차 있어 덮어써야 바뀐다)
-- [ ] 중국어 원어민 검수 (특히 번체) · 중국어 스크린샷
+- [x] 배포 준비 (2026-10-02): APPSTORE.md 네 언어 모든 칸 — 스토어의 영어 설명이 옛 이름·틀린 말(캘린더 안 씀, Pro=아이폰 보내기)이었고
+      한국어 설명은 한 줄, 한국어 지원 URL 은 아이폰 앱 페이지였다. 이름 `무지개 공방: 주간 계획표`
+- [x] 위젯(TimerWidget) 중국어, 요일 약칭 통일(週二…), 버전 1.1.9(25)
+- [x] 스크린샷 네 언어 × 6장 → docs/screenshots/marketing/<로케일>/ (appstore/build.mjs, 중국어는 PingFang)
+- [ ] 중국어 원어민 검수 (특히 번체)
+- [ ] 스크린샷은 그린 목업이다 — 1.1.8~1.1.9 화면(무지개 색 블록·진행 중·종일 막대)이 아직 안 들어갔다
 - [ ] 출시 1~2주 뒤 미국 순위 다시 재기: week schedule 27 · weekly schedule 45 · weekly time blocking 52 · weekly routine 65 · block schedule 85 · time blocking 150

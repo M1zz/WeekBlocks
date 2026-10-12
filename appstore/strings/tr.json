@@ -1,0 +1,215 @@
+{
+ "lang": "tr",
+ "app": "Rainbow Craft",
+ "timer": "Zamanlayıcı",
+ "review": "Değerlendirme",
+ "settings": "Ayarlar",
+ "more": "Diğer",
+ "weekRange": "3–9 Mart",
+ "thisWeek": "Bu hafta",
+ "lensPlan": "Blok görünümü",
+ "lensDay": "Zaman çizelgesi",
+ "summary": "Özet",
+ "hideSummary": "Özeti gizle",
+ "mWeek": "Hafta",
+ "mWeekSub": "Günde 24 sa",
+ "mFixed": "Sabit rutinler",
+ "mFixedSub": "günde yaklaşık 17,4 sa",
+ "mFree": "Kalan boş zaman",
+ "mFreeSub": "günde yaklaşık 6,6 sa",
+ "legRoutines": "Rutinler 122 sa",
+ "legPlanned": "Planlanan 10 sa",
+ "legFree": "Boş (planlanmamış) 37 sa",
+ "days": [
+  "Pzt",
+  "Sal",
+  "Çar",
+  "Per",
+  "Cum",
+  "Cmt",
+  "Paz"
+ ],
+ "rSleep": "Uyku",
+ "rMeals": "Öğünler",
+ "rWork": "İş",
+ "rGym": "Spor",
+ "rSleepWhen": "Her gün · 23:00 · 8 sa",
+ "rSleepSum": "Haftada 56 sa",
+ "rMealsWhen": "Haftada 17,5 sa · günde 3×",
+ "rMealsSum": "esnek saatler",
+ "rWorkWhen": "Pzt–Cum · 09:00 · 9 sa",
+ "rWorkSum": "Haftada 45 sa",
+ "rGymWhen": "Pzt, Çar, Cum · 07:00 · 1 sa",
+ "rGymSum": "Haftada 3 sa",
+ "routinesHead": "Sabit rutinler · yerinden oynamayanlar",
+ "addRoutine": "Rutin ekle",
+ "todos": "Görevler",
+ "newTodo": "Yeni görev",
+ "showAll": "Tümünü göster",
+ "todoCount": "4 · 11 sa 30 dk",
+ "hoursLeft": "{v} sa kaldı",
+ "blocks": [
+  "Swift Combine öğren",
+  "2. çeyrek teklif taslağı",
+  "Bekleyen PR’ları incele",
+  "Dişçiyi ara",
+  "Karşılama metinlerini yeniden yaz",
+  "Sürüm notlarını yayımla",
+  "Derin Çalışma, 4. bölüm",
+  "Haftalık market alışverişi",
+  "Gelecek haftayı planla"
+ ],
+ "todoList": [
+  {
+   "t": "Swift Combine öğren",
+   "step": "sink ve assign farkını yaz",
+   "hrs": "4 sa",
+   "on": "Pazartesi"
+  },
+  {
+   "t": "2. çeyrek teklif taslağı",
+   "step": "Geçen çeyreğin rakamlarını çıkar",
+   "hrs": "6 sa",
+   "on": "Salı"
+  },
+  {
+   "t": "Sürüm notlarını yayımla",
+   "step": "Siteye yükle",
+   "hrs": "1 sa",
+   "frag": "5 dk"
+  },
+  {
+   "t": "Dişçiyi ara",
+   "hrs": "0,5 sa"
+  }
+ ],
+ "currentStep": "Geçerli adım",
+ "done": "Bitti",
+ "allDone": "Hepsi bitince {v}",
+ "splitAcross": "= %100, 4 adıma bölündü",
+ "steps": "Adımlar",
+ "fragment": "Beş dakikada yapılır",
+ "addStep": "Adım ekle",
+ "splitHelper": "Bölme yardımcısı",
+ "stepList": [
+  [
+   "ok",
+   "Örnek projeleri topla",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "sink ve assign farkını yaz",
+   "1,5",
+   "38"
+  ],
+  [
+   "",
+   "Örneği çalıştır",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Notları depoya gönder",
+   "0,5",
+   "12"
+  ]
+ ],
+ "totalHours": "4 sa",
+ "tRange": "20:00–21:00 · 1 saat",
+ "tLeft": "kaldı",
+ "tEnds": "Bitiş: 21:00",
+ "tPause": "Duraklat",
+ "tPlus5": "+5 dk",
+ "tPlus10": "+10 dk",
+ "tStop": "Durdur",
+ "tRest": "Buradan itibaren günün geri kalanı",
+ "tUpNext": [
+  [
+   "Dişçiyi ara",
+   "21:30 · 30 dk"
+  ],
+  [
+   "Uyku",
+   "23:00 · 8 sa"
+  ]
+ ],
+ "rvTitle": "Haftalık değerlendirme",
+ "rvDone": "Bitti",
+ "rvPartial": "Kısmen",
+ "rvSkipped": "Atlandı",
+ "rvPending": "Değerlendirilmedi",
+ "rvNotePlaceholder": "Tek satırlık değerlendirme — ne iyi gitti, ne gitmedi",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Akşam · 1,5 sa",
+   "Notlar yazıldı, örnek çalışıyor"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Akşam · 2,0 sa",
+   "Taslak ve rakamlar bölümü hazır"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Akşam · 1,0 sa",
+   "11 PR’ın 6’sı bitti"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Akşam · 0,5 sa",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Akşam · 1,5 sa",
+   "İlk ekran yeniden yazıldı"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Akşam · 1,0 sa",
+   "Sitede yayımlandı"
+  ]
+ ],
+ "caps": [
+  [
+   "Önce vazgeçilmez saatleri yerleştirin",
+   "Bir hafta 168 saattir. Uyku, öğünler ve iş payını alır; uygulama size gerçekte ne kaldığını gösterir."
+  ],
+  [
+   "Görevi uyduğu güne sürükleyin",
+   "Plan bloğu olur. Başka bir güne taşıyın, bir boşluğa bırakın ya da listeye geri sürükleyin."
+  ],
+  [
+   "Bütün günü 24 saatlik cetvelde görün",
+   "Saati değiştirmek için yana, günü değiştirmek için yukarı ya da aşağı sürükleyin. Boşluk ve çakışmalar hemen görünür."
+  ],
+  [
+   "İşi kapanan adımlara bölün",
+   "Her adım için iki soru: ısınmadan başlayabilir misiniz, beş dakika içinde biter mi?"
+  ],
+  [
+   "Ne kaldığını her an bilin",
+   "Zamanlayıcı planınızdaki saatleri izler; şu an ne yaptığınız ve ne kadar kaldığı asla tahmin değildir."
+  ],
+  [
+   "Haftayı bir kontrol listesiyle kapatın",
+   "Neyi yaptığınızı, yarım bıraktığınızı ve atladığınızı işaretleyin; gelecek haftayı bu yanıtlarla kurun."
+  ]
+ ]
+}

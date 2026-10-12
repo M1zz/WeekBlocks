@@ -1,0 +1,215 @@
+{
+ "lang": "vi",
+ "app": "Rainbow Craft",
+ "timer": "Bộ hẹn giờ",
+ "review": "Nhìn lại",
+ "settings": "Cài đặt",
+ "more": "Thêm",
+ "weekRange": "3 thg 3 – 9 thg 3",
+ "thisWeek": "Tuần này",
+ "lensPlan": "Xem dạng khối",
+ "lensDay": "Xem theo dòng thời gian",
+ "summary": "Tóm tắt",
+ "hideSummary": "Ẩn tóm tắt",
+ "mWeek": "Cả tuần",
+ "mWeekSub": "24 giờ mỗi ngày",
+ "mFixed": "Thói quen cố định",
+ "mFixedSub": "khoảng 17,4 giờ mỗi ngày",
+ "mFree": "Thời gian trống còn lại",
+ "mFreeSub": "khoảng 6,6 giờ mỗi ngày",
+ "legRoutines": "Thói quen 122 giờ",
+ "legPlanned": "Đã lên kế hoạch 10 giờ",
+ "legFree": "Trống (chưa lên kế hoạch) 37 giờ",
+ "days": [
+  "T2",
+  "T3",
+  "T4",
+  "T5",
+  "T6",
+  "T7",
+  "CN"
+ ],
+ "rSleep": "Ngủ",
+ "rMeals": "Bữa ăn",
+ "rWork": "Công việc",
+ "rGym": "Tập thể dục",
+ "rSleepWhen": "Hằng ngày · 23:00 · 8 giờ",
+ "rSleepSum": "56 giờ mỗi tuần",
+ "rMealsWhen": "17,5 giờ mỗi tuần · 3 lần mỗi ngày",
+ "rMealsSum": "giờ linh hoạt",
+ "rWorkWhen": "T2–T6 · 09:00 · 9 giờ",
+ "rWorkSum": "45 giờ mỗi tuần",
+ "rGymWhen": "T2, T4, T6 · 07:00 · 1 giờ",
+ "rGymSum": "3 giờ mỗi tuần",
+ "routinesHead": "Thói quen cố định · điều không thể dời",
+ "addRoutine": "Thêm thói quen",
+ "todos": "Việc cần làm",
+ "newTodo": "Việc cần làm mới",
+ "showAll": "Hiện tất cả",
+ "todoCount": "4 · 11 giờ 30 phút",
+ "hoursLeft": "Còn {v} giờ",
+ "blocks": [
+  "Học Swift Combine",
+  "Soạn đề xuất quý 2",
+  "Duyệt các PR tồn đọng",
+  "Gọi nha sĩ",
+  "Viết lại nội dung giới thiệu",
+  "Đăng ghi chú phát hành",
+  "Deep Work, chương 4",
+  "Đi chợ cho cả tuần",
+  "Lên kế hoạch tuần sau"
+ ],
+ "todoList": [
+  {
+   "t": "Học Swift Combine",
+   "step": "Ghi chú sink và assign",
+   "hrs": "4 giờ",
+   "on": "Thứ Hai"
+  },
+  {
+   "t": "Soạn đề xuất quý 2",
+   "step": "Lấy số liệu quý trước",
+   "hrs": "6 giờ",
+   "on": "Thứ Ba"
+  },
+  {
+   "t": "Đăng ghi chú phát hành",
+   "step": "Đăng lên trang web",
+   "hrs": "1 giờ",
+   "frag": "5 phút"
+  },
+  {
+   "t": "Gọi nha sĩ",
+   "hrs": "0,5 giờ"
+  }
+ ],
+ "currentStep": "Bước hiện tại",
+ "done": "Xong",
+ "allDone": "{v} khi làm xong tất cả",
+ "splitAcross": "= 100%, chia cho 4 bước",
+ "steps": "Các bước",
+ "fragment": "Làm trong năm phút",
+ "addStep": "Thêm bước",
+ "splitHelper": "Chia nhỏ giúp tôi",
+ "stepList": [
+  [
+   "ok",
+   "Gom các dự án mẫu",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "Ghi chú sink và assign",
+   "1,5",
+   "38"
+  ],
+  [
+   "",
+   "Chạy được ví dụ mẫu",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Đẩy ghi chú lên kho mã",
+   "0,5",
+   "12"
+  ]
+ ],
+ "totalHours": "4 giờ",
+ "tRange": "20:00–21:00 · 1 giờ",
+ "tLeft": "còn lại",
+ "tEnds": "Kết thúc lúc 21:00",
+ "tPause": "Tạm dừng",
+ "tPlus5": "+5 phút",
+ "tPlus10": "+10 phút",
+ "tStop": "Dừng",
+ "tRest": "Phần còn lại của ngày kể từ đây",
+ "tUpNext": [
+  [
+   "Gọi nha sĩ",
+   "21:30 · 30 phút"
+  ],
+  [
+   "Ngủ",
+   "23:00 · 8 giờ"
+  ]
+ ],
+ "rvTitle": "Nhìn lại tuần",
+ "rvDone": "Xong",
+ "rvPartial": "Một phần",
+ "rvSkipped": "Bỏ qua",
+ "rvPending": "Chưa nhìn lại",
+ "rvNotePlaceholder": "Nhìn lại một dòng — điều gì ổn, điều gì chưa",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Buổi tối · 1,5 giờ",
+   "Đã ghi chú xong, ví dụ chạy được"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Buổi tối · 2,0 giờ",
+   "Dàn ý và phần số liệu"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Buổi tối · 1,0 giờ",
+   "Đã duyệt 6/11"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Buổi tối · 0,5 giờ",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Buổi tối · 1,5 giờ",
+   "Đã viết lại màn hình đầu"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Buổi tối · 1,0 giờ",
+   "Đã đăng lên trang web"
+  ]
+ ],
+ "caps": [
+  [
+   "Đặt trước những giờ không thể bớt",
+   "Một tuần có 168 giờ. Ngủ, ăn, làm việc lấy phần của chúng — ứng dụng cho bạn thấy thời gian thật sự còn lại."
+  ],
+  [
+   "Kéo việc cần làm vào đúng ngày",
+   "Việc thành một khối kế hoạch. Dời sang ngày khác, thả vào khoảng trống, hoặc kéo về lại danh sách."
+  ],
+  [
+   "Cả ngày trên thước 24 giờ",
+   "Kéo ngang để đổi giờ, kéo lên xuống để đổi ngày. Khoảng trống và chỗ chồng nhau hiện rõ trong nháy mắt."
+  ],
+  [
+   "Chia việc lớn thành bước khép lại được",
+   "Hai câu hỏi cho mỗi bước: bắt đầu được ngay không cần khởi động? Có xong trong năm phút không?"
+  ],
+  [
+   "Luôn biết mình còn bao lâu",
+   "Bộ hẹn giờ chạy theo giờ trong kế hoạch, nên việc đang làm và thời gian còn lại không bao giờ phải đoán."
+  ],
+  [
+   "Khép lại tuần bằng một danh sách",
+   "Đánh dấu việc đã làm, làm dở và bỏ qua, rồi dùng câu trả lời đó để xây tuần tiếp theo."
+  ]
+ ]
+}
