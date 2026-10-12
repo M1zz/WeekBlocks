@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>彩虹工坊 — 每週時間區塊規劃</title>
+<meta name="description" content="依星期與時段規劃一週的 Mac App。先排好固定作息，再把待辦放進剩下的時間。" />
+<meta property="og:title" content="彩虹工坊" />
+<meta property="og:description" content="依星期與時段規劃一週的 Mac App。先排好固定作息，再把待辦放進剩下的時間。" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
+<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
+<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
+<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
+<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
+<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
+<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
+<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
+<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
+<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
+<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
+<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
+<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
+<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
+<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
+<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
+<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
+<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
+<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
+<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
+<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
+<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
+<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
+<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
+<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
+<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
+  nav.langs { padding:14px 16px 0; }
+  nav.pages { padding:8px 16px 0; }
+  nav.langs a, nav.pages a { text-decoration:none; }
+  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
+  footer nav { margin-top:10px; }
+  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
+</style>
+
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+<nav class="langs" aria-label="語言">
+  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
+  <a href="../en/index.html" hreflang="en" lang="en">English</a>
+  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
+  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant" aria-current="true">繁體中文</a>
+  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
+  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
+  <a href="../fr/index.html" hreflang="fr" lang="fr">Français</a>
+  <a href="../it/index.html" hreflang="it" lang="it">Italiano</a>
+  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+  <a href="../nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
+  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
+  <a href="../sv/index.html" hreflang="sv" lang="sv">Svenska</a>
+  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
+  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
+  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
+  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
+  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
+  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
+  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
+  <a href="../id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
+  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
+  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
+</nav>
+<nav class="pages" aria-label="頁面">
+  <a href="index.html" aria-current="page">介紹</a>
+  <a href="support.html">支援</a>
+  <a href="privacy.html">隱私權政策</a>
+</nav>
+
+<header class="hero">
+  <span class="badge">macOS App</span>
+  <h1>彩虹工坊</h1>
+  <p class="tagline">依星期與時段規劃一週的工作台。先放下睡眠、用餐、工作這些拿不走的時間，再把待辦放進剩下的空檔，親眼看清這週到底放得下什麼。</p>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2><span class="dot" style="background:var(--blue)"></span>規劃你真正擁有的一週</h2>
+  <p class="lead">光看待辦清單，看不出這一週到底放不放得下。要先放上去才知道。</p>
+  <div class="grid">
+    <div class="card">
+      <span class="emoji">🕒</span>
+      <h3>先排固定作息</h3>
+      <p>一週有 168 小時。固定作息先占去它的份，剩下的時間會以數字清楚呈現。</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📐</span>
+      <h3>拖到哪天就是計畫</h3>
+      <p>把待辦拖到某一天，它就成了計畫區塊。可以移到別天、調整時間，日期不再合適時也能拖回清單。</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📊</span>
+      <h3>在 24 小時上看一天</h3>
+      <p>時間軸檢視把一天攤在 24 小時的尺規上。空檔和重疊一目了然，重疊的行程要怎麼排列也由你決定。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--green)"></span>拆成能收尾的步驟</h2>
+  <p class="lead">大工作會卡住，往往不是因為懶，而是動手之前還有東西擋著。</p>
+  <p>App 會對每個步驟問兩個問題。</p>
+  <ul class="plain">
+    <li><b>不用暖機就能直接開始嗎？</b>需要重新載入脈絡的工作，放進五分鐘的空檔裡，整段時間都會花在暖機上。</li>
+    <li><b>能在五分鐘內做完嗎？</b>沒做完的事會留下尾巴，連下一段時間也被吃掉。</li>
+  </ul>
+  <p>兩個都是「能」，就是碎片，有五分鐘空檔隨時可以拿起來做。其他的，都需要你事先留好的時間。App 會先依文字與時長做出判斷，判斷錯了，你隨時可以推翻。</p>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--purple)"></span>跟著時間走，再回頭看</h2>
+  <p class="lead">計畫排好之後，才是真正要緊的時候。</p>
+  <div class="grid">
+    <div class="card">
+      <span class="emoji">⏱️</span>
+      <h3>目前計時</h3>
+      <p>計畫到了開始時間會轉為進行中，時間過了會問你做完沒。「目前計時」小工具不必打開 App，就能看到正在做的事和剩餘時間。</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📅</span>
+      <h3>與 Mac 行事曆相通</h3>
+      <p>把會議和約會帶進來，不必再打一次。若你願意，計畫也可以寫進 App 建立的「彩虹工坊」行事曆。其他行事曆一律不會更動。</p>
+    </div>
+    <div class="card">
+      <span class="emoji">✅</span>
+      <h3>每週回顧</h3>
+      <p>每天一張卡片。標出做完的、做了一半的、跳過的，拿來排下一週。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--orange)"></span>與 iPhone 同步</h2>
+  <p>使用同一個 iCloud 帳號時，待辦事項會在本 App 與 iPhone 上的「欲望彩虹」之間同步。在 Mac 上排好今天，出門在外就用 iPhone 查看。</p>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--yellow)"></span>隱私</h2>
+  <div class="note">不需要帳號，也不用註冊，更沒有存放你計畫的開發者伺服器。你寫下的內容只留在你的裝置和你自己的 iCloud。為了改善 App，會傳送不含任何書寫內容的匿名使用統計，你可以在設定中關閉。詳情請見<a href="privacy.html">隱私權政策</a>。</div>
+</section>
+
+<section>
+  <div class="contact">
+    <h2 style="margin-bottom:6px">需要協助嗎？</h2>
+    <p class="lead" style="margin-bottom:0">常見問題與聯絡方式都整理在支援頁面。</p>
+    <a class="btn" href="support.html">前往支援頁面</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 彩虹工坊</div>
+  <div class="fam">彩虹工坊 (macOS) &middot; 欲望彩虹 (iOS)</div>
+  <nav class="pages"><a href="index.html">介紹</a> <a href="support.html">支援</a> <a href="privacy.html">隱私權政策</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">更新說明</a></nav>
+</footer>
+
+</body>
+</html>

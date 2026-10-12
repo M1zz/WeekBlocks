@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>Rainbow Craft — Planning hebdomadaire par blocs de temps</title>
+<meta name="description" content="Une app Mac pour planifier votre semaine jour par jour et heure par heure. Posez d’abord vos routines fixes, puis placez vos tâches dans le temps qui reste." />
+<meta property="og:title" content="Rainbow Craft" />
+<meta property="og:description" content="Une app Mac pour planifier votre semaine jour par jour et heure par heure. Posez d’abord vos routines fixes, puis placez vos tâches dans le temps qui reste." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/fr/" />
+<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/fr/" />
+<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
+<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
+<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
+<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
+<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
+<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
+<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
+<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
+<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
+<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
+<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
+<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
+<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
+<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
+<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
+<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
+<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
+<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
+<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
+<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
+<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
+<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
+<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
+<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
+  nav.langs { padding:14px 16px 0; }
+  nav.pages { padding:8px 16px 0; }
+  nav.langs a, nav.pages a { text-decoration:none; }
+  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
+  footer nav { margin-top:10px; }
+  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
+</style>
+
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+<nav class="langs" aria-label="Language">
+  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
+  <a href="../en/index.html" hreflang="en" lang="en">English</a>
+  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
+  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
+  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
+  <a href="../fr/index.html" hreflang="fr" lang="fr" aria-current="true">Français</a>
+  <a href="../it/index.html" hreflang="it" lang="it">Italiano</a>
+  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+  <a href="../nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
+  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
+  <a href="../sv/index.html" hreflang="sv" lang="sv">Svenska</a>
+  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
+  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
+  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
+  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
+  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
+  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
+  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
+  <a href="../id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
+  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
+  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
+</nav>
+<nav class="pages" aria-label="Pages">
+  <a href="index.html" aria-current="page">Présentation</a>
+  <a href="support.html">Assistance</a>
+  <a href="privacy.html">Confidentialité</a>
+</nav>
+
+<header class="hero">
+  <span class="badge">App macOS</span>
+  <h1>Rainbow Craft</h1>
+  <p class="tagline">Un atelier pour planifier votre semaine jour par jour et heure par heure. Posez d’abord les heures que vous ne pouvez pas céder, comme le sommeil, les repas et le travail, puis placez vos tâches dans ce qui reste et voyez ce qui tient vraiment.</p>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2><span class="dot" style="background:var(--blue)"></span>Planifiez la semaine que vous avez vraiment</h2>
+  <p class="lead">Une liste de tâches ne vous dit pas si votre semaine peut tout contenir. Il faut tout poser et regarder.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="emoji">🕒</span>
+      <h3>Les routines fixes d’abord</h3>
+      <p>Une semaine, c’est 168 heures. Les routines fixes prennent leur part en premier, et l’app affiche ce qui reste en chiffres clairs.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📐</span>
+      <h3>Glissez-la à sa place</h3>
+      <p>Faites glisser une tâche sur un jour : elle devient un bloc planifié. Déplacez-la, changez son heure, ou renvoyez-la dans la liste si la date ne convient plus.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📊</span>
+      <h3>Une journée sur 24 heures</h3>
+      <p>La vue chronologique déroule une journée sur une règle de 24 heures. Creux et chevauchements se repèrent d’un coup d’œil, et vous choisissez comment disposer les éléments qui se chevauchent.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--green)"></span>Découpez les gros travaux en étapes qui se bouclent</h2>
+  <p class="lead">Un gros travail cale rarement par paresse : le plus souvent, quelque chose bloque encore le chemin avant même de pouvoir s’y mettre.</p>
+  <p>L’app pose deux questions sur chaque étape.</p>
+  <ul class="plain">
+    <li><b>Pouvez-vous commencer sans temps de démarrage ?</b> Un travail qui demande de se remettre dans le contexte consomme un creux de cinq minutes entier rien qu’au démarrage.</li>
+    <li><b>Est-ce terminé en cinq minutes ?</b> Un travail inachevé laisse des restes qui grignotent le créneau suivant.</li>
+  </ul>
+  <p>Oui aux deux, c’est un fragment : quelque chose que vous pouvez saisir dès que cinq minutes se libèrent. Tout le reste demande un temps que vous réservez. L’app répond d’abord d’après la formulation et la durée, et vous pouvez la corriger chaque fois qu’elle se trompe.</p>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--purple)"></span>Tenez l’horaire, puis faites le bilan</h2>
+  <p class="lead">Un plan compte surtout après l’avoir fait.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="emoji">⏱️</span>
+      <h3>Minuteur en cours</h3>
+      <p>À l’heure de début, un plan passe en cours, et une fois le temps écoulé l’app vous demande si vous avez terminé. Le widget Minuteur en cours affiche ce que vous faites et le temps restant sans ouvrir l’app.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">📅</span>
+      <h3>Fonctionne avec Calendrier</h3>
+      <p>Importez les réunions et rendez-vous de Calendrier sur votre Mac au lieu de les saisir deux fois. Si vous le souhaitez, vos plans peuvent aller dans un calendrier Rainbow Craft distinct. Vos autres calendriers ne sont jamais modifiés.</p>
+    </div>
+    <div class="card">
+      <span class="emoji">✅</span>
+      <h3>Bilan de la semaine</h3>
+      <p>Une carte par jour. Indiquez ce qui est fait, fait en partie ou passé, et servez-vous-en pour planifier la semaine suivante.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--orange)"></span>Fonctionne avec votre iPhone</h2>
+  <p>Avec le même compte iCloud, les tâches circulent entre cette app et Rainbow of Desire sur iPhone. Planifiez la journée sur votre Mac et consultez-la sur votre iPhone quand vous êtes dehors.</p>
+</section>
+
+<section>
+  <h2><span class="dot" style="background:var(--yellow)"></span>Confidentialité</h2>
+  <div class="note">Pas de compte, pas d’inscription, et aucun serveur du développeur ne conserve vos plans. Ce que vous écrivez reste sur vos appareils et dans votre propre iCloud. Pour améliorer l’app, elle envoie des statistiques d’utilisation anonymes qui ne contiennent jamais ce que vous écrivez, et vous pouvez les désactiver dans les Réglages. Tous les détails figurent dans la <a href="privacy.html">politique de confidentialité</a>.</div>
+</section>
+
+<section>
+  <div class="contact">
+    <h2 style="margin-bottom:6px">Besoin d’aide ?</h2>
+    <p class="lead" style="margin-bottom:0">Les réponses aux questions fréquentes et le moyen de me contacter se trouvent sur la page d’assistance.</p>
+    <a class="btn" href="support.html">Aller à l’assistance</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 Rainbow Craft</div>
+  <div class="fam">Rainbow Craft (macOS) &middot; Rainbow of Desire (iOS)</div>
+  <nav class="pages"><a href="index.html">Présentation</a> <a href="support.html">Assistance</a> <a href="privacy.html">Confidentialité</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">Notes de version</a></nav>
+</footer>
+
+</body>
+</html>

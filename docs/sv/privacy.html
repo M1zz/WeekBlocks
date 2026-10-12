@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>Integritetspolicy — Rainbow Craft</title>
+<meta name="description" content="Vad Rainbow Craft (macOS) hanterar, var det lagras och vad appen aldrig gör." />
+<meta property="og:title" content="Rainbow Craft" />
+<meta property="og:description" content="Vad Rainbow Craft (macOS) hanterar, var det lagras och vad appen aldrig gör." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/sv/privacy.html" />
+<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/sv/privacy.html" />
+<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/privacy.html" />
+<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/privacy.html" />
+<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/privacy.html" />
+<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html" />
+<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html" />
+<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/privacy.html" />
+<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/privacy.html" />
+<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/privacy.html" />
+<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/privacy.html" />
+<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/privacy.html" />
+<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/privacy.html" />
+<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/privacy.html" />
+<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/privacy.html" />
+<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/privacy.html" />
+<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/privacy.html" />
+<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/privacy.html" />
+<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/privacy.html" />
+<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/privacy.html" />
+<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/privacy.html" />
+<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/privacy.html" />
+<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/privacy.html" />
+<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/privacy.html" />
+<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/privacy.html" />
+<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/privacy.html" />
+<style>
+  :root {
+    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
+    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
+    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
+  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
+  header.hero { text-align:center; padding:72px 24px 56px; }
+  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
+  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
+  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:none; }
+  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
+  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
+  .lead { color:var(--sub); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--sub); font-size:15px; }
+  .emoji { font-size:22px; display:block; margin-bottom:10px; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
+  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before {
+    counter-increment:s; content:counter(s);
+    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
+    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  ol.steps b { display:block; }
+  ol.steps span { color:var(--sub); font-size:15px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
+  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"\2013"; }
+  details p { margin:0 0 16px; color:var(--sub); }
+  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
+  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
+  .contact a.btn:hover { opacity:.9; }
+  a { color:var(--blue); }
+  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
+  footer .fam { margin-top:6px; font-size:13px; }
+  .muted { color:var(--sub); font-size:14px; }
+  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
+  table.attrs tr:last-child td { border-bottom:none; }
+  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
+  table.attrs td.v { color:var(--sub); }
+  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
+  h3.sub { font-size:17px; margin:26px 0 6px; }
+  ul.plain { padding-left:20px; color:var(--sub); }
+  ul.plain li { margin:6px 0; }
+  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
+  nav.langs { padding:14px 16px 0; }
+  nav.pages { padding:8px 16px 0; }
+  nav.langs a, nav.pages a { text-decoration:none; }
+  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
+  footer nav { margin-top:10px; }
+  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
+</style>
+
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+<nav class="langs" aria-label="Language">
+  <a href="../privacy.html" hreflang="ko" lang="ko">한국어</a>
+  <a href="../en/privacy.html" hreflang="en" lang="en">English</a>
+  <a href="../ja/privacy.html" hreflang="ja" lang="ja">日本語</a>
+  <a href="../zh-Hans/privacy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+  <a href="../zh-Hant/privacy.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+  <a href="../de/privacy.html" hreflang="de" lang="de">Deutsch</a>
+  <a href="../es/privacy.html" hreflang="es" lang="es">Español</a>
+  <a href="../fr/privacy.html" hreflang="fr" lang="fr">Français</a>
+  <a href="../it/privacy.html" hreflang="it" lang="it">Italiano</a>
+  <a href="../pt-BR/privacy.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+  <a href="../nl/privacy.html" hreflang="nl" lang="nl">Nederlands</a>
+  <a href="../da/privacy.html" hreflang="da" lang="da">Dansk</a>
+  <a href="../sv/privacy.html" hreflang="sv" lang="sv" aria-current="true">Svenska</a>
+  <a href="../nb/privacy.html" hreflang="nb" lang="nb">Norsk bokmål</a>
+  <a href="../fi/privacy.html" hreflang="fi" lang="fi">Suomi</a>
+  <a href="../pl/privacy.html" hreflang="pl" lang="pl">Polski</a>
+  <a href="../cs/privacy.html" hreflang="cs" lang="cs">Čeština</a>
+  <a href="../el/privacy.html" hreflang="el" lang="el">Ελληνικά</a>
+  <a href="../ru/privacy.html" hreflang="ru" lang="ru">Русский</a>
+  <a href="../tr/privacy.html" hreflang="tr" lang="tr">Türkçe</a>
+  <a href="../id/privacy.html" hreflang="id" lang="id">Bahasa Indonesia</a>
+  <a href="../vi/privacy.html" hreflang="vi" lang="vi">Tiếng Việt</a>
+  <a href="../th/privacy.html" hreflang="th" lang="th">ไทย</a>
+</nav>
+<nav class="pages" aria-label="Sidor">
+  <a href="index.html">Om appen</a>
+  <a href="support.html">Support</a>
+  <a href="privacy.html" aria-current="page">Integritetspolicy</a>
+</nav>
+
+<main class="wrap">
+
+<header style="padding:28px 0 28px">
+  <h1 style="font-size:34px; text-align:left; margin:0 0 8px">Integritetspolicy</h1>
+  <p class="muted" style="margin:0">Rainbow Craft (macOS) &middot; Senast uppdaterad: 28 september 2026</p>
+</header>
+
+<section style="border-top:1px solid var(--line); padding-top:28px">
+  <p>Rainbow Craft (appen) är en app som i första hand arbetar lokalt och saknar egen server. Det här dokumentet förklarar vad appen hanterar, var den lagrar det och vad den aldrig gör.</p>
+  <div class="note">
+    I korthet: Det du skriver (uppgifter, planer, rutiner) lagras bara på din enhet och i din egen privata iCloud-databas, och utvecklaren kan inte komma åt det. För att appen ska kunna fortsätta förbättras skickar den däremot <b>anonym användningsstatistik</b> – siffror som appversion, antal starter och hur många poster du har. Den innehåller aldrig något du har skrivit eller något som identifierar dig, och du kan stänga av den i Inställningar.
+  </div>
+</section>
+
+<section>
+  <h2>1. Vad appen inte samlar in</h2>
+  <p class="lead">Appen samlar inte in något av följande.</p>
+  <ul class="plain">
+    <li>Konto- eller kontaktuppgifter som namn, e-postadress eller telefonnummer</li>
+    <li>Plats</li>
+    <li>Annonsidentifierare och spårningsdata (om användningsstatistik, se avsnitt 7 – ingen annonsidentifierare används och inget lämnas till tredje part)</li>
+    <li>Andra data på din enhet, som kontakter eller bilder</li>
+  </ul>
+  <p>Det finns ingen registrering och ingen inloggning.</p>
+  <p class="muted">Din kalender läses bara när du själv väljer att köra Importera från Kalender. Se avsnitt 4.</p>
+</section>
+
+<section>
+  <h2>2. Det du skriver</h2>
+  <p class="lead">För att kunna göra sitt jobb lagrar appen det du skriver in på din enhet.</p>
+  <ul class="plain">
+    <li>Planblock (aktivitet, framgångskriterium, resultat, dag och tid på dagen, längd)</li>
+    <li>Fasta rutiner (tider och inställningar för veckokvot)</li>
+    <li>Uppgifter och deras steg (titel, uppskattad tid, om den är klar, ordning och dina svar på frågorna om ministeg)</li>
+    <li>Uppgiftskategorier (namn, färg, symbol)</li>
+    <li>Genomgångar (klart, delvis klart, överhoppat, anteckningar)</li>
+    <li>Innehåll som delats från en annan app (titeln)</li>
+  </ul>
+  <p>Dessa data används bara för att tillhandahålla appens funktioner. De skickas aldrig till utvecklaren och lämnas aldrig till tredje part.</p>
+</section>
+
+<section>
+  <h2>3. Var det lagras</h2>
+  <p>Allt lagras på din enhet med hjälp av Apples SwiftData. Om du är inloggad på iCloud lagras det i din egen privata iCloud-databas (container iCloud.com.devkoan.ScheduleDensity) och synkas automatiskt mellan enheter med samma iCloud-konto.</p>
+  <p>Lagring och överföring via iCloud omfattas av Apples integritetspolicy. Utvecklaren har ingen åtkomst till din privata iCloud-databas.</p>
+  <p>Innehåll som delats från en annan app ligger kort i ett appgruppsområde på din enhet tills appen hämtar det. Den filen lämnar aldrig din enhet.</p>
+</section>
+
+<section>
+  <h2>4. Läsa och skriva i kalendern på din Mac</h2>
+  <p>Bara när du har valt kalendrar i Inställningar läser appen titlar och tider för händelserna i de kalendrarna och gör om dem till planblock för veckan. De kalendrar du väljer läses bara, de skrivs aldrig till eller ändras. Med automatisk import påslagen läses de igen när de ändras.</p>
+  <p>Bara när du slår på ”Skriv min plan i kalendern Rainbow Craft” i Inställningar skapar appen en kalender som heter ”Rainbow Craft” och skriver titel, tid och framgångskriterium för planblock som har en fast tid. Appen ändrar eller raderar bara de händelser den själv har skrivit i den kalendern och skriver aldrig till någon annan kalender. Kalendern ligger där Kalender i macOS lagrar den (oftast i din egen iCloud) och skickas aldrig till utvecklaren.</p>
+  <p>Det som läses lagras på samma ställe som allt annat du skriver (din enhet och din egen iCloud) och skickas aldrig till utvecklaren. Väljer du inga kalendrar läses ingenting.</p>
+  <p class="muted">macOS kräver full åtkomst för att händelser ska kunna läsas. Trots namnet på behörigheten är den enda kalender appen skriver till kalendern ”Rainbow Craft” som den skapar, och bara när du slår på det.</p>
+</section>
+
+<section>
+  <h2>5. Dela med andra</h2>
+  <p>När du använder Dela mitt schema kan den som får inbjudningslänken du skapat se ditt veckoschema med endast läsbehörighet. Du bestämmer helt själv vad som delas och med vem, och när du slutar dela kan de inte längre se det.</p>
+  <p>Alla som har en inbjudningslänk kan gå med, så skicka den bara till personer du vill dela med. Delningen använder Apples CloudKit-delning direkt, och utvecklaren håller inte dina data på vägen.</p>
+</section>
+
+<section>
+  <h2>6. Skicka frågor och feedback</h2>
+  <p>När du skickar en fråga eller feedback från Inställningar skickas det du skrev just då och din appversion till en iCloud-container som utvecklaren driver (iCloud.com.Ysoup.FeedbackHub). Det används bara för att svara dig och för att rätta appen.</p>
+  <p>Det sker bara när du själv trycker på skicka. Skriver du via e-post används din adress bara för att svara. Det enda som skickas utan att du trycker på något är den anonyma användningsstatistiken i avsnitt 7, och inget du skrivit ingår i den.</p>
+</section>
+
+<section>
+  <h2>7. Anonym användningsstatistik</h2>
+  <p class="lead">Utan att veta vad som faktiskt används går det inte att veta vad som ska rättas. Appen skickar anonymt det minsta som besvarar den frågan.</p>
+  <p><b>Det här skickas</b></p>
+  <ul class="plain">
+    <li>Appversion, macOS-version, typ av enhet (Mac/iPhone), språkinställning</li>
+    <li>Hur många gånger appen har startats, hur många dagar sedan den installerades, när den senast användes</li>
+    <li>Hur <b>många</b> uppgifter, klara uppgifter, kategorier, planblock och fasta rutiner som finns</li>
+    <li>Bara namnet på en handling (till exempel ”lade till en uppgift”, ”importerade från kalendern”, ”öppnade köpskärmen”). Samma namn skickas högst en gång per dag.</li>
+    <li>Om du har Pro just nu &mdash; ett enda värde, ja eller nej. Det innehåller inte vilken produkt du köpte, när eller för hur mycket. Det används för att se hur personer med gratisversionen och personer som har köpt använder appen olika, och inget skickas innan din köpstatus har kontrollerats.</li>
+  </ul>
+  <p><b>Det här skickas inte</b></p>
+  <ul class="plain">
+    <li>Något du har skrivit i en uppgift, plan eller rutin – inte ett enda tecken, titlar inräknade.</li>
+    <li>Ditt namn, din e-postadress, ditt Apple-konto, enhetsidentifierare, plats eller identifiering via IP-adress</li>
+  </ul>
+  <p>Det som skickas hålls bara ihop av <b>ett enda slumptal</b> som appen skapar när den installeras. Talet har ingenting med din enhet eller ditt Apple-konto att göra, och det försvinner när du raderar appen. En ominstallation kopplar dig inte till tidigare uppgifter.</p>
+  <p>Det lagras i samma iCloud-container som drivs av utvecklaren som feedbacken (iCloud.com.Ysoup.FeedbackHub) och läses bara för att förbättra appen. Det används aldrig för reklam, lämnas eller säljs aldrig till tredje part och samkörs aldrig med data från andra företag.</p>
+  <div class="note"><b>Så stänger du av det.</b> Inställningar &rsaquo; Användningsstatistik &rsaquo; stäng av ”Skicka anonym användningsstatistik”, så lämnar inget mer den enheten. Om du vill att redan skickade uppgifter raderas, kontakta e-postadressen nedan.</div>
+</section>
+
+<section>
+  <h2>8. Köp</h2>
+  <p>Pro köps bara via Apples App Store. Apple hanterar betalningen. Utvecklaren tar aldrig emot eller lagrar ditt kortnummer eller din betalningsmetod.</p>
+  <p>Appen registrerar bara om ett köp finns. På en annan Mac med samma Apple-konto hämtar Återställ köp tillbaka det.</p>
+</section>
+
+<section>
+  <h2>9. Lagring och radering</h2>
+  <p class="lead">Data sparas tills du raderar dem eller tar bort appen.</p>
+  <ul class="plain">
+    <li>Du kan radera enskilda poster i appen.</li>
+    <li>Raderar du appen tas de data som lagrats på den enheten bort.</li>
+    <li>Data som synkats till iCloud kan hanteras eller raderas på din enhet under Inställningar, Apple-konto, iCloud, Hantera lagring.</li>
+    <li>Om du vill att feedback du skickat eller din användningsstatistik raderas, kontakta e-postadressen nedan.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>10. Barns integritet</h2>
+  <p>Appen riktar sig inte till barn och samlar inte medvetet in några personuppgifter från barn.</p>
+</section>
+
+<section>
+  <h2>11. Ändringar i policyn</h2>
+  <p>Policyn kan uppdateras när lagar eller appens funktioner ändras. Om något viktigt ändras meddelas det på den här sidan och datumet för senaste uppdatering ovan ändras.</p>
+</section>
+
+<section>
+  <h2>12. Kontakt</h2>
+  <p>Hör av dig om du har frågor eller önskemål om hur dina uppgifter hanteras.</p>
+  <p>E-post: <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a></p>
+</section>
+
+</main>
+
+<footer>
+  <div>2026 Rainbow Craft</div>
+  <div class="fam">Rainbow Craft (macOS) &middot; Rainbow of Desire (iOS)</div>
+  <nav class="pages"><a href="index.html">Om appen</a> <a href="support.html">Support</a> <a href="privacy.html">Integritetspolicy</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">Versionsinformation</a></nav>
+</footer>
+
+</body>
+</html>

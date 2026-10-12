@@ -3,11 +3,38 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
 <title>무지개 공방 — 주간 타임블로킹</title>
-<meta name="description" content="한 주를 요일과 시간대로 짜는 macOS 앱. 할 일을 단계로 쪼개고 지금 시작할 수 있는 것부터 집습니다. 사용 안내, 자주 묻는 질문, 개인정보, 문의." />
+<meta name="description" content="한 주를 요일과 시간대로 짜는 macOS 앱. 고정 루틴을 먼저 깔고 남은 시간에 할 일을 놓습니다." />
 <meta property="og:title" content="무지개 공방" />
-<meta property="og:description" content="한 주를 요일과 시간대로 짜는 작업대. 할 일을 끌어다 놓고 계획을 세웁니다." />
+<meta property="og:description" content="한 주를 요일과 시간대로 짜는 macOS 앱. 고정 루틴을 먼저 깔고 남은 시간에 할 일을 놓습니다." />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/" />
+<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/" />
+<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
+<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
+<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
+<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
+<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
+<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
+<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
+<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
+<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
+<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
+<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
+<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
+<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
+<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
+<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
+<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
+<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
+<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
+<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
+<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
+<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
+<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
+<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
+<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
 <style>
   :root {
     --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
@@ -72,128 +99,128 @@
   h3.sub { font-size:17px; margin:26px 0 6px; }
   ul.plain { padding-left:20px; color:var(--sub); }
   ul.plain li { margin:6px 0; }
+  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
+  nav.langs { padding:14px 16px 0; }
+  nav.pages { padding:8px 16px 0; }
+  nav.langs a, nav.pages a { text-decoration:none; }
+  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
+  footer nav { margin-top:10px; }
+  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
 </style>
+
 </head>
 <body>
 
 <div class="rainbow-bar"></div>
+<nav class="langs" aria-label="언어">
+  <a href="index.html" hreflang="ko" lang="ko" aria-current="true">한국어</a>
+  <a href="en/index.html" hreflang="en" lang="en">English</a>
+  <a href="ja/index.html" hreflang="ja" lang="ja">日本語</a>
+  <a href="zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+  <a href="zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+  <a href="de/index.html" hreflang="de" lang="de">Deutsch</a>
+  <a href="es/index.html" hreflang="es" lang="es">Español</a>
+  <a href="fr/index.html" hreflang="fr" lang="fr">Français</a>
+  <a href="it/index.html" hreflang="it" lang="it">Italiano</a>
+  <a href="pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+  <a href="nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
+  <a href="da/index.html" hreflang="da" lang="da">Dansk</a>
+  <a href="sv/index.html" hreflang="sv" lang="sv">Svenska</a>
+  <a href="nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
+  <a href="fi/index.html" hreflang="fi" lang="fi">Suomi</a>
+  <a href="pl/index.html" hreflang="pl" lang="pl">Polski</a>
+  <a href="cs/index.html" hreflang="cs" lang="cs">Čeština</a>
+  <a href="el/index.html" hreflang="el" lang="el">Ελληνικά</a>
+  <a href="ru/index.html" hreflang="ru" lang="ru">Русский</a>
+  <a href="tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
+  <a href="id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
+  <a href="vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
+  <a href="th/index.html" hreflang="th" lang="th">ไทย</a>
+</nav>
+<nav class="pages" aria-label="페이지">
+  <a href="index.html" aria-current="page">소개</a>
+  <a href="support.html">지원</a>
+  <a href="privacy.html">개인정보 처리방침</a>
+</nav>
 
 <header class="hero">
   <span class="badge">macOS 앱</span>
   <h1>무지개 공방</h1>
-  <p class="tagline">한 주를 요일과 시간대로 짜는 작업대입니다. 할 일을 끌어다 요일에 놓고, 무엇이 몇 시간짜리인지 눈으로 확인하면서 계획을 세웁니다.</p>
+  <p class="tagline">한 주를 요일과 시간대로 짜는 작업대입니다. 잠, 끼니, 회사처럼 빼놓을 수 없는 시간을 먼저 깔고, 남은 자리에 할 일을 놓으며 무엇이 들어가는지 눈으로 확인합니다.</p>
 </header>
 
 <main class="wrap">
 
 <section>
-  <h2><span class="dot" style="background:var(--blue)"></span>주간 타임블로킹</h2>
-  <p class="lead">할 일 목록만으로는 한 주에 그게 다 들어가는지 알 수 없습니다. 자리에 놓아봐야 압니다.</p>
+  <h2><span class="dot" style="background:var(--blue)"></span>실제로 가진 한 주를 짭니다</h2>
+  <p class="lead">할 일 목록만으로는 이번 주에 그게 다 들어가는지 알 수 없습니다. 자리에 놓아 봐야 압니다.</p>
   <div class="grid">
     <div class="card">
-      <span class="emoji">📐</span>
-      <h3>요일에 끌어다 놓기</h3>
-      <p>백로그의 할 일을 요일 칸으로 끌면 계획 블록이 됩니다. 블록은 옮기고 늘리고 지울 수 있습니다.</p>
+      <span class="emoji">🕒</span>
+      <h3>고정 루틴부터</h3>
+      <p>한 주는 168시간입니다. 고정 루틴이 제 몫을 먼저 가져가고, 남은 시간은 숫자로 보입니다.</p>
     </div>
     <div class="card">
-      <span class="emoji">🕒</span>
-      <h3>고정 루틴</h3>
-      <p>수면, 식사, 회사처럼 빼놓을 수 없는 중요한 시간을 먼저 깔아둡니다. 남는 자리가 실제로 쓸 수 있는 시간입니다.</p>
+      <span class="emoji">📐</span>
+      <h3>끌어다 놓으면 계획</h3>
+      <p>할 일을 요일로 끌면 계획 블록이 됩니다. 다른 날로 옮기거나 시각을 바꾸고, 날짜가 틀어지면 목록으로 되돌립니다.</p>
     </div>
     <div class="card">
       <span class="emoji">📊</span>
-      <h3>하루 타임라인</h3>
-      <p>요일별로 시간대를 세로로 펼쳐 봅니다. 어디가 비었고 어디가 겹치는지 바로 보입니다.</p>
+      <h3>24시간 자 위의 하루</h3>
+      <p>시간축 보기는 하루를 24시간 자 위에 펼칩니다. 빈틈과 겹침이 한눈에 보이고, 겹친 일정을 어떻게 세울지 고를 수 있습니다.</p>
     </div>
   </div>
 </section>
 
 <section>
-  <h2><span class="dot" style="background:var(--green)"></span>할 일을 단계로 쪼갠다</h2>
-  <p class="lead">큰 일이 안 굴러가는 건 대개 게을러서가 아니라, 손대기 전에 남아 있는 것이 있어서입니다.</p>
-
-  <p>쪼갤 때 고르는 건 하나뿐입니다. <b>이 단계를 지금 시작할 수 있는가.</b></p>
-
-  <table class="attrs">
-    <tr><td class="k" style="color:var(--green)">바로</td><td class="v">지금 손에 잡히는 것만으로 끝납니다. 짬이 나면 집으세요.</td></tr>
-    <tr><td class="k" style="color:#00A0A0">펼치고</td><td class="v">자료나 도구를 펼쳐야 시작됩니다. 준비할 짬이 났을 때 하세요.</td></tr>
-    <tr><td class="k" style="color:var(--indigo)">몰입해서</td><td class="v">끊기면 처음부터 다시 올라와야 합니다. 방해 없는 시간에 두세요.</td></tr>
-    <tr><td class="k" style="color:var(--orange)">정하고</td><td class="v">아직 정하지 않은 것이 있어 시작이 안 됩니다. 정하는 것이 이 단계의 일입니다.</td></tr>
-    <tr><td class="k" style="color:var(--sub)">기다림</td><td class="v">내 손을 떠나 있습니다. 상대의 답이 와야 움직입니다.</td></tr>
-  </table>
-
-  <p style="margin-top:20px">고른 속성이 예상 시간을 데려오고, 그 일 전체에 걸리는 시간은 단계들의 합이 됩니다. 지금 할 단계에는 언제 하면 되는지가 함께 나옵니다.</p>
+  <h2><span class="dot" style="background:var(--green)"></span>끝이 닫히는 크기로 쪼갭니다</h2>
+  <p class="lead">큰 일이 멈추는 것은 대개 게을러서가 아니라, 손대기 전에 아직 막고 있는 것이 있어서입니다.</p>
+  <p>앱은 단계마다 두 가지를 묻습니다.</p>
+  <ul class="plain">
+    <li><b>시동 없이 바로 시작되나요?</b> 맥락을 다시 읽어 와야 하는 일은 5분 짬에서 시동만 걸다 끝납니다.</li>
+    <li><b>5분 안에 끝나나요?</b> 덜 끝난 일은 찌꺼기를 남겨 다음 시간까지 갉아먹습니다.</li>
+  </ul>
+  <p>둘 다 그렇다면 조각입니다. 5분이 빌 때마다 집어 들면 됩니다. 나머지는 따로 떼어 둔 시간이 필요합니다. 앱이 글과 길이를 보고 먼저 답하고, 틀리면 언제든 뒤집을 수 있습니다.</p>
 </section>
 
 <section>
-  <h2><span class="dot" style="background:var(--purple)"></span>전파 계약</h2>
-  <p class="lead">누군가에게 알려야 끝나는 일은, 알리는 시점을 미리 정해두지 않으면 늘 늦습니다.</p>
-  <p>전파가 필요한 할 일에는 대상과 넘길 형태, 빠르면 언제 늦어도 언제인지를 적어둡니다. 그러면 진짜 마감에서 거꾸로 계산해 언제 무엇을 알려야 하는지가 나옵니다. 상대는 늦어도 언제까지라는 약속을 기준으로 자기 일을 짤 수 있습니다.</p>
-</section>
-
-<section>
-  <h2><span class="dot" style="background:var(--orange)"></span>아이폰과 이어짐</h2>
-  <p class="lead">같은 iCloud 계정을 쓰면 iOS 앱 욕망의 무지개와 자동으로 이어집니다.</p>
+  <h2><span class="dot" style="background:var(--purple)"></span>시각을 따라가고, 돌아봅니다</h2>
+  <p class="lead">계획은 세운 뒤가 더 중요합니다.</p>
   <div class="grid">
     <div class="card">
-      <h3>할 일이 오간다</h3>
-      <p>맥에서 적은 백로그가 아이폰의 할 일 탭에 나타나고, 반대도 마찬가지입니다.</p>
+      <span class="emoji">⏱️</span>
+      <h3>지금 타이머</h3>
+      <p>시작 시각이 되면 계획이 진행 중으로 바뀌고, 시간이 지나면 끝냈는지 묻습니다. 지금 타이머 위젯은 앱을 열지 않아도 지금 하는 일과 남은 시간을 보여 줍니다.</p>
     </div>
     <div class="card">
-      <h3>오늘 계획이 보인다</h3>
-      <p>맥에서 오늘로 배정한 일이 아이폰의 무지개 화면과 위젯에 함께 나타납니다.</p>
+      <span class="emoji">📅</span>
+      <h3>맥 캘린더와 함께</h3>
+      <p>회의와 약속을 두 번 적지 않고 가져옵니다. 원하면 계획을 앱이 만든 무지개 공방 캘린더에 적습니다. 다른 캘린더는 고치지 않습니다.</p>
     </div>
     <div class="card">
-      <h3>공유로 추가</h3>
-      <p>사파리 등에서 공유하면 목록에 무지개 공방이 나타납니다. 속성만 고르면 백로그에 들어갑니다.</p>
+      <span class="emoji">✅</span>
+      <h3>주간 회고</h3>
+      <p>요일마다 카드 한 장. 한 것, 반쯤 한 것, 건너뛴 것을 찍고 다음 주를 짜는 데 씁니다.</p>
     </div>
   </div>
 </section>
 
 <section>
-  <h2><span class="dot" style="background:var(--yellow)"></span>자주 묻는 것</h2>
-
-  <details>
-    <summary>iCloud 로그인이 꼭 필요한가요?</summary>
-    <p>혼자 맥에서만 쓸 때는 필요 없습니다. 아이폰과 이어 보려면, 그리고 공유 기능을 쓰려면 필요합니다.</p>
-  </details>
-
-  <details>
-    <summary>기존에 적어둔 할 일과 계획은 어떻게 되나요?</summary>
-    <p>그대로 유지됩니다. 예전에 고른 라벨은 새 착수 조건으로 자동으로 옮겨 읽고, 배정해둔 시간도 바뀌지 않습니다.</p>
-  </details>
-
-  <details>
-    <summary>창을 닫으면 앱이 꺼지나요?</summary>
-    <p>아니요. 창을 닫아도 앱은 남아 있고, 상단 메뉴의 윈도우에서 다시 열 수 있습니다. Dock 아이콘을 눌러도 됩니다.</p>
-  </details>
-
-  <details>
-    <summary>기다림으로 표시한 단계는 시간에 안 잡히나요?</summary>
-    <p>네. 기다리는 동안 시간이 흐르기는 하지만 내가 쓰는 시간은 아니라서, 그 일에 걸리는 시간 합계에 넣지 않습니다.</p>
-  </details>
+  <h2><span class="dot" style="background:var(--orange)"></span>아이폰과 이어집니다</h2>
+  <p>같은 iCloud 계정을 쓰면 할 일이 이 앱과 아이폰 앱 욕망의 무지개 사이를 오갑니다. 맥에서 짠 오늘 계획을 밖에서는 아이폰으로 확인하세요.</p>
 </section>
 
 <section>
-  <h2><span class="dot" style="background:var(--green)"></span>개인정보</h2>
-  <p class="lead">서버를 따로 두지 않습니다. 적은 내용은 기기와 본인의 iCloud에만 저장됩니다.</p>
-  <div class="note">
-    광고 식별자, 사용 분석, 위치 정보를 수집하지 않습니다. 회원가입도 없습니다.
-    자세한 내용은 <a href="privacy.html">개인정보 처리방침</a>에 있습니다.
-  </div>
-</section>
-
-<section>
-  <h2><span class="dot" style="background:var(--indigo)"></span>바뀐 것</h2>
-  <p class="lead">버전별로 무엇이 달라졌는지 적어둡니다.</p>
-  <p><a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">릴리즈 노트 보기</a></p>
+  <h2><span class="dot" style="background:var(--yellow)"></span>개인정보</h2>
+  <div class="note">계정도 회원가입도 없고, 계획을 담아 두는 개발자 서버도 없습니다. 적은 내용은 내 기기와 내 iCloud에만 있습니다. 앱을 고치기 위해 적은 내용이 들어가지 않는 익명 사용 통계를 보내며, 설정에서 끌 수 있습니다. 자세한 내용은 <a href="privacy.html">개인정보 처리방침</a>에 있습니다.</div>
 </section>
 
 <section>
   <div class="contact">
-    <h2 style="margin-bottom:6px">문의</h2>
-    <p class="lead" style="margin-bottom:0">쓰다가 막히거나 이상한 점이 있으면 알려주세요. 앱 안 설정에도 문의 항목이 있습니다.</p>
-    <a class="btn" href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>
+    <h2 style="margin-bottom:6px">도움이 필요하세요?</h2>
+    <p class="lead" style="margin-bottom:0">자주 묻는 질문과 문의 방법을 모아 두었습니다.</p>
+    <a class="btn" href="support.html">지원 페이지 보기</a>
   </div>
 </section>
 
@@ -201,8 +228,9 @@
 
 <footer>
   <div>2026 무지개 공방</div>
-  <div class="fam">무지개 공방 (macOS) · 욕망의 무지개 (iOS)</div>
-  <div class="fam"><a href="privacy.html">개인정보 처리방침</a></div>
+  <div class="fam">무지개 공방 (macOS) &middot; 욕망의 무지개 (iOS)</div>
+  <nav class="pages"><a href="index.html">소개</a> <a href="support.html">지원</a> <a href="privacy.html">개인정보 처리방침</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">릴리즈 노트</a></nav>
 </footer>
+
 </body>
 </html>
