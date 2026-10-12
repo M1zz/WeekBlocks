@@ -57,10 +57,14 @@ enum TodoSharing {
         item.originInstallID.isEmpty || item.originInstallID == installID
     }
 
-    /// **화면에 그릴 줄인가.** 감추는 것은 *남이 잠긴 채로 적어 둔 줄* 하나뿐이다.
-    /// 내 줄은 잠겨 있어도 내 화면에서는 그대로 보인다.
+    /// **화면에 그릴 줄인가 — 언제나 그린다.**
+    ///
+    /// 한때 '남이 잠긴 채로 적어 둔 줄'(`!isShared && !isMine`)을 감췄다. 동기화가 무료가 된 뒤에도
+    /// 그 커튼이 남아, 아이폰이 잠겨 있던 때 적은 줄은 맥에서 영영 안 보였다 — 두 앱이 서로
+    /// **둘 다 가진 것만** 보여 주는 꼴이었다. 이제 스토어에 내려온 것은 전부 그린다(합집합).
+    /// ⚠️ 아이폰의 같은 이름 함수도 같은 값을 돌려준다. 한쪽만 다시 거르면 또 어긋난다.
     static func isVisible(_ item: some SharedRecord) -> Bool {
-        item.isShared || isMine(item)
+        true
     }
 
     /// 새로 적는 줄에 지금 상태를 새긴다.
