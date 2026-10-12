@@ -200,7 +200,7 @@ struct RainbowEventEditor: View {
                 .font(.title2.bold())
 
             Form {
-                TextField("이름", text: $title)
+                TextField("제목", text: $title)
                 DatePicker("시작", selection: $start, displayedComponents: .date)
                 Toggle("끝없이 반복", isOn: $isInfinite)
                 if !isInfinite {

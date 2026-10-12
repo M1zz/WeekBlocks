@@ -15,7 +15,7 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 - [x] CloudSchemaPrimer 표본에 RainbowEvent (옵셔널 다섯 칸 + 지움 표 — 아이폰 다리가 진짜 일정으로 세우지 않게)
 - [ ] 🚢 **출시 전 반드시: CloudKit 콘솔 Development → Production 스키마 배포 (CD_RainbowEvent).**
       안 하면 Production 앱에서 미러링이 통째로 멈춘다. 디버그에서 스키마 표본 올리기 → 배포
-- [ ] 새 문구 번역 (진행 중)
+- [x] 새 문구 번역 (맥 19개 키 · 22개 언어)
 - [ ] 실기기: 아이폰에서 만든 무지개 일정이 맥 주간에 서는지 / 맥에서 고친 것이 아이폰에 오는지
 
 ## ▶ 데이터 금고 — 업데이트·동기화로 기록이 사라지지 않게 (2026-10-12, 빌드 성공 · 커밋 안 함 · 앱 실행 확인 안 함)
