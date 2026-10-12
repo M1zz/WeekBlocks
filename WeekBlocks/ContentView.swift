@@ -94,6 +94,8 @@ struct ContentView: View {
     @AppStorage("showsWeekSummary") private var showsWeekSummary = false
     /// 무지개(겹친 무지개 일정의 밀도)를 펼쳐 두었는가. 타이머 옆 단추로 여닫고, 상태를 기억한다.
     @AppStorage("showsRainbow") private var showsRainbow = false
+    /// 움직임 줄이기를 켠 사람에게는 펴지는 대신 나타나기만 한다.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// 마지막으로 보던 자리. 앱을 다시 켜도 하던 일을 이어서 한다.
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
@@ -177,14 +179,11 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 weekHeader
-                // 무지개는 날짜 줄 바로 아래로 **위에서 내려온다** (타이머 옆 단추 · ⌘3).
-                // 요약과 같은 결로 여닫고, 내려오는 동안 날짜 줄을 덮지 않게 자른다 (그림자는 남긴다).
+                // 무지개는 날짜 줄 바로 아래로 **위에서 펴져 내려온다** (툴바 타이머 옆 단추 · ⌘3).
+                // 윗변을 붙든 채 세로로 펴지고, 스프링이 살짝 지나쳤다 돌아와 쫀득하게 멎는다.
                 if showsRainbow {
                     rainbowSection
-                        .transition(.disclose)
-                        .padding(20)
-                        .clipped()
-                        .padding(-20)
+                        .transition(reduceMotion ? .opacity : .unroll)
                 }
                 // 지금 화면에서 다음에 할 일 하나. 흐름을 다 지나면 사라진다.
                 if let step = nextStep {
@@ -289,7 +288,7 @@ struct ContentView: View {
             //    돌아 돌아오는 사이에 애니메이션이 떨어져 나가서, 요약이 늘고 줄 때 아래 화면이 툭
             //    끊겨 올라왔다. 값 자체에 결을 건다 — 어디서 바꾸든(단추·다른 창·다음 실행) 같은 결로 움직인다.
             .animation(Motion.disclose, value: showsWeekSummary)
-            .animation(Motion.disclose, value: showsRainbow)
+            .animation(.panelSpring, value: showsRainbow)
             .animation(Motion.screen, value: weekLensRaw)
             .animation(Motion.screen, value: scopeRaw)
         }
@@ -317,6 +316,18 @@ struct ContentView: View {
                     Label("타이머", systemImage: "timer")
                 }
                 .help("지금 하는 일에 남은 시간 (⇧⌘R)")
+
+                // 무지개 — 누르면 날짜 줄 아래로 판이 위에서 펴져 내려온다 (→ rainbowSection).
+                // 일간의 판을 펼 때와 같은 스프링(.panelSpring)이라 한 앱의 손짓으로 읽힌다.
+                Button {
+                    Haptic.tick()
+                    withAnimation(.panelSpring) { showsRainbow.toggle() }
+                } label: {
+                    Label("무지개", systemImage: "rainbow")
+                        .symbolRenderingMode(showsRainbow ? .multicolor : .monochrome)
+                }
+                .keyboardShortcut("3", modifiers: .command)
+                .help("무지개")
 
                 Button {
                     showingReflection = true
@@ -708,7 +719,6 @@ struct ContentView: View {
                         // 위젯에도 같은 타임라인을 건넨다 — 바뀌었을 때만 (→ TimerWidgetBridge).
                         TimerWidgetBridge.publish(slots: slots, timer: taskTimer, focus: scheduleFocus)
                     }
-                    rainbowToggle
                 }
                 .animation(Motion.row, value: overdue.count)
             }
@@ -1176,26 +1186,6 @@ struct ContentView: View {
 
     /// 무지개 보기가 한 번에 보이는 주 수.
     private static let rainbowWeeks = 8
-
-    /// 타이머 오른쪽의 무지개 단추. 누르면 날짜 줄 바로 아래로 무지개가 내려온다.
-    private var rainbowToggle: some View {
-        Button {
-            withAnimation(Motion.disclose) { showsRainbow.toggle() }
-        } label: {
-            Image(systemName: "rainbow")
-                .symbolRenderingMode(.multicolor)
-                .font(.system(size: 15, weight: .semibold))
-                .frame(width: 30, height: 26)
-                .background {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color.primary.opacity(showsRainbow ? 0.12 : 0.05))
-                }
-        }
-        .buttonStyle(.plain)
-        .keyboardShortcut("3", modifiers: .command)
-        .help("무지개")
-        .accessibilityLabel(Text("무지개"))
-    }
 
     /// 날짜를 가로로, 겹친 무지개 일정을 줄로 (→ RainbowDensityView).
     private var rainbowSection: some View {

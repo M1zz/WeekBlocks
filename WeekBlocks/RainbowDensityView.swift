@@ -213,3 +213,26 @@ enum RainbowPacking {
         return result
     }
 }
+
+// MARK: - 펴져 내려오는 결
+
+/// 윗변을 붙든 채 세로로 펴진다. 가로는 살짝 좁았다가 넓어져 — 일간 판의 출렁임(→ ExpandablePanel)처럼
+/// 가로와 세로가 엇갈려 움직여야 '쫀득'하게 읽힌다. `.panelSpring`과 짝이다.
+private struct Unroll: ViewModifier {
+    let y: CGFloat
+    let x: CGFloat
+    let opacity: Double
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(x: x, y: y, anchor: .top)
+            .opacity(opacity)
+    }
+}
+
+extension AnyTransition {
+    static let unroll = AnyTransition.modifier(
+        active: Unroll(y: 0.02, x: 0.96, opacity: 0),
+        identity: Unroll(y: 1, x: 1, opacity: 1)
+    )
+}
