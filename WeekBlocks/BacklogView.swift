@@ -23,6 +23,17 @@ struct BacklogSection: View {
 
     @AppStorage("didSeedBacklogCategories") private var didSeedCategories = false
 
+    /// 아이폰에서 할 일에 정한 기한 (→ RainbowEvent.todoToken). 카드에 '~10월 20일'로 붙는다.
+    @Query private var rainbowEvents: [RainbowEvent]
+    private var deadlineByToken: [String: Date] {
+        var map: [String: Date] = [:]
+        for e in rainbowEvents where !e.isRemoved && !e.isInfinite {
+            guard let token = e.todoToken else { continue }
+            map[token] = min(map[token] ?? .distantFuture, e.endDate)
+        }
+        return map
+    }
+
     /// '요일에 올린 일'을 펼쳐 두었는가. **기본은 펼침** — 아이폰 할 일 목록은 요일에 올린 줄도
     /// 한 줄기로 다 보여 준다. 맥만 접어 두면 같은 할 일이 한쪽에서만 안 보인다(합집합).
     /// 접으면 그 뜻을 기억한다.
@@ -460,7 +471,7 @@ struct BacklogSection: View {
             tint: colors[item.dragToken] ?? .secondary,
             lane: tree.lane(of: item),
             isFragment: isFragmentCard(item, tree: tree),
-            planNote: planNote(for: item, in: placement),
+            planNote: notes(for: item, in: placement, deadlines: deadlineByToken),
             steps: stepsInfo(for: item, tree: tree),
             onAdvance: { advance(item) },
             onRewind: { rewind(item) },
@@ -748,6 +759,16 @@ struct BacklogSection: View {
     /// 그래서 카드만 보면 올렸는지 아닌지를 알 수 없다 — 이 표시가 그 자리를 메운다.
     /// 블록과 항목을 잇는 식별자가 스키마에 없어 **제목으로 맞춘다**(iOS도 같은 방식).
     /// 단계를 올린 블록은 "할 일 · 단계" 꼴이라 접두어까지 함께 본다.
+    /// 요일 표시와 기한을 한 줄로. 둘 다 없으면 nil.
+    private func notes(for item: BacklogItem, in placement: [String: [DayOfWeek]],
+                       deadlines: [String: Date]) -> String? {
+        let deadline = deadlines[item.dragToken].map {
+            String(localized: "~\($0.formatted(.dateTime.month().day()))")
+        }
+        let parts = [planNote(for: item, in: placement), deadline].compactMap { $0 }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
     private func planNote(for item: BacklogItem, in placement: [String: [DayOfWeek]]) -> String? {
         guard let days = placement[item.title],
               let first = days.min(by: { $0.rawValue < $1.rawValue }) else { return nil }

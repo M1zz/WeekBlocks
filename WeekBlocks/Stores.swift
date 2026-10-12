@@ -71,10 +71,11 @@ final class PlanStore {
     /// 이 앱이 iCloud로 오가는 전부. **한 스토어에 여섯 타입**이 함께 산다.
     /// ⚠️ `ProMark`는 일곱 번째 타입이다 — "한쪽에서 샀다"는 표 (→ ProMark.swift).
     /// ⚠️ `Project`는 여덟 번째 — 할 일을 끝이 있는 일로 묶는다 (→ BacklogCategory.swift).
+    /// ⚠️ `RainbowEvent`는 아홉 번째 — 아이폰 무지개 일정을 맥과 함께 쓰는 사본 (→ RainbowEvent.swift).
     ///    아이폰 스토어의 같은 목록과 **글자 하나까지 같아야 한다.**
     static let schema = Schema([Routine.self, PlanBlock.self, BacklogItem.self,
                                 RoutineOccurrence.self, BacklogCategory.self, QuotaPlacement.self,
-                                ProMark.self, Project.self])
+                                ProMark.self, Project.self, RainbowEvent.self])
 
     let container: ModelContainer
     var context: ModelContext { container.mainContext }

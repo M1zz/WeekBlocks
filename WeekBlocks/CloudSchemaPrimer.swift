@@ -26,7 +26,7 @@
 //     지금 채우는 것: BacklogItem·PlanBlock의 옵셔널 전부, 세 모델
 //     (BacklogItem·PlanBlock·Routine)의 함께 쓰기 칸(isShared·originInstallID),
 //     ProMark 타입 자체와 그 옵셔널(validUntil), Project 타입 자체와 그 옵셔널(completedAt),
-//     그리고 BacklogItem.projectID.
+//     BacklogItem.projectID, 그리고 RainbowEvent 타입 자체와 그 옵셔널 다섯 칸.
 //
 
 #if DEBUG
@@ -63,6 +63,17 @@ enum CloudSchemaPrimer {
         let project = Project(name: marker, colorName: "blue", sortIndex: 9_999)
         project.isCompleted = true
         project.completedAt = now
+
+        // 함께 쓰는 무지개 일정 (→ RainbowEvent.swift). 새 타입이라 타입부터 없다.
+        // 옵셔널 다섯 칸을 다 채운다. **'지움' 표도 찍는다** — 표본이 아이폰 다리(RainbowBridge)를
+        // 타고 진짜 일정으로 세워지면 안 되고, deletedAt 칸도 이렇게 해야 생긴다.
+        let rainbow = RainbowEvent(title: marker)
+        rainbow.selectedWeekdays = [2, 4]
+        rainbow.weeklyPattern = Array(repeating: true, count: 35)
+        rainbow.excludedDates = [now]
+        rainbow.todoToken = "schema-sample-todo"
+        rainbow.deletedAt = now
+        rainbow.originInstallID = "schema-sample-install"
 
         let item = BacklogItem(title: marker, durationHours: 1, sortIndex: 9_999,
                                categoryID: category.uuid, weekStartDate: week)
@@ -104,7 +115,7 @@ enum CloudSchemaPrimer {
         let mark = ProMark(platform: .current, productID: marker,
                            validUntil: Date(timeIntervalSince1970: 0))
 
-        for model in [category as any PersistentModel, project, item, block, routine, mark] {
+        for model in [category as any PersistentModel, project, item, block, routine, mark, rainbow] {
             context.insert(model)
         }
         do {
@@ -118,13 +129,13 @@ enum CloudSchemaPrimer {
 
         // ── 치운다. 스키마는 남는다. ────────────────────────────────────────
         var deleted = 0
-        for model in [category as any PersistentModel, project, item, block, routine, mark] {
+        for model in [category as any PersistentModel, project, item, block, routine, mark, rainbow] {
             context.delete(model)
             deleted += 1
         }
         try? context.save()
 
-        return Report(created: 6, deleted: deleted,
+        return Report(created: 7, deleted: deleted,
                       note: "표본을 올렸다 지웠습니다. 콘솔의 Development 스키마에 칸이 생겼는지 확인한 뒤 Production으로 배포하세요.")
     }
 }

@@ -21,6 +21,9 @@ struct ContentView: View {
     private var backlogItems: [BacklogItem]
     @Query private var allOccurrences: [RoutineOccurrence]
     @Query private var allQuotaPlacements: [QuotaPlacement]
+    /// 아이폰 무지개 일정의 함께 쓰는 사본 (→ RainbowEvent.swift). 지운 표가 찍힌 것은 안 보인다.
+    @Query(sort: [SortDescriptor(\RainbowEvent.startDate)]) private var rainbowEventsRaw: [RainbowEvent]
+    private var rainbowEvents: [RainbowEvent] { rainbowEventsRaw.filter { !$0.isRemoved } }
 
     /// 보고 있는 주. **그 주의 월요일**로 부른다 — 일요일 시작이어도 (→ WeekStartSetting).
     @State private var selectedWeek: Date = Date().shownWeekStart(sundayFirst: WeekStartSetting.sundayFirst)
@@ -42,6 +45,8 @@ struct ContentView: View {
     /// 캘린더 일정과 겹치는 계획을 짝지어 고르는 창 (→ CalendarMergeSheet).
     @State private var mergePairs: [CalendarMerge.Pair]?
     @State private var blockSheet: BlockSheetContext?
+    /// 무지개 일정 고치기·더하기 창 (→ RainbowLane.swift).
+    @State private var rainbowSheet: RainbowEditContext?
     @State private var routineSheet: RoutineSheetContext?
     @State private var routineDetailSheet: RoutineDetailContext?
     @State private var showingReflection = false
@@ -340,6 +345,14 @@ struct ContentView: View {
                     } label: {
                         Label("루틴 추가", systemImage: "plus")
                     }
+                    // 아이폰 '욕망의 무지개'와 함께 쓰는 일정 (→ RainbowLane.swift).
+                    Button {
+                        let today = Calendar.current.startOfDay(for: Date())
+                        let weekStart = Calendar.current.startOfDay(for: selectedWeek)
+                        rainbowSheet = RainbowEditContext(event: nil, defaultStart: max(today, weekStart))
+                    } label: {
+                        Label("무지개 일정 추가", systemImage: "rainbow")
+                    }
                     Button {
                         showingSampleAlert = true
                     } label: {
@@ -386,6 +399,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: Binding(get: { mergePairs != nil }, set: { if !$0 { mergePairs = nil } })) {
             CalendarMergeSheet(pairs: mergePairs ?? [])
+        }
+        .sheet(item: $rainbowSheet) { ctx in
+            RainbowEventEditor(event: ctx.event, defaultStart: ctx.defaultStart) { rainbowSheet = nil }
         }
         .sheet(item: $blockSheet) { ctx in
             BlockEditorView(
@@ -1505,6 +1521,14 @@ struct ContentView: View {
         return VStack(alignment: .leading, spacing: 8) {
             HourAxis(window: window, showsRainbow: true)
 
+            // 무지개 일정은 시각이 없다 — 시간 자 위가 아니라 요일별 목록으로 선다.
+            if !rainbowEvents.isEmpty {
+                RainbowDayList(events: rainbowEvents,
+                               days: shownDays.map { (day: $0, date: dayDate($0)) }) { event in
+                    rainbowSheet = RainbowEditContext(event: event)
+                }
+            }
+
             VStack(spacing: 4) {
                 ForEach(shownDays) { day in
                     DayTimelineRow(
@@ -1577,6 +1601,15 @@ struct ContentView: View {
                                dates: shownDays.map { Calendar.current.startOfDay(for: dayDate($0)) },
                                spacing: 10) { block in
                         blockSheet = BlockSheetContext(day: block.day, block: block)
+                    }
+                    .transition(.disclose)
+                }
+                // 아이폰 무지개 일정 — 기간 동안 하루 몇 시간씩. 하는 날이 진하다.
+                if !rainbowEvents.isEmpty {
+                    RainbowLane(events: rainbowEvents,
+                                dates: shownDays.map { Calendar.current.startOfDay(for: dayDate($0)) },
+                                spacing: 10) { event in
+                        rainbowSheet = RainbowEditContext(event: event)
                     }
                     .transition(.disclose)
                 }

@@ -167,6 +167,8 @@ enum DataVault {
         var routines: [RoutineRow]
         var occurrences: [OccurrenceRow]
         var placements: [PlacementRow]
+        /// 함께 쓰는 무지개 일정 (→ RainbowEvent.swift). 옛 백업에는 없어서 옵셔널이다.
+        var rainbowEvents: [RainbowRow]? = nil
 
         var isEmpty: Bool {
             items.isEmpty && projects.isEmpty && blocks.isEmpty && routines.isEmpty && categories.isEmpty
@@ -191,7 +193,8 @@ enum DataVault {
                         blocks: all(PlanBlock.self).map(BlockRow.init),
                         routines: all(Routine.self).map(RoutineRow.init),
                         occurrences: all(RoutineOccurrence.self).map(OccurrenceRow.init),
-                        placements: all(QuotaPlacement.self).map(PlacementRow.init))
+                        placements: all(QuotaPlacement.self).map(PlacementRow.init),
+                        rainbowEvents: all(RainbowEvent.self).map(RainbowRow.init))
     }
 
     /// 지금 스토어를 한 벌 떠서 **새 파일**로 남긴다. 지난번과 내용이 같으면(자동 저장일 때) 건너뛴다.
@@ -349,9 +352,12 @@ enum DataVault {
         var routines: [RoutineRow] = []
         var occurrences: [OccurrenceRow] = []
         var placements: [PlacementRow] = []
+        var rainbowEvents: [RainbowRow] = []
 
         /// 사람에게 말할 만한 것의 수. 요일 배치(occurrence·placement)는 루틴이 있으면 저절로 다시 선다.
-        var total: Int { items.count + projects.count + blocks.count + routines.count + categories.count }
+        var total: Int {
+            items.count + projects.count + blocks.count + routines.count + categories.count + rainbowEvents.count
+        }
         var isEmpty: Bool { total == 0 && occurrences.isEmpty && placements.isEmpty }
     }
 
@@ -384,6 +390,11 @@ enum DataVault {
         m.occurrences = base.occurrences.filter { !occKeys.contains($0.key) }
         let placeKeys = Set(now.placements.map(\.key))
         m.placements = base.placements.filter { !placeKeys.contains($0.key) }
+
+        // 무지개 일정은 uuid로 본다. 지금 '지움' 표가 찍혀 있으면 사람이 지운 것이라 없어진 것으로 치지 않는다
+        // (행이 남아 있으니 uuid가 있다). 기준 벌에서 이미 지운 것도 셈에서 뺀다.
+        let rainbowIDs = Set((now.rainbowEvents ?? []).map(\.uuid))
+        m.rainbowEvents = (base.rainbowEvents ?? []).filter { $0.deletedAt == nil && !rainbowIDs.contains($0.uuid) }
         return m
     }
 
@@ -402,6 +413,7 @@ enum DataVault {
         for r in m.blocks { context.insert(r.model()) }
         for r in m.occurrences { context.insert(r.model()) }
         for r in m.placements { context.insert(r.model()) }
+        for r in m.rainbowEvents { context.insert(r.model()) }
         do {
             try context.save()
         } catch {
@@ -632,6 +644,44 @@ enum DataVault {
             let m = QuotaPlacement(routineName: routineName, day: .mon, weekStartDate: weekStartDate,
                                    sessionIndex: sessionIndex, startHour: startHour)
             m.dayRaw = dayRaw; m.hidden = hidden
+            return m
+        }
+    }
+
+    struct RainbowRow: Codable {
+        var uuid: String
+        var title: String
+        var startDate: Date
+        var endDate: Date
+        var colorHex: String
+        var hoursPerDay: Double
+        var selectedWeekdaysData: Data?
+        var weeklyPatternData: Data?
+        var importanceRaw: String
+        var isInfinite: Bool
+        var excludedDatesData: Data?
+        var todoToken: String?
+        var createdAt: Date
+        var updatedAt: Date
+        var deletedAt: Date?
+        var originInstallID: String
+
+        init(_ m: RainbowEvent) {
+            uuid = m.uuid; title = m.title; startDate = m.startDate; endDate = m.endDate
+            colorHex = m.colorHex; hoursPerDay = m.hoursPerDay
+            selectedWeekdaysData = m.selectedWeekdaysData; weeklyPatternData = m.weeklyPatternData
+            importanceRaw = m.importanceRaw; isInfinite = m.isInfinite; excludedDatesData = m.excludedDatesData
+            todoToken = m.todoToken; createdAt = m.createdAt; updatedAt = m.updatedAt
+            deletedAt = m.deletedAt; originInstallID = m.originInstallID
+        }
+
+        func model() -> RainbowEvent {
+            let m = RainbowEvent(uuid: uuid, title: title)
+            m.startDate = startDate; m.endDate = endDate; m.colorHex = colorHex; m.hoursPerDay = hoursPerDay
+            m.selectedWeekdaysData = selectedWeekdaysData; m.weeklyPatternData = weeklyPatternData
+            m.importanceRaw = importanceRaw; m.isInfinite = isInfinite; m.excludedDatesData = excludedDatesData
+            m.todoToken = todoToken; m.createdAt = createdAt; m.updatedAt = Date()
+            m.deletedAt = deletedAt; m.originInstallID = originInstallID
             return m
         }
     }
