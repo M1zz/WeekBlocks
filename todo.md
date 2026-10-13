@@ -362,8 +362,8 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
             → 설정 ▸ 타이머 ▸ '걸린 시간 재기'(기본 꺼짐)를 켠 사람만 타이머가 일정을 따르지 않고 끝까지 세어
               `PlanBlock.actualMinutes`에 쌓는다 (→ ActualTime.swift). 끈 사람은 회고 결과로 '해낸 시간'을 셈한다.
               회고 추세(Pro)에 '계획 대비 실제' 카드, 페이월 첫 줄.
-      - [ ] ⚠️ `PlanBlock.actualMinutes`는 CloudKit 스키마가 늘어나는 칸 — 아이폰 PlanBlock에도 넣었다.
-            이 판을 출시하기 전 디버그 빌드에서 CloudSchemaPrimer를 돌리고 Development → Production 배포 (사람)
+      - [x] ⚠️ `PlanBlock.actualMinutes`는 CloudKit 스키마가 늘어나는 칸 — 아이폰 PlanBlock에도 넣었다.
+            콘솔에서 Development `CD_PlanBlock`에 `CD_actualMinutes`(Double)를 직접 더하고 Production 배포 (2026-10-13, 사람이 함)
       - [ ] 주 템플릿 — 잘 된 주를 이름 붙여 저장하고 한 번에 깔기 (다른 주 가져오기를 넓힌 것)
       - [ ] 회고 추세 무제한 · 월간/분기 리포트 · 미루는 일 패턴
       - [ ] 무지개 26주 장기 밀도, 빽빽한 주 미리 경고 (8주는 무료 그대로)
