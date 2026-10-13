@@ -11,16 +11,61 @@
 //  · 하는 날은 진하게, 기간 안이지만 쉬는 날(요일 · 패턴 · 뺀 날)은 옅게 — 아이폰과 같다.
 //  · 줄은 일곱 개(무지개 일곱 빛). 그보다 많이 겹치면 맨 아래에 "+N"으로 센다.
 //  · 일정 색은 그 일정의 색이 아니라 **줄의 색**이다. 아이폰도 줄로 칠한다 — 색이 곧 밀도의 눈금이다.
+//  · 무지개 일정만이 아니라 **계획 블록도 하루짜리 한 줄로** 선다 (→ RainbowDensityItem). 아이폰 무지개가
+//    맥 계획(캘린더에서 가져온 회의 포함)을 함께 세우기 때문이다. 무지개 일정만 넣었더니 아이폰은 빽빽한데
+//    맥 판은 텅 비었다. 루틴 이름의 블록 · 배경 종일은 요일 아래 점처럼 세지 않는다 (→ PlanBlock.isTodo).
 //
 
 import SwiftUI
 
+/// 무지개 판의 한 줄 — 여러 날에 걸친 무지개 일정이거나, 하루짜리 계획 블록.
+enum RainbowDensityItem {
+    case event(RainbowEvent)
+    /// 블록과 그 블록이 선 날(0시).
+    case block(PlanBlock, date: Date)
+
+    init(_ block: PlanBlock) {
+        let date = Calendar(identifier: .iso8601)
+            .date(byAdding: .day, value: block.day.rawValue, to: block.weekStartDate) ?? block.weekStartDate
+        self = .block(block, date: Calendar.current.startOfDay(for: date))
+    }
+
+    /// 어느 기기에서 그려도 같은 줄이 나오게 하는 마지막 열쇠.
+    var key: String {
+        switch self {
+        case .event(let e): e.uuid
+        case .block(let b, _): b.dragToken
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .event(let e): e.title
+        case .block(let b, _): b.title
+        }
+    }
+
+    func spans(_ day: Date) -> Bool {
+        switch self {
+        case .event(let e): e.spans(day)
+        case .block(_, let date): Calendar.current.isDate(date, inSameDayAs: day)
+        }
+    }
+
+    func occurs(on day: Date) -> Bool {
+        switch self {
+        case .event(let e): e.occurs(on: day)
+        case .block(_, let date): Calendar.current.isDate(date, inSameDayAs: day)
+        }
+    }
+}
+
 struct RainbowDensityView: View {
-    let events: [RainbowEvent]
+    let events: [RainbowDensityItem]
     /// 보여 줄 첫날 (그 주의 첫날).
     let start: Date
     let weeks: Int
-    let onOpen: (RainbowEvent) -> Void
+    let onOpen: (RainbowDensityItem) -> Void
     let onAdd: (Date) -> Void
 
     private static let laneCount = 7
@@ -93,7 +138,7 @@ struct RainbowDensityView: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture(count: 2) { onAdd(day) }
-                .help("두 번 눌러 이날부터 무지개 일정 추가")
+                .help("두 번 눌러 이날부터 장기 플랜 추가")
             }
         }
     }
@@ -103,21 +148,21 @@ struct RainbowDensityView: View {
     private func laneRow(_ lane: Int, days: [Date], packed: RainbowPacking.Result) -> some View {
         let color = Color(hex: Rainbow.spectrum[lane].hex) ?? .accentColor
         return HStack(spacing: Self.gap) {
-            ForEach(days, id: \.self) { day in
+            ForEach(Array(days.enumerated()), id: \.offset) { i, day in
                 let event = packed.event(lane: lane, on: day)
                 let state = event.map { $0.occurs(on: day) ? 2 : ($0.spans(day) ? 1 : 0) } ?? 0
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                // 기간이 이어진 일정은 칸 사이 틈까지 메워 한 막대로 선다. 둥근 모서리는 처음과 끝에만.
+                let joinsPrev = i > 0 && packed.joins(lane: lane, i - 1, i)
+                let joinsNext = i + 1 < days.count && packed.joins(lane: lane, i, i + 1)
+                let r: CGFloat = 5
+                UnevenRoundedRectangle(topLeadingRadius: joinsPrev ? 0 : r,
+                                       bottomLeadingRadius: joinsPrev ? 0 : r,
+                                       bottomTrailingRadius: joinsNext ? 0 : r,
+                                       topTrailingRadius: joinsNext ? 0 : r,
+                                       style: .continuous)
                     .fill(state == 2 ? color : (state == 1 ? color.opacity(0.28) : Color.primary.opacity(0.045)))
-                    .frame(width: Self.cellWidth, height: Self.cellHeight)
-                    .overlay {
-                        // 그 줄에서 이 일정이 보이기 시작하는 칸에만 제목 첫 글자 — 칸이 좁아 긴 글은 말풍선(help)으로.
-                        // (보는 기간보다 먼저 시작한 일정도 첫 칸에 이름이 선다)
-                        if let event, state > 0, packed.startsHere(lane: lane, on: day) {
-                            Text(event.title.prefix(1))
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(state == 2 ? Color.white : color)
-                        }
-                    }
+                    .frame(width: Self.cellWidth + (joinsNext ? Self.gap : 0), height: Self.cellHeight)
+                    .frame(width: Self.cellWidth, alignment: .leading)
                     .contentShape(Rectangle())
                     .onTapGesture { if let event { onOpen(event) } }
                     .help(event?.title ?? "")
@@ -165,19 +210,21 @@ struct RainbowDensityView: View {
 enum RainbowPacking {
     struct Result {
         /// 줄 → 그 줄의 일정과 차지한 날(보는 기간 안의 첫날 · 끝날 번호).
-        var lanes: [[(event: RainbowEvent, from: Int, to: Int)]]
+        var lanes: [[(event: RainbowDensityItem, from: Int, to: Int)]]
         var days: [Date]
         /// 줄에 못 들어간 일정.
-        var overflowed: [(event: RainbowEvent, from: Int, to: Int)]
+        var overflowed: [(event: RainbowDensityItem, from: Int, to: Int)]
 
-        func event(lane: Int, on day: Date) -> RainbowEvent? {
+        func event(lane: Int, on day: Date) -> RainbowDensityItem? {
             guard lane < lanes.count, let i = days.firstIndex(of: day) else { return nil }
             return lanes[lane].first { $0.from <= i && i <= $0.to }?.event
         }
 
-        func startsHere(lane: Int, on day: Date) -> Bool {
-            guard lane < lanes.count, let i = days.firstIndex(of: day) else { return false }
-            return lanes[lane].contains { $0.from == i }
+        /// 이웃한 두 날(번호)이 이 줄에서 같은 일정의 기간으로 이어지는가. 손으로 뺀 날에서는 끊긴다.
+        func joins(lane: Int, _ a: Int, _ b: Int) -> Bool {
+            guard lane < lanes.count, a >= 0, b < days.count else { return false }
+            guard let entry = lanes[lane].first(where: { $0.from <= a && b <= $0.to }) else { return false }
+            return entry.event.spans(days[a]) && entry.event.spans(days[b])
         }
 
         func overflow(on day: Date) -> Int {
@@ -186,9 +233,9 @@ enum RainbowPacking {
         }
     }
 
-    static func pack(_ events: [RainbowEvent], days: [Date], lanes: Int) -> Result {
+    static func pack(_ events: [RainbowDensityItem], days: [Date], lanes: Int) -> Result {
         // 보는 기간 안에서 차지하는 칸 (기간 안인 첫날 ~ 마지막 날).
-        let spans: [(RainbowEvent, Int, Int)] = events.compactMap { e in
+        let spans: [(RainbowDensityItem, Int, Int)] = events.compactMap { e in
             let hits = days.indices.filter { e.spans(days[$0]) }
             guard let a = hits.first, let b = hits.last else { return nil }
             return (e, a, b)
@@ -197,7 +244,7 @@ enum RainbowPacking {
             // 먼저 시작한 것 → 긴 것 → 만든 차례. 어느 기기에서 그려도 같은 줄이 나오게 uuid로 끝낸다.
             if l.1 != r.1 { return l.1 < r.1 }
             if (l.2 - l.1) != (r.2 - r.1) { return (l.2 - l.1) > (r.2 - r.1) }
-            return l.0.uuid < r.0.uuid
+            return l.0.key < r.0.key
         }
 
         var result = Result(lanes: Array(repeating: [], count: lanes), days: days, overflowed: [])

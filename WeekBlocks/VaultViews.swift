@@ -61,7 +61,7 @@ struct VaultRecoverySheet: View {
                         group("계획 블록", m.blocks.map(\.title))
                         group("루틴", m.routines.map(\.name))
                         group("분류", m.categories.map(\.name))
-                        group("무지개 일정", m.rainbowEvents.map(\.title))
+                        group("장기 플랜", m.rainbowEvents.map(\.title))
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

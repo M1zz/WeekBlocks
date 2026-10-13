@@ -660,6 +660,9 @@ enum DataVault {
         var hoursPerDay: Double
         var selectedWeekdaysData: Data?
         var weeklyPatternData: Data?
+        /// 옛 백업에는 없어서 옵셔널이다 (없으면 매주).
+        var repeatWeeks: Int?
+        var sessionsData: Data?
         var importanceRaw: String
         var isInfinite: Bool
         var excludedDatesData: Data?
@@ -673,6 +676,7 @@ enum DataVault {
             uuid = m.uuid; title = m.title; startDate = m.startDate; endDate = m.endDate
             colorHex = m.colorHex; hoursPerDay = m.hoursPerDay
             selectedWeekdaysData = m.selectedWeekdaysData; weeklyPatternData = m.weeklyPatternData
+            repeatWeeks = m.repeatWeeks; sessionsData = m.sessionsData
             importanceRaw = m.importanceRaw; isInfinite = m.isInfinite; excludedDatesData = m.excludedDatesData
             todoToken = m.todoToken; createdAt = m.createdAt; updatedAt = m.updatedAt
             deletedAt = m.deletedAt; originInstallID = m.originInstallID
@@ -682,6 +686,7 @@ enum DataVault {
             let m = RainbowEvent(uuid: uuid, title: title)
             m.startDate = startDate; m.endDate = endDate; m.colorHex = colorHex; m.hoursPerDay = hoursPerDay
             m.selectedWeekdaysData = selectedWeekdaysData; m.weeklyPatternData = weeklyPatternData
+            m.repeatWeeks = repeatWeeks ?? 1; m.sessionsData = sessionsData
             m.importanceRaw = importanceRaw; m.isInfinite = isInfinite; m.excludedDatesData = excludedDatesData
             m.todoToken = todoToken; m.createdAt = createdAt; m.updatedAt = Date()
             m.deletedAt = deletedAt; m.originInstallID = originInstallID

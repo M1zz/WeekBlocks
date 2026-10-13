@@ -17,13 +17,16 @@ struct BacklogSection: View {
     /// 주간 화면에서는 끈다 — 거기서 할 일은 **요일 칸으로 끌어다 놓을 카드**일 뿐이라
     /// 거르는 도구가 앞에 서면 계획을 짜는 손을 방해한다. 거르는 일은 할 일 창에서 한다.
     var showsCategoryFilter: Bool = true
+    /// 머리글 아래 목록을 판 안에서 스크롤한다. 일간처럼 판의 키가 바깥(타임라인)에서 정해질 때 켠다 —
+    /// 할 일이 늘어도 판이 길어지지 않고, 옆 타임라인 아래가 하얗게 비지 않는다.
+    var scrollsContent: Bool = false
 
     @Query(sort: [SortDescriptor(\BacklogCategory.sortIndex), SortDescriptor(\BacklogCategory.createdAt)])
     private var categories: [BacklogCategory]
 
     @AppStorage("didSeedBacklogCategories") private var didSeedCategories = false
 
-    /// 아이폰에서 할 일에 정한 기한 (→ RainbowEvent.todoToken). 카드에 '~10월 20일'로 붙는다.
+    /// 할 일에 정한 기한 (→ RainbowEvent.todoToken · TodoPeriod). 아이폰에서 정한 것도 같다. 카드에 '~10월 20일'로 붙는다.
     @Query private var rainbowEvents: [RainbowEvent]
     private var deadlineByToken: [String: Date] {
         var map: [String: Date] = [:]
@@ -75,6 +78,9 @@ struct BacklogSection: View {
     /// 빈 칸이 열려 있는가.
     @State private var isAdding = false
     @State private var newTitle = ""
+    /// 적는 중인 할 일의 기간 (시작 ~ 마감). 담을 때 이어진 장기 플랜으로 선다 (→ TodoPeriod).
+    @State private var draftPeriod: ClosedRange<Date>?
+    @State private var showingDraftPeriod = false
     @FocusState private var addFocused: Bool
     /// 단계(뎁스)를 들여다보는 시트.
     @State private var stepsSheetItem: BacklogItem?
@@ -305,6 +311,7 @@ struct BacklogSection: View {
                 .fixedSize()
             }
 
+            scrollingIfNeeded {
             // 분류 버튼 줄은 거를 자리가 있을 때만 선다 (할 일 창).
             // 주간 화면에서는 아예 나타나지 않아 한 줄을 통째로 아낀다.
             if canPlan, showsCategoryFilter {
@@ -408,6 +415,7 @@ struct BacklogSection: View {
                 placedSection
                     .transition(.disclose)
             }
+            }
         }
         // **요일에서 끌어 내리면 다시 '아직 안 정한 일'이 된다.**
         //
@@ -459,6 +467,23 @@ struct BacklogSection: View {
         // 끝냈거나 지운 프로젝트를 거르고 있었으면 거르기를 푼다 — 칩도 없는데 목록만 비면 헤맨다.
         .onChange(of: openProjects.map(\.uuid)) { _, ids in
             if let f = filterProjectID, !ids.contains(f) { filterProjectID = nil }
+        }
+    }
+
+    /// 머리글 아래 몫 — `scrollsContent`면 판 안에서 스크롤한다.
+    /// 끌어 놓을 때 켜지는 테두리(카드 · 묶음 바깥 -6)가 스크롤 가장자리에 잘리지 않게 안쪽에 여백을 두고 바깥에서 되돌린다.
+    @ViewBuilder
+    private func scrollingIfNeeded<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        if scrollsContent {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 10) { content() }
+                    .padding(8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(-8)
+            .frame(maxHeight: .infinity, alignment: .top)
+        } else {
+            VStack(alignment: .leading, spacing: 10) { content() }
         }
     }
 
@@ -802,6 +827,25 @@ struct BacklogSection: View {
                 .onExitCommand { endAdding() }
                 .padding(.top, 6)
 
+            // 기간 — 시작부터 마감까지 무지개에 옅은 줄이 이어지고, 카드에 '~마감'이 붙는다.
+            Button {
+                showingDraftPeriod = true
+            } label: {
+                if let period = draftPeriod {
+                    Text("~\(period.upperBound.formatted(.dateTime.month().day()))")
+                        .font(.body)
+                        .foregroundStyle(draftTint)
+                } else {
+                    Image(systemName: "calendar").font(.body)
+                }
+            }
+            .buttonStyle(.squish)
+            .foregroundStyle(.secondary)
+            .help("기간 정하기")
+            .popover(isPresented: $showingDraftPeriod, arrowEdge: .bottom) {
+                TodoPeriodPicker(period: $draftPeriod) { showingDraftPeriod = false }
+            }
+
             Button(action: endAdding) {
                 Image(systemName: "xmark").font(.system(size: 11))
             }
@@ -821,7 +865,11 @@ struct BacklogSection: View {
         )
         // 다른 데를 누르면 적던 것이 그대로 담긴다. 빈 칸이면 조용히 사라진다.
         .onChange(of: addFocused) { _, focused in
-            if !focused { commitDraft(keepOpen: false) }
+            // 기간을 고르러 간 사이에는 담지 않는다 — 고르고 돌아와 이어 적는다.
+            if !focused && !showingDraftPeriod { commitDraft(keepOpen: false) }
+        }
+        .onChange(of: showingDraftPeriod) { _, showing in
+            if !showing { addFocused = true }
         }
         .transition(.card)
     }
@@ -874,6 +922,7 @@ struct BacklogSection: View {
 
     private func endAdding() {
         newTitle = ""
+        draftPeriod = nil
         addFocused = false
         withAnimation(Motion.card) { isAdding = false }
     }
@@ -899,10 +948,14 @@ struct BacklogSection: View {
         TodoSharing.stamp(item)
         withAnimation(Motion.card) {
             context.insert(item)
+            if let period = draftPeriod {
+                TodoPeriod.draw(for: item, period: period, context: context)
+            }
             try? context.save()
         }
         Telemetry.record(.todoAdded)
         newTitle = ""
+        draftPeriod = nil
         if keepOpen {
             addFocused = true          // 손이 키보드를 떠나지 않게 둔다
         } else {

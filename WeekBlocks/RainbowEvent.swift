@@ -38,6 +38,13 @@ final class RainbowEvent {
     var selectedWeekdaysData: Data? = nil
     /// 5주 × 7일 = 35칸 `[Bool]` JSON. 있으면 요일보다 먼저 본다.
     var weeklyPatternData: Data? = nil
+    /// **몇 주마다 하는가** — 1 = 매주, 2 = 격주. 시작일부터 7일씩 세어 그 주에만 요일이 선다.
+    /// 35일 패턴은 5주마다 처음으로 돌아가 격주가 어긋난다 (1·3·5주 다음이 또 1주). 그래서 따로 둔다.
+    /// 패턴이 있으면 보지 않는다. 기간(옅은 줄)은 그대로 이어지고 하는 날만 성기게 진해진다.
+    var repeatWeeks: Int = 1
+    /// 회차 `[RainbowSession]` JSON. 있으면 **이 날들만** 하는 날이다 — 요일 · 반복 · 패턴보다 먼저 본다.
+    /// 자격증 과정처럼 회차마다 시간과 내용이 다른 일. 기간(옅은 줄)은 첫 회차부터 마지막 회차까지.
+    var sessionsData: Data? = nil
     /// "high" · "medium" · "low".
     var importanceRaw: String = "medium"
     var isInfinite: Bool = false
@@ -58,6 +65,15 @@ final class RainbowEvent {
         self.title = title
     }
 
+    /// '매주' · '격주' · 'N주마다' — 두 앱의 편집기와 정보 줄이 같은 말을 쓴다.
+    static func repeatLabel(_ weeks: Int) -> String {
+        switch weeks {
+        case ...1: String(localized: "매주")
+        case 2: String(localized: "격주")
+        default: String(localized: "\(weeks)주마다")
+        }
+    }
+
     /// 사람이 지운 표가 있다. (`isDeleted`는 SwiftData가 쓰는 이름이라 피한다.)
     var isRemoved: Bool { deletedAt != nil }
 
@@ -75,6 +91,24 @@ final class RainbowEvent {
         set {
             weeklyPatternData = (newValue?.count == 35) ? newValue.flatMap { try? JSONEncoder().encode($0) } : nil
         }
+    }
+
+    /// 회차들, 날짜 차례로. 비어 있으면 회차 없는 일정이다.
+    var sessions: [RainbowSession] {
+        get { RainbowSession.decode(sessionsData) }
+        set { sessionsData = RainbowSession.encode(newValue) }
+    }
+
+    /// 이날의 회차.
+    func session(on date: Date) -> RainbowSession? {
+        let d = Calendar.current.startOfDay(for: date)
+        return sessions.first { Self.day($0.date) == d }
+    }
+
+    /// 이 블록이 이 일정의 회차를 옮겨 적은 것인가 — 회차 날에 선, 일정 이름으로 시작하는 블록.
+    /// 무지개는 둘 중 하나만 센다 (같은 일이 두 칸이 되지 않게).
+    func carriesSession(blockTitle: String, on date: Date) -> Bool {
+        sessionsData != nil && blockTitle.hasPrefix(title) && session(on: date) != nil
     }
 
     var excludedDates: Set<Date> {
@@ -110,19 +144,75 @@ final class RainbowEvent {
         return !excludedDates.contains(d)
     }
 
-    /// 이날 실제로 하는가 — 35일 패턴 → 요일 → 뺀 날 차례 (아이폰 `Event.occursOn`과 같다).
+    /// 이날 실제로 하는가 — 35일 패턴(없으면 요일 · N주마다) → 뺀 날 차례 (아이폰 `Event.occursOn`과 같다).
     func occurs(on date: Date) -> Bool {
         let cal = Calendar.current
         let d = cal.startOfDay(for: date)
         let first = Self.day(startDate)
         guard d >= first, d <= Self.day(effectiveEndDate) else { return false }
+        if sessionsData != nil, !sessions.isEmpty {
+            return session(on: d) != nil && !excludedDates.contains(d)
+        }
         if let pattern = weeklyPattern {
             let since = cal.dateComponents([.day], from: first, to: d).day ?? 0
             let i = since % 35
             if i >= 0, i < 35, !pattern[i] { return false }
-        } else if let days = selectedWeekdays, !days.isEmpty {
-            if !days.contains(cal.component(.weekday, from: d)) { return false }
+        } else {
+            if let days = selectedWeekdays, !days.isEmpty, !days.contains(cal.component(.weekday, from: d)) {
+                return false
+            }
+            if repeatWeeks > 1 {
+                let since = cal.dateComponents([.day], from: first, to: d).day ?? 0
+                if (since / 7) % repeatWeeks != 0 { return false }
+            }
         }
         return !excludedDates.contains(d)
+    }
+}
+
+/// **장기 플랜의 한 회차** — 그날 · 몇 시간 · 이름 · 메모. 두 앱이 같은 꼴로 읽고 쓴다.
+///
+/// ⚠️ 칸을 늘릴 때는 옵셔널처럼 읽는다(`decodeIfPresent`). 옛 버전이 쓴 JSON에는 새 칸이 없다.
+struct RainbowSession: Codable, Hashable, Identifiable {
+    var id: String = UUID().uuidString
+    /// 그날 0시 (적은 기기의). 읽을 때는 `RainbowEvent.day`로 이 기기의 그날에 맞춘다.
+    var date: Date
+    var hours: Double = 1
+    /// "1세션"처럼 회차의 이름. 비면 "N회차".
+    var title: String = ""
+    var note: String = ""
+    /// 맥이 이 회차를 계획 블록으로 옮겨 적었다. 다시 만들지 않는다 — 블록을 지웠으면 지운 뜻이다.
+    var blockMade: Bool = false
+
+    init(date: Date, hours: Double = 1, title: String = "", note: String = "") {
+        self.date = date
+        self.hours = hours
+        self.title = title
+        self.note = note
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        date = try c.decode(Date.self, forKey: .date)
+        hours = try c.decodeIfPresent(Double.self, forKey: .hours) ?? 1
+        title = try c.decodeIfPresent(String.self, forKey: .title) ?? ""
+        note = try c.decodeIfPresent(String.self, forKey: .note) ?? ""
+        blockMade = try c.decodeIfPresent(Bool.self, forKey: .blockMade) ?? false
+    }
+
+    /// 이름이 비었으면 "N회차" (N은 1부터).
+    func displayTitle(index: Int) -> String {
+        let t = title.trimmingCharacters(in: .whitespaces)
+        return t.isEmpty ? String(localized: "\(index + 1)회차") : t
+    }
+
+    static func decode(_ data: Data?) -> [RainbowSession] {
+        guard let data, let list = try? JSONDecoder().decode([RainbowSession].self, from: data) else { return [] }
+        return list.sorted { $0.date < $1.date }
+    }
+
+    static func encode(_ list: [RainbowSession]) -> Data? {
+        list.isEmpty ? nil : try? JSONEncoder().encode(list.sorted { $0.date < $1.date })
     }
 }

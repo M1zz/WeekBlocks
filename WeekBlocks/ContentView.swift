@@ -377,7 +377,7 @@ struct ContentView: View {
                         let weekStart = Calendar.current.startOfDay(for: selectedWeek)
                         rainbowSheet = RainbowEditContext(event: nil, defaultStart: max(today, weekStart))
                     } label: {
-                        Label("무지개 일정 추가", systemImage: "rainbow")
+                        Label("장기 플랜 추가", systemImage: "rainbow")
                     }
                     // 무지개 일정은 요일 아래 점(칸)으로만 선다 — 고칠 것은 여기서 고른다.
                     let weekRainbow = rainbowEvents.filter { e in shownDays.contains { e.spans(dayDate($0)) } }
@@ -389,7 +389,7 @@ struct ContentView: View {
                                 }
                             }
                         } label: {
-                            Label("이 주의 무지개 일정", systemImage: "rainbow")
+                            Label("이 주의 장기 플랜", systemImage: "rainbow")
                         }
                     }
                     Button {
@@ -911,7 +911,7 @@ struct ContentView: View {
             // **반은 하루, 반은 그날의 회고와 아직 안 정한 할 일.** 하루 옆에 그날 계획해 둔 블록마다
             // 했는지를 찍는 칸을 두고(→ DayReflectionPanel, 주간 회고와 같은 표시), 그 아래에
             // 요일을 아직 안 정한 할 일을 세워 빈 시간에 바로 끌어다 놓게 한다.
-            HStack(alignment: .top, spacing: 14) {
+            DayColumnsLayout(spacing: 14) {
                 if shows(.schedule) {
                 ZStack(alignment: .topLeading) {
                     DayScheduleView(
@@ -1025,7 +1025,9 @@ struct ContentView: View {
                                    weekBlocks: weekBlocks,
                                    canPlan: hasFixedRoutines,
                                    externallyTargeted: dayZones.hovering == .backlog,
-                                   showsCategoryFilter: false)
+                                   showsCategoryFilter: false,
+                                   // 판의 키는 왼쪽 타임라인이 정한다 — 넘치는 할 일은 판 안에서 스크롤 (→ DayColumnsLayout).
+                                   scrollsContent: shows(.schedule))
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
                     .expandable(.backlog, expanded: $expandedPanel)
@@ -1051,7 +1053,8 @@ struct ContentView: View {
                         .allowsHitTesting(false)
                 }
             }
-            // 두 판의 키를 긴 쪽에 맞춘다 — 들쭉날쭉하면 한 화면이 아니라 두 조각으로 읽힌다.
+            // 두 판의 키를 맞춘다 — 들쭉날쭉하면 한 화면이 아니라 두 조각으로 읽힌다.
+            // 기준은 타임라인이다 (→ DayColumnsLayout). 오른쪽이 넘치면 할 일 목록이 스크롤한다.
             .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -1170,8 +1173,12 @@ struct ContentView: View {
     private func todoLoad(on day: DayOfWeek) -> TodoLoad {
         let date = dayDate(day)
         // 아이폰 무지개 일정도 그날의 칸으로 센다 — 기간 안이면 한 칸, 하는 날이면 진하게.
-        let rainbow = rainbowEvents.filter { $0.spans(date) }.map { (title: $0.title, active: $0.occurs(on: date)) }
-        return TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames, rainbow: rainbow)
+        let dayBlocks = weekBlocks.filter { $0.day == day }
+        // 장기 플랜의 회차가 그날 블록으로 서 있으면 블록 칸이 그 회차다 — 플랜 칸은 그날 세지 않는다.
+        let rainbow = rainbowEvents
+            .filter { e in e.spans(date) && !dayBlocks.contains { e.carriesSession(blockTitle: $0.title, on: date) } }
+            .map { (title: $0.title, active: $0.occurs(on: date)) }
+        return TodoLoad(dayBlocks, routineNames: routineNames, rainbow: rainbow)
     }
 
     /// 보는 주의 종일 막대 (→ AllDaySpan). 캘린더에서 온 여러 날 일정은 끝나는 날을 캘린더에서 읽는다.
@@ -1205,25 +1212,64 @@ struct ContentView: View {
 
     /// 날짜를 가로로, 겹친 무지개 일정을 줄로 (→ RainbowDensityView).
     private var rainbowSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if rainbowEvents.isEmpty {
-                HStack(spacing: 10) {
-                    Text("아직 무지개 일정이 없습니다. 아이폰에서 만든 일정도 여기에 보입니다.")
-                        .font(.callout)
+        let items = rainbowItems
+        return VStack(alignment: .leading, spacing: 12) {
+            // 긴 일정(자격증 과정 · 격주 수업)을 적는 문. 늘 보이게 둔다 — 메뉴 · 날짜 두 번 누르기만으로는 못 찾았다.
+            HStack(spacing: 10) {
+                if items.isEmpty {
+                    Text("아직 장기 플랜이 없습니다. 프로젝트 기간 · 마감 · 격주 수업처럼 오래 이어지는 일을 적으면 여기에 쌓입니다.")
+                        .font(.body)
                         .foregroundStyle(.secondary)
-                    Button("무지개 일정 추가") {
-                        rainbowSheet = RainbowEditContext(event: nil, defaultStart: Calendar.current.startOfDay(for: Date()))
-                    }
-                    .controlSize(.small)
+                }
+                Spacer(minLength: 0)
+                Button {
+                    rainbowSheet = RainbowEditContext(event: nil, defaultStart: Calendar.current.startOfDay(for: Date()))
+                } label: {
+                    Label("장기 플랜 추가", systemImage: "plus")
                 }
             }
-            RainbowDensityView(events: rainbowEvents,
+            RainbowDensityView(events: items,
                                start: selectedWeek,
                                weeks: Self.rainbowWeeks,
-                               onOpen: { rainbowSheet = RainbowEditContext(event: $0) },
+                               onOpen: openRainbowItem,
                                onAdd: { rainbowSheet = RainbowEditContext(event: nil, defaultStart: $0) })
         }
         .dashboardPanel()
+    }
+
+    /// 무지개 판에 서는 것 — 무지개 일정과, 보는 여덟 주 안의 해야 할 계획 블록.
+    /// 아이폰 무지개가 맥 계획을 함께 세우므로 맥 판도 같이 센다 (→ RainbowDensityItem).
+    private var rainbowItems: [RainbowDensityItem] {
+        let cal = Calendar.current
+        let first = cal.startOfDay(for: selectedWeek)
+        let end = cal.date(byAdding: .day, value: Self.rainbowWeeks * 7, to: first) ?? first
+        let names = routineNames
+        let plans = rainbowEvents
+        let blocks = allBlocks
+            .filter { $0.isTodo(names) && !$0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .map(RainbowDensityItem.init)
+            .filter { item in
+                guard case .block(let b, let date) = item, date >= first, date < end else { return false }
+                // 장기 플랜의 회차를 옮겨 적은 블록은 그 플랜 줄에 진하게 서 있다 — 두 번 세지 않는다.
+                return !plans.contains { $0.carriesSession(blockTitle: b.title, on: date) }
+            }
+        return rainbowEvents.map(RainbowDensityItem.event) + blocks
+    }
+
+    /// 무지개 칸을 눌렀다 — 무지개 일정은 고치기, 계획 블록은 그날의 일간으로.
+    private func openRainbowItem(_ item: RainbowDensityItem) {
+        switch item {
+        case .event(let e):
+            rainbowSheet = RainbowEditContext(event: e)
+        case .block(_, let date):
+            dayForward = date >= dayDate(selectedDay)
+            weekForward = dayForward
+            withAnimation(Motion.screen) {
+                selectedWeek = date.shownWeekStart(sundayFirst: weekStartsOnSunday)
+                selectedDay = DayOfWeek.of(date)
+                scopeRaw = CalendarScope.day.rawValue
+            }
+        }
     }
 
     private var weekRangeString: String {

@@ -140,3 +140,40 @@ extension View {
         modifier(ExpandablePanel(panel: panel, expanded: expanded))
     }
 }
+
+/// **일간의 두 칸 — 키는 왼쪽 타임라인이 정한다.**
+///
+/// 예전에는 두 칸의 키를 긴 쪽에 맞췄다. 할 일이 늘면 오른쪽이 길어지고, 타임라인 판이 따라 늘어나
+/// 아래가 하얗게 비었다. 이제 오른쪽은 타임라인 높이를 받고, 넘치는 할 일은 판 안에서 스크롤한다
+/// (→ BacklogSection.scrollsContent). 타임라인이 아주 짧은 날에도 오른쪽이 찌그러지지 않게 바닥 키를 둔다.
+/// 판 하나를 크게 펴서 칸이 하나뿐이면 그 칸이 폭을 다 쓰고 제 키대로 선다.
+struct DayColumnsLayout: Layout {
+    var spacing: CGFloat = 14
+    /// 오른쪽 칸(오늘의 계획 + 할 일)의 바닥 키.
+    var minTrailingHeight: CGFloat = 420
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let first = subviews.first else { return .zero }
+        if subviews.count == 1 {
+            let size = first.sizeThatFits(ProposedViewSize(width: proposal.width, height: nil))
+            return CGSize(width: proposal.width ?? size.width, height: size.height)
+        }
+        let width = proposal.width ?? (first.sizeThatFits(.unspecified).width * 2 + spacing)
+        let column = (width - spacing) / 2
+        let leading = first.sizeThatFits(ProposedViewSize(width: column, height: nil)).height
+        return CGSize(width: width, height: max(leading, minTrailingHeight))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        if subviews.count == 1 {
+            subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
+            return
+        }
+        let column = (bounds.width - spacing) / 2
+        for (i, subview) in subviews.prefix(2).enumerated() {
+            let x = bounds.minX + CGFloat(i) * (column + spacing)
+            subview.place(at: CGPoint(x: x, y: bounds.minY),
+                          proposal: ProposedViewSize(width: column, height: bounds.height))
+        }
+    }
+}

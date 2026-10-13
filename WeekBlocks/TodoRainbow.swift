@@ -106,7 +106,7 @@ struct TodoRainbow: View {
             ? String(localized: "해야 할 일 없음")
             : String(localized: "해야 할 일 \(load.total)개 · 남은 것 \(load.remaining)개")
         guard !load.rainbowTitles.isEmpty else { return base }
-        return base + "\n" + String(localized: "무지개 일정: \(load.rainbowTitles.joined(separator: ", "))")
+        return base + "\n" + String(localized: "장기 플랜: \(load.rainbowTitles.joined(separator: ", "))")
     }
 }
 

@@ -70,6 +70,8 @@ enum CloudSchemaPrimer {
         let rainbow = RainbowEvent(title: marker)
         rainbow.selectedWeekdays = [2, 4]
         rainbow.weeklyPattern = Array(repeating: true, count: 35)
+        rainbow.repeatWeeks = 2
+        rainbow.sessions = [RainbowSession(date: now, hours: 1, title: "schema", note: "sample")]
         rainbow.excludedDates = [now]
         rainbow.todoToken = "schema-sample-todo"
         rainbow.deletedAt = now
