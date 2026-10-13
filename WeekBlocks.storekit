@@ -3,43 +3,23 @@
   "nonRenewingSubscriptions": [],
   "products": [
     {
-      "displayPrice": "49000",
+      "displayPrice": "44000",
       "familyShareable": false,
       "internalID": "5214ABC8-8962-4B3E-938D-C0DE64DF3221",
       "localizations": [
         {
-          "description": "회고 추세와 다른 주 계획 가져오기를 한 번 결제로 계속 씁니다.",
-          "displayName": "무지개 공방 Pro 평생",
+          "description": "회고 추세와 계획 대비 실제를 한 번 결제로 계속 씁니다. 아이폰 앱도 함께 열립니다.",
+          "displayName": "무지개 공방 Pro (평생)",
           "locale": "ko"
         },
         {
-          "description": "Reflection trends and copying past weeks, with one payment.",
-          "displayName": "Rainbow Craft Pro Lifetime",
-          "locale": "en_US"
-        }
-      ],
-      "productID": "com.devkoan.ScheduleDensityApp.pro.lifetime",
-      "referenceName": "Pro 평생",
-      "type": "NonConsumable"
-    },
-    {
-      "displayPrice": "4.99",
-      "familyShareable": false,
-      "internalID": "2D155F32-D51C-48F8-9F8E-150E1F4FE9C7",
-      "localizations": [
-        {
-          "description": "이 맥에서 적은 할 일이 아이폰에도 보입니다. 한 번 사면 끝이고 구독이 아닙니다.",
-          "displayName": "함께 쓰기",
-          "locale": "ko"
-        },
-        {
-          "description": "Write todos on this Mac and see them on your iPhone. One-time purchase, not a subscription.",
-          "displayName": "Sync Writing",
+          "description": "Review trends and plan vs. actual, with one payment. Unlocks the iPhone app too.",
+          "displayName": "Rainbow Craft Pro (Lifetime)",
           "locale": "en_US"
         }
       ],
       "productID": "com.devkoan.ScheduleDensityApp.sync",
-      "referenceName": "함께 쓰기 (판매 중단 · Pro로 인정)",
+      "referenceName": "Pro 평생 (예전 '함께 쓰기' 상품을 이어 씀)",
       "type": "NonConsumable"
     }
   ],

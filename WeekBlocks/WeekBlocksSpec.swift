@@ -70,13 +70,16 @@ enum WeekBlocksSpec: LeeoAppSpec {
     /// ⚠️ 콘솔에 만든 것·`WeekBlocks.storekit`에 적은 것과 **글자 하나까지 같아야 한다.**
     /// 연간·월간은 같은 구독 그룹(「무지개 공방 Pro」)에 넣어야 서로 갈아탈 수 있다.
     static let proYearlyID = "com.devkoan.ScheduleDensityApp.pro.yearly"
-    static let proLifetimeID = "com.devkoan.ScheduleDensityApp.pro.lifetime"
+    /// **평생 이용권은 예전 '함께 쓰기' 상품을 이어 쓴다** (2026-10-13).
+    /// 판 적이 없어 산 사람이 없고, 이름·설명·가격은 콘솔에서 고칠 수 있다. 평생 상품을 하나 더 만들면
+    /// 페이월에 평생이 둘 서고 산 사람도 헷갈린다. ID에 'sync'가 남지만 사용자에게는 안 보인다.
+    static let proLifetimeID = legacySyncProductID
     static let proMonthlyID = "com.devkoan.ScheduleDensityApp.pro.monthly"
 
     /// 페이월에 서는 차례 그대로 — 연간이 먼저, 평생, 월간은 비교 기준이라 마지막.
     static let proProductIDs = [proYearlyID, proLifetimeID, proMonthlyID]
 
-    /// 예전 '함께 쓰기'(비소모성). 더는 팔지 않지만 산 사람은 Pro다.
+    /// 예전 '함께 쓰기'(비소모성). 지금은 Pro 평생 이용권이다 (→ proLifetimeID).
     static let legacySyncProductID = "com.devkoan.ScheduleDensityApp.sync"
 
     /// 이 중 하나라도 있으면 Pro다. 아이폰에 남길 표를 만들 때도 이 목록으로 고른다

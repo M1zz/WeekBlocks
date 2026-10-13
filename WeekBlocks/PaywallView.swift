@@ -138,6 +138,11 @@ struct PaywallView: View {
             }
             trialEligible = eligible
         }
+        // 고른 상품이 목록에 없으면(구독이 아직 승인 전 등) 선 것 중 첫째를 고른다 —
+        // 안 그러면 결제 단추가 아무것도 가리키지 않아 눌러도 안 된다.
+        .onChange(of: purchases.products.map(\.id), initial: true) { _, ids in
+            if !ids.contains(selectedID), let first = ids.first { selectedID = first }
+        }
     }
 
     // MARK: 요금제
