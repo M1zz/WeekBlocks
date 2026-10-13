@@ -525,6 +525,7 @@ enum DataVault {
         var originInstallID: String?
         var nextAction: String?
         var iconName: String?
+        var actualMinutes: Double?
         var reviewStatusRaw: String?
         var reviewNote: String?
         var reviewedAt: Date?
@@ -535,7 +536,7 @@ enum DataVault {
             weekStartDate = m.weekStartDate; concreteVerified = m.concreteVerified
             withinRoutine = m.withinRoutine; startHour = m.startHour; createdAt = m.createdAt
             calendarEventID = m.calendarEventID; isShared = m.isShared; originInstallID = m.originInstallID
-            nextAction = m.nextAction; iconName = m.iconName
+            nextAction = m.nextAction; iconName = m.iconName; actualMinutes = m.actualMinutes
             reviewStatusRaw = m.reviewStatusRaw; reviewNote = m.reviewNote; reviewedAt = m.reviewedAt
         }
 
@@ -554,6 +555,7 @@ enum DataVault {
                               withinRoutine: withinRoutine, startHour: startHour)
             m.dayRaw = dayRaw; m.timeBandRaw = timeBandRaw; m.createdAt = createdAt
             m.calendarEventID = calendarEventID; m.nextAction = nextAction; m.iconName = iconName
+            m.actualMinutes = actualMinutes
             m.reviewStatusRaw = reviewStatusRaw; m.reviewNote = reviewNote; m.reviewedAt = reviewedAt
             if let isShared { m.isShared = isShared }
             if let originInstallID { m.originInstallID = originInstallID }

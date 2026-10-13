@@ -118,6 +118,59 @@ enum ReflectionTrends {
         }
     }
 
+    // MARK: 계획 대비 실제 (→ ActualTime)
+
+    /// 일 하나(단계는 할 일 이름으로 모은다)가 계획보다 얼마나 걸렸나.
+    struct Pace: Identifiable {
+        let title: String
+        let count: Int
+        let plannedMinutes: Double
+        let actualMinutes: Double
+        var id: String { title }
+        /// 실제 ÷ 계획. 1.3이면 30% 더 걸렸다.
+        var ratio: Double { actualMinutes / plannedMinutes }
+    }
+
+    /// **회고로 셈한 시간** — 재지 않아도 선다. 회고를 찍은 블록의 계획 시간과, 그중 해낸 몫
+    /// (달성은 전부, 부분은 반). 종일·길이 없는 것은 시간을 쓰는 일이 아니라 뺀다.
+    static func hours(_ blocks: [PlanBlock]) -> (planned: Double, done: Double)? {
+        let reviewed = blocks.filter { $0.reviewStatus != nil && !$0.isAllDay && $0.durationHours > 0 }
+        guard !reviewed.isEmpty else { return nil }
+        let planned = reviewed.reduce(0) { $0 + $1.durationHours }
+        let done = reviewed.reduce(0.0) { acc, b in
+            switch b.reviewStatus {
+            case .done: acc + b.durationHours
+            case .partial: acc + b.durationHours / 2
+            default: acc
+            }
+        }
+        return (planned, done)
+    }
+
+    /// 잰 블록 전체로 본 실제 ÷ 계획. 잰 것이 없으면 nil.
+    static func overallPace(_ blocks: [PlanBlock]) -> Double? {
+        let measured = blocks.filter { $0.actualMinutes != nil && $0.durationHours > 0 }
+        let planned = measured.reduce(0) { $0 + $1.durationHours * 60 }
+        guard planned > 0 else { return nil }
+        return measured.reduce(0) { $0 + ($1.actualMinutes ?? 0) } / planned
+    }
+
+    /// 계획과 가장 어긋나는 일부터. 단계를 올린 블록("할 일 · 단계")은 할 일 이름으로 모은다.
+    static func paces(_ blocks: [PlanBlock], limit: Int = 5) -> [Pace] {
+        var sums: [String: (count: Int, planned: Double, actual: Double)] = [:]
+        for b in blocks where b.durationHours > 0 {
+            guard let actual = b.actualMinutes else { continue }
+            let root = b.title.components(separatedBy: " · ").first ?? b.title
+            let cur = sums[root] ?? (0, 0, 0)
+            sums[root] = (cur.count + 1, cur.planned + b.durationHours * 60, cur.actual + actual)
+        }
+        return sums.map { Pace(title: $0.key, count: $0.value.count,
+                               plannedMinutes: $0.value.planned, actualMinutes: $0.value.actual) }
+            .sorted { abs($0.ratio - 1) != abs($1.ratio - 1) ? abs($0.ratio - 1) > abs($1.ratio - 1) : $0.title < $1.title }
+            .prefix(limit)
+            .map { $0 }
+    }
+
     /// 두 번 이상 건너뛴 일. 단계를 올린 블록("할 일 · 단계")은 할 일 이름으로 모은다.
     static func mostSkipped(_ blocks: [PlanBlock], limit: Int = 5) -> [Skipped] {
         var counts: [String: Int] = [:]
@@ -206,6 +259,7 @@ struct ReflectionTrendsView: View {
                         shareCard(title: "요일별", shares: ReflectionTrends.byDay(blocks))
                         shareCard(title: "시간대별", shares: ReflectionTrends.byBand(blocks))
                     }
+                    planVsActualCard(blocks)
                     skippedCard(ReflectionTrends.mostSkipped(blocks))
                 } else {
                     proBanner
@@ -335,6 +389,73 @@ struct ReflectionTrendsView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.primary.opacity(0.03), in: .soft(Corner.card))
+    }
+
+    /// **계획 대비 실제** — Pro의 간판. 재지 않는 사람도 회고로 셈한 '해낸 시간'은 본다.
+    private func planVsActualCard(_ blocks: [PlanBlock]) -> some View {
+        let hours = ReflectionTrends.hours(blocks)
+        let overall = ReflectionTrends.overallPace(blocks)
+        let paces = ReflectionTrends.paces(blocks)
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("계획 대비 실제")
+                .font(.subheadline.weight(.semibold))
+            HStack(spacing: 10) {
+                tile(label: "계획한 시간", value: hours.map { formatDuration($0.planned) } ?? "–", color: .secondary)
+                tile(label: "해낸 시간", value: hours.map { formatDuration($0.done) } ?? "–", color: .green)
+                tile(label: "잰 일은 계획보다", value: overall.map(paceText) ?? "–",
+                     color: overall.map(paceColor) ?? .secondary)
+            }
+            ForEach(paces) { pace in
+                HStack(spacing: 8) {
+                    Image(systemName: "stopwatch")
+                        .foregroundStyle(paceColor(pace.ratio))
+                    Text(pace.title)
+                        .lineLimit(1)
+                    Spacer()
+                    Text("계획 \(formatDuration(pace.plannedMinutes / 60)) · 실제 \(formatDuration(pace.actualMinutes / 60))")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                    Text(paceText(pace.ratio))
+                        .monospacedDigit()
+                        .fontWeight(.semibold)
+                        .foregroundStyle(paceColor(pace.ratio))
+                        .frame(width: 52, alignment: .trailing)
+                }
+                .font(.callout)
+                .help(String(localized: "\(pace.count)번 잰 값을 모았습니다"))
+            }
+            Group {
+                if let worst = paces.first(where: { $0.ratio >= 1.2 }) {
+                    let more = "\(Int(((worst.ratio - 1) * 100).rounded()))%"
+                    Text("‘\(worst.title)’ 일은 보통 계획보다 \(more) 더 걸립니다. 다음엔 그만큼 넉넉히 잡아 보세요.")
+                } else if paces.isEmpty, ActualTime.isEnabled {
+                    Text("타이머로 잰 일이 쌓이면 일마다 실제로 얼마나 걸렸는지 여기에 보입니다.")
+                } else if paces.isEmpty {
+                    Text("해낸 시간은 회고로 셈합니다. 설정 ▸ 타이머에서 '걸린 시간 재기'를 켜면 일마다 실제로 얼마나 걸렸는지도 봅니다.")
+                } else {
+                    Text("해낸 시간은 회고로, 실제 시간은 타이머로 잰 값으로 셈합니다.")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.primary.opacity(0.03), in: .soft(Corner.card))
+    }
+
+    /// 1.42 → "+42%", 0.9 → "-10%", 거의 같으면 "계획대로".
+    private func paceText(_ ratio: Double) -> String {
+        let points = Int(((ratio - 1) * 100).rounded())
+        if abs(points) < 3 { return String(localized: "계획대로") }
+        return points > 0 ? "+\(points)%" : "\(points)%"
+    }
+
+    /// 더 걸리면 주황, 덜 걸리면 초록, 엇비슷하면 회색.
+    private func paceColor(_ ratio: Double) -> Color {
+        if ratio >= 1.1 { return .orange }
+        if ratio <= 0.9 { return .green }
+        return .secondary
     }
 
     private func tile(label: LocalizedStringKey, value: String, color: Color) -> some View {

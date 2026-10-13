@@ -48,6 +48,8 @@ struct PaywallView: View {
                 Text("사면 열리는 것")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
+                row("stopwatch", "계획 대비 실제",
+                    "계획한 시간 중 해낸 시간, 일마다 계획보다 얼마나 더 걸리는지 봅니다.")
                 row("chart.bar.xaxis", "회고 추세 8주",
                     "잘 되는 요일과 시간대, 번번이 미루는 일까지. 무료로는 지난 2주가 보입니다.")
                 row("square.on.square", "다른 주 계획 가져오기",

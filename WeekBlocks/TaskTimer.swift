@@ -36,6 +36,10 @@ struct TimerTarget: Codable, Equatable {
     /// 일정 한가운데서 켠 타이머가 따르는 **일정의 끝.** 이 시각이 지나면 타이머는 스스로 물러난다 —
     /// 끝난 일정을 계속 세고 있으면 지금 하는 일을 가린다. nil이면 일정과 묶이지 않은 타이머.
     var scheduledEnd: Date? = nil
+    /// **잰다** — '걸린 시간 재기'를 켜고 계획 블록에서 시작한 타이머 (→ ActualTime).
+    /// 일정을 따르지 않고 켠 순간부터 멈출 때까지 그대로 세며, 멈추면 그 블록에 걸린 시간을 남긴다.
+    /// 옵셔널인 까닭: 예전에 남겨 둔 타이머 상태(JSON)에는 이 칸이 없다.
+    var measuring: Bool? = nil
 }
 
 // MARK: - 스토어
@@ -96,8 +100,13 @@ final class TaskTimer {
     func start(token: String, title: String, plannedSeconds: Double,
                scheduledStart: Date? = nil,
                iconName: String = "timer", colorName: String? = nil) {
+        // 재던 일에서 다른 일로 건너간다 — 재던 몫은 먼저 남긴다.
+        if target?.measuring == true { stop() }
         let t0 = Date()
-        let bind = Self.binding(scheduledStart: scheduledStart, planned: plannedSeconds, now: t0)
+        // 재는 사람의 계획 블록은 일정에 묶지 않는다 — 묶으면 늦게 켠 만큼이 '걸린 시간'에 끼고,
+        // 일정이 시작되는 순간 타이머가 물러나 끝까지 잴 수 없다 (→ ActualTime).
+        let measuring = ActualTime.isEnabled && token.hasPrefix("block:")
+        let bind = measuring ? nil : Self.binding(scheduledStart: scheduledStart, planned: plannedSeconds, now: t0)
         // **지금 진행 중인 일정은 따로 세지 않는다.** 타임라인이 이미 세고 있다 (→ ScheduleClock).
         // 따로 세는 타이머를 하나 더 세우면 그게 알약을 차지하고, 일정과 어긋나기 시작한다.
         if bind != nil, let scheduledStart, t0 >= scheduledStart {
@@ -107,7 +116,7 @@ final class TaskTimer {
         let planned = bind?.planned ?? max(60, plannedSeconds)
         target = TimerTarget(token: token, title: title, colorName: colorName,
                              iconName: iconName, plannedSeconds: planned,
-                             scheduledEnd: bind?.end)
+                             scheduledEnd: bind?.end, measuring: measuring ? true : nil)
         now = t0
         runningSince = t0
         // 남은 시간 = 일정의 끝 − 지금. 같은 t0으로 셈해야 끝이 한 치도 안 어긋난다.
@@ -141,7 +150,12 @@ final class TaskTimer {
     func toggle() { isRunning ? pause() : resume() }
 
     /// 끝낸다. 세던 것을 지우고 자리를 비운다.
-    func stop() {
+    /// 재던 타이머면 흐른 만큼을 그 블록에 남긴다 — `record`가 false면 남기지 않는다(잊고 둔 타이머).
+    func stop(record: Bool = true) {
+        if record, let t = target, t.measuring == true {
+            let seconds = elapsed
+            Task { @MainActor in ActualTime.record(token: t.token, title: t.title, seconds: seconds) }
+        }
         target = nil
         runningSince = nil
         accumulated = 0
@@ -215,7 +229,8 @@ final class TaskTimer {
     /// - 오늘 그 일정이 이미 다 끝났으면 → 물러난다. 끝난 인터뷰를 다음 인터뷰 시간에 세고 있으면 안 된다.
     /// 일정에 없는 일(다른 날의 블록 등)은 건드리지 않는다. 우측 상단 알약이 매분 부른다.
     func reconcile(with slots: [ScheduleSlot], now date: Date = Date()) {
-        guard let t = target else { return }
+        // 재는 타이머는 일정을 따르지 않는다 — 사람이 멈출 때까지 센다 (→ ActualTime).
+        guard let t = target, t.measuring != true else { return }
         // 열쇠로 먼저 찾고, 못 찾으면 이름으로. 블록 열쇠(persistentModelID)는 앱을 다시 켜면 글자가
         // 달라질 수 있다 — 그러면 되살아난 타이머가 제 일정을 못 찾아 '일정에 없는 일'로 남아
         // 다음 일정 시간까지 끝난 일을 세고 있었다.
@@ -288,12 +303,13 @@ final class TaskTimer {
         now = Date()
 
         if elapsed > snap.target.plannedSeconds + 12 * 3600 {
-            stop()
+            // 끄고 잊어버린 타이머다 — 열두 시간을 '걸린 시간'으로 남기면 추세가 망가진다.
+            stop(record: false)
             return
         }
         // 꺼져 있는 동안 따르던 일정이 끝났다.
         if let end = snap.target.scheduledEnd, Date() >= end {
-            stop()
+            stop(record: false)
             return
         }
         if isRunning { startTicking() }

@@ -65,6 +65,7 @@
 		98278046F3F6DA26559B9008 /* Surface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEC8822FA5DD9EE70C20530 /* Surface.swift */; };
 		995871F5986FE5C82D0852D5 /* ReflectionTrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693C973A71B452CF93C32569 /* ReflectionTrendsView.swift */; };
 		9D5EEDBB4DA71FED5DFA3AE7 /* ScheduleClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AB47D0D95CB6D901FC0D81 /* ScheduleClock.swift */; };
+		9E63C40A3DADC3368F635C81 /* ActualTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3546A38F0C3559E406840E4A /* ActualTime.swift */; };
 		9F5A4B6B73214FA1C5C353B4 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD73EF7D52999BFEC85767 /* Motion.swift */; };
 		A14391170989592054428F6E /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 557E8F32612BE4E8BC96E369 /* InfoPlist.xcstrings */; };
 		A2A0A55F465DF4893B6A6A40 /* Affordance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162BD316D362F2B5D760A08 /* Affordance.swift */; };
@@ -148,6 +149,7 @@
 		30B38CA301764D3E76ED7206 /* SharedScheduleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedScheduleSection.swift; sourceTree = "<group>"; };
 		30CD73EF7D52999BFEC85767 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		352BBAC09C0B86084BEAE372 /* DataVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataVault.swift; sourceTree = "<group>"; };
+		3546A38F0C3559E406840E4A /* ActualTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActualTime.swift; sourceTree = "<group>"; };
 		366AC4444055F42F3587B1AE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOccurrence.swift; sourceTree = "<group>"; };
 		3C7DA6B68AC7163ACA0B879E /* CalendarMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMerge.swift; sourceTree = "<group>"; };
@@ -306,6 +308,7 @@
 		973BF38AE3DB330122685508 /* WeekBlocks */ = {
 			isa = PBXGroup;
 			children = (
+				3546A38F0C3559E406840E4A /* ActualTime.swift */,
 				1162BD316D362F2B5D760A08 /* Affordance.swift */,
 				502517D08C4AA9A117B81DA7 /* AllDaySpans.swift */,
 				057B281BD7D45DD504A07D00 /* AppLanguage.swift */,
@@ -666,6 +669,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E63C40A3DADC3368F635C81 /* ActualTime.swift in Sources */,
 				A2A0A55F465DF4893B6A6A40 /* Affordance.swift in Sources */,
 				B4EBE209685DBC43D266A4BE /* AllDaySpans.swift in Sources */,
 				EAE7E8DCDDF38D8D9E2637A2 /* AppLanguage.swift in Sources */,

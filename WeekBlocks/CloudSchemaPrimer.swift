@@ -99,6 +99,8 @@ enum CloudSchemaPrimer {
         block.nextAction = "schema-sample-next"
         // 알약 아이콘 칸 (→ PlanBlock.iconName). 아이콘을 한 번이라도 누른 사람에게서만 생긴다.
         block.iconName = "star.fill"
+        // 걸린 시간 칸 (→ PlanBlock.actualMinutes). '걸린 시간 재기'를 켜고 잰 사람에게서만 생긴다.
+        block.actualMinutes = 1
         // 계획·루틴에도 걸린 함께 쓰기 칸 (→ TodoSharing.swift).
         block.isShared = true
         block.originInstallID = "schema-sample-install"

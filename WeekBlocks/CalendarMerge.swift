@@ -103,6 +103,7 @@ enum CalendarMerge {
         if mine.successCriteria.isEmpty { mine.successCriteria = imported.successCriteria }
         if mine.deliverable.isEmpty { mine.deliverable = imported.deliverable }
         if (mine.nextAction ?? "").isEmpty { mine.nextAction = imported.nextAction }
+        if mine.actualMinutes == nil { mine.actualMinutes = imported.actualMinutes }
         if mine.reviewStatus == nil, imported.reviewStatus != nil {
             mine.reviewStatus = imported.reviewStatus
             mine.reviewNote = imported.reviewNote

@@ -510,6 +510,7 @@ final class CalendarBridge {
             || !block.successCriteria.isEmpty
             || !block.deliverable.isEmpty
             || !(block.nextAction ?? "").isEmpty
+            || block.actualMinutes != nil
             || block.reviewStatus != nil
     }
 

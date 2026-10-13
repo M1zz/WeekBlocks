@@ -66,6 +66,14 @@ final class PlanBlock {
     ///    출시 전 Development → Production 스키마 배포에 실려 가야 한다 (→ CloudSchemaPrimer).
     var iconName: String? = nil
 
+    /// **실제로 걸린 분.** '걸린 시간 재기'(설정 ▸ 타이머)를 켠 사람이 타이머로 이 일을 센 만큼이
+    /// 쌓인다 (→ ActualTime.swift). nil이면 재지 않은 것이다 — 0분 걸렸다는 뜻이 아니다.
+    /// 계획한 길이(`durationHours`)와 견주어 '이 일은 늘 몇 % 더 걸리는가'를 낸다 (→ ReflectionTrends.paces).
+    ///
+    /// ⚠️ **CloudKit 스키마가 늘어나는 필드다.** 맥·아이폰 PlanBlock 양쪽에 같이 있어야 하고,
+    ///    출시 전 Development → Production 스키마 배포에 실려 가야 한다 (→ CloudSchemaPrimer).
+    var actualMinutes: Double? = nil
+
     // Review (populated after the day passes)
     var reviewStatusRaw: String? = nil
     var reviewNote: String? = nil

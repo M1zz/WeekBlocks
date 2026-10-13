@@ -17,6 +17,8 @@ struct SettingsView: View {
     @AppStorage(ColumnMode.storageKey) private var columnMode: ColumnMode = .auto
     /// 타이머 숫자를 어떻게 적는가 (→ CountdownFormat).
     @AppStorage(CountdownFormat.storageKey) private var countdownFormat: CountdownFormat = .hms
+    /// 계획 블록의 타이머가 실제로 걸린 시간을 남기는가 (→ ActualTime).
+    @AppStorage(ActualTime.enabledKey) private var measuresActual = false
     /// 설정 위의 아이폰 앱 권유를 닫았는가 (→ IPhoneNudge).
     @AppStorage(IPhoneNudge.dismissedKey) private var iphoneNudgeDismissed = false
     /// 한 주를 무슨 요일부터 보이는가 (→ WeekStartSetting).
@@ -145,12 +147,16 @@ struct SettingsView: View {
                             Text(f.label).tag(f)
                         }
                     }
+                    Toggle("걸린 시간 재기", isOn: $measuresActual)
                 } header: {
                     Text("타이머")
                 } footer: {
-                    Text("타이머 창 · 맨 위 알약 · 계획 칩에 남은 시간을 적는 방식입니다. 위젯은 시스템이 세므로 시:분:초로 보입니다.")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("타이머 창 · 맨 위 알약 · 계획 칩에 남은 시간을 적는 방식입니다. 위젯은 시스템이 세므로 시:분:초로 보입니다.")
+                        Text("걸린 시간 재기를 켜면 계획에서 켠 타이머가 일정을 따르지 않고 멈출 때까지 세고, 실제로 걸린 시간을 남깁니다. 회고 추세에서 계획과 견주어 봅니다.")
+                    }
+                    .font(.body)
+                    .foregroundStyle(.secondary)
                 }
 
                 Section {

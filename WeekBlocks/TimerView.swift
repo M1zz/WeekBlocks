@@ -473,11 +473,19 @@ struct RunningTimerFace: View {
                         timer.stop()
                     }
                 } label: {
-                    Label("일정 기준으로", systemImage: "arrow.uturn.backward")
-                        .frame(maxWidth: .infinity)
+                    // 재던 타이머는 멈추는 것이 곧 기록이다 (→ ActualTime).
+                    if timer.target?.measuring == true {
+                        Label("멈추고 남기기", systemImage: "stopwatch")
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Label("일정 기준으로", systemImage: "arrow.uturn.backward")
+                            .frame(maxWidth: .infinity)
+                    }
                 }
                 .controlSize(.large)
-                .help("직접 세는 것을 그만두고, 일정에 적힌 시각을 다시 따릅니다")
+                .help(timer.target?.measuring == true
+                      ? String(localized: "멈추고, 지금까지 걸린 시간을 이 일에 남깁니다")
+                      : String(localized: "직접 세는 것을 그만두고, 일정에 적힌 시각을 다시 따릅니다"))
             }
 
             HStack(spacing: 10) {
@@ -610,6 +618,8 @@ struct TimerMenuItems: View {
     }
 
     @State private var timer = TaskTimer.shared
+    /// 걸린 시간을 재는 사람인가 (→ ActualTime). 그러면 일정과 상관없이 언제든 켜서 끝까지 센다.
+    @AppStorage(ActualTime.enabledKey) private var measures = false
 
     var body: some View {
         if timer.isTiming(token) {
@@ -618,7 +628,19 @@ struct TimerMenuItems: View {
                       systemImage: timer.isRunning ? "pause.fill" : "play.fill")
             }
             Button { timer.stop() } label: {
-                Label("일정 기준으로 되돌리기", systemImage: "arrow.uturn.backward")
+                if timer.target?.measuring == true {
+                    Label("멈추고 걸린 시간 남기기", systemImage: "stopwatch")
+                } else {
+                    Label("일정 기준으로 되돌리기", systemImage: "arrow.uturn.backward")
+                }
+            }
+        } else if measures, token.hasPrefix("block:") {
+            Button {
+                timer.start(token: token, title: title, plannedSeconds: hours * 3600,
+                            scheduledStart: scheduledStart,
+                            iconName: iconName, colorName: colorName)
+            } label: {
+                Label("지금부터 재기", systemImage: "stopwatch")
             }
         } else if isOverToday {
             // 오늘 이미 끝난 일정 — 켜 봐야 타임라인이 곧바로 거둔다 (→ TaskTimer.reconcile).
