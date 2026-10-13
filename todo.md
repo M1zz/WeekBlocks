@@ -35,7 +35,7 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 - [x] 칸 안 첫 글자를 걷고(이름은 마우스를 올리면), 기간이 있는 일정은 칸 사이 틈까지 메워 한 막대로 잇는다 — 둥근 모서리는 처음과 끝에만, 손으로 뺀 날에서 끊긴다 (빌드 성공 · 앱 창 확인 안 함)
 - [x] 긴 일정 · 격주: 공용 `RainbowEvent.repeatWeeks`(1 = 매주, 2 = 격주 …, 시작일부터 7일씩 센다). 맥 편집기에 '반복'(매주 · 격주 · 3주마다 · 4주마다),
       판 위에 늘 보이는 '무지개 일정 추가' 단추. 기간은 옅게 이어지고 하는 주의 요일만 진하게 (2026-10-13, 맥·아이폰 빌드 성공 · 앱 창 확인 안 함)
-- [ ] 🚢 CloudKit: `CD_RainbowEvent`에 `repeatWeeks` 칸이 늘었다 — Production 배포 전에 디버그에서 스키마 표본을 다시 올릴 것 (CloudSchemaPrimer가 2를 채운다)
+- [x] 🚢 CloudKit: `CD_RainbowEvent`에 `repeatWeeks` 칸이 늘었다 — Production 배포 전에 디버그에서 스키마 표본을 다시 올릴 것 (CloudSchemaPrimer가 2를 채운다)
 - [ ] 아이폰과 다른 점 남음: 기간 없는 할 일 묶음('할 일 N개' 줄), 맥이 아직 계획에 안 옮긴 캘린더 일정은 맥 판에 없다
 
 ## ▶ 기기 넷(아이맥 · 맥북 · 아이폰 둘)에서 써도 안전하게 (2026-10-12, 맥 빌드 성공 · 실기기 확인 안 함)
@@ -54,7 +54,8 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
       '업데이트하지 않은 기기가 있어요' (같은 기기들로 사흘에 한 번), 되살리기 창에도 한 줄
 - [x] 미리 알리기 ② 무지개 일정: 맥은 모든 칸이 같은 일정(다리가 하나로 합치는 것)을 막고 고치라고 알린다.
       아이폰은 같은 제목 · 같은 기간이면 '그래도 추가'로 한 번 묻는다
-- [ ] 🚢 **출시 전 반드시: CloudKit Production 스키마 배포 — `CD_RainbowEvent`와 함께 `CD_DeletionMark`.** 디버그에서 스키마 표본 올리기 → 배포
+- [x] 🚢 **출시 전 반드시: CloudKit Production 스키마 배포 — `CD_RainbowEvent`와 함께 `CD_DeletionMark`.** 디버그에서 스키마 표본 올리기 → 배포
+      → 2026-10-13 완료: `CD_DeletionMark`는 이미 Production에 있었고, `CD_RainbowEvent`(필드 23개, repeatWeeks 포함)는 콘솔에서 손으로 만들어 배포 (사람)
 - [ ] 실기기 넷: 아이폰에서 할 일 셋을 지웠을 때 맥 두 대에 되살리기 창이 안 뜨는지 / 같은 날 같은 제목 두 블록이 남는지 /
       두 맥에서 캘린더가 한 벌만 서는지
 - 남은 위험: 모든 칸이 같은 두 사본(되살리기가 두 기기에서 동시에)은 여전히 두 맥이 서로 다른 쪽을 지울 수 있다 —
@@ -77,7 +78,7 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
       ⋯ 메뉴 '무지개 일정 추가' · '이 주의 무지개 일정'에서 고르면 고치기 · 지우기(행은 남기고 deletedAt 표). 할 일 카드에 '~10월 20일' 기한
 - [x] 금고(DataVault) 백업에 무지개 일정도 (옵셔널 칸이라 옛 백업 파일도 읽힘), 되살리기 창에 '무지개 일정'
 - [x] CloudSchemaPrimer 표본에 RainbowEvent (옵셔널 다섯 칸 + 지움 표 — 아이폰 다리가 진짜 일정으로 세우지 않게)
-- [ ] 🚢 **출시 전 반드시: CloudKit 콘솔 Development → Production 스키마 배포 (CD_RainbowEvent).**
+- [x] 🚢 **출시 전 반드시: CloudKit 콘솔 Development → Production 스키마 배포 (CD_RainbowEvent).**
       안 하면 Production 앱에서 미러링이 통째로 멈춘다. 디버그에서 스키마 표본 올리기 → 배포
 - [x] 새 문구 번역 (맥 19개 키 · 22개 언어)
 - [ ] 실기기: 아이폰에서 만든 무지개 일정이 맥 주간에 서는지 / 맥에서 고친 것이 아이폰에 오는지
