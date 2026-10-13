@@ -21,12 +21,21 @@ struct TodoLoad: Equatable {
 
     var remaining: Int { total - marked }
 
-    init(_ blocks: [PlanBlock], routineNames: Set<String>) {
+    /// 아이폰 무지개 일정 중 그날에 걸린 것 (→ RainbowEvent). 블록 칸 **뒤에** 이어서 선다.
+    /// 아이폰 무지개의 한 줄이 그날 한 칸인 것과 같은 뜻이다 — 하는 날은 진하게, 기간 안이기만 하면 옅게.
+    var rainbowActive: [Bool] = []
+    var rainbowTitles: [String] = []
+    /// 블록 칸의 수. 그 뒤가 무지개 일정 칸이다.
+    var blockCount: Int { marks.count }
+
+    init(_ blocks: [PlanBlock], routineNames: Set<String>, rainbow: [(title: String, active: Bool)] = []) {
         // 칸 차례 = 하루에 놓인 차례. 찍어도 칸이 옮겨 가지 않아야 블록 색이 그대로 머문다.
         let todos = blocks.filter { $0.isTodo(routineNames) }
             .sorted { ($0.sortHour, $0.createdAt) < ($1.sortHour, $1.createdAt) }
-        total = todos.count
+        total = todos.count + rainbow.count
         marks = todos.map { $0.reviewStatus != nil }
+        rainbowActive = rainbow.map(\.active)
+        rainbowTitles = rainbow.map(\.title)
         marked = marks.filter { $0 }.count
         let lanes = Rainbow.spectrum.count
         colorNames = Dictionary(todos.enumerated().map { ($1.dragToken, Rainbow.spectrum[min($0, lanes - 1)].name) },
@@ -82,16 +91,22 @@ struct TodoRainbow: View {
     }
 
     private func fill(_ i: Int) -> Color {
-        if i < load.total {
+        if i < load.blockCount {
             return load.marks[i] ? Rainbow.laneColor(i).opacity(0.25) : Rainbow.laneColor(i)
+        }
+        if i < load.total {
+            // 무지개 일정 칸 — 하는 날은 진하게, 기간 안이기만 하면 옅게 (아이폰 무지개와 같다).
+            return load.rainbowActive[i - load.blockCount] ? Rainbow.laneColor(i) : Rainbow.laneColor(i).opacity(0.35)
         }
         return Color.primary.opacity(0.06)
     }
 
     private var help: String {
-        load.total == 0
+        let base = load.total == 0
             ? String(localized: "해야 할 일 없음")
             : String(localized: "해야 할 일 \(load.total)개 · 남은 것 \(load.remaining)개")
+        guard !load.rainbowTitles.isEmpty else { return base }
+        return base + "\n" + String(localized: "무지개 일정: \(load.rainbowTitles.joined(separator: ", "))")
     }
 }
 

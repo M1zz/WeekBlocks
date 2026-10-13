@@ -252,8 +252,8 @@ final class CalendarBridge {
         Self.migrateAllDayToBackground(in: context)
 
         // 이 주의 블록들. 캘린더에서 온 것은 맞춰 갈 대상, 사람이 세운 것은 짝지을 후보다.
-        let weekBlocks = ((try? context.fetch(FetchDescriptor<PlanBlock>())) ?? [])
-            .filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) }
+        let allBlocks = (try? context.fetch(FetchDescriptor<PlanBlock>())) ?? []
+        let weekBlocks = allBlocks.filter { cal.isDate($0.weekStartDate, inSameDayAs: weekStart) }
         let existing = weekBlocks.filter { $0.calendarEventID != nil }
         var mine = weekBlocks.filter { $0.calendarEventID == nil }
         var byKey = Dictionary(existing.map { ($0.calendarEventID!, $0) }, uniquingKeysWith: { a, _ in a })
@@ -282,18 +282,40 @@ final class CalendarBridge {
                 Self.relink(old, to: key)
                 block = old
             }
-            // 시각을 옮긴 일정은 이름(= id + 시작 시각)이 바뀐다. 반복 일정이 아니면 같은 id의
-            // 블록을 찾아 그 블록을 옮긴다 — 안 그러면 새 블록 하나와 '사라진 일정' 하나로 갈린다.
-            if block == nil, !event.hasRecurrenceRules,
-               let moved = byKey.first(where: { Self.names($0.key, event) }) {
-                byKey.removeValue(forKey: moved.key)
-                Self.relink(moved.value, to: key)
-                block = moved.value
-            }
             // 옛 이름에 붙어 있던 '사람이 지은 제목' 표시도 새 이름으로 넘긴다.
             if let legacy, legacy != key, CalendarMerge.hasOwnTitle(legacy) { CalendarMerge.keepOwnTitle(for: key) }
             matches.append(Match(event: event, key: key, legacy: legacy, day: day, hour: hour,
                                  allDay: allDay, title: title, block: block))
+        }
+
+        // ── 1차 뒤: 시각을 옮긴 일정. ──
+        // 시각을 옮기면 이름(= id + 시작 시각)이 바뀐다. 같은 id의 블록을 찾아 그 블록을 옮긴다 —
+        // 안 그러면 새 블록 하나와 '사라진 일정' 하나로 갈린다.
+        // ⚠️ 이름이 그대로 맞는 짝을 **모든 일정에 대해 먼저** 지은 뒤에 한다. 반복 일정은 회차마다 id가
+        //    같아서, 섞어 돌리면 옮긴 회차가 제자리에 있는 다른 회차의 블록을 가로챈다.
+        //    남은 같은 id 블록 중 **시각이 가장 가까운 것**을 고른다 — 반복 일정의 한 회차만 옮긴 경우도 따라간다.
+        for i in matches.indices where matches[i].block == nil {
+            let event = matches[i].event
+            guard let start = event.startDate else { continue }
+            let same = byKey.filter { Self.names($0.key, event) }
+            guard let nearest = same.min(by: {
+                abs(Double((Self.parse($0.key)?.start ?? 0)) - start.timeIntervalSince1970)
+                    < abs(Double((Self.parse($1.key)?.start ?? 0)) - start.timeIntervalSince1970)
+            }) else {
+                // 다른 주에서 이 주로 옮겨 온 일정 — 그 주에 있던 블록을 데려온다 (반복 일정은 회차를 가릴 수 없어 빼고).
+                guard !event.hasRecurrenceRules,
+                      let from = allBlocks.first(where: { b in
+                          !cal.isDate(b.weekStartDate, inSameDayAs: weekStart)
+                              && b.calendarEventID.map { Self.names($0, event) } == true
+                      }) else { continue }
+                from.weekStartDate = weekStart
+                Self.relink(from, to: matches[i].key)
+                matches[i].block = from
+                continue
+            }
+            byKey.removeValue(forKey: nearest.key)
+            Self.relink(nearest.value, to: matches[i].key)
+            matches[i].block = nearest.value
         }
 
         // ── 2차: 같은 날 · 같은 시작 분 · 같은 제목으로 한 번 더 맞춘다. ──
@@ -398,6 +420,12 @@ final class CalendarBridge {
                 let homes = Set(linkedEvents(forKey: key).compactMap { $0.calendar?.calendarIdentifier })
                 guard !homes.isDisjoint(with: chosenIDs) else { continue }
             }
+            // 다른 주로 옮긴 일정 — 사라진 게 아니다. 블록을 그 주·그 요일·그 시각으로 따라 옮긴다.
+            if let moved = movedElsewhere(key: key, from: weekStart, among: chosenIDs) {
+                if let k = follow(orphan, to: moved, key: key) { seen.insert(k) }
+                result.updated += 1
+                continue
+            }
             if Self.wasTouchedByPerson(orphan) {
                 orphan.calendarEventID = nil   // 연결만 끊고 글은 남긴다.
                 result.keptOrphans += 1
@@ -411,6 +439,34 @@ final class CalendarBridge {
         // 고르기만 하고 아무것도 안 들어온 주가 흔하다. '가져왔다'는 들어왔을 때만이다.
         if result.added > 0 || result.updated > 0 { Telemetry.record(.calendarImported) }
         return result
+    }
+
+    /// 이 이름의 일정이 **이 주 밖으로** 옮겨 갔으면 그 일정. 반복 일정은 회차를 가릴 수 없어 보지 않는다.
+    private func movedElsewhere(key: String, from weekStart: Date, among calendars: Set<String>) -> EKEvent? {
+        guard let event = linkedEvents(forKey: key).first(where: {
+            !$0.hasRecurrenceRules && calendars.contains($0.calendar?.calendarIdentifier ?? "")
+        }), let start = event.startDate else { return nil }
+        guard let end = Calendar.current.date(byAdding: .day, value: 7, to: weekStart) else { return nil }
+        return (start < weekStart || start >= end) ? event : nil
+    }
+
+    /// 블록을 옮겨 간 일정에 맞춘다 — 주 · 요일 · 시각 · 길이 · 이름. 사람이 적은 것과 제목은 그대로다
+    /// (제목은 그 주를 가져올 때 늘 하던 규칙대로 맞춘다).
+    @discardableResult
+    private func follow(_ block: PlanBlock, to event: EKEvent, key old: String) -> String? {
+        guard let start = event.startDate, let newKey = Self.key(for: event) else { return nil }
+        let cal = Calendar.current
+        let week = start.shownWeekStart(sundayFirst: WeekStartSetting.sundayFirst)
+        guard let day = Self.day(of: start, in: week) else { return nil }
+        let allDay = Self.isWholeDay(event)
+        let hour = allDay ? PlanBlock.backgroundHour : Self.hourOfDay(start, calendar: cal)
+        block.weekStartDate = week
+        block.day = day
+        if !(allDay && block.isAllDay) { block.startHour = hour }
+        block.durationHours = Self.duration(of: event, startHour: hour)
+        block.timeBand = .containing(hour >= 0 ? hour : 9)
+        Self.relink(block, to: newKey)
+        return newKey
     }
 
     /// 이번 가져오기에서 캘린더 일정 하나와, 그 일정을 맡을 블록.

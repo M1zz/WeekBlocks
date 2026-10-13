@@ -379,6 +379,19 @@ struct ContentView: View {
                     } label: {
                         Label("무지개 일정 추가", systemImage: "rainbow")
                     }
+                    // 무지개 일정은 요일 아래 점(칸)으로만 선다 — 고칠 것은 여기서 고른다.
+                    let weekRainbow = rainbowEvents.filter { e in shownDays.contains { e.spans(dayDate($0)) } }
+                    if !weekRainbow.isEmpty {
+                        Menu {
+                            ForEach(weekRainbow, id: \.uuid) { e in
+                                Button("\(e.title) · \(RainbowEventFormat.hours(e.hoursPerDay))") {
+                                    rainbowSheet = RainbowEditContext(event: e)
+                                }
+                            }
+                        } label: {
+                            Label("이 주의 무지개 일정", systemImage: "rainbow")
+                        }
+                    }
                     Button {
                         showingSampleAlert = true
                     } label: {
@@ -1155,7 +1168,10 @@ struct ContentView: View {
 
     /// 그 요일에 해야 할 일의 수 — 일간 요일 줄과 주간 두 보기의 무지개가 같은 값을 본다 (→ TodoRainbow).
     private func todoLoad(on day: DayOfWeek) -> TodoLoad {
-        TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames)
+        let date = dayDate(day)
+        // 아이폰 무지개 일정도 그날의 칸으로 센다 — 기간 안이면 한 칸, 하는 날이면 진하게.
+        let rainbow = rainbowEvents.filter { $0.spans(date) }.map { (title: $0.title, active: $0.occurs(on: date)) }
+        return TodoLoad(weekBlocks.filter { $0.day == day }, routineNames: routineNames, rainbow: rainbow)
     }
 
     /// 보는 주의 종일 막대 (→ AllDaySpan). 캘린더에서 온 여러 날 일정은 끝나는 날을 캘린더에서 읽는다.
@@ -1573,14 +1589,6 @@ struct ContentView: View {
         return VStack(alignment: .leading, spacing: 8) {
             HourAxis(window: window, showsRainbow: true)
 
-            // 무지개 일정은 시각이 없다 — 시간 자 위가 아니라 요일별 목록으로 선다.
-            if !rainbowEvents.isEmpty {
-                RainbowDayList(events: rainbowEvents,
-                               days: shownDays.map { (day: $0, date: dayDate($0)) }) { event in
-                    rainbowSheet = RainbowEditContext(event: event)
-                }
-            }
-
             VStack(spacing: 4) {
                 ForEach(shownDays) { day in
                     DayTimelineRow(
@@ -1653,15 +1661,6 @@ struct ContentView: View {
                                dates: shownDays.map { Calendar.current.startOfDay(for: dayDate($0)) },
                                spacing: 10) { block in
                         blockSheet = BlockSheetContext(day: block.day, block: block)
-                    }
-                    .transition(.disclose)
-                }
-                // 아이폰 무지개 일정 — 기간 동안 하루 몇 시간씩. 하는 날이 진하다.
-                if !rainbowEvents.isEmpty {
-                    RainbowLane(events: rainbowEvents,
-                                dates: shownDays.map { Calendar.current.startOfDay(for: dayDate($0)) },
-                                spacing: 10) { event in
-                        rainbowSheet = RainbowEditContext(event: event)
                     }
                     .transition(.disclose)
                 }
