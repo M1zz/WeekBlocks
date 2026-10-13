@@ -1,5 +1,168 @@
 # 릴리즈 노트
 
+## 1.1.12
+
+### 앱스토어 (한국어)
+
+날짜별로 일정이 얼마나 겹치는지 무지개로 봅니다
+타이머로 실제 걸린 시간을 잴 수 있습니다
+계획과 실제를 견주어 보는 Pro가 나왔습니다
+한 번 사면 아이폰 앱도 함께 Pro로 열립니다
+
+### App Store (English)
+
+See how busy each day is as a rainbow
+Time how long tasks really take
+Pro compares your plan with reality
+One purchase unlocks Pro on iPhone too
+
+### App Store (繁體中文, zh-Hant)
+
+用彩虹看每天的行程有多密
+用計時器測量實際花了多久
+Pro 讓你比較計畫與實際
+購買一次，iPhone 也一起解鎖 Pro
+
+### App Store (简体中文, zh-Hans)
+
+用彩虹看每天的日程有多密
+用计时器测量实际用了多久
+Pro 让你对比计划与实际
+购买一次，iPhone 也一起解锁 Pro
+
+### App Store (日本語, ja)
+
+日ごとの予定の混み具合を虹で見られます
+タイマーで実際にかかった時間を計れます
+Proで計画と実際を比べられます
+一度の購入でiPhoneでもProが使えます
+
+### App Store (Deutsch, de)
+
+Ein Regenbogen zeigt, wie voll Tage sind
+Miss, wie lange Aufgaben wirklich dauern
+Pro vergleicht Plan und Wirklichkeit
+Ein Kauf schaltet auch das iPhone frei
+
+### App Store (Español, es)
+
+Un arcoíris muestra lo lleno de cada día
+Mide cuánto tardan de verdad tus tareas
+Pro compara tu plan con la realidad
+Una compra activa Pro también en iPhone
+
+### App Store (Français, fr)
+
+Un arc-en-ciel montre vos jours chargés
+Mesurez le vrai temps de vos tâches
+Pro compare le prévu et le réel
+Un achat débloque aussi Pro sur iPhone
+
+### App Store (Italiano, it)
+
+Un arcobaleno mostra i giorni più pieni
+Misura quanto durano davvero le attività
+Pro confronta piano e realtà
+Un acquisto sblocca Pro anche su iPhone
+
+### App Store (Português (Brasil), pt-BR)
+
+Um arco-íris mostra os dias mais cheios
+Meça quanto as tarefas levam de verdade
+O Pro compara o plano com a realidade
+Uma compra libera o Pro também no iPhone
+
+### App Store (Русский, ru)
+
+Радуга показывает, насколько занят день
+Замеряйте, сколько уходит на задачи
+Pro сравнивает план и факт
+Одна покупка откроет Pro и на iPhone
+
+### App Store (Čeština, cs)
+
+Duha ukáže, jak nabitý je každý den
+Změřte, jak dlouho úkoly opravdu trvají
+Pro porovná plán se skutečností
+Jeden nákup odemkne Pro i na iPhonu
+
+### App Store (Dansk, da)
+
+En regnbue viser, hvor travle dagene er
+Mål, hvor lang tid opgaver reelt tager
+Pro sammenligner plan og virkelighed
+Ét køb låser også Pro op på iPhone
+
+### App Store (Ελληνικά, el)
+
+Ουράνιο τόξο για τις γεμάτες μέρες
+Μέτρησε τον πραγματικό χρόνο εργασιών
+Το Pro συγκρίνει πλάνο και πράξη
+Μία αγορά ανοίγει το Pro και στο iPhone
+
+### App Store (Suomi, fi)
+
+Sateenkaari näyttää päivien kiireen
+Mittaa tehtävien todellinen kesto
+Pro vertaa suunnitelmaa toteutuneeseen
+Yksi osto avaa Pron myös iPhonessa
+
+### App Store (Bahasa Indonesia, id)
+
+Pelangi menunjukkan hari yang padat
+Ukur berapa lama tugas sebenarnya
+Pro membandingkan rencana dan kenyataan
+Sekali beli, Pro juga terbuka di iPhone
+
+### App Store (Norsk bokmål, nb)
+
+En regnbue viser hvor travle dagene er
+Mål hvor lang tid oppgaver faktisk tar
+Pro sammenligner plan og virkelighet
+Ett kjøp låser opp Pro på iPhone også
+
+### App Store (Nederlands, nl)
+
+Een regenboog toont hoe vol elke dag is
+Meet hoe lang taken echt duren
+Pro vergelijkt plan en werkelijkheid
+Eén aankoop geeft ook Pro op je iPhone
+
+### App Store (Polski, pl)
+
+Tęcza pokazuje, jak napięty jest dzień
+Zmierz, ile naprawdę trwają zadania
+Pro porównuje plan z rzeczywistością
+Jeden zakup odblokuje Pro też na iPhonie
+
+### App Store (Svenska, sv)
+
+En regnbåge visar hur fulla dagarna är
+Mät hur lång tid uppgifter faktiskt tar
+Pro jämför plan och verklighet
+Ett köp låser upp Pro även på iPhone
+
+### App Store (ไทย, th)
+
+ดูความแน่นของแต่ละวันเป็นสายรุ้ง
+จับเวลาว่างานใช้เวลาจริงเท่าไร
+Pro เทียบแผนกับสิ่งที่เกิดขึ้นจริง
+ซื้อครั้งเดียว iPhone ก็ได้ Pro ด้วย
+
+### App Store (Türkçe, tr)
+
+Gökkuşağı yoğun günleri gösterir
+İşlerin gerçekte ne kadar sürdüğünü ölç
+Pro planı gerçekle karşılaştırır
+Tek satın alma iPhone’da da Pro’yu açar
+
+### App Store (Tiếng Việt, vi)
+
+Xem mỗi ngày bận đến đâu bằng cầu vồng
+Đo thời gian thực sự làm mỗi việc
+Pro so sánh kế hoạch với thực tế
+Mua một lần, iPhone cũng mở khóa Pro
+
 ## 1.1.11
 
 ### 앱스토어 (한국어)

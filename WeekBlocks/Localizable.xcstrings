@@ -137192,6 +137192,142 @@
           }
         }
       }
+    },
+    "한 번 사면 아이폰 앱도 함께 Pro로 열립니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy once and the iPhone app unlocks Pro too."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買一次，iPhone App 也會一起解鎖 Pro。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买一次，iPhone App 也会一起解锁 Pro。"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一度購入すると、iPhoneアプリでもProが使えます。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal kaufen – Pro gilt auch in der iPhone-App."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra una vez y la app de iPhone también desbloquea Pro."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un seul achat débloque aussi Pro dans l’app iPhone."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acquista una volta e Pro si sblocca anche nell’app per iPhone."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compre uma vez e o app do iPhone também libera o Pro."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Одна покупка открывает Pro и в приложении для iPhone."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stačí koupit jednou a Pro se odemkne i v aplikaci pro iPhone."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Køb én gang, så låses Pro også op i iPhone-appen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Με μία αγορά, το Pro ξεκλειδώνει και στην εφαρμογή iPhone."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yksi osto avaa Pron myös iPhone-apissa."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beli sekali, Pro juga terbuka di app iPhone."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kjøp én gang, så låses Pro også opp i iPhone-appen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eén keer kopen ontgrendelt Pro ook in de iPhone-app."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeden zakup odblokowuje Pro także w aplikacji na iPhone’a."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Köp en gång så låses Pro upp även i iPhone-appen."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ซื้อครั้งเดียว แอปบน iPhone ก็ปลดล็อก Pro ด้วย"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir kez al, iPhone uygulamasında da Pro açılsın."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mua một lần, ứng dụng iPhone cũng mở khóa Pro."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

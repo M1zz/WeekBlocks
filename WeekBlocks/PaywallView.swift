@@ -73,6 +73,13 @@ struct PaywallView: View {
             .padding(.bottom, 20)
 
             plans
+                .padding(.bottom, 8)
+
+            // 두 앱은 서로 다른 앱이지만, 한쪽에서 산 것이 다른 쪽도 연다 (→ ProMark.swift).
+            // 두 번 사는 줄 알고 망설이는 사람이 가장 오래 쓸 사람이다 — 값 앞에서 말해 둔다.
+            Label("한 번 사면 아이폰 앱도 함께 Pro로 열립니다.", systemImage: "iphone")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
                 .padding(.bottom, 12)
 
             if let message = purchases.failureMessage {
