@@ -67,6 +67,11 @@ struct RainbowDensityView: View {
     let weeks: Int
     let onOpen: (RainbowDensityItem) -> Void
     let onAdd: (Date) -> Void
+    /// 날짜 · 칸을 가로로 끌어 고른 기간 (첫날, 끝날).
+    let onAddRange: (Date, Date) -> Void
+
+    /// 끌고 있는 동안 고른 칸 (시작 번호, 지금 번호).
+    @State private var dragRange: (from: Int, to: Int)?
 
     private static let laneCount = 7
     private static let cellWidth: CGFloat = 30
@@ -93,9 +98,48 @@ struct RainbowDensityView: View {
                     }
                     countRow(days, packed: packed)
                 }
+                .coordinateSpace(name: Self.gridSpace)
+                .overlay(alignment: .topLeading) { dragHighlight }
+                // 가로로 끌어 기간을 고른다 — 놓으면 그 기간으로 장기 플랜 추가. 조금은 움직여야 끌기로 친다
+                // (칸 누르기 · 날짜 두 번 누르기는 그대로).
+                .gesture(
+                    DragGesture(minimumDistance: 4, coordinateSpace: .named(Self.gridSpace))
+                        .onChanged { value in
+                            let from = column(at: value.startLocation.x, count: days.count)
+                            let to = column(at: value.location.x, count: days.count)
+                            if dragRange?.from != from || dragRange?.to != to { dragRange = (from, to) }
+                        }
+                        .onEnded { _ in
+                            guard let range = dragRange else { return }
+                            dragRange = nil
+                            onAddRange(days[min(range.from, range.to)], days[max(range.from, range.to)])
+                        }
+                )
                 .padding(.bottom, 6)
             }
             legend
+        }
+    }
+
+    // MARK: 끌어 고르기
+
+    private static let gridSpace = "rainbowGrid"
+
+    private func column(at x: CGFloat, count: Int) -> Int {
+        min(max(Int(x / (Self.cellWidth + Self.gap)), 0), count - 1)
+    }
+
+    /// 끌고 있는 기간 — 고른 날들의 세로 띠.
+    @ViewBuilder private var dragHighlight: some View {
+        if let range = dragRange {
+            let lo = min(range.from, range.to), hi = max(range.from, range.to)
+            let step = Self.cellWidth + Self.gap
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.accentColor.opacity(0.16))
+                .strokeBorder(Color.accentColor, lineWidth: 1.5)
+                .frame(width: CGFloat(hi - lo + 1) * step - Self.gap)
+                .offset(x: CGFloat(lo) * step)
+                .allowsHitTesting(false)
         }
     }
 
@@ -138,7 +182,7 @@ struct RainbowDensityView: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture(count: 2) { onAdd(day) }
-                .help("두 번 눌러 이날부터 장기 플랜 추가")
+                .help("가로로 끌어 기간을 고르거나, 두 번 눌러 이날부터 장기 플랜 추가")
             }
         }
     }
@@ -165,7 +209,7 @@ struct RainbowDensityView: View {
                     .frame(width: Self.cellWidth, alignment: .leading)
                     .contentShape(Rectangle())
                     .onTapGesture { if let event { onOpen(event) } }
-                    .help(event?.title ?? "")
+                    .help(event?.title ?? String(localized: "가로로 끌어 기간을 고르면 장기 플랜 추가"))
             }
         }
     }

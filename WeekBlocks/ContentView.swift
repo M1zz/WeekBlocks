@@ -440,7 +440,7 @@ struct ContentView: View {
             CalendarMergeSheet(pairs: mergePairs ?? [])
         }
         .sheet(item: $rainbowSheet) { ctx in
-            RainbowEventEditor(event: ctx.event, defaultStart: ctx.defaultStart) { rainbowSheet = nil }
+            RainbowEventEditor(event: ctx.event, defaultStart: ctx.defaultStart, defaultEnd: ctx.defaultEnd) { rainbowSheet = nil }
         }
         .sheet(item: $blockSheet) { ctx in
             BlockEditorView(
@@ -1232,7 +1232,8 @@ struct ContentView: View {
                                start: selectedWeek,
                                weeks: Self.rainbowWeeks,
                                onOpen: openRainbowItem,
-                               onAdd: { rainbowSheet = RainbowEditContext(event: nil, defaultStart: $0) })
+                               onAdd: { rainbowSheet = RainbowEditContext(event: nil, defaultStart: $0) },
+                               onAddRange: { rainbowSheet = RainbowEditContext(event: nil, defaultStart: $0, defaultEnd: $1) })
         }
         .dashboardPanel()
     }

@@ -16014,6 +16014,822 @@
         }
       }
     },
+    "가로로 끌어 기간을 고르거나, 두 번 눌러 이날부터 장기 플랜 추가" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tažením do strany vyberte období, nebo dvojitým kliknutím přidejte dlouhodobý plán od tohoto dne"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Træk henover for at vælge en periode, eller dobbeltklik for at tilføje en langsigtet plan fra denne dag"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitlich ziehen, um einen Zeitraum zu wählen, oder doppelklicken, um ab diesem Tag einen langfristigen Plan hinzuzufügen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σύρετε οριζόντια για να επιλέξετε περίοδο ή κάντε διπλό κλικ για προσθήκη μακροπρόθεσμου πλάνου από αυτή την ημέρα"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag across to pick a period, or double-click to add a long-term plan starting this day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrastra en horizontal para elegir un periodo, o haz doble clic para añadir un plan a largo plazo desde este día"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vedä vaakasuunnassa valitaksesi jakson tai kaksoisosoita lisätäksesi suunnitelman tästä päivästä alkaen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites glisser horizontalement pour choisir une période, ou double-cliquez pour ajouter un plan à long terme à partir de ce jour"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seret mendatar untuk memilih periode, atau klik dua kali untuk menambah rencana jangka panjang mulai hari ini"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trascina in orizzontale per scegliere un periodo, o fai doppio clic per aggiungere un piano a lungo termine da questo giorno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "横にドラッグして期間を選ぶか、ダブルクリックでこの日から長期プランを追加"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dra sidelengs for å velge en periode, eller dobbeltklikk for å legge til en langsiktig plan fra denne dagen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep horizontaal om een periode te kiezen, of dubbelklik om vanaf deze dag een langetermijnplan toe te voegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeciągnij w poziomie, aby wybrać okres, lub kliknij dwukrotnie, aby dodać plan długoterminowy od tego dnia"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arraste na horizontal para escolher um período, ou clique duas vezes para adicionar um plano de longo prazo a partir deste dia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проведите по горизонтали, чтобы выбрать период, или дважды щёлкните, чтобы добавить долгосрочный план с этого дня"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dra i sidled för att välja en period, eller dubbelklicka för att lägga till en långsiktig plan från den här dagen"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ลากในแนวนอนเพื่อเลือกช่วงเวลา หรือคลิกสองครั้งเพื่อเพิ่มแผนระยะยาวตั้งแต่วันนี้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir dönem seçmek için yatay sürükleyin veya bu günden başlayan uzun vadeli plan eklemek için çift tıklayın"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kéo ngang để chọn khoảng thời gian, hoặc nhấp đúp để thêm kế hoạch dài hạn từ ngày này"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "横向拖动选择时间段，或双击从这一天起添加长期计划"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "橫向拖曳選擇時段，或按兩下從這一天起新增長期計畫"
+          }
+        }
+      }
+    },
+    "가로로 끌어 기간을 고르면 장기 플랜 추가" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tažením do strany vyberte období a přidejte dlouhodobý plán"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Træk henover for at vælge en periode og tilføje en langsigtet plan"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seitlich ziehen, um einen Zeitraum zu wählen und einen langfristigen Plan hinzuzufügen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σύρετε οριζόντια για να επιλέξετε περίοδο και να προσθέσετε μακροπρόθεσμο πλάνο"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag across to pick a period and add a long-term plan"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrastra en horizontal para elegir un periodo y añadir un plan a largo plazo"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vedä vaakasuunnassa valitaksesi jakson ja lisätäksesi pitkän aikavälin suunnitelman"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites glisser horizontalement pour choisir une période et ajouter un plan à long terme"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seret mendatar untuk memilih periode dan menambah rencana jangka panjang"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trascina in orizzontale per scegliere un periodo e aggiungere un piano a lungo termine"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "横にドラッグして期間を選び、長期プランを追加"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dra sidelengs for å velge en periode og legge til en langsiktig plan"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep horizontaal om een periode te kiezen en een langetermijnplan toe te voegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeciągnij w poziomie, aby wybrać okres i dodać plan długoterminowy"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arraste na horizontal para escolher um período e adicionar um plano de longo prazo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проведите по горизонтали, чтобы выбрать период и добавить долгосрочный план"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dra i sidled för att välja en period och lägga till en långsiktig plan"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ลากในแนวนอนเพื่อเลือกช่วงเวลาและเพิ่มแผนระยะยาว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir dönem seçip uzun vadeli plan eklemek için yatay sürükleyin"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kéo ngang để chọn khoảng thời gian và thêm kế hoạch dài hạn"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "横向拖动选择时间段并添加长期计划"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "橫向拖曳選擇時段並新增長期計畫"
+          }
+        }
+      }
+    },
+    "날짜 줄(2026-10-06 19:00~21:00)과 회차 줄(1세션 · 2H · 메모)을 붙여 넣으세요. 차례대로 짝짓습니다. 시각은 없어도 됩니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vložte řádky s daty (2026-10-06 19:00~21:00) a řádky lekcí (1. lekce · 2H · poznámka). Spárují se popořadě. Čas je nepovinný."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indsæt datolinjer (2026-10-06 19:00~21:00) og sessionslinjer (Session 1 · 2H · note). De parres i rækkefølge. Tidspunkt er valgfrit."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge Datumszeilen (2026-10-06 19:00~21:00) und Einheitszeilen (Einheit 1 · 2H · Notiz) ein. Sie werden der Reihe nach gepaart. Uhrzeiten sind optional."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Επικολλήστε γραμμές ημερομηνιών (2026-10-06 19:00~21:00) και γραμμές συνεδριών (Συνεδρία 1 · 2H · σημείωση). Αντιστοιχίζονται με τη σειρά. Η ώρα είναι προαιρετική."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste date lines (2026-10-06 19:00~21:00) and session lines (Session 1 · 2H · note). They’re paired in order. Times are optional."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pega líneas de fecha (2026-10-06 19:00~21:00) y líneas de sesión (Sesión 1 · 2H · nota). Se emparejan en orden. La hora es opcional."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liitä päivämäärärivit (2026-10-06 19:00~21:00) ja kertarivit (1. kerta · 2H · muistiinpano). Ne yhdistetään järjestyksessä. Kellonaika on valinnainen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collez des lignes de date (2026-10-06 19:00~21:00) et des lignes de séance (Séance 1 · 2H · note). Elles sont associées dans l’ordre. L’heure est facultative."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempel baris tanggal (2026-10-06 19:00~21:00) dan baris sesi (Sesi 1 · 2H · catatan). Dipasangkan sesuai urutan. Jam boleh dikosongkan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incolla righe di data (2026-10-06 19:00~21:00) e righe di sessione (Sessione 1 · 2H · nota). Vengono abbinate in ordine. L’ora è facoltativa."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付の行（2026-10-06 19:00~21:00）と回の行（1回目 · 2H · メモ）を貼り付けてください。順番に組み合わせます。時刻はなくても構いません。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lim inn datolinjer (2026-10-06 19:00~21:00) og øktlinjer (Økt 1 · 2H · notat). De pares i rekkefølge. Tid er valgfritt."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plak datumregels (2026-10-06 19:00~21:00) en sessieregels (Sessie 1 · 2H · notitie). Ze worden op volgorde gekoppeld. Tijden zijn optioneel."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wklej wiersze dat (2026-10-06 19:00~21:00) i wiersze sesji (Sesja 1 · 2H · notatka). Zostaną dopasowane po kolei. Godzina jest opcjonalna."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cole linhas de data (2026-10-06 19:00~21:00) e linhas de sessão (Sessão 1 · 2H · nota). Elas são pareadas em ordem. O horário é opcional."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вставьте строки с датами (2026-10-06 19:00~21:00) и строки занятий (Занятие 1 · 2H · заметка). Они сопоставляются по порядку. Время указывать необязательно."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klistra in datumrader (2026-10-06 19:00~21:00) och passrader (Pass 1 · 2H · anteckning). De paras ihop i ordning. Tid är valfritt."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "วางบรรทัดวันที่ (2026-10-06 19:00~21:00) และบรรทัดครั้ง (ครั้งที่ 1 · 2H · บันทึก) ระบบจะจับคู่ตามลำดับ ไม่ใส่เวลาก็ได้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarih satırlarını (2026-10-06 19:00~21:00) ve oturum satırlarını (Oturum 1 · 2H · not) yapıştırın. Sırayla eşleştirilir. Saat isteğe bağlıdır."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dán các dòng ngày (2026-10-06 19:00~21:00) và dòng buổi (Buổi 1 · 2H · ghi chú). Chúng được ghép theo thứ tự. Giờ có thể bỏ trống."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粘贴日期行（2026-10-06 19:00~21:00）和课次行（第1次 · 2H · 备注），按顺序配对。时间可不填。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貼上日期行（2026-10-06 19:00~21:00）與課次行（第1次 · 2H · 備註），依序配對。時間可不填。"
+          }
+        }
+      }
+    },
+    "시각" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Čas"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tid"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhrzeit"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ώρα"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aika"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jam"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ora"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時刻"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tid"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tijd"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Godzina"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horário"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tid"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เวลา"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saat"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giờ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
+          }
+        }
+      }
+    },
+    "시각 지우기" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smazat čas"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ryd tid"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhrzeit entfernen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Διαγραφή ώρας"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar hora"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista aika"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer l’heure"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus jam"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi ora"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時刻を消去"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fjern tid"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tijd wissen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń godzinę"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover horário"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать время"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rensa tid"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ล้างเวลา"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saati temizle"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xóa giờ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除时间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除時間"
+          }
+        }
+      }
+    },
+    "이 회차를 시작하는 시각 정하기" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavit čas začátku této lekce"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angiv starttidspunkt for denne session"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startzeit dieser Einheit festlegen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ορισμός ώρας έναρξης αυτής της συνεδρίας"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the start time of this session"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fijar la hora de inicio de esta sesión"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aseta tämän kerran alkamisaika"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir l’heure de début de cette séance"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atur jam mulai sesi ini"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imposta l’ora di inizio di questa sessione"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この回の開始時刻を設定"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angi starttid for denne økten"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begintijd van deze sessie instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustaw godzinę rozpoczęcia tej sesji"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definir o horário de início desta sessão"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Задать время начала этого занятия"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ange starttid för det här passet"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ตั้งเวลาเริ่มของครั้งนี้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu oturumun başlangıç saatini ayarla"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đặt giờ bắt đầu buổi này"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置本次课程的开始时间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定本次課程的開始時間"
+          }
+        }
+      }
+    },
     "💡 세 가지를 다 통과한 블록만 또렷한 색으로 섭니다. 비워 두어도 저장되고, 그때는 시간표에서 주황색 '구체성 미검증'으로 남습니다." : {
       "localizations" : {
         "cs" : {
@@ -49097,142 +49913,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按兩下，從這一天開始新增彩虹行程"
-          }
-        }
-      }
-    },
-    "두 번 눌러 이날부터 장기 플랜 추가" : {
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dvojitým kliknutím přidáte dlouhodobý plán od tohoto dne"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dobbeltklik for at tilføje en langsigtet plan fra denne dag"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Doppelklicken, um ab diesem Tag einen langfristigen Plan hinzuzufügen"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Διπλό κλικ για προσθήκη μακροπρόθεσμου πλάνου από αυτή την ημέρα"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double-click to add a long-term plan starting this day"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Doble clic para añadir un plan a largo plazo desde este día"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kaksoisosoita lisätäksesi suunnitelman tästä päivästä alkaen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double-cliquez pour ajouter un plan à long terme à partir de ce jour"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klik dua kali untuk menambah rencana jangka panjang mulai hari ini"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Doppio clic per aggiungere un piano a lungo termine da questo giorno"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダブルクリックでこの日から長期プランを追加"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dobbeltklikk for å legge til en langsiktig plan fra denne dagen"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dubbelklik om vanaf deze dag een langetermijnplan toe te voegen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kliknij dwukrotnie, aby dodać plan długoterminowy od tego dnia"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clique duas vezes para adicionar um plano de longo prazo a partir deste dia"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Дважды щёлкните, чтобы добавить долгосрочный план с этого дня"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dubbelklicka för att lägga till en långsiktig plan från den här dagen"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "คลิกสองครั้งเพื่อเพิ่มแผนระยะยาวตั้งแต่วันนี้"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bu günden başlayan uzun vadeli plan eklemek için çift tıklayın"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nhấp đúp để thêm kế hoạch dài hạn từ ngày này"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "双击从这一天起添加长期计划"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "按兩下從這一天起新增長期計畫"
           }
         }
       }
@@ -134061,142 +134741,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "貼上課次"
-          }
-        }
-      }
-    },
-    "날짜 줄(2026-10-06)과 회차 줄(1세션 · 2H · 메모)을 붙여 넣으세요. 차례대로 짝짓습니다." : {
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vložte řádky s daty (2026-10-06) a řádky lekcí (1. lekce · 2H · poznámka). Spárují se v pořadí."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indsæt datolinjer (2026-10-06) og sessionslinjer (Session 1 · 2H · note). De parres i rækkefølge."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Füge Datumszeilen (2026-10-06) und Terminzeilen (Termin 1 · 2H · Notiz) ein. Sie werden der Reihe nach gepaart."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Επικολλήστε γραμμές ημερομηνιών (2026-10-06) και γραμμές συνεδριών (Session 1 · 2H · σημείωση). Ζευγαρώνονται με τη σειρά."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paste date lines (2026-10-06) and session lines (Session 1 · 2H · note). They’re paired in order."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pega líneas de fecha (2026-10-06) y líneas de sesión (Session 1 · 2H · nota). Se emparejan en orden."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liitä päivämäärärivit (2026-10-06) ja kertarivit (Session 1 · 2H · muistiinpano). Ne yhdistetään järjestyksessä."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collez les lignes de date (2026-10-06) et les lignes de séance (Session 1 · 2H · note). Elles sont associées dans l’ordre."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tempel baris tanggal (2026-10-06) dan baris sesi (Session 1 · 2H · catatan). Dipasangkan sesuai urutan."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Incolla righe di data (2026-10-06) e righe di sessione (Session 1 · 2H · nota). Vengono abbinate in ordine."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日付の行（2026-10-06）と回の行（1回 · 2H · メモ）を貼り付けてください。順番に組み合わせます。"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lim inn datolinjer (2026-10-06) og øktlinjer (Session 1 · 2H · notat). De pares i rekkefølge."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plak datumregels (2026-10-06) en sessieregels (Session 1 · 2H · notitie). Ze worden op volgorde gekoppeld."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wklej wiersze dat (2026-10-06) i wiersze sesji (Session 1 · 2H · notatka). Zostaną połączone w kolejności."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cole linhas de data (2026-10-06) e linhas de sessão (Session 1 · 2H · nota). Elas são pareadas em ordem."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вставьте строки с датами (2026-10-06) и строки занятий (Session 1 · 2H · заметка). Они сопоставляются по порядку."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klistra in datumrader (2026-10-06) och tillfällesrader (Session 1 · 2H · anteckning). De paras ihop i ordning."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "วางบรรทัดวันที่ (2026-10-06) และบรรทัดครั้ง (Session 1 · 2H · บันทึก) ระบบจะจับคู่ตามลำดับ"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarih satırlarını (2026-10-06) ve oturum satırlarını (Session 1 · 2H · not) yapıştırın. Sırayla eşleştirilir."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dán các dòng ngày (2026-10-06) và dòng buổi (Session 1 · 2H · ghi chú). Chúng được ghép theo thứ tự."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "粘贴日期行（2026-10-06）和课次行（第1次 · 2H · 备注），会按顺序配对。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "貼上日期行（2026-10-06）和課次行（第1次 · 2H · 備註），會依序配對。"
           }
         }
       }
