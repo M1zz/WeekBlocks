@@ -178,15 +178,19 @@ struct RainbowSession: Codable, Hashable, Identifiable {
     /// 그날 0시 (적은 기기의). 읽을 때는 `RainbowEvent.day`로 이 기기의 그날에 맞춘다.
     var date: Date
     var hours: Double = 1
+    /// 시작 시각(h, 19.5 = 19:30). nil이면 시각을 안 정했다 — 그날 하루 몇 시간만.
+    /// 옛 JSON에는 없는 칸이라 옵셔널이다. 아이폰 다리는 `sessionsData`를 바이트째 옮기므로 그대로 건넌다.
+    var startHour: Double? = nil
     /// "1세션"처럼 회차의 이름. 비면 "N회차".
     var title: String = ""
     var note: String = ""
     /// 맥이 이 회차를 계획 블록으로 옮겨 적었다. 다시 만들지 않는다 — 블록을 지웠으면 지운 뜻이다.
     var blockMade: Bool = false
 
-    init(date: Date, hours: Double = 1, title: String = "", note: String = "") {
+    init(date: Date, hours: Double = 1, startHour: Double? = nil, title: String = "", note: String = "") {
         self.date = date
         self.hours = hours
+        self.startHour = startHour
         self.title = title
         self.note = note
     }
@@ -196,9 +200,17 @@ struct RainbowSession: Codable, Hashable, Identifiable {
         id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
         date = try c.decode(Date.self, forKey: .date)
         hours = try c.decodeIfPresent(Double.self, forKey: .hours) ?? 1
+        startHour = try c.decodeIfPresent(Double.self, forKey: .startHour)
         title = try c.decodeIfPresent(String.self, forKey: .title) ?? ""
         note = try c.decodeIfPresent(String.self, forKey: .note) ?? ""
         blockMade = try c.decodeIfPresent(Bool.self, forKey: .blockMade) ?? false
+    }
+
+    /// "오후 7:00~9:00"처럼 시작 ~ 끝 시각. 시각을 안 정했으면 nil. 이 기기의 시각 표기로 적는다.
+    var timeRangeText: String? {
+        guard let startHour else { return nil }
+        let start = Calendar.current.startOfDay(for: Date()).addingTimeInterval(startHour * 3600)
+        return (start..<start.addingTimeInterval(max(hours, 0.25) * 3600)).formatted(.interval.hour().minute())
     }
 
     /// 이름이 비었으면 "N회차" (N은 1부터).

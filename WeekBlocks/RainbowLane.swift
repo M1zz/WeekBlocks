@@ -35,6 +35,8 @@ struct RainbowEventEditor: View {
     /// nil이면 새로 적는다.
     let event: RainbowEvent?
     var defaultStart: Date = Date()
+    /// 무지개 판에서 끌어 고른 끝날. nil이면 시작부터 한 주.
+    var defaultEnd: Date? = nil
     let onClose: () -> Void
 
     @Environment(\.modelContext) private var context
@@ -182,7 +184,8 @@ struct RainbowEventEditor: View {
     private func load() {
         guard let event else {
             start = Calendar.current.startOfDay(for: defaultStart)
-            end = Calendar.current.date(byAdding: .day, value: 6, to: start) ?? start
+            end = defaultEnd.map { max(start, Calendar.current.startOfDay(for: $0)) }
+                ?? Calendar.current.date(byAdding: .day, value: 6, to: start) ?? start
             return
         }
         title = event.title
@@ -235,6 +238,7 @@ struct RainbowEventEditor: View {
             target.weeklyPattern = nil
             target.repeatWeeks = 1
             target.hoursPerDay = list.map(\.hours).reduce(0, +) / Double(list.count)
+            moveSessionBlocks(list, planTitle: target.title)
             makeSessionBlocks(&list, planTitle: target.title)
         }
         target.sessions = list
@@ -249,16 +253,47 @@ struct RainbowEventEditor: View {
     private func makeSessionBlocks(_ list: inout [RainbowSession], planTitle: String) {
         for i in list.indices where !list[i].blockMade {
             let date = Calendar.current.startOfDay(for: list[i].date)
+            let startHour = list[i].startHour
             let block = PlanBlock(day: DayOfWeek.of(date),
-                                  timeBand: .evening,
+                                  timeBand: startHour.map(TimeBand.containing) ?? .evening,
                                   durationHours: list[i].hours,
                                   title: "\(planTitle) \(list[i].displayTitle(index: i))",
                                   successCriteria: "",
                                   deliverable: "",
-                                  weekStartDate: date.weekStart())
+                                  weekStartDate: date.weekStart(),
+                                  startHour: startHour ?? -1)
             TodoSharing.stamp(block)
             context.insert(block)
             list[i].blockMade = true
+        }
+    }
+
+    /// **이미 블록이 선 회차의 시각을 바꿨으면 그 블록도 옮긴다** — 그날, 같은 이름의 블록.
+    /// 회차 날짜 · 이름을 바꾼 것은 따라가지 않는다 (어느 블록인지 더는 모른다).
+    private func moveSessionBlocks(_ list: [RainbowSession], planTitle: String) {
+        let before = Dictionary(uniqueKeysWithValues: (event?.sessions ?? []).map { ($0.id, $0) })
+        let blocks = (try? context.fetch(FetchDescriptor<PlanBlock>())) ?? []
+        for (i, session) in list.enumerated() where session.blockMade {
+            guard let old = before[session.id], old.startHour != session.startHour || old.hours != session.hours,
+                  RainbowEvent.day(old.date) == RainbowEvent.day(session.date) else { continue }
+            let date = RainbowEvent.day(session.date)
+            let name = "\(planTitle) \(session.displayTitle(index: i))"
+            for block in blocks where block.title == name && block.day == DayOfWeek.of(date)
+                && Calendar.current.isDate(block.weekStartDate, inSameDayAs: date.weekStart()) {
+                block.startHour = session.startHour ?? -1
+                if let h = session.startHour { block.timeBand = .containing(h) }
+                block.durationHours = session.hours
+            }
+        }
+    }
+
+    /// 회차의 시작 시각을 시계 칸에 물린다 (그날 0시 + 시각).
+    private func startTime(_ session: Binding<RainbowSession>) -> Binding<Date> {
+        Binding {
+            Calendar.current.startOfDay(for: Date()).addingTimeInterval((session.wrappedValue.startHour ?? 19) * 3600)
+        } set: { date in
+            let c = Calendar.current.dateComponents([.hour, .minute], from: date)
+            session.wrappedValue.startHour = Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60
         }
     }
 
@@ -292,8 +327,31 @@ struct RainbowEventEditor: View {
                         .buttonStyle(.borderless)
                         .help("이 회차 빼기")
                     }
-                    TextField("", text: $session.note, prompt: Text("메모"))
-                        .textFieldStyle(.roundedBorder)
+                    HStack(spacing: 8) {
+                        // 시각은 고르기 — 비워 두면 그날 몇 시간만 (블록은 저녁에 시각 없이 선다).
+                        if session.startHour != nil {
+                            DatePicker("", selection: startTime($session), displayedComponents: .hourAndMinute)
+                                .labelsHidden()
+                                .fixedSize()
+                            Button {
+                                session.startHour = nil
+                            } label: {
+                                Image(systemName: "xmark.circle")
+                            }
+                            .buttonStyle(.borderless)
+                            .help("시각 지우기")
+                        } else {
+                            Button {
+                                // 앞 회차의 시각을 이어받는다 — 과정은 대개 같은 시각이다.
+                                session.startHour = sessions.last(where: { $0.startHour != nil })?.startHour ?? 19
+                            } label: {
+                                Label("시각", systemImage: "clock")
+                            }
+                            .help("이 회차를 시작하는 시각 정하기")
+                        }
+                        TextField("", text: $session.note, prompt: Text("메모"))
+                            .textFieldStyle(.roundedBorder)
+                    }
                     if session.blockMade {
                         Text("일간에 블록으로 서 있습니다")
                             .font(.body)
@@ -309,7 +367,8 @@ struct RainbowEventEditor: View {
                     // 다음 회차는 마지막 회차 2주 뒤 — 격주 과정이 흔하다. 처음이면 시작일.
                     let date = last.flatMap { cal.date(byAdding: .day, value: 14, to: $0) } ?? cal.startOfDay(for: start)
                     withAnimation(Motion.row) {
-                        sessions.append(RainbowSession(date: date, hours: sessions.last?.hours ?? hours))
+                        sessions.append(RainbowSession(date: date, hours: sessions.last?.hours ?? hours,
+                                                       startHour: sessions.last?.startHour))
                     }
                 } label: {
                     Label("회차 추가", systemImage: "plus")
@@ -376,6 +435,8 @@ struct RainbowEditContext: Identifiable {
     let id = UUID()
     let event: RainbowEvent?
     var defaultStart: Date = Date()
+    /// 무지개 판에서 끌어 고른 끝날 (→ RainbowDensityView.onAddRange).
+    var defaultEnd: Date? = nil
 }
 
 // MARK: - 할 일의 기간
@@ -475,12 +536,15 @@ enum RainbowSessionParser {
     static func parse(_ text: String) -> Result {
         var title: String?
         var dates: [Date] = []
+        /// 날짜 줄에 함께 적힌 시각 (시작, 끝) — "2026-10-06 19:00~21:00".
+        var times: [(start: Double?, end: Double?)] = []
         var drafts: [(title: String, hours: Double?, note: [String])] = []
         for raw in text.components(separatedBy: .newlines) {
             let line = raw.trimmingCharacters(in: .whitespaces)
             guard !line.isEmpty else { continue }
             if let date = date(in: line) {
                 dates.append(date)
+                times.append(clockTimes(in: line))
             } else if line.range(of: #"^(\d+\s*(세션|회차|회|주차)|(session|class)\s*\d+)$"#,
                                  options: [.regularExpression, .caseInsensitive]) != nil {
                 drafts.append((line, nil, []))
@@ -495,7 +559,10 @@ enum RainbowSessionParser {
         let count = drafts.isEmpty ? dates.count : min(dates.count, drafts.count)
         let sessions = (0..<count).map { i -> RainbowSession in
             let draft = i < drafts.count ? drafts[i] : nil
-            return RainbowSession(date: dates[i], hours: draft?.hours ?? 1,
+            let time = times[i]
+            // 회차 줄의 시간(2H)이 먼저, 없으면 날짜 줄의 시작~끝.
+            let span = time.start.flatMap { s in time.end.map { $0 > s ? $0 - s : $0 + 24 - s } }
+            return RainbowSession(date: dates[i], hours: draft?.hours ?? span ?? 1, startHour: time.start,
                                   title: draft?.title ?? "", note: draft?.note.joined(separator: " ") ?? "")
         }
         return Result(title: title, sessions: sessions, dateCount: dates.count, sessionCount: drafts.count)
@@ -506,6 +573,18 @@ enum RainbowSessionParser {
         let parts = line[r].split(whereSeparator: { "-./".contains($0) }).compactMap { Int($0) }
         guard parts.count == 3 else { return nil }
         return Calendar.current.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2]))
+    }
+
+    /// 줄 안의 "19:00" · "19:00~21:00" — 앞의 둘까지.
+    private static func clockTimes(in line: String) -> (start: Double?, end: Double?) {
+        let regex = try? NSRegularExpression(pattern: #"(\d{1,2}):(\d{2})"#)
+        let ns = line as NSString
+        let found = (regex?.matches(in: line, range: NSRange(location: 0, length: ns.length)) ?? []).compactMap { m -> Double? in
+            guard let h = Int(ns.substring(with: m.range(at: 1))), let mm = Int(ns.substring(with: m.range(at: 2))),
+                  h < 24, mm < 60 else { return nil }
+            return Double(h) + Double(mm) / 60
+        }
+        return (found.first, found.count > 1 ? found[1] : nil)
     }
 
     private static func hours(in line: String) -> Double? {
@@ -528,7 +607,7 @@ struct RainbowSessionPasteSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("회차 붙여 넣기")
                 .font(.title2.bold())
-            Text("날짜 줄(2026-10-06)과 회차 줄(1세션 · 2H · 메모)을 붙여 넣으세요. 차례대로 짝짓습니다.")
+            Text("날짜 줄(2026-10-06 19:00~21:00)과 회차 줄(1세션 · 2H · 메모)을 붙여 넣으세요. 차례대로 짝짓습니다. 시각은 없어도 됩니다.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
