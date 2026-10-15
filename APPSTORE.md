@@ -69,6 +69,9 @@ DeployBar 가 이 파일을 읽어 App Store Connect 의 스토어 페이지를 
 계정이 없고, 계획을 담아 두는 개발자 서버도 없습니다. 적은 내용은 내 기기와 내 iCloud에만 있습니다. 적은 내용이 들어가지 않는 익명 사용 통계를 보내며, 설정에서 끌 수 있습니다.
 
 한국어, 영어, 일본어, 중국어, 독일어, 프랑스어, 스페인어 등 23개 언어로 쓸 수 있습니다.
+
+이용약관(EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+개인정보 처리방침: https://m1zz.github.io/WeekBlocks/privacy.html
 ```
 
 ### 키워드
@@ -159,6 +162,9 @@ PRIVACY
 There's no account and no developer server holding your plans. What you write stays on your devices and in your own iCloud. The app sends anonymous usage counts that never include what you write, and you can turn them off in Settings.
 
 Available in 23 languages, including English, Japanese, German, French, Spanish, Korean and Chinese.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://m1zz.github.io/WeekBlocks/en/privacy.html
 ```
 
 ### 키워드
@@ -239,6 +245,9 @@ https://m1zz.github.io/WeekBlocks/en/privacy.html
 不需要帳號，也沒有存放你計畫的開發者伺服器。你寫下的內容只留在你的裝置和你自己的 iCloud。App 會傳送不含任何書寫內容的匿名使用統計，你可以在設定中關閉。
 
 支援 23 種語言，包括繁體中文、簡體中文、英文、日文、韓文、德文、法文與西班牙文。
+
+使用條款（EULA）: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+隱私權政策: https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html
 ```
 
 ### 키워드
@@ -316,6 +325,9 @@ https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html
 不需要账户，也没有存放你计划的开发者服务器。你写下的内容只留在你的设备和你自己的 iCloud 里。App 会发送不含任何书写内容的匿名使用统计，你可以在设置中关闭。
 
 支持 23 种语言，包括简体中文、繁体中文、英文、日文、韩文、德文、法文和西班牙文。
+
+使用条款（EULA）: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+隐私政策: https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html
 ```
 
 ### 키워드
@@ -390,6 +402,9 @@ iPhoneと連携
 アカウントも、あなたの予定を預かる開発者のサーバーもありません。書いたものはあなたのデバイスと、あなた自身のiCloudにだけ保存されます。アプリは匿名の使用状況の件数を送信しますが、書いた内容は一切含まれず、設定でオフにできます。
 
 日本語を含む23の言語で利用できます。
+
+利用規約（EULA）: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+プライバシーポリシー: https://m1zz.github.io/WeekBlocks/ja/privacy.html
 ```
 
 ### 키워드
@@ -465,6 +480,9 @@ Datenschutz
 Kein Account und kein Entwicklerserver, der deine Pläne speichert. Was du schreibst, bleibt auf deinen Geräten und in deiner eigenen iCloud. Die App sendet anonyme Nutzungszahlen, die nie deine Inhalte enthalten, und du kannst sie in den Einstellungen ausschalten.
 
 Verfügbar in 23 Sprachen, darunter Deutsch.
+
+Nutzungsbedingungen (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Datenschutzerklärung: https://m1zz.github.io/WeekBlocks/de/privacy.html
 ```
 
 ### 키워드
@@ -540,6 +558,9 @@ PRIVACIDAD
 No hay cuenta ni servidor del desarrollador que guarde tus planes. Lo que escribes se queda en tus dispositivos y en tu propio iCloud. La app envía recuentos de uso anónimos que nunca incluyen lo que escribes, y puedes desactivarlos en Ajustes.
 
 Disponible en 23 idiomas, incluido el español.
+
+Términos de uso (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Política de privacidad: https://m1zz.github.io/WeekBlocks/es/privacy.html
 ```
 
 ### 키워드
@@ -615,6 +636,9 @@ Confidentialité
 Pas de compte, et aucun serveur du développeur ne conserve vos plans. Ce que vous écrivez reste sur vos appareils et dans votre propre iCloud. L’app envoie des statistiques d’utilisation anonymes qui ne contiennent jamais ce que vous écrivez, et vous pouvez les désactiver dans les Réglages.
 
 Disponible en 23 langues, dont le français.
+
+Conditions d'utilisation (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Politique de confidentialité: https://m1zz.github.io/WeekBlocks/fr/privacy.html
 ```
 
 ### 키워드
@@ -690,6 +714,9 @@ Privacy
 Nessun account e nessun server dello sviluppatore che conserva i tuoi piani. Ciò che scrivi resta sui tuoi dispositivi e nel tuo iCloud. L’app invia conteggi di utilizzo anonimi che non includono mai ciò che scrivi, e puoi disattivarli in Impostazioni.
 
 Disponibile in 23 lingue, tra cui l’italiano.
+
+Termini di utilizzo (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Informativa sulla privacy: https://m1zz.github.io/WeekBlocks/it/privacy.html
 ```
 
 ### 키워드
@@ -765,6 +792,9 @@ Privacidade
 Não há conta nem servidor do desenvolvedor guardando seus planos. O que você escreve fica nos seus aparelhos e no seu próprio iCloud. O app envia contagens de uso anônimas, que nunca incluem o que você escreve, e você pode desativá-las nos Ajustes.
 
 Disponível em 23 idiomas, incluindo português do Brasil.
+
+Termos de Uso (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Política de Privacidade: https://m1zz.github.io/WeekBlocks/pt-BR/privacy.html
 ```
 
 ### 키워드
@@ -840,6 +870,9 @@ Rainbow Craft: планер недели
 Нет ни учётной записи, ни сервера разработчика, где хранились бы ваши планы. Всё, что вы пишете, остаётся на ваших устройствах и в вашем собственном iCloud. Приложение отправляет анонимную статистику использования, в которой никогда нет ваших записей, и её можно выключить в Настройках.
 
 Доступно на 23 языках, включая русский.
+
+Условия использования (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Политика конфиденциальности: https://m1zz.github.io/WeekBlocks/ru/privacy.html
 ```
 
 ### 키워드
@@ -915,6 +948,9 @@ SOUKROMÍ
 Žádný účet a žádný server vývojáře, který by držel vaše plány. Co napíšete, zůstává ve vašich zařízeních a ve vašem vlastním iCloudu. Aplikace odesílá anonymní statistiky používání, které nikdy neobsahují nic z toho, co jste napsali, a v Nastavení je můžete vypnout.
 
 K dispozici ve 23 jazycích, včetně češtiny.
+
+Podmínky použití (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Zásady ochrany osobních údajů: https://m1zz.github.io/WeekBlocks/cs/privacy.html
 ```
 
 ### 키워드
@@ -990,6 +1026,9 @@ Anonymitet
 Der er ingen konto og ingen udviklerserver, der gemmer dine planer. Det, du skriver, bliver på dine enheder og i din egen iCloud. Appen sender anonyme brugstal, som aldrig indeholder det, du skriver, og du kan slå dem fra i Indstillinger.
 
 Fås på 23 sprog, herunder dansk.
+
+Brugsvilkår (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privatlivspolitik: https://m1zz.github.io/WeekBlocks/da/privacy.html
 ```
 
 ### 키워드
@@ -1065,6 +1104,9 @@ Rainbow Craft: Οργάνωση χρόνου
 Δεν υπάρχει λογαριασμός ούτε διακομιστής του προγραμματιστή που να κρατά τα πλάνα σου. Ό,τι γράφεις μένει στις συσκευές σου και στο δικό σου iCloud. Η εφαρμογή στέλνει ανώνυμες μετρήσεις χρήσης που δεν περιέχουν ποτέ όσα γράφεις, και μπορείς να τις απενεργοποιήσεις στις Ρυθμίσεις.
 
 Διαθέσιμο σε 23 γλώσσες, μεταξύ των οποίων και τα ελληνικά.
+
+Όροι χρήσης (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Πολιτική απορρήτου: https://m1zz.github.io/WeekBlocks/el/privacy.html
 ```
 
 ### 키워드
@@ -1140,6 +1182,9 @@ Yksityisyys
 Tiliä ei tarvita, eikä mikään kehittäjän palvelin säilytä suunnitelmiasi. Kirjoittamasi pysyy laitteillasi ja omassa iCloudissasi. Appi lähettää anonyymejä käyttömääriä, jotka eivät koskaan sisällä kirjoittamaasi, ja voit laittaa ne pois päältä asetuksista.
 
 Saatavilla 23 kielellä, myös suomeksi.
+
+Käyttöehdot (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Tietosuojakäytäntö: https://m1zz.github.io/WeekBlocks/fi/privacy.html
 ```
 
 ### 키워드
@@ -1215,6 +1260,9 @@ Privasi
 Tanpa akun dan tanpa server pengembang yang menyimpan rencana Anda. Apa yang Anda tulis tetap di perangkat Anda dan di iCloud Anda sendiri. App mengirim hitungan penggunaan anonim yang tidak pernah memuat tulisan Anda, dan Anda bisa mematikannya di Pengaturan.
 
 Tersedia dalam 23 bahasa, termasuk Bahasa Indonesia.
+
+Ketentuan Penggunaan (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Kebijakan Privasi: https://m1zz.github.io/WeekBlocks/id/privacy.html
 ```
 
 ### 키워드
@@ -1290,6 +1338,9 @@ Personvern
 Det finnes ingen konto og ingen utviklerserver som lagrer planene dine. Det du skriver, blir værende på enhetene dine og i din egen iCloud. Appen sender anonyme brukstall som aldri inneholder det du skriver, og du kan slå dem av i Innstillinger.
 
 Tilgjengelig på 23 språk, blant annet norsk.
+
+Bruksvilkår (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Personvernerklæring: https://m1zz.github.io/WeekBlocks/nb/privacy.html
 ```
 
 ### 키워드
@@ -1365,6 +1416,9 @@ Privacy
 Er is geen account en geen server van de ontwikkelaar die je plannen bewaart. Wat je schrijft, blijft op je apparaten en in je eigen iCloud. De app stuurt anonieme gebruikstellingen die nooit bevatten wat je schrijft, en je kunt ze uitzetten in Instellingen.
 
 Beschikbaar in 23 talen, waaronder het Nederlands.
+
+Gebruiksvoorwaarden (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacybeleid: https://m1zz.github.io/WeekBlocks/nl/privacy.html
 ```
 
 ### 키워드
@@ -1440,6 +1494,9 @@ Prywatność
 Nie ma konta ani serwera dewelopera, na którym leżałyby Twoje plany. To, co piszesz, zostaje na Twoich urządzeniach i w Twoim własnym iCloud. Aplikacja wysyła anonimowe statystyki użycia, które nigdy nie zawierają Twoich treści, a w Ustawieniach możesz je wyłączyć.
 
 Dostępne w 23 językach, w tym po polsku.
+
+Warunki korzystania (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Polityka prywatności: https://m1zz.github.io/WeekBlocks/pl/privacy.html
 ```
 
 ### 키워드
@@ -1515,6 +1572,9 @@ Integritet
 Inget konto och ingen utvecklarserver som lagrar dina planer. Det du skriver stannar på dina enheter och i din egen iCloud. Appen skickar anonyma användningssiffror som aldrig innehåller det du skriver, och du kan stänga av dem i Inställningar.
 
 Finns på 23 språk, bland annat svenska.
+
+Användarvillkor (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Integritetspolicy: https://m1zz.github.io/WeekBlocks/sv/privacy.html
 ```
 
 ### 키워드
@@ -1589,6 +1649,9 @@ Rainbow Craft: วางแผนสัปดาห์
 ไม่มีบัญชีผู้ใช้ และไม่มีเซิร์ฟเวอร์ของนักพัฒนาเก็บแผนของคุณ สิ่งที่คุณเขียนอยู่บนอุปกรณ์ของคุณและใน iCloud ของคุณเอง แอปส่งเพียงสถิติการใช้งานแบบไม่ระบุตัวตนที่ไม่มีสิ่งที่คุณเขียน และปิดได้ในการตั้งค่า
 
 มีให้ใช้งาน 23 ภาษา รวมถึงภาษาไทย
+
+ข้อกำหนดการใช้งาน (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+นโยบายความเป็นส่วนตัว: https://m1zz.github.io/WeekBlocks/th/privacy.html
 ```
 
 ### 키워드
@@ -1664,6 +1727,9 @@ Gizlilik
 Hesap yok, planlarınızı tutan bir geliştirici sunucusu da yok. Yazdıklarınız aygıtlarınızda ve kendi iCloud’unuzda kalır. Uygulama, yazdıklarınızı asla içermeyen anonim kullanım sayıları gönderir; bunu Ayarlar’dan kapatabilirsiniz.
 
 Türkçe dahil 23 dilde kullanılabilir.
+
+Kullanım Koşulları (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Gizlilik Politikası: https://m1zz.github.io/WeekBlocks/tr/privacy.html
 ```
 
 ### 키워드
@@ -1739,6 +1805,9 @@ QUYỀN RIÊNG TƯ
 Không cần tài khoản và không có máy chủ nào của nhà phát triển lưu kế hoạch của bạn. Những gì bạn viết nằm trên thiết bị và trong iCloud của riêng bạn. Ứng dụng gửi số liệu sử dụng ẩn danh, không bao giờ kèm nội dung bạn viết, và bạn có thể tắt trong Cài đặt.
 
 Có sẵn 23 ngôn ngữ, trong đó có tiếng Việt.
+
+Điều khoản sử dụng (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Chính sách quyền riêng tư: https://m1zz.github.io/WeekBlocks/vi/privacy.html
 ```
 
 ### 키워드

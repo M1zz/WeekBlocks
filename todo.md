@@ -4,6 +4,11 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
 
+## ▶ 심사 멈춤: 스토어 설명에 이용약관(EULA) 링크 없음 (2026-10-15)
+- [x] APPSTORE.md 23개 언어 설명 끝에 Apple 표준 EULA 링크 + 개인정보 처리방침 링크 (앱 안 페이월엔 이미 있음)
+- [ ] App Store Connect에 설명 반영 (`DeployBar --storemeta 무지개 공방` 또는 웹) 후 심사 다시 제출
+- [ ] 앱 정보 ▸ 라이선스 계약(EULA)은 표준 그대로 두기
+
 ## ▶ 장기 플랜 회차의 시작 시각 (2026-10-14, 맥·아이폰 빌드 성공 · 앱 창 확인 안 함)
 - [x] 공용 `RainbowSession.startHour: Double?` (nil = 시각 안 정함). sessionsData JSON 안의 칸이라 CloudKit 스키마는 그대로,
       아이폰 다리는 바이트째 옮겨 건넌다. 두 레포의 RainbowEvent.swift 같게 맞춤
