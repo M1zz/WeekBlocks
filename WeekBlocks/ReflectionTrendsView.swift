@@ -262,6 +262,9 @@ struct ReflectionTrendsView: View {
                     planVsActualCard(blocks)
                     skippedCard(ReflectionTrends.mostSkipped(blocks))
                 } else {
+                    // 간판은 맛보기로 선다 — 해낸 시간은 무료로 보이고, 일마다 어긋난 결은 잠긴다.
+                    // 제 숫자를 한 번 봐야 나머지가 궁금해진다.
+                    planVsActualCard(blocks, locked: true)
                     proBanner
                 }
             }
@@ -392,7 +395,10 @@ struct ReflectionTrendsView: View {
     }
 
     /// **계획 대비 실제** — Pro의 간판. 재지 않는 사람도 회고로 셈한 '해낸 시간'은 본다.
-    private func planVsActualCard(_ blocks: [PlanBlock]) -> some View {
+    ///
+    /// `locked`면 안 산 사람의 맛보기다: 계획한 시간·해낸 시간은 보이고, 계획보다 얼마나
+    /// 더 걸리는지(셋째 칸과 일마다의 줄)는 잠긴다.
+    private func planVsActualCard(_ blocks: [PlanBlock], locked: Bool = false) -> some View {
         let hours = ReflectionTrends.hours(blocks)
         let overall = ReflectionTrends.overallPace(blocks)
         let paces = ReflectionTrends.paces(blocks)
@@ -402,10 +408,14 @@ struct ReflectionTrendsView: View {
             HStack(spacing: 10) {
                 tile(label: "계획한 시간", value: hours.map { formatDuration($0.planned) } ?? "–", color: .secondary)
                 tile(label: "해낸 시간", value: hours.map { formatDuration($0.done) } ?? "–", color: .green)
-                tile(label: "잰 일은 계획보다", value: overall.map(paceText) ?? "–",
-                     color: overall.map(paceColor) ?? .secondary)
+                if locked {
+                    lockedTile(label: "잰 일은 계획보다")
+                } else {
+                    tile(label: "잰 일은 계획보다", value: overall.map(paceText) ?? "–",
+                         color: overall.map(paceColor) ?? .secondary)
+                }
             }
-            ForEach(paces) { pace in
+            ForEach(locked ? [] : paces) { pace in
                 HStack(spacing: 8) {
                     Image(systemName: "stopwatch")
                         .foregroundStyle(paceColor(pace.ratio))
@@ -425,7 +435,9 @@ struct ReflectionTrendsView: View {
                 .help(String(localized: "\(pace.count)번 잰 값을 모았습니다"))
             }
             Group {
-                if let worst = paces.first(where: { $0.ratio >= 1.2 }) {
+                if locked {
+                    Text("일마다 계획보다 얼마나 더 걸리는지는 Pro에서 봅니다.")
+                } else if let worst = paces.first(where: { $0.ratio >= 1.2 }) {
                     let more = "\(Int(((worst.ratio - 1) * 100).rounded()))%"
                     Text("‘\(worst.title)’ 일은 보통 계획보다 \(more) 더 걸립니다. 다음엔 그만큼 넉넉히 잡아 보세요.")
                 } else if paces.isEmpty, ActualTime.isEnabled {
@@ -456,6 +468,29 @@ struct ReflectionTrendsView: View {
         if ratio >= 1.1 { return .orange }
         if ratio <= 0.9 { return .green }
         return .secondary
+    }
+
+    /// 잠긴 칸. 누르면 페이월이 열린다.
+    private func lockedTile(label: LocalizedStringKey) -> some View {
+        Button {
+            showingPaywall = true
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Label("Pro", systemImage: "lock.fill")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(.tint)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.card))
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .help("Pro 기능입니다")
     }
 
     private func tile(label: LocalizedStringKey, value: String, color: Color) -> some View {

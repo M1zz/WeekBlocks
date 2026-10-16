@@ -17,6 +17,7 @@
 
 import SwiftUI
 import StoreKit
+import SwiftData
 import LeeoKit
 
 struct PaywallView: View {
@@ -31,6 +32,9 @@ struct PaywallView: View {
     @State private var selectedID: String = WeekBlocksSpec.proYearlyID
     /// 체험을 받을 수 있는 구독 상품들. 이미 한 번 받은 사람에게 '무료 체험'이라고 말하면 거짓말이다.
     @State private var trialEligible: Set<String> = []
+    /// 회고를 찍어 둔 주가 몇 주인가. 추세는 쌓인 주가 있어야 서므로, 거의 없을 때
+    /// 체험을 시작하면 일주일이 빈 화면으로 지나간다 — 그때만 한 줄 일러 준다.
+    @State private var reviewedWeeks: Int?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -74,6 +78,17 @@ struct PaywallView: View {
 
             plans
                 .padding(.bottom, 8)
+
+            if let reviewedWeeks, reviewedWeeks < ReflectionTrends.freeWeekCount,
+               trialEligible.contains(selectedID) {
+                Label("아직 돌아본 주가 적습니다. 회고가 두 주쯤 쌓인 뒤에 체험하면 추세가 더 많이 보입니다.",
+                      systemImage: "calendar.badge.clock")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 8)
+                    .transition(.disclose)
+            }
 
             // 두 앱은 서로 다른 앱이지만, 한쪽에서 산 것이 다른 쪽도 연다 (→ ProMark.swift).
             // 두 번 사는 줄 알고 망설이는 사람이 가장 오래 쓸 사람이다 — 값 앞에서 말해 둔다.
@@ -144,6 +159,7 @@ struct PaywallView: View {
                 }
             }
             trialEligible = eligible
+            reviewedWeeks = Self.countReviewedWeeks()
         }
         // 고른 상품이 목록에 없으면(구독이 아직 승인 전 등) 선 것 중 첫째를 고른다 —
         // 안 그러면 결제 단추가 아무것도 가리키지 않아 눌러도 안 된다.
@@ -203,6 +219,14 @@ struct PaywallView: View {
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 1)
                                 .background(Color.accentColor, in: Capsule())
+                            if let saving = yearlySaving(product) {
+                                Text("\(saving) 절약")
+                                    .font(.system(size: 10.5, weight: .semibold))
+                                    .foregroundStyle(Color.accentColor)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 1)
+                                    .background(Color.accentColor.opacity(0.12), in: Capsule())
+                            }
                         }
                     }
                     Text(planNote(product))
@@ -221,6 +245,12 @@ struct PaywallView: View {
                         Text(unit)
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
+                    }
+                    if let perMonth = perMonthPrice(product) {
+                        Text("월 \(perMonth) 꼴")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
                     }
                 }
                 .fixedSize()
@@ -255,6 +285,34 @@ struct PaywallView: View {
         case WeekBlocksSpec.proMonthlyID: return String(localized: "달마다 결제되고 언제든 해지합니다.")
         default: return String(localized: "해마다 결제되고 언제든 해지합니다.")
         }
+    }
+
+    // MARK: 연간이 얼마나 이득인가
+
+    /// 연간을 열두 달로 나눈 값 ("₩1,833"). 가격만 있으면 연간을 고를 이유가 안 보인다.
+    /// 통화 표기는 상품의 것을 그대로 쓴다 — 나라마다 값과 소수 자리가 다르다.
+    private func perMonthPrice(_ product: Product) -> String? {
+        guard product.id == WeekBlocksSpec.proYearlyID else { return nil }
+        return (product.price / 12).formatted(product.priceFormatStyle)
+    }
+
+    /// 월간으로 열두 달 냈을 때보다 얼마나 싼가 ("39%"). 월간이 안 섰거나 싸지 않으면 말하지 않는다.
+    private func yearlySaving(_ yearly: Product) -> String? {
+        guard let monthly = purchases.products.first(where: { $0.id == WeekBlocksSpec.proMonthlyID }),
+              monthly.price > 0 else { return nil }
+        let ratio = 1 - NSDecimalNumber(decimal: yearly.price / (monthly.price * 12)).doubleValue
+        // 내려 버린다 — 39.1%를 40%라 하면 과장이다.
+        let points = Int((ratio * 100).rounded(.down))
+        guard points >= 5 else { return nil }
+        return (Double(points) / 100).formatted(.percent.precision(.fractionLength(0)))
+    }
+
+    /// 회고를 찍어 둔 주의 수 (→ reviewedWeeks).
+    private static func countReviewedWeeks() -> Int {
+        let blocks = (try? PlanStore.shared.context.fetch(
+            FetchDescriptor<PlanBlock>(predicate: #Predicate { $0.reviewStatusRaw != nil }))) ?? []
+        let cal = Calendar(identifier: .iso8601)
+        return Set(blocks.map { cal.startOfDay(for: $0.weekStartDate) }).count
     }
 
     /// "/ 년" · "/ 월". 평생 이용권에는 없다.
