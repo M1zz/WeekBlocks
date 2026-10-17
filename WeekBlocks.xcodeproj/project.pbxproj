@@ -93,6 +93,7 @@
 		E9C19CBAE78FAC241507D607 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE20311F927F785DA2C6677B /* Telemetry.swift */; };
 		EAC153AF06A575CC60795AD5 /* LeeoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 144D087CE2C3CFFED2EABEE8 /* LeeoKit */; };
 		EAE7E8DCDDF38D8D9E2637A2 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057B281BD7D45DD504A07D00 /* AppLanguage.swift */; };
+		EB58387C6BB58FBC6E26CBB9 /* WeekBlocksRoadmap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66DC914D08C34C841E62D07 /* WeekBlocksRoadmap.swift */; };
 		EC7DC2E67436E45DBB567A85 /* TimerWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799F5A31A8D7F0BF9EA76E5B /* TimerWidgetSnapshot.swift */; };
 		ED80D0BA5F1168CBEDCE0747 /* ShareTodoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622A5D436D0F426C007C5246 /* ShareTodoView.swift */; };
 		EDB94546FCC7080E977ACCCC /* ConcretenessChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */; };
@@ -220,6 +221,7 @@
 		DE20311F927F785DA2C6677B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		DF43AE5A1D15A524000873FD /* RainbowDensityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainbowDensityView.swift; sourceTree = "<group>"; };
 		E29F659737698D0D348D6468 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E66DC914D08C34C841E62D07 /* WeekBlocksRoadmap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksRoadmap.swift; sourceTree = "<group>"; };
 		E9F2729111E0B1DEA68C05EA /* TodoRainbow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoRainbow.swift; sourceTree = "<group>"; };
 		ED647C75FA807E44EAFADBE6 /* ConcretenessChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcretenessChecker.swift; sourceTree = "<group>"; };
 		F3EF66EAB632EF007258912A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -381,6 +383,7 @@
 				156753551C5150A4259616D5 /* VaultViews.swift */,
 				FE2891429087F31216F7F774 /* WeekBlocks.entitlements */,
 				77F6DC672D5A8A4A51FE4E5E /* WeekBlocksApp.swift */,
+				E66DC914D08C34C841E62D07 /* WeekBlocksRoadmap.swift */,
 				9F532A8D22094F3D6514B098 /* WeekBlocksSpec.swift */,
 				C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */,
 				87EB398D348B2377FA8540BF /* WeekGridView.swift */,
@@ -736,6 +739,7 @@
 				BC35BB60FFEF1185CB71A744 /* VaultMonitor.swift in Sources */,
 				90473F78CC811E3C434B4601 /* VaultViews.swift in Sources */,
 				58EFDC2B31047E4376DAB4FD /* WeekBlocksApp.swift in Sources */,
+				EB58387C6BB58FBC6E26CBB9 /* WeekBlocksRoadmap.swift in Sources */,
 				D71D717068E0CD2BE567389F /* WeekBlocksSpec.swift in Sources */,
 				AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */,
 				837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */,
@@ -1091,7 +1095,7 @@
 			repositoryURL = "https://github.com/M1zz/LeeoKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.16.1;
+				minimumVersion = 3.20.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

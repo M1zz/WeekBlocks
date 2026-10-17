@@ -322,6 +322,7 @@ struct SettingsView: View {
 
                 Section {
                     LeeoSupportSection<WeekBlocksSpec>()
+                    NavigationLink(LeeoRoadmapText.entry) { RoadmapScreen() }
                 } header: {
                     Text("피드백 & 리뷰")
                 }
