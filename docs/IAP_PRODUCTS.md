@@ -29,7 +29,7 @@
 2. **유료 앱 계약**이 '활성'인지 본다. 아니면 약관에 동의하고 은행 계좌·세금 양식을 끝낸다.
    이게 활성이 아니면 상품을 다 세워도 앱에서 값이 **아예 안 뜬다.**
 3. 아이폰 심사용 스크린샷을 준비한다 (맥은 이미 있다 → 아래 '심사용 스크린샷').
-4. 가족 공유를 켤지 정한다 (→ 아래 '정할 것 — 가족 공유'). 정한 대로 6개 모두 똑같이 한다.
+4. 가족 공유는 **6개 모두 켠다** (→ 아래 '가족 공유').
 
 ---
 
@@ -72,7 +72,7 @@ ASC ▸ **앱** ▸ **욕망의 무지개** 를 연다. 왼쪽 메뉴의 **수�
      설명 `Widgets, Calendar import, sharing and stats. Mac too.`
    - 한도: 표시 이름 35자, 설명 55자. 위 문구는 한도 안이다.
      (`Products.storekit` 의 설명은 55자를 넘어서 그대로 붙여 넣으면 안 된다.)
-7. **가족 공유**: 0단계에서 정한 대로.
+7. **가족 공유**: **켜기**.
 8. **이미지**(선택, 앱스토어에서 홍보할 때): `docs/screenshots/iap/promo-yearly.png` (1024×1024).
 9. **심사 정보**:
    - 스크린샷: `docs/screenshots/iap/pro-yearly.png` (아직 없다 → 아래 '심사용 스크린샷')
@@ -113,8 +113,7 @@ ASC ▸ **앱** ▸ **욕망의 무지개** 를 연다. 왼쪽 메뉴의 **수�
      설명 `위젯·캘린더 가져오기·통계를 한 번 결제로. 맥 앱도 함께 열립니다.`
    - 영어(미국) — 표시 이름 `Rainbow Pro Lifetime`
      설명 `Widgets, Calendar import and stats, once. Mac too.`
-4. **가족 공유**: 지금 테스트 파일에는 켜져 있다. ASC에서도 이미 켜져 있으면 **끌 수 없다** —
-   그러면 나머지 다섯도 켜는 쪽으로 맞추게 된다 (→ '정할 것 — 가족 공유').
+4. **가족 공유**: **켜기** (이미 켜져 있으면 그대로).
 5. 이미지 `promo-lifetime.png`, 심사 스크린샷 `pro-lifetime.png`, 심사 메모.
 6. 저장. 이름·설명을 고치면 상품이 다시 심사 대상이 될 수 있다 → 2단계에서 버전과 함께 낸다.
 
@@ -155,7 +154,7 @@ ASC ▸ **앱** ▸ **무지개 공방** 을 연다. 메뉴 자리는 아이폰�
      설명 `회고 추세·계획 대비 실제·지난 주 가져오기. 아이폰 앱도 함께.`
    - 영어(미국) — 표시 이름 `Rainbow Craft Pro Yearly`
      설명 `Trends, plan vs. actual, past weeks. iPhone app too.`
-5. 가족 공유: 0단계에서 정한 대로.
+5. 가족 공유: **켜기**.
 6. 이미지 `docs/screenshots/iap/promo-yearly.png`, 심사 스크린샷 `docs/screenshots/iap/pro-yearly.png`
    (2880×1800, 이미 있다), 심사 메모는 아래 맥 글.
 7. 저장 ▸ **제출 준비 완료** 확인.
@@ -185,7 +184,7 @@ ASC ▸ **앱** ▸ **무지개 공방** 을 연다. 메뉴 자리는 아이폰�
      설명 `회고 추세와 계획 대비 실제를 한 번 결제로. 아이폰 앱도 함께 열립니다.`
    - 영어(미국) — 표시 이름 `Rainbow Craft Pro (Lifetime)`
      설명 `Trends and plan vs. actual, once. iPhone app too.`
-4. 가족 공유: 0단계에서 정한 대로.
+4. 가족 공유: **켜기**.
 5. 이미지 `promo-lifetime.png`, 심사 스크린샷 `pro-lifetime.png`, 심사 메모.
 6. 저장.
 
@@ -212,7 +211,7 @@ ASC ▸ **앱** ▸ **무지개 공방** 을 연다. 메뉴 자리는 아이폰�
 | 미국 | 세 값이 맥과 같은가 | |
 | 판매 국가 | 맥과 같은 국가 목록인가 | |
 | 도입 오퍼 | 연간에만 1주 무료 | 연간에만 1주 무료 |
-| 가족 공유 | 6개 모두 같은가 | |
+| 가족 공유 | 6개 모두 켜졌는가 | |
 
 ---
 
@@ -264,13 +263,15 @@ Yearly and Monthly are in one subscription group; Yearly has a 1-week free trial
 Pro bought in our companion iPhone app with the same iCloud account also unlocks this app (and vice versa) through a record in the user's private iCloud. Restore Purchases is on the paywall.
 ```
 
-## 정할 것 — 가족 공유
+## 가족 공유 — 6개 모두 켠다 (2026-10-17 결정)
 
-- 지금 어긋나 있다: 아이폰 평생(`…pro`)은 테스트 파일에서 **켜져** 있고, 나머지 다섯은 **꺼져** 있다.
-- ASC에서 **한 번 켜면 다시 끌 수 없다.** 먼저 아이폰 평생이 ASC에서 이미 켜져 있는지 본다.
-  - 이미 켜져 있으면 → 6개 모두 켠다 (끌 길이 없으니).
-  - 꺼져 있으면 → 켤지 끌지 정해서 6개를 똑같이. 무지개 공방 로드맵에는 "가족 공유 켜기"가 있다.
-- 정하면 두 레포의 `.storekit` 의 `familyShareable` 도 같은 값으로 고친다 (테스트 결제가 실제와 같게).
+- 6개 상품 모두 **가족 공유 켜기**. 한 사람이 사면 가족 공유 그룹 최대 6명이 함께 Pro를 쓴다.
+- ⚠️ ASC에서 **한 번 켜면 다시 끌 수 없다.** 켜기 전에 이 결정이 맞는지 한 번 더 본다.
+- 이미 산 사람(특히 아이폰 평생 `…pro` 와 맥 `…sync`)에게도 켜는 순간부터 가족에게 퍼진다.
+- 두 레포의 `.storekit` 도 6개 모두 `familyShareable: true` 로 맞췄다 (테스트 결제가 실제와 같게).
+- 코드는 고칠 것이 없다. 가족이 공유받은 거래도 `LeeoStore` 가 영수증으로 읽고,
+  그 가족의 iCloud에 `ProMark` 를 남겨 다른 쪽 앱도 연다.
+- 앱 소개 글에 가족 공유를 알리고 싶으면 `APPSTORE.md` 의 구독 안내에 한 줄 더한다 (선택).
 
 ## 코드와 맞물리는 곳 (값·ID를 바꾸면 같이 볼 것)
 
