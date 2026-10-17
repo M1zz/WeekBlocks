@@ -4,6 +4,9 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
 
+## ▶ ProMark를 영수증이 바뀔 때마다 바로 고친다 (2026-10-17, 빌드 성공 · 1.1.12 심사 중이라 다음 판에 나간다)
+- [x] 사기·복원·가족 공유·환불·만료 뒤 앱을 다시 켜지 않아도 아이폰이 곧 연다/잠근다 (아이폰 PurchaseManager와 같은 규칙)
+
 ## ▶ 심사 멈춤: 스토어 설명에 이용약관(EULA) 링크 없음 (2026-10-15)
 - [x] APPSTORE.md 23개 언어 설명 끝에 Apple 표준 EULA 링크 + 개인정보 처리방침 링크 (앱 안 페이월엔 이미 있음)
 - [ ] App Store Connect에 설명 반영 (`DeployBar --storemeta 무지개 공방` 또는 웹) 후 심사 다시 제출
