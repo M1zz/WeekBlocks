@@ -127,9 +127,9 @@ enum DeletionLog {
         for k in fresh { ctx.insert(DeletionMark(key: k, originInstallID: me)) }
         do {
             try ctx.save()
-            print("🪦 [Deletion] 지운 것 \(fresh.count)개에 표를 찍었다")
+            AppLog.vault.info("지운 것 \(fresh.count, privacy: .public)개에 표를 찍었다")
         } catch {
-            print("⚠️ [Deletion] 표 저장 실패: \(error)")
+            AppLog.vault.error("표 저장 실패: \(String(describing: error), privacy: .public)")
         }
     }
 

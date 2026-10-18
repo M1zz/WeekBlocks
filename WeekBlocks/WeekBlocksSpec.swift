@@ -14,6 +14,11 @@ enum WeekBlocksSpec: LeeoAppSpec {
     static var appName: String { String(localized: "무지개 공방", comment: "앱 이름") }
     static let developerEmail = "leeo@kakao.com"
 
+    /// 함께 쓰는 앱 목록(`LeeoFamilyCatalog`)에서 이 앱의 자리. 설정 ▸ 함께 쓰면 좋은 앱에서
+    /// 자기 자신을 빼고, 짝인 아이폰 앱 '욕망의 무지개'를 맨 앞에 세운다.
+    static let familyID: String? = "rainbow-mac"
+    static let familyFeatured = ["rainbow-ios"]
+
     /// WeekBlocks.entitlements에 iCloud.com.Ysoup.FeedbackHub 컨테이너가 있어야 한다.
     /// 공용 피드백 허브(FeedbackHub)로 수집 — appIdentifier로 앱을 구분한다.
     /// (앱 데이터는 iCloud.com.devkoan.ScheduleDensity 컨테이너에서 계속 동기화된다.)
@@ -116,7 +121,10 @@ enum WeekBlocksSpec: LeeoAppSpec {
                       .analytics, .feedbackChannel,
                       .privacyManifest, .minimalPermissions,
                       .localization, .darkMode, .onboarding, .microInteractions,
-                      .emptyStates, .conversionFunnel],
+                      .emptyStates, .conversionFunnel,
+                      .accessibility, .killSwitch,
+                      .performanceMonitoring, .structuredLogging,
+                      .automatedTests, .staticAnalysis, .continuousIntegration],
         notApplicable: [
             .accountDeletion: "계정이 없다 — 로그인도 회원가입도 하지 않는다",
             .biometricLock: "잠글 비밀이 없다. 할 일과 주간 계획뿐이다",

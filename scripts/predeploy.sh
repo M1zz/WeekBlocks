@@ -2,9 +2,9 @@
 #
 # 배포 전 검사 — 실패하면 0이 아닌 값으로 끝나 아카이브를 막는다.
 #
-# ⚠️ **이 앱에는 테스트 타겟이 없다.** 그래서 이 검사가 지킬 수 있는 것은
-#    "적어도 컴파일은 된다"까지다. 초록불이 떠도 동작이 옳다는 뜻이 아니다.
-#    테스트 타겟이 생기면 아래 build 를 test 로 바꾸고 -only-testing 을 붙인다.
+# 두 단계다: ① Release 로 짓는다 ② 단위 시험(WeekBlocksTests)을 돌린다.
+#    UI 시험(WeekBlocksUITests)은 화면을 띄워 몇 분 걸리므로 여기서 돌리지 않는다 —
+#    Xcode 에서 ⌘U 로, 또는 `-only-testing:WeekBlocksUITests` 로 따로 돌린다.
 #
 # Release 로 짓는 이유: Debug 만 통과하고 Release 에서 깨지는 일이 실제로 있다
 # (#if DEBUG 안에만 있는 코드 — CloudSchemaPrimer 같은 것 — 를 밖에서 부르는 경우).
@@ -38,4 +38,21 @@ if ! xcodebuild -project "$PROJECT" -scheme "$SCHEME" \
 fi
 rm -f "$LOG"
 
-echo "✅ Release 빌드 통과 (⚠️ 테스트 타겟이 없어 컴파일만 확인했습니다)"
+echo "✅ Release 빌드 통과"
+
+# 단위 시험 — 계약(LeeoPreflight)·핵심 로직. 숙주 앱은 메모리 안 스토어로만 뜬다
+# (→ WeekBlocks/LaunchEnvironment.swift) — 이 맥의 진짜 데이터·iCloud 를 건드리지 않는다.
+LOG="$(mktemp -t predeploy-test)"
+if ! xcodebuild -project "$PROJECT" -scheme "$SCHEME" \
+     -destination 'platform=macOS' \
+     CODE_SIGNING_ALLOWED=NO \
+     -only-testing:WeekBlocksTests \
+     -quiet test > "$LOG" 2>&1; then
+  echo "❌ 단위 시험 실패"
+  grep -E "error:|failed" "$LOG" | tail -40
+  rm -f "$LOG"
+  exit 1
+fi
+rm -f "$LOG"
+
+echo "✅ 단위 시험 통과"

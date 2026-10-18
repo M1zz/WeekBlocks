@@ -56,6 +56,8 @@ struct SettingsView: View {
     /// 통계 화면은 남의 기록을 읽는 자리라 이 스위치 뒤에 둔다.
     @AppStorage("dev.masterMode") private var devMode = false
     @State private var showingPaywall = false
+    /// 프로모션 코드 넣는 시트 (→ OfferCode.swift).
+    @State private var showingOfferCode = false
 
     /// 스토어를 세는 일은 화면을 그릴 때마다 할 일이 아니다 — 열 때 한 번, 누른 뒤 한 번.
     @State private var todoCount = 0
@@ -192,6 +194,8 @@ struct SettingsView: View {
                         .font(.body)
                         .foregroundStyle(.secondary)
                 }
+                // 고른 기준이 바뀌는 순간을 트랙패드로도 — 다른 고르기(체크·표시)와 같은 손맛이다 (→ Haptic.tick).
+                .sensoryFeedback(.levelChange, trigger: overlapRule)
 
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
@@ -275,12 +279,8 @@ struct SettingsView: View {
                         Text(appVersion)
                             .foregroundStyle(.secondary)
                     }
-                    HStack {
-                        Text("패밀리")
-                        Spacer()
-                        Text("욕망의 무지개 · 무지개 공방")
-                            .foregroundStyle(.secondary)
-                    }
+                    // 함께 쓰면 좋은 내 다른 앱들 — 짝인 아이폰 앱이 맨 앞에 선다 (→ WeekBlocksSpec.familyID).
+                    LeeoFamilySettingsRow<WeekBlocksSpec>()
                     // 권유를 닫아도 소개로 가는 길은 여기 늘 남는다.
                     NavigationLink {
                         IPhoneCompanionView()
@@ -314,6 +314,12 @@ struct SettingsView: View {
                     Text("할 일 화면에서 닫았던 조언(라벨·비중·쪼개기 팁)을 처음부터 다시 봅니다.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    NavigationLink {
+                        WhatsNewView(onClose: { }, showsCloseButton: false)
+                    } label: {
+                        Label("새로 생긴 것 다시 보기", systemImage: "newspaper")
+                    }
                 } header: {
                     Text("조언")
                 }
@@ -351,6 +357,7 @@ struct SettingsView: View {
             await purchases.refresh()
         }
         .sheet(isPresented: $showingPaywall) { PaywallView(reason: "settings") }
+        .offerCodeSheet(isPresented: $showingOfferCode)
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
             Button("취소", role: .cancel) { }
             Button("다시 받아오기", role: .destructive) {
@@ -557,6 +564,16 @@ struct SettingsView: View {
                 .disabled(purchases.isWorking)
             }
 
+            // 받은 프로모션 코드를 여기서 바로 쓴다 — 이미 Pro 면 쓸 일이 없다.
+            if purchases.offersPro, !isPro, OfferCode.isAvailable {
+                Button {
+                    showingOfferCode = true
+                } label: {
+                    Label("코드 사용", systemImage: "ticket")
+                }
+                .disabled(purchases.isWorking)
+            }
+
             if let message = purchases.failureMessage, purchases.offersPro {
                 Text(message)
                     .font(.caption)
@@ -597,6 +614,12 @@ struct SettingsView: View {
                     LeeoUsageStatsView<WeekBlocksSpec>()
                 } label: {
                     Label("사용 통계 보기 (개발자)", systemImage: "chart.bar")
+                }
+                // 내보내기 전에 계약(상품·정책 링크·분석·스위치)이 맞는지 이 맥에서 바로 본다.
+                NavigationLink {
+                    PreflightReportView()
+                } label: {
+                    Label { Text(verbatim: "Preflight") } icon: { Image(systemName: "checklist.checked") }
                 }
             }
         } header: {

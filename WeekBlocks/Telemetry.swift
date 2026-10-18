@@ -72,7 +72,9 @@ enum Telemetry {
     ///    반대로 '끄기'로 두면 기본이 '보냄'이고, 끈 사람만 true로 남는다.
     static let optOutKey = "usage.optOut"
 
-    static var isEnabled: Bool { !UserDefaults.standard.bool(forKey: optOutKey) }
+    static var isEnabled: Bool {
+        !UserDefaults.standard.bool(forKey: optOutKey) && !LaunchEnvironment.isUnderTest
+    }
 
     /// 피드백과 같은 컨테이너·같은 appId를 쓴다 (→ WeekBlocksSpec.feedback).
     static let reporter = LeeoUsageReporter(spec: WeekBlocksSpec.self)

@@ -58,6 +58,11 @@ schemes:
       storeKitConfiguration: WeekBlocks.storekit
     test:
       config: Debug
+      # 단위 시험 → UI 시험 순. UI 시험은 `-uiTesting` 으로 띄워 메모리 안 스토어로만 돈다
+      # (→ WeekBlocks/LaunchEnvironment.swift) — 개발 맥의 진짜 데이터·캘린더를 건드리지 않는다.
+      targets:
+        - WeekBlocksTests
+        - WeekBlocksUITests
     profile:
       config: Release
     analyze:
@@ -132,6 +137,8 @@ targets:
       - path: TodoShare
       # 앱과 함께 쓰는 파일만 골라 넣는다.
       - path: WeekBlocks/TodoShareInbox.swift
+      # 받은 상자가 실패를 남기는 자리 (→ AppLog.swift). OSLog 말고는 아무것도 안 딸려온다.
+      - path: WeekBlocks/AppLog.swift
       # 움직임의 어휘. 확장 창도 같은 결로 움직여야 한 앱으로 읽힌다
       # (SwiftUI 말고는 아무것도 안 딸려온다).
       - path: WeekBlocks/Motion.swift
@@ -202,3 +209,36 @@ targets:
           - "$(inherited)"
           - "@executable_path/../Frameworks"
           - "@executable_path/../../../../Frameworks"
+
+  # 핵심 로직·계약(LeeoPreflight) 단위 시험. 앱을 숙주로 쓰지만 숙주는 창도 디스크 스토어도
+  # 세우지 않는다 (→ LaunchEnvironment.isUnitTestHost).
+  WeekBlocksTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: WeekBlocksTests
+    dependencies:
+      - target: WeekBlocks
+      - package: LeeoKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.Tests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/무지개 공방.app/Contents/MacOS/WeekBlocks"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  # 실행 → 한 바퀴 → 손쉬운 사용 자동 점검(performAccessibilityAudit).
+  WeekBlocksUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: WeekBlocksUITests
+    dependencies:
+      - target: WeekBlocks
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.UITests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+        TEST_TARGET_NAME: WeekBlocks

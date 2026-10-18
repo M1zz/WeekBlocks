@@ -80,7 +80,7 @@ enum TodoSharing {
         let n = flipMine(to: true, in: context)
         guard n > 0 else { return }
         try? context.save()
-        print("🔓 [Sharing] 이 기기의 것 \(n)개를 함께 쓰기로 열었다")
+        AppLog.sharing.info("이 기기의 것 \(n, privacy: .public)개를 함께 쓰기로 열었다")
     }
 
     /// 세 모델을 한 번에 뒤집는다. **내 것만** 건드린다.
@@ -120,7 +120,7 @@ enum TodoSharing {
         let n = flipMine(to: false, in: context)
         guard n > 0 else { return }
         try? context.save()
-        print("🔒 [Sharing] 이 기기의 것 \(n)개를 함께 쓰기에서 닫았다")
+        AppLog.sharing.info("이 기기의 것 \(n, privacy: .public)개를 함께 쓰기에서 닫았다")
     }
 
     /// **영수증과 화면을 맞춘다.** 켤 때 한 번, 그리고 권한이 바뀔 때마다.

@@ -113,7 +113,15 @@ extension CalendarBridge {
     /// 바꾼 일정 수를 돌려준다.
     @discardableResult
     func exportPlan(blocks: [PlanBlock], routineNames: Set<String>) -> Int {
-        guard exportEnabled, hasAccess else { return 0 }
+        // 시험의 빈 스토어로 맞추면 '무지개 공방' 캘린더가 통째로 비워진다 (→ LaunchEnvironment).
+        guard exportEnabled, hasAccess, !LaunchEnvironment.isUnderTest else { return 0 }
+        // 원격 스위치로 꺼 두었으면 사람의 캘린더를 건드리지 않는다 (→ WeekBlocksFlag.swift).
+        guard WeekBlocksFlag.calendarExport.isOn else {
+            AppLog.launch.notice("캘린더에 쓰기가 원격으로 꺼져 있어 건너뛴다")
+            return 0
+        }
+        let signpost = AppLog.signposter.beginInterval("CalendarExport")
+        defer { AppLog.signposter.endInterval("CalendarExport", signpost) }
         do {
             let calendar = try exportCalendar()
             let window = Self.exportWindow()

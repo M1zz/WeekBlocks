@@ -63,7 +63,7 @@ enum TodoShareInbox {
     @discardableResult
     static func add(_ draft: SharedTodoDraft) -> Bool {
         guard let url = fileURL else {
-            print("⚠️ [Share] App Group 컨테이너를 찾을 수 없습니다: \(appGroupID)")
+            AppLog.sharing.error("App Group 컨테이너를 찾을 수 없습니다: \(appGroupID, privacy: .public)")
             return false
         }
         var ok = false
@@ -100,7 +100,7 @@ enum TodoShareInbox {
             body(url)
         }
         if let coordinationError {
-            print("⚠️ [Share] 받은 상자 접근 실패: \(coordinationError)")
+            AppLog.sharing.error("받은 상자 접근 실패: \(String(describing: coordinationError), privacy: .public)")
         }
     }
 
@@ -115,7 +115,7 @@ enum TodoShareInbox {
             try JSONEncoder().encode(drafts).write(to: url, options: .atomic)
             return true
         } catch {
-            print("⚠️ [Share] 받은 상자 저장 실패: \(error)")
+            AppLog.sharing.error("받은 상자 저장 실패: \(String(describing: error), privacy: .public)")
             return false
         }
     }
