@@ -18,16 +18,16 @@ import LeeoKit
 extension WeekBlocksSpec {
     static var roadmap: [LeeoRoadmapItem] {[
         // MARK: 다음에 만들어요
-        .init(id: "a11y.voiceover", status: .planned,
+        .init(id: "a11y.voiceover", status: .building,
               title: String(localized: "VoiceOver로 더 편하게", comment: "Roadmap item: better VoiceOver support"),
               detail: String(localized: "VoiceOver가 계획표의 블록과 단추를 빠짐없이, 알맞은 순서로 읽어 줘요.", comment: "Roadmap item detail: better VoiceOver support")),
         .init(id: "a11y.largetext", status: .planned,
               title: String(localized: "큰 글씨에 맞춘 화면", comment: "Roadmap item: layouts for larger text"),
               detail: String(localized: "글자를 키워도 계획표가 잘리지 않고 보기 좋게 다시 놓여요.", comment: "Roadmap item detail: layouts for larger text")),
-        .init(id: "a11y.contrast", status: .planned,
+        .init(id: "a11y.contrast", status: .shipped("1.1.13"),
               title: String(localized: "보기 편한 색과 대비", comment: "Roadmap item: better colors and contrast"),
               detail: String(localized: "대비를 높이거나 색을 구별하기 어려워도 무지개 블록을 알아볼 수 있어요.", comment: "Roadmap item detail: better colors and contrast")),
-        .init(id: "whatsnew", status: .planned,
+        .init(id: "whatsnew", status: .shipped("1.1.13"),
               title: String(localized: "업데이트 소식", comment: "Roadmap item: what's new after an update"),
               detail: String(localized: "업데이트 뒤 처음 열 때 무엇이 새로 생겼는지 알려 줘요.", comment: "Roadmap item detail: what's new after an update")),
         .init(id: "gift", status: .planned,
