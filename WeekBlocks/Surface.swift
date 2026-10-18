@@ -14,34 +14,29 @@
 //
 
 import SwiftUI
-import AppKit
 
 extension Color {
+    // 색은 에셋 카탈로그(Assets.xcassets ▸ Dashboard*)에 있다. 밝은·어두운 모양에
+    // **고대비** 모양을 한 벌씩 더 두었다 — 손쉬운 사용 ▸ 대비 증가를 켜면 바닥이 한 톤 더
+    // 가라앉고(어두울 때는 검정) 카드 가장자리 선이 또렷해진다. 옅은 회색 위의 흰 카드는
+    // 대비를 높인 화면에서 경계가 아예 사라졌다.
+
     /// 대시보드의 바닥. 카드보다 한 톤 가라앉는다.
-    static let canvas = Color(nsColor: NSColor(name: "WeekBlocksCanvas") { appearance in
-        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            ? NSColor(srgbRed: 0.105, green: 0.105, blue: 0.115, alpha: 1)
-            : NSColor(srgbRed: 0.945, green: 0.945, blue: 0.957, alpha: 1)
-    })
+    static let canvas = Color("DashboardCanvas")
 
     /// 바닥 위에 올라간 카드.
-    static let surface = Color(nsColor: NSColor(name: "WeekBlocksSurface") { appearance in
-        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            ? NSColor(srgbRed: 0.165, green: 0.165, blue: 0.178, alpha: 1)
-            : .white
-    })
+    static let surface = Color("DashboardSurface")
 
-    /// 카드 가장자리. 밝을 때는 그림자가 경계를 맡으므로 거의 안 보인다.
-    static let surfaceEdge = Color(nsColor: NSColor(name: "WeekBlocksSurfaceEdge") { appearance in
-        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            ? NSColor(white: 1, alpha: 0.07)
-            : NSColor(white: 0, alpha: 0.04)
-    })
+    /// 카드 가장자리. 밝을 때는 그림자가 경계를 맡으므로 거의 안 보인다(고대비에서는 또렷하다).
+    static let surfaceEdge = Color("DashboardSurfaceEdge")
 }
 
 /// 바닥 위에 올라간 카드의 **바탕**. `.background { DashboardSurface() }`로 깐다.
 struct DashboardSurface: View {
     var radius: CGFloat = Corner.panel
+    /// 어두운 모드에서는 그림자가 바닥에 묻혀 경계를 못 맡는다 — 가장자리 선을 두 배로 세운다.
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         RoundedRectangle.soft(radius)
@@ -49,7 +44,9 @@ struct DashboardSurface: View {
             // 두 겹: 바짝 붙은 얇은 그림자가 윤곽을, 넓게 퍼진 그림자가 떠 있는 높이를 만든다.
             .shadow(color: .black.opacity(0.05), radius: 1, y: 0.5)
             .shadow(color: .black.opacity(0.07), radius: 14, y: 4)
-            .overlay(RoundedRectangle.soft(radius).strokeBorder(Color.surfaceEdge, lineWidth: 0.5))
+            .overlay(RoundedRectangle.soft(radius)
+                .strokeBorder(Color.surfaceEdge,
+                              lineWidth: contrast == .increased ? 1.5 : (colorScheme == .dark ? 1 : 0.5)))
     }
 }
 
@@ -60,5 +57,33 @@ extension View {
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background { DashboardSurface() }
+    }
+}
+
+// MARK: - 떠 있는 것의 바탕
+
+/// 시간표 **위에 떠 있는** 조각(블록 그리는 창·겹침 알약·접기 단추)의 바탕.
+///
+/// 평소에는 반투명 재질이라 아래 시간표가 비친다 — 무엇 위에 떠 있는지가 보인다.
+/// 손쉬운 사용 ▸ 투명도 줄이기를 켠 사람에게는 비치는 무늬가 글씨를 흐리는 소음이라
+/// **카드와 같은 불투명 색**으로 깐다. 시스템이 재질을 회색으로 바꿔 주기는 하지만,
+/// 그러면 이 앱의 카드와 결이 달라져 떠 있는 것만 다른 앱처럼 보인다.
+struct FloatingBackdrop<S: InsettableShape>: ViewModifier {
+    let shape: S
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    func body(content: Content) -> some View {
+        if reduceTransparency {
+            content.background(Color.surface, in: shape)
+        } else {
+            content.background(.regularMaterial, in: shape)
+        }
+    }
+}
+
+extension View {
+    /// 시간표 위에 떠 있는 조각의 바탕 (→ FloatingBackdrop).
+    func floatingBackdrop<S: InsettableShape>(in shape: S) -> some View {
+        modifier(FloatingBackdrop(shape: shape))
     }
 }

@@ -74,7 +74,7 @@ private struct ExpandablePanel: ViewModifier {
                             .labelStyle(.iconOnly)
                             .font(.body.weight(.semibold))
                             .frame(width: 28, height: 28)
-                            .background(.regularMaterial, in: Circle())
+                            .floatingBackdrop(in: Circle())
                     }
                     .buttonStyle(.squish)
                     .help("접기 (Esc)")

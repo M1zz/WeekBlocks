@@ -1278,6 +1278,10 @@ struct BacklogBlock: View {
     var onToggleNow: () -> Void = { }
 
     @State private var hovering = false
+    /// 색으로만 갈래를 가르지 않게 — 손쉬운 사용 ▸ 색상 없이 구별 (→ laneBadge).
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    /// 손쉬운 사용 ▸ 대비 증가. 옅은 바탕만으로는 카드 가장자리가 안 보여서 테두리를 늘 세운다.
+    @Environment(\.colorSchemeContrast) private var contrast
     /// 방금 끝냄을 눌렀다. 고리가 꽉 차고 체크가 서는 것을 **보여 준 뒤에** 카드를 내린다 —
     /// 누르자마자 사라지면 무엇을 눌렀는지 눈이 따라가지 못한다.
     @State private var finishing = false
@@ -1293,10 +1297,51 @@ struct BacklogBlock: View {
             }
         }
         withAnimation(Motion.squish) { finishing = true }
+        let title = item.title
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
             if steps != nil { onAdvance() } else { onComplete() }
+            // 카드가 목록에서 내려간다 — VoiceOver 를 쓰는 사람에게는 사라진 것이 안 보인다.
+            AccessibilityNotification.Announcement(String(localized: "‘\(title)’ 끝냄")).post()
         }
     }
+
+    /// 지우기. 모서리 단추는 가리킬 때만 서서, VoiceOver·음성 제어로도 같은 길을 둔다.
+    private func deleteAnnouncing() {
+        let title = item.title
+        onDelete()
+        AccessibilityNotification.Announcement(String(localized: "‘\(title)’ 삭제함")).post()
+    }
+
+    /// 갈래를 색 말고 **모양**으로도 — 색상 없이 구별을 켠 사람에게만 선다.
+    /// 바로(번개)는 앞 동그라미가 이미 말하니, 색으로만 갈리던 '그냥 하면 되는 것'과 '시간을 잡은 일'을 적는다.
+    @ViewBuilder
+    private var laneBadge: some View {
+        if differentiateWithoutColor, !(lane == .now || isFragment) {
+            Image(systemName: lane == .errand ? "circle.dashed" : "clock")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .help(lane == .errand ? Text("그냥 하면 되는 일") : Text("시간을 잡은 일"))
+                .accessibilityHidden(true)
+        }
+    }
+
+    /// VoiceOver 가 카드 하나를 읽을 때의 갈래 이름.
+    private var laneName: String {
+        if lane == .now || isFragment { return String(localized: "바로 하면 되는 일") }
+        return lane == .errand ? String(localized: "그냥 하면 되는 일") : String(localized: "시간을 잡은 일")
+    }
+
+    /// 테두리를 늘 세우는가 — 가리킬 때, 또는 대비 증가·색상 없이 구별을 켰을 때.
+    private var showsBorder: Bool {
+        hovering || contrast == .increased || differentiateWithoutColor
+    }
+
+    private var borderColor: Color {
+        if contrast == .increased { return Color.primary.opacity(0.45) }
+        return laneBorder.opacity(showsBorder ? 1 : 0)
+    }
+
+    private var borderWidth: CGFloat { contrast == .increased ? 1.5 : 1 }
 
     /// 카드 동그라미에 설 분류 아이콘. 분류가 없으면 nil — 첫 글자가 선다.
     private var categoryIcon: String? {
@@ -1331,6 +1376,21 @@ struct BacklogBlock: View {
     }
 
     var body: some View {
+        card
+        // **VoiceOver 로도 카드 하나에서 다 한다.** 끝내기·지우기는 가리켜야 서는 단추라
+        // 화면을 못 보는 사람에게는 길이 없었다. 오른쪽 클릭 메뉴와 같은 일을 동작으로 둔다.
+            .accessibilityElement(children: .combine)
+            .accessibilityValue(Text(verbatim: laneName))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { onOpen() }
+            .accessibilityAction(named: steps == nil ? Text("끝내기") : Text("지금 단계 끝내기")) { checkProgress() }
+            .accessibilityAction(named: steps == nil ? Text("단계로 쪼개기…") : Text("단계 보기·편집…"), onEditSteps)
+            .accessibilityAction(named: lane == .now ? Text("'바로' 표시 거두기") : Text("바로 하면 되는 일로 표시"),
+                                 onToggleNow)
+            .accessibilityAction(named: Text("삭제"), deleteAnnouncing)
+    }
+
+    private var card: some View {
         HStack(alignment: .top, spacing: 9) {
             // **누르면 진행이 차는 동그라미.** 고리가 곧 진행도다 — 단계로 쪼갠 일은 누를 때마다
             // 지금 단계를 끝내고, 안 쪼갠 일은 한 번에 끝난다. 안에는 분류 아이콘('바로 하면
@@ -1385,6 +1445,7 @@ struct BacklogBlock: View {
                 // 한 줄에 글씨가 넷씩 붙으면 정작 읽어야 할 시간·요일이 묻힌다.
                 // 무슨 분류인지 확인하고 바꾸는 자리는 카드 오른쪽 클릭 메뉴다.
                 HStack(spacing: 6) {
+                    laneBadge
                     Text(formatDuration(steps?.totalHours ?? item.durationHours))
                         .font(.system(size: 13, weight: .medium))
                         .monospacedDigit()
@@ -1416,7 +1477,8 @@ struct BacklogBlock: View {
         .frame(maxWidth: .infinity, minHeight: Self.cardHeight, maxHeight: Self.cardHeight, alignment: .topLeading)
         .background(laneBackground, in: .soft(Corner.panel))
         // 갈래(지금·잔일·계획)는 바탕색과 왼쪽 동그라미가 이미 말한다. 테두리는 가리킬 때만 선다.
-        .overlay(RoundedRectangle.soft(Corner.panel).strokeBorder(laneBorder.opacity(hovering ? 1 : 0), lineWidth: 1))
+        // 대비 증가·색상 없이 구별을 켰으면 늘 세운다 — 옅은 바탕만으로는 카드 가장자리가 안 보인다.
+        .overlay(RoundedRectangle.soft(Corner.panel).strokeBorder(borderColor, lineWidth: borderWidth))
         // 가리키면 **들어 올린 카드**처럼 그림자가 깔린다 — 집어서 끌 수 있다는 넛지.
         .background {
             RoundedRectangle.soft(Corner.panel)
@@ -1427,7 +1489,7 @@ struct BacklogBlock: View {
         // 글자가 '…'로 잘렸다가 손을 떼면 돌아왔다. 얹으면 글씨는 제자리에 그대로다.
         .overlay(alignment: .topTrailing) {
             if hovering {
-                Button(action: onDelete) {
+                Button(action: deleteAnnouncing) {
                     Image(systemName: "xmark")
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.secondary)
@@ -1439,6 +1501,8 @@ struct BacklogBlock: View {
                 .offset(x: 6, y: -6)
                 .transition(.pop)
                 .help("삭제")
+                .accessibilityLabel("삭제")
+                .accessibilityInputLabels([Text("삭제"), Text("지우기")])
             }
         }
         .contentShape(.soft(Corner.panel))
@@ -1511,7 +1575,7 @@ struct BacklogBlock: View {
                 Button("새 프로젝트…", action: onNewProject)
             }
             Divider()
-            Button("삭제", role: .destructive, action: onDelete)
+            Button("삭제", role: .destructive, action: deleteAnnouncing)
         }
     }
 }

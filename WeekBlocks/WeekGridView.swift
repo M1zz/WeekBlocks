@@ -578,6 +578,13 @@ struct BlockChip: View {
     let onTap: () -> Void
 
     @State private var hovering = false
+    /// 손쉬운 사용 ▸ 색상 없이 구별. '구체성 미검증'은 주황 하나로만 말했다 — 그때는 느낌표를 세운다.
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+
+    /// 다듬지 않은 블록인가 — 무지개 색도 배경 일정도 아니면서 성공 기준을 안 채운 것.
+    private var isUnverified: Bool {
+        tint == nil && !block.isBackground && !block.concreteVerified
+    }
 
     private var palette: (bg: Color, fg: Color, stroke: Color) {
         if let tint {
@@ -619,6 +626,12 @@ struct BlockChip: View {
                 }
             }
             // 내리는 길이 생겼으니 말해 준다 — 손짓은 있는데 아무도 모르면 없는 것과 같다.
+            // VoiceOver 는 칩 하나를 한 덩어리로 읽고, 누르면 편집기가 열린다.
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityValue(isUnverified ? Text("구체성 미검증") : Text(verbatim: ""))
+            .accessibilityAction { onTap() }
+            .accessibilityInputLabels([Text(verbatim: block.title)])
             .help(block.successCriteria.isEmpty
                   ? String(localized: "구체성 미검증 — 눌러서 다듬기 · 다른 요일로 끌어 옮기기 · 할 일 목록으로 끌어 내리면 날짜가 무름")
                   : block.successCriteria
@@ -641,6 +654,10 @@ struct BlockChip: View {
                         if let status = block.reviewStatus {
                             GlyphBadge(symbol: status == .done ? "checkmark" : status.systemImage,
                                        color: reviewTint(status), size: 22)
+                                .transition(.pop)
+                        } else if differentiateWithoutColor, isUnverified {
+                            // 주황을 못 가르는 사람에게는 '아직 안 다듬음'을 모양으로.
+                            GlyphBadge(symbol: "exclamationmark", color: palette.fg, size: 22)
                                 .transition(.pop)
                         } else {
                             GlyphBadge(title: block.title, color: palette.fg, size: 22)
