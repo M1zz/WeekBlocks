@@ -998,7 +998,9 @@ struct ContentView: View {
                         }
                     },
                     todoLoad: todoLoad(on: selectedDay),
-                    allDaySpans: allDaySpans(on: selectedDay)
+                    allDaySpans: allDaySpans(on: selectedDay),
+                    plans: dayPlans(on: selectedDay),
+                    onOpenPlan: { plan in rainbowSheet = RainbowEditContext(event: plan) }
                 )
                     .frame(maxHeight: .infinity, alignment: .top)
                     .dashboardPanel(padding: 14)
@@ -2056,6 +2058,11 @@ struct ContentView: View {
             }
             return
         }
+        if token.hasPrefix("rainbow:") {
+            guard atHour != nil else { return }   // 시각을 주는 자리(일간 자)에서만 받는다.
+            placePlan(uuid: String(token.dropFirst("rainbow:".count)), day: day, atHour: atHour, duration: duration)
+            return
+        }
         if token.hasPrefix("routine:") {
             let name = String(token.dropFirst("routine:".count))
             guard let routine = routines.first(where: { $0.name == name }) else { return }
@@ -2078,6 +2085,48 @@ struct ContentView: View {
             convertBacklogItem(item, to: day, atHour: atHour, duration: duration)
         }
         // 놓인 자리에서 톡 튀어나온다 — 손끝의 딸깍과 같은 순간에.
+        Haptic.snap()
+        withAnimation(Motion.squish) { try? context.save() }
+    }
+
+    /// 그날 하는 장기 플랜 중 **아직 블록이 안 선 것** — 일간 머리의 칩 (→ DayScheduleView.planStrip).
+    /// 플랜 이름으로 시작하는 블록이 그날 있으면 이미 세운 것이다 (무지개의 `carriesSession`과 같은 기준).
+    private func dayPlans(on day: DayOfWeek) -> [RainbowEvent] {
+        let date = dayDate(day)
+        let titles = weekBlocks.filter { $0.day == day }.map(\.title)
+        return rainbowEvents.filter { plan in
+            plan.occurs(on: date) && !titles.contains { $0.hasPrefix(plan.title) }
+        }
+    }
+
+    /// 장기 플랜 칩을 일간 자 위에 놓았다 — 그 시각에 그날의 블록을 세운다.
+    /// 회차 날이면 회차를 옮겨 적은 블록과 같은 이름 · 같은 표(blockMade)로 — 편집기가 또 만들지 않게.
+    private func placePlan(uuid: String, day: DayOfWeek, atHour: Double?, duration: Double?) {
+        guard let plan = rainbowEvents.first(where: { $0.uuid == uuid }) else { return }
+        let date = dayDate(day)
+        var sessions = plan.sessions
+        let index = sessions.firstIndex { RainbowEvent.day($0.date) == Calendar.current.startOfDay(for: date) }
+        let hours = duration ?? index.map { sessions[$0].hours } ?? plan.hoursPerDay
+        let start = atHour.map { clampStart($0, duration: hours) }
+        let title = index.map { "\(plan.title) \(sessions[$0].displayTitle(index: $0))" } ?? plan.title
+        let block = PlanBlock(
+            day: day,
+            timeBand: timeBand(for: start ?? 18),
+            durationHours: hours,
+            title: title,
+            successCriteria: "",
+            deliverable: "",
+            weekStartDate: storedWeek(for: day),
+            concreteVerified: false,
+            startHour: start ?? -1
+        )
+        TodoSharing.stamp(block)
+        context.insert(block)
+        if let index, !sessions[index].blockMade {
+            sessions[index].blockMade = true
+            plan.sessions = sessions
+            plan.updatedAt = Date()
+        }
         Haptic.snap()
         withAnimation(Motion.squish) { try? context.save() }
     }

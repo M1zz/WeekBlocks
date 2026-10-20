@@ -79,6 +79,9 @@ struct DayScheduleView: View {
     var todoLoad: TodoLoad? = nil
     /// 그날에 걸친 종일 막대 (→ AllDaySpan) — 앞날에 시작한 여러 날 일정도 들어온다.
     var allDaySpans: [AllDaySpan] = []
+    /// 그날 하는 장기 플랜 중 아직 블록이 안 선 것 (→ RainbowEvent.occurs). 머리 밑 한 줄에 칩으로 선다.
+    var plans: [RainbowEvent] = []
+    var onOpenPlan: (RainbowEvent) -> Void = { _ in }
 
     /// 종일 한 줄의 색. 무지개 칸이 있으면 그 색, 없으면 예전처럼 검증 여부로.
     private func allDayTint(_ block: PlanBlock) -> Color {
@@ -196,6 +199,7 @@ struct DayScheduleView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             allDayStrip
+            planStrip
             timeline(segs)
         }
         .onAppear {
@@ -272,6 +276,60 @@ struct DayScheduleView: View {
             }
             .transition(.pop)
         }
+    }
+
+    /// **오늘의 장기 플랜.** 요일 반복 플랜은 시각이 없어 블록이 서지 않고, 그래서 일간에서 통째로 안 보였다.
+    /// 그날 하는 것만 칩으로 세운다 — 누르면 플랜을 고치고, 자 위로 끌면 그 시각에 블록이 선다.
+    /// 블록이 서면 칩은 거둔다 (→ ContentView.dayPlans). 무지개가 같은 일을 두 번 세지 않는 규칙과 같다.
+    @ViewBuilder
+    private var planStrip: some View {
+        if !plans.isEmpty {
+            HStack(spacing: 8) {
+                Text("장기 플랜")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(plans, id: \.uuid) { plan in
+                            planChip(plan)
+                        }
+                    }
+                }
+            }
+            .transition(.pop)
+        }
+    }
+
+    private func planChip(_ plan: RainbowEvent) -> some View {
+        let tint = Color(hex: plan.colorHex) ?? .accentColor
+        return Button { onOpenPlan(plan) } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "rainbow")
+                Text(plan.title)
+                    .lineLimit(1)
+                Text(RainbowEventFormat.hours(Self.planHours(plan, on: date)))
+                    .monospacedDigit()
+                    .opacity(0.7)
+            }
+            .font(.body.weight(.medium))
+            .foregroundStyle(tint)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(tint.opacity(0.14), in: Capsule())
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .draggable(Self.planToken(plan))
+        .pointingCursor()
+        .help(String(localized: "그날의 장기 플랜 — 눌러서 고치기 · 자 위로 끌면 그 시각에 블록으로 세움"))
+    }
+
+    /// 장기 플랜 칩을 끌 때 실리는 글자. 받는 쪽(ContentView.dropBacklogItem)이 같은 머리로 알아본다.
+    static func planToken(_ plan: RainbowEvent) -> String { "rainbow:\(plan.uuid)" }
+
+    /// 그날 이 플랜에 쓰는 시간 — 회차가 있으면 그 회차의 시간, 없으면 하루 시간.
+    static func planHours(_ plan: RainbowEvent, on date: Date) -> Double {
+        plan.session(on: date)?.hours ?? plan.hoursPerDay
     }
 
     /// 종일 한 알. 배경은 회색 달력, 할 일은 무지개 색 체크리스트.
@@ -781,6 +839,7 @@ struct DayScheduleView: View {
     private func duration(of token: String) -> Double? {
         if let c = candidates.first(where: { $0.token == token }) { return c.hours }
         if let b = PlanBlock.matching(dragToken: token, in: blocks) { return b.durationHours }
+        if let p = plans.first(where: { Self.planToken($0) == token }) { return Self.planHours(p, on: date) }
         return nil
     }
 
