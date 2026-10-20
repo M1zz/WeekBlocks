@@ -199,13 +199,21 @@ struct RainbowDensityView: View {
                 let joinsPrev = i > 0 && packed.joins(lane: lane, i - 1, i)
                 let joinsNext = i + 1 < days.count && packed.joins(lane: lane, i, i + 1)
                 let r: CGFloat = 5
-                UnevenRoundedRectangle(topLeadingRadius: joinsPrev ? 0 : r,
-                                       bottomLeadingRadius: joinsPrev ? 0 : r,
-                                       bottomTrailingRadius: joinsNext ? 0 : r,
-                                       topTrailingRadius: joinsNext ? 0 : r,
-                                       style: .continuous)
-                    .fill(state == 2 ? color : (state == 1 ? color.opacity(0.28) : Color.primary.opacity(0.045)))
-                    .frame(width: Self.cellWidth + (joinsNext ? Self.gap : 0), height: Self.cellHeight)
+                // 하는 날은 옅은 막대 위에 제 모서리가 둥근 칸으로 따로 선다 — 막대에 이어 붙이면 네모가 된다.
+                ZStack(alignment: .leading) {
+                    UnevenRoundedRectangle(topLeadingRadius: joinsPrev ? 0 : r,
+                                           bottomLeadingRadius: joinsPrev ? 0 : r,
+                                           bottomTrailingRadius: joinsNext ? 0 : r,
+                                           topTrailingRadius: joinsNext ? 0 : r,
+                                           style: .continuous)
+                        .fill(state >= 1 ? color.opacity(0.28) : Color.primary.opacity(0.045))
+                        .frame(width: Self.cellWidth + (joinsNext ? Self.gap : 0), height: Self.cellHeight)
+                    if state == 2 {
+                        RoundedRectangle(cornerRadius: r, style: .continuous)
+                            .fill(color)
+                            .frame(width: Self.cellWidth, height: Self.cellHeight)
+                    }
+                }
                     .frame(width: Self.cellWidth, alignment: .leading)
                     .contentShape(Rectangle())
                     .onTapGesture { if let event { onOpen(event) } }

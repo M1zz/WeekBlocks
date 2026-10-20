@@ -519,12 +519,15 @@ struct DayScheduleView: View {
                         .zIndex(4)
                 }
 
+                let checkDrops = checkDrops(segs, lanes: lanes, laned: laned, right: right,
+                                            dug: dug, trackWidth: trackWidth)
                 ForEach(segs) { seg in
                     if let frame = frame(for: seg, lanes: lanes, laned: laned, right: right,
                                          dug: dug, trackWidth: trackWidth) {
                         let i = order[seg.id] ?? 0
                         segmentView(seg, size: frame.size, dugIn: dug.contains(seg.id),
                                     labelDrop: digging.labelDrop[seg.id] ?? 0,
+                                    checkDrop: checkDrops[seg.id] ?? 0,
                                     columns: digging.inside.contains(seg.id)
                                         ? columnChoice(seg, dug: dug, right: right) : nil)
                             .offset(x: Self.gutter + frame.minX + (seg.id == dragId ? dragPx : 0),
@@ -1330,8 +1333,10 @@ struct DayScheduleView: View {
     @ViewBuilder
     /// - Parameter labelDrop: 머리 글씨를 이만큼 내린다. 회사 시작에 파고든 일정이 있으면 회사 글씨는 그 아래로 (→ `dugIn`).
     /// - Parameter columns: 회사 같은 일정 안에 들어 있으면 (지금 열, 고를 수 있는 열 수) — 우클릭에 'N열로 옮기기'가 선다.
+    /// - Parameter checkDrop: 오른쪽 동그라미를 이만큼 내린다. 바로 위 일정의 동그라미와 포개지면 (→ `checkDrops`).
     private func segmentView(_ seg: TimeSegment, size: CGSize, dugIn: Bool = false,
-                             labelDrop: CGFloat = 0, columns: (current: Int, count: Int)? = nil) -> some View {
+                             labelDrop: CGFloat = 0, checkDrop: CGFloat = 0,
+                             columns: (current: Int, count: Int)? = nil) -> some View {
         let dragging = seg.id == dragId
         let hovering = hoverId == seg.id
         let block = planBlock(seg)
@@ -1339,7 +1344,7 @@ struct DayScheduleView: View {
         let done = status == .done
         // 넓으면 알약 + 시각·제목 + 동그라미, 좁으면 알약 + 제목, 아주 좁으면 알약만.
         let showsText = size.width >= Self.pillWidth + 44
-        let showsCheck = block != nil && !seg.isGhost && size.width >= Self.pillWidth + 120
+        let showsCheck = block != nil && !seg.isGhost && Self.showsCheck(width: size.width)
         // 끝 시각이 지났는데 안 찍었다 — 동그라미 옆에서 끝냈는지 묻는다.
         let asks = showsCheck && isOverdue(seg) && size.width >= Self.pillWidth + 220
         // **다 지나간 일정은 흐리게** — 알약까지 빛을 빼야 '이미 지나간 것'이 한눈에 갈린다.
@@ -1516,7 +1521,7 @@ struct DayScheduleView: View {
                     }
                     checkButton(block, color: seg.color)
                 }
-                .padding(.top, size.height >= 38 ? 7 : max(0, (size.height - 22) / 2))
+                .padding(.top, Self.checkTop(height: size.height) + checkDrop)
                 .padding(.trailing, 2)
                 .animation(Motion.squish, value: asks)
             }
@@ -1889,6 +1894,37 @@ struct DayScheduleView: View {
         .menuIndicator(.hidden)
         .fixedSize()
         .help("시간이 지났습니다. 끝냈는지 골라 주세요")
+    }
+
+    private static func showsCheck(width: CGFloat) -> Bool { width >= pillWidth + 120 }
+
+    /// 동그라미의 윗변 — 줄 안에서. 키가 넉넉하면 첫 줄 글씨 옆, 낮으면 가운데.
+    private static func checkTop(height: CGFloat) -> CGFloat {
+        height >= 38 ? 7 : max(0, (height - 22) / 2)
+    }
+
+    /// **동그라미끼리 포개지지 않게.** 짧은 일정도 줄 키는 22pt라 15분짜리 바로 뒤에 다음 일정이 붙으면
+    /// 두 동그라미가 반쯤 겹쳤다. 같은 오른쪽 끝에 선 동그라미를 위에서부터 보며, 앞 것과 겹치면 아래 것을 내린다.
+    /// 끄는 중인 일정은 빼고 센다 — 손을 따라 움직이는 동안 이웃 동그라미가 출렁이지 않게.
+    private func checkDrops(_ segs: [TimeSegment], lanes: [String: Lane], laned: [TimeSegment],
+                            right: [String: Lane], dug: Set<String>, trackWidth: CGFloat) -> [String: CGFloat] {
+        let size: CGFloat = 22, spacing: CGFloat = 3
+        let circles: [(id: String, edge: Int, top: CGFloat)] = segs.compactMap { seg in
+            guard seg.id != dragId, planBlock(seg) != nil,
+                  let f = frame(for: seg, lanes: lanes, laned: laned, right: right, dug: dug, trackWidth: trackWidth),
+                  Self.showsCheck(width: f.width) else { return nil }
+            return (seg.id, Int(f.maxX.rounded()), f.minY + Self.checkTop(height: f.height))
+        }
+        var drops: [String: CGFloat] = [:]
+        for (_, column) in Dictionary(grouping: circles, by: \.edge) {
+            var floor = -CGFloat.infinity
+            for c in column.sorted(by: { ($0.top, $0.id) < ($1.top, $1.id) }) {
+                let top = max(c.top, floor)
+                if top > c.top { drops[c.id] = top - c.top }
+                floor = top + size + spacing
+            }
+        }
+        return drops
     }
 
     /// 오른쪽 동그라미 — 누르면 끝낸 것이 되고, 다시 누르면 풀린다 (→ SoftCheck, ReflectionRow의 같은 손짓).
