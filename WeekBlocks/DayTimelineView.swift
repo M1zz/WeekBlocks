@@ -228,15 +228,20 @@ enum TimelineLayout {
         }
 
         // 4) 루틴 안 일정 — 정확한 시각에 루틴 위로 겹쳐(인셋) 그린다. 빈 구간/자유 시간엔 영향 없음.
+        //
+        // ⚠️ 품어 줄 일정이 그 시각에 없으면 보통 일정처럼 등뼈 위에 선다. 루틴 위에 얹어 둔 뒤
+        //    그 루틴을 지우거나 숨겨도 '루틴 안' 표시는 남아서, 혼자인데도 오른쪽 자리에 떠 있었다.
+        let hosts = segs.filter { !$0.isGhost && !$0.isFlexible }
         for blk in blocks where blk.withinRoutine {
             let dur = visibleDuration(blk)
             let start = blk.startHour >= 0 ? min(blk.startHour, 24 - minVisibleHours) : 9
             var piece = 0
             for (a, b) in splitAtMidnight(start, start + dur) {
+                let hosted = hosts.contains { $0.start < b - 1e-6 && a < $0.end - 1e-6 }
                 segs.append(TimeSegment(id: "nested:\(blockID(blk)):\(piece)", start: a, end: b,
                                         color: blockColors[blk.dragToken] ?? .accentColor,
                                         title: blk.title, isRoutine: false,
-                                        isNested: true, source: .planBlock(blk),
+                                        isNested: hosted, source: .planBlock(blk),
                                         logicalStart: start, logicalDuration: dur))
                 piece += 1
             }
