@@ -72,6 +72,13 @@ struct RainbowDensityView: View {
 
     /// 끌고 있는 동안 고른 칸 (시작 번호, 지금 번호).
     @State private var dragRange: (from: Int, to: Int)?
+    /// 마우스를 올려 둔 칸 — 무슨 일정인지 작은 카드로 보여 준다 (→ `hoverCard`).
+    @State private var hovered: HoverCell?
+
+    private struct HoverCell: Equatable {
+        let lane: Int
+        let day: Int
+    }
 
     private static let laneCount = 7
     private static let cellWidth: CGFloat = 30
@@ -95,6 +102,8 @@ struct RainbowDensityView: View {
                     dateRow(days)
                     ForEach(0..<Self.laneCount, id: \.self) { lane in
                         laneRow(lane, days: days, packed: packed)
+                            // 카드가 아래 · 위 줄에 가리지 않게 올려 둔 줄을 앞으로.
+                            .zIndex(hovered?.lane == lane ? 1 : 0)
                     }
                     countRow(days, packed: packed)
                 }
@@ -217,9 +226,100 @@ struct RainbowDensityView: View {
                     .frame(width: Self.cellWidth, alignment: .leading)
                     .contentShape(Rectangle())
                     .onTapGesture { if let event { onOpen(event) } }
-                    .help(event?.title ?? String(localized: "가로로 끌어 기간을 고르면 장기 플랜 추가"))
+                    .onHover { inside in
+                        let cell = HoverCell(lane: lane, day: i)
+                        if inside, event != nil { hovered = cell } else if hovered == cell { hovered = nil }
+                    }
+                    // 위 네 줄은 아래로, 아래 세 줄은 위로 — 판 밖으로 나가 잘리지 않게. 오른쪽 끝 주는 왼쪽으로 편다.
+                    .overlay(alignment: Self.cardAlignment(lane: lane, day: i, count: days.count)) {
+                        if let event, hovered == HoverCell(lane: lane, day: i), dragRange == nil {
+                            hoverCard(event, on: day, color: color)
+                                .alignmentGuide(VerticalAlignment.top) { $0[.top] - Self.cellHeight - 4 }
+                                .alignmentGuide(VerticalAlignment.bottom) { $0[.bottom] + Self.cellHeight + 4 }
+                                .allowsHitTesting(false)
+                                .transition(.opacity)
+                        }
+                    }
+                    .help(event == nil ? String(localized: "가로로 끌어 기간을 고르면 장기 플랜 추가") : "")
+                    .zIndex(hovered == HoverCell(lane: lane, day: i) ? 1 : 0)
+            }
+            .animation(.easeOut(duration: 0.12), value: hovered)
+        }
+    }
+
+    // MARK: 올려 보기
+
+    private static func cardAlignment(lane: Int, day: Int, count: Int) -> Alignment {
+        let trailing = day >= count - 7
+        switch (lane < 4, trailing) {
+        case (true, false): return .topLeading
+        case (true, true): return .topTrailing
+        case (false, false): return .bottomLeading
+        case (false, true): return .bottomTrailing
+        }
+    }
+
+    /// 칸에 마우스를 올리면 뜨는 카드 — 누르지 않아도 무슨 일정인지, 언제인지, 이날 하는지가 보인다.
+    private func hoverCard(_ item: RainbowDensityItem, on day: Date, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Circle().fill(color).frame(width: 8, height: 8)
+                Text(item.title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .lineLimit(2)
+            }
+            ForEach(Self.cardLines(item, on: day), id: \.self) { line in
+                Text(line)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .frame(width: 210, alignment: .leading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Color.primary.opacity(0.08)))
+        .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// 카드의 둘째 줄부터 — 기간, 이날 하는 것.
+    private static func cardLines(_ item: RainbowDensityItem, on day: Date) -> [String] {
+        let df = DateFormatter()
+        df.setLocalizedDateFormatFromTemplate("MMMdE")
+        switch item {
+        case .event(let e):
+            let start = df.string(from: RainbowEvent.day(e.startDate))
+            let period = e.isInfinite
+                ? String(localized: "\(start)부터 계속")
+                : "\(start) – \(df.string(from: RainbowEvent.day(e.endDate)))"
+            let today: String
+            if let session = e.session(on: day) {
+                let name = session.title.isEmpty ? df.string(from: day) : session.title
+                let at = session.startHour.map { formatHour($0) + " · " } ?? ""
+                today = "\(name) · \(at)\(hours(session.hours))"
+            } else if e.occurs(on: day) {
+                today = String(localized: "이날 하는 날 · \(hours(e.hoursPerDay))")
+            } else {
+                today = String(localized: "이날은 쉬는 날")
+            }
+            return [period, today]
+        case .block(let b, let date):
+            let when = b.isAllDay ? b.whenLabel : "\(b.whenLabel) · \(hours(b.durationHours))"
+            var lines = [df.string(from: date), when]
+            if b.reviewStatus == .done { lines.append(String(localized: "끝냄")) }
+            return lines
+        }
+    }
+
+    /// 2 → "2시간", 1.5 → "1시간 30분", 0.5 → "30분".
+    private static func hours(_ h: Double) -> String {
+        let minutes = Int((h * 60).rounded())
+        let hh = minutes / 60, mm = minutes % 60
+        if hh == 0 { return String(localized: "\(mm)분") }
+        if mm == 0 { return String(localized: "\(hh)시간") }
+        return String(localized: "\(hh)시간 \(mm)분")
     }
 
     /// 그날 실제로 하는 일정의 수. 일곱 줄을 넘으면 넘친 수를 함께 적는다.

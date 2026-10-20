@@ -586,6 +586,8 @@ struct DayScheduleView: View {
                         segmentView(seg, size: frame.size, dugIn: dug.contains(seg.id),
                                     labelDrop: digging.labelDrop[seg.id] ?? 0,
                                     checkDrop: checkDrops[seg.id] ?? 0,
+                                    checkReach: checkReach(seg, frame: frame, lanes: lanes, laned: laned,
+                                                           dug: dug, trackWidth: trackWidth),
                                     columns: digging.inside.contains(seg.id)
                                         ? columnChoice(seg, dug: dug, right: right) : nil)
                             .offset(x: Self.gutter + frame.minX + (seg.id == dragId ? dragPx : 0),
@@ -1393,8 +1395,9 @@ struct DayScheduleView: View {
     /// - Parameter labelDrop: 머리 글씨를 이만큼 내린다. 회사 시작에 파고든 일정이 있으면 회사 글씨는 그 아래로 (→ `dugIn`).
     /// - Parameter columns: 회사 같은 일정 안에 들어 있으면 (지금 열, 고를 수 있는 열 수) — 우클릭에 'N열로 옮기기'가 선다.
     /// - Parameter checkDrop: 오른쪽 동그라미를 이만큼 내린다. 바로 위 일정의 동그라미와 포개지면 (→ `checkDrops`).
+    /// - Parameter checkReach: 동그라미를 이만큼 오른쪽으로 내보낸다 — 오른쪽 절반을 비워 둔 긴 일정도 동그라미는 자 끝에 (→ `checkReach`).
     private func segmentView(_ seg: TimeSegment, size: CGSize, dugIn: Bool = false,
-                             labelDrop: CGFloat = 0, checkDrop: CGFloat = 0,
+                             labelDrop: CGFloat = 0, checkDrop: CGFloat = 0, checkReach: CGFloat = 0,
                              columns: (current: Int, count: Int)? = nil) -> some View {
         let dragging = seg.id == dragId
         let hovering = hoverId == seg.id
@@ -1405,7 +1408,9 @@ struct DayScheduleView: View {
         let showsText = size.width >= Self.pillWidth + 44
         let showsCheck = block != nil && !seg.isGhost && Self.showsCheck(width: size.width)
         // 끝 시각이 지났는데 안 찍었다 — 동그라미 옆에서 끝냈는지 묻는다.
-        let asks = showsCheck && isOverdue(seg) && size.width >= Self.pillWidth + 220
+        let asks = showsCheck && isOverdue(seg) && size.width + checkReach >= Self.pillWidth + 220
+        // 동그라미가 바깥(비워 둔 오른쪽 절반)에 서면 글씨는 제 폭을 다 쓴다.
+        let checkRoom: CGFloat = checkReach > 0 ? 4 : (asks ? 130 : (showsCheck ? 30 : 4))
         // **다 지나간 일정은 흐리게** — 알약까지 빛을 빼야 '이미 지나간 것'이 한눈에 갈린다.
         // 글씨만 옅어지던 때는 색 알약이 그대로 또렷해서 지난 것과 남은 것이 한 무게로 읽혔다.
         // 가리키거나 끄는 동안에는 또렷하게. 끝냈나요?·동그라미는 흐리지 않는다 — 아직 할 일이 남았다.
@@ -1437,7 +1442,7 @@ struct DayScheduleView: View {
                     // 글씨가 설 폭에 맞춰 시각을 줄인다 — '07:00–08:00 · 1h' → '07:00–08:00' → '07:00'.
                     // 한때 폭이 모자라면 시각을 통째로 뺐다. 회사 옆 오른쪽 칸의 일정들은 제목만 남아
                     // 몇 시 일인지 알 수 없었다.
-                    let textRoom = size.width - Self.pillWidth - 10 - (asks ? 130 : (showsCheck ? 30 : 4))
+                    let textRoom = size.width - Self.pillWidth - 10 - checkRoom
                     let when = Text(timeRange(seg, start: moving, room: textRoom))
                         .font(.system(size: 10.5, weight: moving != nil ? .bold : .medium, design: .rounded))
                         .monospacedDigit()
@@ -1464,7 +1469,7 @@ struct DayScheduleView: View {
                     .contentTransition(.numericText())
                     .padding(.top, labelDrop)
                     .opacity(faded ? 0.5 : 1)
-                    .padding(.trailing, asks ? 130 : (showsCheck ? 30 : 4))
+                    .padding(.trailing, checkRoom)
                 }
                 Spacer(minLength: 0)
             }
@@ -1582,6 +1587,7 @@ struct DayScheduleView: View {
                 }
                 .padding(.top, Self.checkTop(height: size.height) + checkDrop)
                 .padding(.trailing, 2)
+                .offset(x: checkReach)
                 .animation(Motion.squish, value: asks)
             }
         }
@@ -1972,7 +1978,8 @@ struct DayScheduleView: View {
             guard seg.id != dragId, planBlock(seg) != nil,
                   let f = frame(for: seg, lanes: lanes, laned: laned, right: right, dug: dug, trackWidth: trackWidth),
                   Self.showsCheck(width: f.width) else { return nil }
-            return (seg.id, Int(f.maxX.rounded()), f.minY + Self.checkTop(height: f.height))
+            let edge = f.maxX + checkReach(seg, frame: f, lanes: lanes, laned: laned, dug: dug, trackWidth: trackWidth)
+            return (seg.id, Int(edge.rounded()), f.minY + Self.checkTop(height: f.height))
         }
         var drops: [String: CGFloat] = [:]
         for (_, column) in Dictionary(grouping: circles, by: \.edge) {
@@ -1984,6 +1991,17 @@ struct DayScheduleView: View {
             }
         }
         return drops
+    }
+
+    /// **동그라미는 늘 자 오른쪽 끝에.** 1시간 넘는 블록은 오른쪽 절반을 '이 시간 안' 자리로 비워 두느라
+    /// 왼쪽 45%만 차지한다 (→ `frame(for:)`). 동그라미가 그 끝에 붙으니 짧은 블록·얹힌 일정은 오른쪽 끝,
+    /// 긴 블록은 화면 가운데에 서서 한 줄로 읽히지 않았다. 혼자 선 긴 블록만 내보낸다 — 둘로 갈린 칸은
+    /// 오른쪽에 다른 일정이 서 있다.
+    private func checkReach(_ seg: TimeSegment, frame f: CGRect, lanes: [String: Lane], laned: [TimeSegment],
+                            dug: Set<String>, trackWidth: CGFloat) -> CGFloat {
+        guard hostsNested(seg), !dug.contains(seg.id), !isOverlay(seg, laned: laned),
+              (lanes[seg.id]?.count ?? 1) <= 1 else { return 0 }
+        return max(0, trackWidth - f.maxX)
     }
 
     /// 오른쪽 동그라미 — 누르면 끝낸 것이 되고, 다시 누르면 풀린다 (→ SoftCheck, ReflectionRow의 같은 손짓).
