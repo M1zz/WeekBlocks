@@ -101,7 +101,8 @@ final class ScheduleShareStore {
     // MARK: 새로고침
 
     func refresh() async {
-        guard !isBusy else { return }
+        // 시험이 띄운 실행은 iCloud 의 공유 일정을 읽지도 쓰지도 않는다 (→ LaunchEnvironment).
+        guard !isBusy, !LaunchEnvironment.isUnderTest else { return }
         isBusy = true
         defer { isBusy = false }
         do {
@@ -188,6 +189,11 @@ final class ScheduleShareStore {
     /// 존을 만들고 주별 스냅숏을 저장한 뒤, 읽기 전용 존 공유를 만들어 초대 URL을 돌려준다.
     @discardableResult
     func startSharing(publishing snapshots: [SharedScheduleSnapshot]) async -> URL? {
+        // 원격 스위치로 꺼 두었으면 새로 열지 않는다 (→ WeekBlocksFlag.swift).
+        guard WeekBlocksFlag.scheduleSharing.isOn else {
+            errorMessage = String(localized: "일정 공유를 잠시 멈췄습니다. 앱을 업데이트한 뒤 다시 시도해 주세요.")
+            return nil
+        }
         isBusy = true
         defer { isBusy = false }
         do {
@@ -222,7 +228,7 @@ final class ScheduleShareStore {
 
     /// 공유 중일 때, 바뀐 주만 골라 스냅숏을 갱신한다.
     func publish(_ snapshots: [SharedScheduleSnapshot]) async {
-        guard isSharing else { return }
+        guard isSharing, WeekBlocksFlag.scheduleSharing.isOn, !LaunchEnvironment.isUnderTest else { return }
         let changed = snapshots.filter { snap in
             guard let payload = encode(snap) else { return false }
             return payload != lastPublishedPayload[weekKey(snap.weekStart)]

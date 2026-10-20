@@ -13,6 +13,7 @@ import WidgetKit
 
 enum TimerWidgetBridge {
     static func publish(slots: [ScheduleSlot], timer: TaskTimer, focus: String = "", now: Date = Date()) {
+        guard !LaunchEnvironment.isUnderTest else { return }   // 시험 데이터가 위젯에 서지 않게.
         // 지금부터 내일 끝까지. 지나간 조각은 위젯이 쓸 일이 없다.
         let items = slots
             .filter { $0.end > now }

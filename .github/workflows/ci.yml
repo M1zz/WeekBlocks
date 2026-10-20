@@ -1,0 +1,57 @@
+name: CI
+
+# 로컬에서만 돌던 게이트(scripts/predeploy.sh — Release 빌드 + 단위 시험)를 푸시·PR 마다 자동으로 돌린다.
+# 게이트 로직은 predeploy.sh 한 곳에만 둔다 — 여기서 명령을 복제하면 로컬과 CI 가 갈라진다.
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+concurrency:
+  # 같은 브랜치에 연속 푸시하면 이전 실행은 취소 — 러너 시간 절약
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: 빌드 · 단위 시험
+    runs-on: macos-15
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode 버전 확인
+        run: xcodebuild -version
+
+      # LeeoKit(공개 SPM 패키지)을 매번 새로 받지 않도록 캐시.
+      - name: SPM 캐시
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      # Release 빌드(권한 문구 검사 포함) + 단위 시험. 서명은 끈다 — 서명·공증은 DeployBar 의 아카이브가 한다.
+      - name: 게이트 실행 (predeploy.sh)
+        run: bash scripts/predeploy.sh
+
+  lint:
+    name: SwiftLint
+    runs-on: macos-15
+    timeout-minutes: 10
+    # ⚠️ 처음에는 막지 않는다. 지금 강제 언랩 18건 · 1000줄 넘는 파일 3개가 남아 있어서,
+    #    막는 순간 모든 PR 이 빨간불이 되고 결국 아무도 안 본다. 0 으로 만든 뒤 이 줄을 지운다.
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SwiftLint 설치
+        run: brew install swiftlint
+
+      - name: SwiftLint 실행
+        run: swiftlint --strict

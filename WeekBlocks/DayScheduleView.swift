@@ -1089,7 +1089,7 @@ struct DayScheduleView: View {
                 onDrawBlock(hour, hours)
             },
             onCancel: { selection = nil })
-        .background(.regularMaterial, in: .soft(Corner.panel))
+        .floatingBackdrop(in: RoundedRectangle.soft(Corner.panel))
         .overlay(RoundedRectangle.soft(Corner.panel)
             .strokeBorder(Color.primary.opacity(0.1), lineWidth: 1))
         .shadow(color: .black.opacity(0.22), radius: 14, y: 6)
@@ -2157,7 +2157,7 @@ struct DayScheduleView: View {
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background(.regularMaterial, in: Capsule())
+                .floatingBackdrop(in: Capsule())
                 .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1))
         }
         .buttonStyle(.plain)
@@ -2224,7 +2224,7 @@ struct DayScheduleView: View {
                 .foregroundStyle(Color.orange)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background(.regularMaterial, in: Capsule())
+                .floatingBackdrop(in: Capsule())
                 .overlay(Capsule().strokeBorder(Color.orange.opacity(0.45), lineWidth: 1))
         }
         .buttonStyle(.plain)

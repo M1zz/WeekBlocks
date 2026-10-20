@@ -136,6 +136,7 @@ final class PurchaseManager {
     /// ⚠️ 아이폰의 `PurchaseManager.syncCrossPlatformMark`와 **같은 규칙**이다. 자기 표만
     ///    쓰고 지우며, 구독은 끝나는 날을 함께 적는다. 한쪽을 고치면 같이 고칠 것.
     private func syncCrossPlatformMark() async {
+        markedHasPro = store.hasPro
         crossPlatformPro = await ProMarkStore.sync(hasPro: store.hasPro,
                                                    entitlementIDs: WeekBlocksSpec.proEntitlementIDs,
                                                    defaultProductID: WeekBlocksSpec.proYearlyID,
@@ -144,6 +145,12 @@ final class PurchaseManager {
 
     /// 아이폰에서 산 것이 살아 있는가.
     @ObservationIgnored private var crossPlatformPro = false
+
+    /// 내 표에 마지막으로 옮겨 적은 답. 영수증이 이것과 달라지면 표를 다시 적는다.
+    ///
+    /// ⚠️ 전에는 켤 때(`refresh`)만 표를 적어서, 여기서 막 산 사람이 바로 아이폰을 켜면
+    ///    아이폰은 아직 표를 못 봤다 — 이 앱을 한 번 더 켜야 열렸다. 해지·환불·가족 공유도 같았다.
+    @ObservationIgnored private var markedHasPro: Bool?
 
     /// 고른 상품을 산다. 성공·취소·승인 대기·실패의 갈래와 퍼널 이벤트는 LeeoStore 안에 있다.
     func purchase(_ product: Product) async {
@@ -166,6 +173,11 @@ final class PurchaseManager {
     }
 
     private func pull() {
+        // 사기·복원·리스너(다른 기기, 가족 공유, 환불, 만료)로 영수증이 바뀌었으면 표도 바로 고친다.
+        if entitlementsChecked, let marked = markedHasPro, marked != store.hasPro {
+            markedHasPro = store.hasPro
+            Task { await syncCrossPlatformMark(); pull() }
+        }
         if entitlementsChecked {
             // 아이폰에서 산 표가 살아 있으면 그것도 권한이다 (→ syncCrossPlatformMark).
             MacEntitlement.setPurchased(store.hasPro || crossPlatformPro)

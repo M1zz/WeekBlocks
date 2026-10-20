@@ -18,6 +18,8 @@ enum TodoShareIntake {
     /// - Returns: 실제로 들어간 개수. 0이면 아무 일도 없었다는 뜻이다.
     @discardableResult
     static func drain(into context: ModelContext) -> Int {
+        // 시험의 메모리 스토어로 비우면 사람이 공유해 둔 할 일이 사라진다 (→ LaunchEnvironment).
+        guard !LaunchEnvironment.isUnderTest else { return 0 }
         let drafts = TodoShareInbox.drain()
         guard !drafts.isEmpty else { return 0 }
 
@@ -41,7 +43,7 @@ enum TodoShareIntake {
         } catch {
             // 저장에 실패하면 상자는 이미 비운 뒤라 되돌릴 수 없다.
             // 흔치 않은 경우라 로그만 남기고 넘어간다.
-            print("⚠️ [Share] 받은 할 일 저장 실패: \(error)")
+            AppLog.sharing.error("받은 할 일 저장 실패: \(String(describing: error), privacy: .public)")
             return 0
         }
         return drafts.count

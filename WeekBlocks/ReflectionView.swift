@@ -902,6 +902,8 @@ struct ReflectionRow: View {
                 Text("기준: \(block.successCriteria)")
                     .font(.body)
                     .foregroundStyle(.secondary)
+                    // 다음 주 계획이나 노트에 그대로 옮겨 적을 수 있게 — 다시 치지 않아도 된다.
+                    .textSelection(.enabled)
                     .padding(.leading, detailIndent)
             }
 

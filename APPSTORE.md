@@ -77,7 +77,7 @@ DeployBar 가 이 파일을 읽어 App Store Connect 의 스토어 페이지를 
 ### 키워드
 
 ```
-시간관리,일정관리,플래너,할일,투두리스트,스케줄러,시간표,타임테이블,캘린더,집중,타이머,습관,하루계획,업무관리,체크리스트,회고,위젯,다이어리,데일리,갓생,시간블록,욕망의무지개
+생활계획표,시간표만들기,위클리,주간플래너,시간표,회고,갓생,시간계획,타임박싱,하루일과,공부계획표,방학계획표,루틴관리,플래너,투두리스트,일정관리,시간관리,스케줄러,캘린더,습관
 ```
 
 ### 지원 URL
@@ -170,7 +170,7 @@ Privacy Policy: https://m1zz.github.io/WeekBlocks/en/privacy.html
 ### 키워드
 
 ```
-schedule,block,todo,list,task,breakdown,steps,timer,focus,deep,work,daily,timeline,calendar,adhd,168
+timebox,timeblock,breakdown,timeline,hourly,168,schedule,agenda,todo,adhd,focus,daily,calendar,tasks
 ```
 
 ### 지원 URL

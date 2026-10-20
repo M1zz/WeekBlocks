@@ -88,7 +88,10 @@ final class CalendarBridge {
     }
 
     /// 자동으로 가져올 수 있는 상태인가.
-    var isAutoReady: Bool { autoImport && hasAccess && !selectedIDs.isEmpty }
+    var isAutoReady: Bool {
+        autoImport && hasAccess && !selectedIDs.isEmpty && WeekBlocksFlag.calendarAutoImport.isOn
+            && !LaunchEnvironment.isUnderTest
+    }
 
     private init() {
         reloadCalendarsIfAllowed()
@@ -243,6 +246,8 @@ final class CalendarBridge {
             return result
         }
         failureMessage = nil
+        let signpost = AppLog.signposter.beginInterval("CalendarImport")
+        defer { AppLog.signposter.endInterval("CalendarImport", signpost) }
 
         let cal = Calendar.current
         guard let weekEnd = cal.date(byAdding: .day, value: 7, to: weekStart) else { return result }

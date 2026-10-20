@@ -1,5 +1,191 @@
 # 릴리즈 노트
 
+## 1.1.13
+
+### 앱스토어 (한국어)
+
+업데이트 뒤 새로 생긴 것을 처음에 알려 줍니다
+대비 증가와 색상 없이 구별에 맞춰 화면이 바뀝니다
+프로모션 코드를 앱 안에서 바로 쓸 수 있습니다
+계획 대비 실제를 무료로도 볼 수 있습니다
+앞으로 만들 기능을 보고 의견을 보낼 수 있습니다
+
+### App Store (English)
+
+See what’s new right after each update
+Adapts to Increase Contrast settings
+Redeem promo codes right in the app
+Plan vs. Actual is now free to view
+See upcoming features and send ideas
+
+### App Store (繁體中文, zh-Hant)
+
+更新後第一次打開會告訴你新功能
+畫面會配合增加對比與不以顏色區分
+可以直接在 App 內兌換優惠代碼
+免費也能看計畫與實際
+可以查看即將推出的功能並提供意見
+
+### App Store (简体中文, zh-Hans)
+
+更新后首次打开会告诉你新功能
+界面会配合增强对比度与区分不依赖颜色
+可以直接在 App 内兑换优惠代码
+免费也能看计划与实际
+可以查看即将推出的功能并提出建议
+
+### App Store (日本語, ja)
+
+アップデート後の新機能を最初にお知らせ
+コントラストやカラー以外の区別に対応
+プロモーションコードをアプリ内で使えます
+計画と実際を無料でも見られます
+これから作る機能を見て要望を送れます
+
+### App Store (Deutsch, de)
+
+Neuigkeiten direkt nach jedem Update
+Passt sich an „Kontrast erhöhen“ an
+Aktionscodes direkt in der App einlösen
+Plan und Wirklichkeit jetzt auch gratis
+Geplante Funktionen ansehen und mitreden
+
+### App Store (Español, es)
+
+Novedades justo después de cada versión
+Se adapta a Aumentar contraste
+Canjea códigos promocionales en la app
+Plan frente a real, ahora también gratis
+Mira lo que viene y envía tus ideas
+
+### App Store (Français, fr)
+
+Les nouveautés dès chaque mise à jour
+S’adapte à Augmenter le contraste
+Utilisez vos codes promo dans l’app
+Prévu et réel, désormais gratuit
+Voyez ce qui arrive, proposez vos idées
+
+### App Store (Italiano, it)
+
+Le novità subito dopo ogni aggiornamento
+Si adatta ad Aumenta contrasto
+Riscatta i codici promozionali nell’app
+Previsto e reale, ora anche gratis
+Scopri le funzioni in arrivo e proponi
+
+### App Store (Português (Brasil), pt-BR)
+
+Novidades logo após cada atualização
+Se adapta ao Aumentar contraste
+Resgate códigos promocionais no app
+Planejado x real agora também grátis
+Veja o que vem por aí e mande ideias
+
+### App Store (Русский, ru)
+
+Новое видно сразу после обновления
+Учитывает «Увеличить контраст»
+Промокоды вводятся прямо в приложении
+План и факт теперь и бесплатно
+Смотрите, что будет, и предлагайте идеи
+
+### App Store (Čeština, cs)
+
+Novinky hned po každé aktualizaci
+Přizpůsobí se Zvýšení kontrastu
+Propagační kódy uplatníte v aplikaci
+Plán a skutečnost nyní i zdarma
+Prohlédněte si plány a pošlete nápad
+
+### App Store (Dansk, da)
+
+Nyheder lige efter hver opdatering
+Tilpasser sig Øg kontrast
+Indløs kampagnekoder direkte i appen
+Plan og virkelighed nu også gratis
+Se, hvad der kommer, og send idéer
+
+### App Store (Ελληνικά, el)
+
+Τα νέα αμέσως μετά από κάθε ενημέρωση
+Προσαρμόζεται στην Αύξηση αντίθεσης
+Εξαργυρώστε κωδικούς μέσα στην εφαρμογή
+Πλάνο και πραγματικότητα και δωρεάν
+Δείτε τι έρχεται και στείλτε ιδέες
+
+### App Store (Suomi, fi)
+
+Uutuudet heti päivityksen jälkeen
+Mukautuu Lisää kontrastia -asetukseen
+Lunasta tarjouskoodit suoraan apissa
+Suunniteltu ja toteutunut nyt ilmaiseksi
+Katso tulevat ominaisuudet ja ehdota
+
+### App Store (Bahasa Indonesia, id)
+
+Lihat yang baru setelah tiap pembaruan
+Menyesuaikan Tingkatkan kontras
+Tukarkan kode promo langsung di aplikasi
+Rencana vs. kenyataan kini juga gratis
+Lihat fitur mendatang dan kirim ide
+
+### App Store (Norsk bokmål, nb)
+
+Nyheter rett etter hver oppdatering
+Tilpasser seg Øk kontrast
+Løs inn kampanjekoder rett i appen
+Plan og virkelighet nå også gratis
+Se hva som kommer, og send inn idéer
+
+### App Store (Nederlands, nl)
+
+Nieuw direct na elke update
+Past zich aan op Verhoog contrast
+Wissel promotiecodes in de app in
+Plan en werkelijkheid nu ook gratis
+Bekijk wat eraan komt en deel ideeën
+
+### App Store (Polski, pl)
+
+Nowości zaraz po każdej aktualizacji
+Dopasowuje się do Zwiększ kontrast
+Kody promocyjne zrealizujesz w aplikacji
+Plan a rzeczywistość także za darmo
+Zobacz, co nadchodzi, i zgłoś pomysł
+
+### App Store (Svenska, sv)
+
+Nyheter direkt efter varje uppdatering
+Anpassar sig efter Öka kontrasten
+Lös in kampanjkoder direkt i appen
+Plan och verklighet nu även gratis
+Se vad som kommer och skicka idéer
+
+### App Store (ไทย, th)
+
+บอกสิ่งใหม่ทันทีหลังอัปเดต
+ปรับตามการเพิ่มความต่างสี
+แลกรหัสโปรโมชันในแอปได้เลย
+ดูแผนเทียบกับจริงได้ฟรีแล้ว
+ดูฟีเจอร์ที่กำลังจะมาและส่งไอเดียได้
+
+### App Store (Türkçe, tr)
+
+Her güncellemeden sonra yenilikler
+Karşıtlığı artır ayarına uyum sağlar
+Promosyon kodlarını uygulamada kullanın
+Plan ve gerçek artık ücretsiz
+Gelecek özellikleri görün, fikir verin
+
+### App Store (Tiếng Việt, vi)
+
+Báo điều mới ngay sau mỗi bản cập nhật
+Tự điều chỉnh theo Tăng độ tương phản
+Đổi mã khuyến mãi ngay trong ứng dụng
+Kế hoạch và thực tế nay miễn phí
+Xem tính năng sắp có và gửi ý tưởng
+
 ## 1.1.12
 
 ### 앱스토어 (한국어)

@@ -149,6 +149,13 @@ struct ScheduleShareSettingsSection: View {
                     ShareLink(item: url) {
                         Label("초대 링크 보내기", systemImage: "square.and.arrow.up")
                     }
+                    // 공유 메뉴에 없는 메신저도 있다 — 링크를 골라 복사할 수 있게 글로도 세운다.
+                    Text(verbatim: url.absoluteString)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .textSelection(.enabled)
                 }
                 Button {
                     Task { await store.publish(snapshotsProvider()) }

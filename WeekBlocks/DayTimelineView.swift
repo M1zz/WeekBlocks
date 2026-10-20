@@ -672,7 +672,7 @@ struct DayTimelineRow: View {
                                                        : (todoLoad?.color(for: span.block) ?? .accentColor))
                     .padding(.horizontal, 7)
                     .padding(.vertical, 2)
-                    .background(.regularMaterial, in: Capsule())
+                    .floatingBackdrop(in: Capsule())
                     .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1))
                     .fixedSize()
                     .contextMenu { AllDayKindMenu(block: span.block) }

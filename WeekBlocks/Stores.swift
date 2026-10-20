@@ -32,7 +32,15 @@ enum StoreBootstrap {
     ///  1) 옛 스토어에 남아 있는 할 일을 파일로 떠 둔다 (되돌릴 길).
     ///  2) 계획 스토어를 연다 — 이때 옛 할 일 테이블이 정리된다.
     ///  3) 할 일 스토어를 연다 — CloudKit이 존에 있는 할 일을 도로 채워 준다.
-    static func run() {
+    ///
+    /// - Parameter safeMode: 직전 실행들이 첫 화면 전에 끝났다 (→ WeekBlocksApp.launchGuard).
+    ///   스토어를 열고 금고와 견주는 데까지만 하고, 그 뒤의 정리는 이번 한 번 건너뛴다.
+    static func run(safeMode: Bool = false) {
+        // 시험이 띄운 실행: 메모리 안 스토어만 연다. 금고·옛 스토어·다시 받기는 디스크의 진짜 파일을 만진다.
+        guard !LaunchEnvironment.isUnderTest else {
+            _ = PlanStore.shared
+            return
+        }
         // 스토어를 열기 전에 해야 하는 일이 둘 있다.
         //  ① '다시 받아오기' 요청이 걸려 있으면 로컬 사본을 먼저 버린다.
         //  ② 한때 갈라 두었던 할 일 스토어가 남아 있으면, 그 안의 할 일을 떠 온다.
@@ -46,6 +54,10 @@ enum StoreBootstrap {
         // 연 **직후**, 무엇을 정리하기도 전에 지난번 마지막 벌과 견준다 (→ VaultMonitor.swift).
         // 아래 정리들이 지우는 것까지 '사라짐'으로 보지 않게, 견준 뒤에 이번 벌을 뜬다.
         VaultMonitor.shared.start(container: PlanStore.shared.container)
+        guard !safeMode else {
+            AppLog.launch.notice("세이프 모드 — 켤 때 정리를 건너뛴다")
+            return
+        }
         TodoStore.shared.pullForwardOverdueWeeks()
         // 동기화가 막혀 있던 동안 두 기기가 각자 만든 같은 것이 한꺼번에 내려온다.
         // 켤 때 한 번 정리하고, 늦게 도착하는 것은 아래 판정이 한 번 더 본다.
@@ -100,12 +112,16 @@ final class PlanStore {
         //    앱 샌드박스 → App Group 컨테이너로 바뀐다. 그러면 이미 배포된 사용자의
         //    기존 store를 못 찾고 빈 스토어를 새로 만들어, 루틴·계획이 전부
         //    사라진 것처럼 보인다. (iOS '욕망의 무지개'도 같은 이유로 못박아 두었다.)
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            groupContainer: .none,
-            cloudKitDatabase: .private(containerID)
-        )
+        // 시험이 띄운 실행은 메모리 안에서만 — 사람의 스토어와 iCloud 는 건드리지 않는다 (→ LaunchEnvironment).
+        let config = LaunchEnvironment.isUnderTest
+            ? ModelConfiguration(schema: schema, isStoredInMemoryOnly: true,
+                                 groupContainer: .none, cloudKitDatabase: .none)
+            : ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                groupContainer: .none,
+                cloudKitDatabase: .private(containerID)
+            )
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
@@ -154,7 +170,7 @@ final class PlanStore {
         guard !victims.isEmpty else { return }
         for v in victims { context.delete(v) }
         save()
-        print("🧹 [Dedupe] 겹쳐 있던 계획 블록 \(victims.count)개를 정리했다")
+        AppLog.store.info("겹쳐 있던 계획 블록 \(victims.count, privacy: .public)개를 정리했다")
     }
 
     /// 만든 때까지 같을 때 고르는 기준. 기기마다 다른 가져온 순서가 아니라 내용으로 가른다.
@@ -189,7 +205,7 @@ final class PlanStore {
         guard !victims.isEmpty else { return }
         for v in victims { context.delete(v) }
         save()
-        print("🧹 [Dedupe] 겹쳐 있던 무지개 일정 \(victims.count)개를 정리했다")
+        AppLog.store.info("겹쳐 있던 무지개 일정 \(victims.count, privacy: .public)개를 정리했다")
     }
 }
 
@@ -233,10 +249,10 @@ final class TodoStore {
         // ⚠️ **지우지 않고 금고로 옮긴다.** 아직 iCloud에 못 올라간 것이 이 파일에만 있을 수 있다.
         //    옮기지 못하면 아무것도 버리지 않고 그대로 연다 — 다시 받기를 못 하는 편이 잃는 것보다 낫다.
         guard DataVault.moveStoreFilesAside(PlanStore.storeFileURLs, reason: "refetch") else {
-            print("⚠️ [Store] 로컬 사본을 금고로 옮기지 못해 다시 받기를 그만둔다")
+            AppLog.store.error("로컬 사본을 금고로 옮기지 못해 다시 받기를 그만둔다")
             return
         }
-        print("🔄 [Store] 로컬 사본을 금고로 옮겼다 — iCloud에서 처음부터 받는다")
+        AppLog.store.info("로컬 사본을 금고로 옮겼다 — iCloud에서 처음부터 받는다")
     }
 
     // MARK: 계획 화면이 물어보는 것들
@@ -337,15 +353,17 @@ final class TodoStore {
         let archiveStamp = archive.lastTouched
 
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd HH:mm"
-        print("🔎 [Split] 최신 비교 — 클라우드 \(items.count)개(\(f.string(from: cloudStamp))) "
-              + "vs 떠 둔 것 \(archive.items.count)개(\(f.string(from: archiveStamp)))")
+        AppLog.store.info("""
+            최신 비교 — 클라우드 \(items.count, privacy: .public)개(\(f.string(from: cloudStamp), privacy: .public)) \
+            vs 떠 둔 것 \(archive.items.count, privacy: .public)개(\(f.string(from: archiveStamp), privacy: .public))
+            """)
 
         guard !archive.items.isEmpty else {
-            print("ℹ️ [Split] 떠 둔 것이 비어 있다 — 지금 있는 것으로 안전망을 세운다")
+            AppLog.store.info("떠 둔 것이 비어 있다 — 지금 있는 것으로 안전망을 세운다")
             return
         }
         guard archiveStamp > cloudStamp else {
-            print("ℹ️ [Split] 클라우드 쪽이 더 최신이라 그대로 둔다")
+            AppLog.store.info("클라우드 쪽이 더 최신이라 그대로 둔다")
             return
         }
 
@@ -369,7 +387,7 @@ final class TodoStore {
             added += 1
         }
         save()
-        print("💾 [Split] 떠 둔 쪽이 더 최신 — 모자란 할 일 \(added)개를 세웠다")
+        AppLog.store.info("떠 둔 쪽이 더 최신 — 모자란 할 일 \(added, privacy: .public)개를 세웠다")
     }
 
     /// 판정이 끝난 **지금의 한 벌**을 안전망으로 다시 떠 둔다.
@@ -414,7 +432,7 @@ final class TodoStore {
             context.delete(dup)
         }
         save()
-        print("🧹 [Dedupe] 이름이 겹치던 분류 \(duplicates.count)개를 합쳤다")
+        AppLog.store.info("이름이 겹치던 분류 \(duplicates.count, privacy: .public)개를 합쳤다")
     }
 
     /// 같은 dragToken이 둘 이상이면 **가장 최근에 손댄 것 하나만** 남긴다.
@@ -438,7 +456,7 @@ final class TodoStore {
         guard !victims.isEmpty else { return }
         for v in victims { context.delete(v) }
         save()
-        print("🧹 [Split] 같은 할 일이 겹쳐 있던 \(victims.count)개를 정리했다")
+        AppLog.store.info("같은 할 일이 겹쳐 있던 \(victims.count, privacy: .public)개를 정리했다")
     }
 
     /// **같은 uuid의 프로젝트**가 둘 이상이면 하나만 남긴다.
@@ -462,7 +480,7 @@ final class TodoStore {
         guard !victims.isEmpty else { return }
         for v in victims { context.delete(v) }
         save()
-        print("🧹 [Dedupe] 겹쳐 있던 프로젝트 \(victims.count)개를 정리했다")
+        AppLog.store.info("겹쳐 있던 프로젝트 \(victims.count, privacy: .public)개를 정리했다")
     }
 
     static func tieBreak(_ item: BacklogItem) -> String {
@@ -528,9 +546,9 @@ enum LegacyTodoArchive {
             write(items: items, categories: categories)
             reconcilePending = true
             defaults.set(true, forKey: key)
-            print("✅ [Merge] 갈라 두었던 스토어에서 할 일 \(items.count)개를 떠 왔다")
+            AppLog.store.info("갈라 두었던 스토어에서 할 일 \(items.count, privacy: .public)개를 떠 왔다")
         } catch {
-            print("⚠️ [Merge] 갈라 두었던 스토어를 못 읽었다: \(error)")
+            AppLog.store.error("갈라 두었던 스토어를 못 읽었다: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -546,9 +564,9 @@ enum LegacyTodoArchive {
         encoder.dateEncodingStrategy = .iso8601
         do {
             try encoder.encode(snapshot).write(to: archiveURL, options: .atomic)
-            print("🗄 [Todo] 지금 할 일 \(items.count)개를 떠 두었다")
+            AppLog.store.info("지금 할 일 \(items.count, privacy: .public)개를 떠 두었다")
         } catch {
-            print("⚠️ [Todo] 스냅샷 쓰기 실패: \(error)")
+            AppLog.store.error("스냅샷 쓰기 실패: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -558,7 +576,7 @@ enum LegacyTodoArchive {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         guard let snapshot = try? decoder.decode(Snapshot.self, from: data) else {
-            print("⚠️ [Split] 스냅샷을 읽지 못했다")
+            AppLog.store.error("스냅샷을 읽지 못했다")
             return nil
         }
         return snapshot

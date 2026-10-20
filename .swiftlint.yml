@@ -1,0 +1,34 @@
+# SwiftLint — 최소 규칙으로 시작한다 (클립키보드와 같은 출발점).
+#
+# ⚠️ 의도적으로 셋만 켠다. 파일 80개에 전체 규칙을 걸면 경고가 수천 건 쏟아지고, 그러면 아무도 안 본다.
+#    여기 있는 규칙은 "나오면 반드시 고친다"는 뜻이다. 늘릴 땐 한 번에 하나씩, 기존 위반을 0으로 만든 뒤에.
+#
+# 실행: swiftlint            (경고 확인)
+#       swiftlint --strict   (CI — 경고도 실패로)
+
+only_rules:
+  - force_try          # try! — 스토어·파일을 다루는 앱이라 한 번의 실패가 곧 데이터 손실이다
+  - force_unwrapping   # 옵셔널 강제 언랩. 크래시 1순위 원인
+  - file_length        # 파일 비대화 방지
+
+included:
+  - WeekBlocks
+  - TodoShare
+  - TimerWidget
+# 시험 코드는 뺀다 — 시험의 강제 언랩은 "여기서 바로 실패하라"는 관용 표현이다.
+
+excluded:
+  - build
+  - DerivedData
+  - .build
+  - docs
+  - scripts
+
+file_length:
+  # 지금 넘는 파일: DayScheduleView(≈2.9k) · BacklogView(≈2.7k) · ContentView(≈2.6k).
+  # 1000 에서 경고로 시작해 줄여 간다. 4000 을 넘기면 실패.
+  warning: 1000
+  error: 4000
+  ignore_comment_only_lines: true
+
+reporter: "xcode"

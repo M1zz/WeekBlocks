@@ -176,7 +176,9 @@ final class VaultMonitor {
         // 사람이 지운 것(표가 찍힌 것)은 이 기기에서 지웠든 다른 기기에서 지웠든 묻지 않는다.
         let unexplained = DeletionLog.excludingMarked(missing, in: context)
         guard Self.isWorthAsking(unexplained) else {
-            if unexplained.total > 0 { print("ℹ️ [Vault] \(unexplained.total)개가 없어졌다(묻지 않음) — 기준 \(missing.base.lastPathComponent)") }
+            if unexplained.total > 0 {
+                AppLog.vault.info("\(unexplained.total, privacy: .public)개가 없어졌다(묻지 않음) — 기준 \(missing.base.lastPathComponent, privacy: .public)")
+            }
             return
         }
         // 지운 것과 그 표는 따로 저장되어 따로 내려올 수 있다. 표가 늦게 오는 동안 묻지 않게,
@@ -189,10 +191,10 @@ final class VaultMonitor {
             let again = DeletionLog.excludingMarked(
                 DataVault.missing(in: context, comparedTo: base, at: missing.base), in: context)
             guard Self.isWorthAsking(again) else {
-                print("ℹ️ [Vault] 다시 보니 묻지 않아도 된다 — 표가 내려왔거나 도로 생겼다")
+                AppLog.vault.info("다시 보니 묻지 않아도 된다 — 표가 내려왔거나 도로 생겼다")
                 return
             }
-            print("🚨 [Vault] 지난 벌에 있던 \(again.total)개가 지금 없다 — 기준 \(again.base.lastPathComponent)")
+            AppLog.vault.fault("지난 벌에 있던 \(again.total, privacy: .public)개가 지금 없다 — 기준 \(again.base.lastPathComponent, privacy: .public)")
             finding = Finding(missing: again, cause: cause)
         }
     }

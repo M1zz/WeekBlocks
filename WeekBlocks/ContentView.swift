@@ -308,6 +308,8 @@ struct ContentView: View {
                 }
                 .disabled(!canUndo)
                 .help("되돌리기 (⌘Z)")
+                // 음성 제어로 부를 이름 — 단추 글자 말고 사람이 흔히 하는 말도 받는다.
+                .accessibilityInputLabels([Text("되돌리기"), Text("실행 취소")])
             }
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {
@@ -316,6 +318,7 @@ struct ContentView: View {
                     Label("타이머", systemImage: "timer")
                 }
                 .help("지금 하는 일에 남은 시간 (⇧⌘R)")
+                .accessibilityInputLabels([Text("타이머"), Text("타이머 창")])
 
                 // 무지개 — 누르면 날짜 줄 아래로 판이 위에서 펴져 내려온다 (→ rainbowSection).
                 // 일간의 판을 펼 때와 같은 스프링(.panelSpring)이라 한 앱의 손짓으로 읽힌다.
@@ -328,18 +331,21 @@ struct ContentView: View {
                 }
                 .keyboardShortcut("3", modifiers: .command)
                 .help("무지개")
+                .accessibilityInputLabels([Text("무지개"), Text("일정 밀도")])
 
                 Button {
                     showingReflection = true
                 } label: {
                     Label("회고", systemImage: "checklist")
                 }
+                .accessibilityInputLabels([Text("회고"), Text("돌아보기")])
 
                 Button {
                     showingSettings = true
                 } label: {
                     Label("설정", systemImage: "gearshape")
                 }
+                .accessibilityInputLabels([Text("설정"), Text("환경설정")])
 
                 Menu {
                     // 할 일 창은 두 창을 나란히 놓고 쓰고 싶을 때의 길이다.
@@ -406,6 +412,7 @@ struct ContentView: View {
                 } label: {
                     Label("더 보기", systemImage: "ellipsis.circle")
                 }
+                .accessibilityInputLabels([Text("더 보기"), Text("메뉴")])
             }
         }
         .alert("캘린더에서 사라진 일정 \(pendingRemovals.count)개를 지울까요?",
@@ -678,6 +685,10 @@ struct ContentView: View {
                 Image(systemName: "chevron.left").font(.body.weight(.semibold))
             }
             .buttonStyle(.borderless)
+            // 화살표뿐인 단추 — VoiceOver 가 읽을 이름과 음성 제어로 부를 이름을 단다.
+            .help(scope == .day ? Text("전날") : Text("지난주"))
+            .accessibilityLabel(scope == .day ? Text("전날") : Text("지난주"))
+            .accessibilityInputLabels(scope == .day ? [Text("전날"), Text("이전")] : [Text("지난주"), Text("이전")])
 
             Text(scope == .day ? dayTitleString : weekRangeString)
                 .font(.system(size: 19, weight: .semibold))
@@ -691,6 +702,9 @@ struct ContentView: View {
                 Image(systemName: "chevron.right").font(.body.weight(.semibold))
             }
             .buttonStyle(.borderless)
+            .help(scope == .day ? Text("다음 날") : Text("다음 주"))
+            .accessibilityLabel(scope == .day ? Text("다음 날") : Text("다음 주"))
+            .accessibilityInputLabels(scope == .day ? [Text("다음 날"), Text("다음")] : [Text("다음 주"), Text("다음")])
 
             Text(scope == .day ? daySubtitle : weekSubtitle)
                 .contentTransition(.opacity)
@@ -803,6 +817,11 @@ struct ContentView: View {
     /// 날짜 줄의 ‹ › — 일간이면 하루, 주간이면 한 주.
     private func step(_ n: Int) {
         if scope == .day { shiftDay(by: n) } else { shiftWeek(by: n) }
+        // 화면 밖에서 날짜가 바뀐다 — VoiceOver 를 쓰는 사람에게 어디로 왔는지 말해 준다.
+        // 값이 새 날짜로 자리 잡은 다음 차례에 읽는다.
+        DispatchQueue.main.async {
+            AccessibilityNotification.Announcement(scope == .day ? dayTitleString : weekRangeString).post()
+        }
     }
 
     /// 주간에서 한 날을 눌러 **그날의 일간으로 들어간다.**
