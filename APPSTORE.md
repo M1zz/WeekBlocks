@@ -185,6 +185,84 @@ https://m1zz.github.io/WeekBlocks/en/
 
 https://m1zz.github.io/WeekBlocks/en/privacy.html
 
+## en-GB
+
+### 이름
+
+```
+Rainbow Craft: Week Planner
+```
+
+### 부제
+
+```
+Time Blocking & Weekly Routine
+```
+
+### 프로모션 텍스트
+
+```
+Lay down sleep, meals and work first, then see the hours you really have left this week. Now in 23 languages, from Japanese and German to Spanish and French.
+```
+
+### 설명
+
+```
+A to-do list can't tell you whether your week can actually hold it. Rainbow Craft lays the week out by day and hour, so you can see what fits before you say yes.
+
+Start with the hours you can't give up, such as sleep, meals and work. What's left is the time you really have. Then drag your to-dos onto the days that still have room.
+
+PLAN THE WEEK YOU REALLY HAVE
+A week is 168 hours. Fixed routines take their share first, and the app shows what remains in plain numbers. A rainbow on each day shows how many to-dos are already sitting there.
+
+DRAG IT WHERE IT GOES
+Drag a to-do onto a day and it becomes a plan block. Move it to another day, change its time, or drag it back to the list when the date no longer works.
+
+SEE A DAY ACROSS 24 HOURS
+The timeline lays a day out on a 24-hour ruler. Gaps and overlaps are easy to spot, and you choose how overlapping items are arranged.
+
+SPLIT BIG JOBS INTO STEPS THAT FINISH
+Big jobs stall when something is still in the way. The app asks two questions about every step: can you start without warming up, and can you finish it in five minutes? Steps that pass both are fragments you can pick up whenever five minutes open up. Everything else needs time you set aside. If the app guesses wrong, you overrule it.
+
+STAY ON THE CLOCK
+When a plan's start time arrives it turns in progress, and once its time is up the app asks whether you finished. A timer follows your timeline, and the Now Timer widget shows what you're on and how long is left without opening the app.
+
+WORKS WITH YOUR CALENDAR
+Bring in meetings and appointments from Calendar on your Mac instead of typing them twice. All-day events stay in the background, and multi-day trips show as a single bar. If you like, your plans can also go into a separate Rainbow Craft calendar so you see them in Calendar on your iPhone. Your other calendars are never changed.
+
+LOOK BACK ON THE WEEK
+The weekly review works like a checklist, one card per day. Mark what you did, half did or skipped, and use it to plan the next week.
+
+WORKS WITH YOUR IPHONE
+On the same iCloud account, to-dos move between this app and Rainbow of Desire on iPhone.
+
+PRIVACY
+There's no account and no developer server holding your plans. What you write stays on your devices and in your own iCloud. The app sends anonymous usage counts that never include what you write, and you can turn them off in Settings.
+
+Available in 23 languages, including English, Japanese, German, French, Spanish, Korean and Chinese.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://m1zz.github.io/WeekBlocks/en/privacy.html
+```
+
+### 키워드
+
+```
+timebox,timeblock,breakdown,timeline,hourly,168,timetable,agenda,todo,adhd,focus,diary,calendar,rota
+```
+
+### 지원 URL
+
+https://m1zz.github.io/WeekBlocks/en/support.html
+
+### 마케팅 URL
+
+https://m1zz.github.io/WeekBlocks/en/
+
+### 개인정보 처리방침 URL
+
+https://m1zz.github.io/WeekBlocks/en/privacy.html
+
 ## zh-Hant
 
 <!-- 2026-09 닷새 동안 1,201건 중 98%가 해외 — 대만 189, 홍콩 83 은 번체, 중국 179 는 간체를 본다.

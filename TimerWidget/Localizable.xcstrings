@@ -134,6 +134,12 @@
             "state" : "translated",
             "value" : "Tập trung"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus"
+          }
         }
       }
     },
@@ -269,6 +275,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kết thúc lúc %@"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ends %@"
           }
         }
       }
@@ -406,6 +418,12 @@
             "state" : "translated",
             "value" : "Đã tạm dừng"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
         }
       }
     },
@@ -541,6 +559,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hiện không có lịch nào"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing scheduled right now"
           }
         }
       }
@@ -678,6 +702,12 @@
             "state" : "translated",
             "value" : "Tiếp theo"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
         }
       }
     },
@@ -813,6 +843,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hôm nay không còn gì"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing left today"
           }
         }
       }
@@ -950,6 +986,12 @@
             "state" : "translated",
             "value" : "Bộ hẹn giờ Hiện tại"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now Timer"
+          }
         }
       }
     },
@@ -1085,6 +1127,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cho biết việc bạn đang làm và còn bao lâu, lấy thẳng từ dòng thời gian."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows what you're on now and how long is left, straight from your timeline."
           }
         }
       }

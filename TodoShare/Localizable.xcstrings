@@ -134,6 +134,12 @@
             "state" : "translated",
             "value" : "Thực sự làm %@"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actually do %@"
+          }
         }
       }
     },
@@ -269,6 +275,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dài %@ nên vừa trong một mảnh."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At %@, it fits inside a fragment."
           }
         }
       }
@@ -406,6 +418,12 @@
             "state" : "translated",
             "value" : "Dài %@ nên không vừa trong một mảnh."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At %@, it won't fit into a fragment."
+          }
         }
       }
     },
@@ -541,6 +559,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dài %@. Ngồi một mạch cũng không khép lại được."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's %@ long. It won't close even in one sitting."
           }
         }
       }
@@ -678,6 +702,12 @@
             "state" : "translated",
             "value" : "Có %lld bước dài hơn hai tiếng. Hãy chia nhỏ đến mức khép lại được. Một bước làm dở sẽ kéo sự chú ý của bạn sang giờ tiếp theo."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld steps run over two hours. Split them down to a size that closes. A step left half-done drags your attention into the next hour."
+          }
         }
       }
     },
@@ -814,6 +844,12 @@
             "state" : "translated",
             "value" : "%lld phút"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldm"
+          }
         }
       }
     },
@@ -949,6 +985,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld giờ"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldh"
           }
         }
       }
@@ -1092,6 +1134,12 @@
             "state" : "translated",
             "value" : "%1$lld giờ %2$lld phút"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldh %lldm"
+          }
         }
       }
     },
@@ -1227,6 +1275,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hãy kết thúc bằng một bước khép việc lại: gửi, đăng, nộp. 10% cuối của một việc đã xong 90% là cách dùng mảnh thời gian tốt nhất, và khép nó lại giúp các quãng phía sau được gọn gàng."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End with a step that closes it — send, publish, submit. The last 10% of a job that's 90% done is the best possible use of a fragment, and closing it leaves the chunks that follow clean."
           }
         }
       }
@@ -1364,6 +1418,12 @@
             "state" : "translated",
             "value" : "Có xong trong năm phút không?"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Does it finish within five minutes?"
+          }
         }
       }
     },
@@ -1500,6 +1560,12 @@
             "state" : "translated",
             "value" : "Không có gì ở đây làm được trong năm phút"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing here you could pick up in five minutes"
+          }
         }
       }
     },
@@ -1635,6 +1701,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“%@” không xong được trong một lần"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” won't finish in one go"
           }
         }
       }
@@ -1778,6 +1850,12 @@
             "state" : "translated",
             "value" : "“%1$@” nằm sau “%2$@”. Việc bắt đầu khi chưa quyết định xong sẽ không khép lại được, dù trong mảnh hay trong quãng. Hãy đưa bước quyết định lên trước."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” comes after “%@”. Work you start before it's decided won't close in a fragment or in a chunk. Move the deciding step earlier."
+          }
         }
       }
     },
@@ -1913,6 +1991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đã bỏ qua"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
           }
         }
       }
@@ -2050,6 +2134,12 @@
             "state" : "translated",
             "value" : "Bước quyết định nằm sau phần làm"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The decision comes after the work"
+          }
         }
       }
     },
@@ -2186,6 +2276,12 @@
             "state" : "translated",
             "value" : "Giờ cố định"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed hours"
+          }
         }
       }
     },
@@ -2321,6 +2417,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Viết, lập trình, thiết kế — việc gì cần nạp lại ngữ cảnh sẽ tiêu hết cả mảnh chỉ để khởi động. Hãy cho thêm thời gian, hoặc đặt một mảnh “chuẩn bị” riêng phía trước."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing, building, designing — anything where you have to load the context back in will spend the whole fragment just spinning up. Give them more time, or put a separate “get ready” fragment in front."
           }
         }
       }
@@ -2459,6 +2561,12 @@
             "state" : "translated",
             "value" : "T6"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fri"
+          }
         }
       }
     },
@@ -2594,6 +2702,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thứ Sáu"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friday"
           }
         }
       }
@@ -2731,6 +2845,12 @@
             "state" : "translated",
             "value" : "Nếu bị ngắt quãng, bạn phải lấy lại nhịp từ đầu. Hãy đặt vào khoảng thời gian không bị làm phiền."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you're interrupted you have to climb back in. Put it in undisturbed time."
+          }
         }
       }
     },
@@ -2866,6 +2986,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Việc chưa xong để lại dư âm, ăn mòn cả quãng thời gian tiếp theo."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unfinished work leaves residue that eats into the next chunk of time."
           }
         }
       }
@@ -3003,6 +3129,12 @@
             "state" : "translated",
             "value" : "Bước khép việc lại. Có khoảng trống là làm ngay được."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The step that closes it. Pick it up the moment a gap opens."
+          }
         }
       }
     },
@@ -3138,6 +3270,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hãy chia nhỏ đến mức khép lại được. Một bước làm dở sẽ kéo sự chú ý của bạn sang giờ tiếp theo."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split it down to a size that closes. A step left half-done drags your attention into the next hour."
           }
         }
       }
@@ -3275,6 +3413,12 @@
             "state" : "translated",
             "value" : "Điểm kết thúc đã rõ nên khép lại ngay tại đây."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The end is fixed, so it closes right here."
+          }
         }
       }
     },
@@ -3410,6 +3554,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Không có điểm kết thúc rõ ràng nên không bao giờ khép lại."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There's no fixed end, so it never closes."
           }
         }
       }
@@ -3547,6 +3697,12 @@
             "state" : "translated",
             "value" : "Quay lại nhịp làm việc mất trung bình 23 phút. Trong một mảnh, bạn sẽ chỉ kịp khởi động — hãy cho thêm thời gian hoặc chuyển sang một quãng."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting back into it takes 23 minutes on average. In a fragment you'd spend the whole time spinning up — give it more time, or move it to a chunk."
+          }
         }
       }
     },
@@ -3682,6 +3838,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xong"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         }
       }
@@ -3819,6 +3981,12 @@
             "state" : "translated",
             "value" : "Quãng"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chunk"
+          }
         }
       }
     },
@@ -3954,6 +4122,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đây là một quãng. Hãy đặt vào khoảng thời gian bạn đã giữ riêng."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a chunk. Put it in time you've protected."
           }
         }
       }
@@ -4091,6 +4265,12 @@
             "state" : "translated",
             "value" : "Chỉ mở sẵn các liên kết và tài liệu. Bạn trả trước chi phí khởi động của phần việc chính ngay tại đây."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Just open the links and files. You pay the real work's spin-up cost here, in advance."
+          }
         }
       }
     },
@@ -4226,6 +4406,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hoàn thiện và gửi đi"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrap it up and send it"
           }
         }
       }
@@ -4363,6 +4549,12 @@
             "state" : "translated",
             "value" : "Không có bước nào khép lại phần cuối"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing closes the end"
+          }
         }
       }
     },
@@ -4499,6 +4691,12 @@
             "state" : "translated",
             "value" : "Việc cần nạp lại ngữ cảnh sẽ tiêu hết cả mảnh chỉ để khởi động."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work that makes you load the context back in will spend the whole fragment just spinning up."
+          }
         }
       }
     },
@@ -4634,6 +4832,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bước nào ở đây cũng cần một chỗ ngồi riêng. Hãy thêm một bước khép lại được trong một mảnh — gom tài liệu, ghi nhanh một dòng — và những khoảng trống bạn vẫn bỏ phí sẽ bắt đầu dồn vào việc này."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every step here needs a seat of its own. Add one step that closes inside a fragment — gathering the files, jotting a line — and the gaps you were letting slip start going into this to-do."
           }
         }
       }
@@ -4772,6 +4976,12 @@
             "state" : "translated",
             "value" : "T5"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu"
+          }
         }
       }
     },
@@ -4907,6 +5117,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thứ Năm"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thursday"
           }
         }
       }
@@ -5044,6 +5260,12 @@
             "state" : "translated",
             "value" : "Việc chân tay vẫn cộng dồn dù có chia nhỏ."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Physical work adds up even when you split it."
+          }
         }
       }
     },
@@ -5179,6 +5401,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Là việc chân tay nên không cần khởi động."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's physical, so there's no spin-up."
           }
         }
       }
@@ -5316,6 +5544,12 @@
             "state" : "translated",
             "value" : "Quyết định việc cần làm"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decide what to do"
+          }
         }
       }
     },
@@ -5452,6 +5686,12 @@
             "state" : "translated",
             "value" : "Mảnh thời gian hết trong lúc bạn còn đang chọn làm gì."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fragment ends while you're still choosing what to do."
+          }
         }
       }
     },
@@ -5587,6 +5827,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mảnh thời gian hết trong lúc bạn còn đang chọn. Hãy quyết định trong một quãng, và chỉ chuyển phần việc đã rõ sang các bước mảnh."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fragment ends while you're still choosing. Decide in a chunk, and send only the settled work to fragment steps."
           }
         }
       }
@@ -5725,6 +5971,12 @@
             "state" : "translated",
             "value" : "Lỗ thoát"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drain"
+          }
         }
       }
     },
@@ -5860,6 +6112,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Xong một phần"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partly done"
           }
         }
       }
@@ -5998,6 +6256,12 @@
             "state" : "translated",
             "value" : "T4"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wed"
+          }
         }
       }
     },
@@ -6133,6 +6397,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thứ Tư"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wednesday"
           }
         }
       }
@@ -6270,6 +6540,12 @@
             "state" : "translated",
             "value" : "Dòng này chưa đặt thời gian nên vừa trong một mảnh."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No time is set on this line, so it fits in a fragment."
+          }
         }
       }
     },
@@ -6405,6 +6681,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Có bắt đầu được ngay mà không cần khởi động không?"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can you start without spinning up?"
           }
         }
       }
@@ -6542,6 +6824,12 @@
             "state" : "translated",
             "value" : "Đêm khuya"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Late night"
+          }
         }
       }
     },
@@ -6677,6 +6965,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đêm khuya (sau 23:00)"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Late night (after 23:00)"
           }
         }
       }
@@ -6814,6 +7108,12 @@
             "state" : "translated",
             "value" : "Buổi sáng"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morning"
+          }
         }
       }
     },
@@ -6949,6 +7249,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buổi sáng (06–12)"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morning (06–12)"
           }
         }
       }
@@ -7086,6 +7392,12 @@
             "state" : "translated",
             "value" : "Có điều chưa quyết định đang chặn việc này."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something undecided is blocking it."
+          }
         }
       }
     },
@@ -7221,6 +7533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Khi còn điều chưa quyết định, các bước bên dưới sẽ không mở được."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While anything is undecided, none of the steps below will open."
           }
         }
       }
@@ -7358,6 +7676,12 @@
             "state" : "translated",
             "value" : "Có vẻ không có gì đang chặn việc này."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing seems to be blocking it."
+          }
         }
       }
     },
@@ -7493,6 +7817,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bạn phải đọc lại xem mình đã làm tới đâu rồi mới bắt đầu được."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have to read back where you left off before it starts."
           }
         }
       }
@@ -7630,6 +7960,12 @@
             "state" : "translated",
             "value" : "Buổi chiều"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afternoon"
+          }
         }
       }
     },
@@ -7765,6 +8101,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buổi chiều (12–18)"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afternoon (12–18)"
           }
         }
       }
@@ -7903,6 +8245,12 @@
             "state" : "translated",
             "value" : "T2"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mon"
+          }
         }
       }
     },
@@ -8038,6 +8386,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thứ Hai"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monday"
           }
         }
       }
@@ -8176,6 +8530,12 @@
             "state" : "translated",
             "value" : "việc này"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "this"
+          }
         }
       }
     },
@@ -8311,6 +8671,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đây không phải việc cần làm, mà là chỗ mảnh thời gian của bạn rò rỉ mất. Để nó làm một bước chỉ khiến thanh tiến độ phình lên."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This isn't a to-do, it's where your fragments leak away. Kept as a step, it only inflates your progress bar."
           }
         }
       }
@@ -8449,6 +8815,12 @@
             "state" : "translated",
             "value" : "CN"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
+          }
         }
       }
     },
@@ -8584,6 +8956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chủ Nhật"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunday"
           }
         }
       }
@@ -8721,6 +9099,12 @@
             "state" : "translated",
             "value" : "Buổi tối"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evening"
+          }
         }
       }
     },
@@ -8856,6 +9240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buổi tối (18–23)"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evening (18–23)"
           }
         }
       }
@@ -8993,6 +9383,12 @@
             "state" : "translated",
             "value" : "Mảnh"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragment"
+          }
         }
       }
     },
@@ -9129,6 +9525,12 @@
             "state" : "translated",
             "value" : "Các mảnh thời gian không cộng dồn thành tổng. Mười hai khoảng năm phút không bằng một giờ. Vì vậy nên tách ngay từ đầu những bước làm được trong năm phút với những bước cần thời gian được giữ riêng."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragments don't add up into a total. Twelve five-minute gaps are not one hour. So it's better to separate, from the start, the steps you can pick up in five minutes from the steps that need protected time."
+          }
         }
       }
     },
@@ -9264,6 +9666,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mảnh và quãng đã được tách riêng"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragments and chunks are separated"
           }
         }
       }
@@ -9407,6 +9815,12 @@
             "state" : "translated",
             "value" : "%1$lld bước làm được trong một mảnh, %2$lld bước cần thời gian giữ riêng. Khi có năm phút, hãy làm một mảnh; khi đã giành được một khoảng dài, hãy làm một quãng."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld steps you can pick up in a fragment, %lld that need protected time. When five minutes open up, take a fragment; when you've secured a stretch, take a chunk."
+          }
         }
       }
     },
@@ -9542,6 +9956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đây là một mảnh. Khi có năm phút, hãy làm nó."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a fragment. When five minutes open up, pick it up."
           }
         }
       }
@@ -9679,6 +10099,12 @@
             "state" : "translated",
             "value" : "Hạn mức tuần (giờ linh hoạt)"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly quota (flexible hours)"
+          }
         }
       }
     },
@@ -9814,6 +10240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đây là câu trả lời do bạn tự chọn."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You answered this yourself."
           }
         }
       }
@@ -9951,6 +10383,12 @@
             "state" : "translated",
             "value" : "Dù đặt thời gian ngắn, việc này cũng không xong ở đây."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Even booked short, it won't finish here."
+          }
         }
       }
     },
@@ -10086,6 +10524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld việc cỡ một quãng đang được đặt thời gian quá ngắn"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld chunk-sized jobs are booked short"
           }
         }
       }
@@ -10223,6 +10667,12 @@
             "state" : "translated",
             "value" : "Quãng ngắn"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short chunk"
+          }
         }
       }
     },
@@ -10358,6 +10808,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đây là một quãng ngắn. Bạn phải ngồi xuống, nhưng làm một lần là xong."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a short chunk. You have to sit down, but it finishes in one sitting."
           }
         }
       }
@@ -10495,6 +10951,12 @@
             "state" : "translated",
             "value" : "Một điều trước khi chia nhỏ"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One thing before you split it"
+          }
         }
       }
     },
@@ -10631,6 +11093,12 @@
             "state" : "translated",
             "value" : "Thêm"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
         }
       }
     },
@@ -10766,6 +11234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hủy"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         }
       }
@@ -10904,6 +11378,12 @@
             "state" : "translated",
             "value" : "T7"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sat"
+          }
         }
       }
     },
@@ -11039,6 +11519,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thứ Bảy"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saturday"
           }
         }
       }
@@ -11177,6 +11663,12 @@
             "state" : "translated",
             "value" : "Tiêu chí 3"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rule 3"
+          }
         }
       }
     },
@@ -11312,6 +11804,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gom những thứ cần thiết"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gather what you need"
           }
         }
       }
@@ -11449,6 +11947,12 @@
             "state" : "translated",
             "value" : "Việc này quá lớn để làm xong trong một lần. Nếu không chia nhỏ đến mức khép lại được, trạng thái làm dở sẽ theo bạn sang giờ tiếp theo."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is too big to finish in one go. Unless you split it down to something that closes, the half-done state follows you into the next hour."
+          }
         }
       }
     },
@@ -11584,6 +12088,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Việc cần làm đã rõ nên bắt tay vào ngay được."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to do is settled, so your hands go straight to it."
           }
         }
       }
@@ -11721,6 +12231,12 @@
             "state" : "translated",
             "value" : "Việc cần làm"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To-dos"
+          }
         }
       }
     },
@@ -11857,6 +12373,12 @@
             "state" : "translated",
             "value" : "Thêm vào Việc cần làm"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to To-dos"
+          }
         }
       }
     },
@@ -11992,6 +12514,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Không lưu được việc cần làm. Hãy mở ứng dụng một lần rồi thử lại."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save the to-do. Open the app once and try again."
           }
         }
       }
@@ -12130,6 +12658,12 @@
             "state" : "translated",
             "value" : "T3"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tue"
+          }
         }
       }
     },
@@ -12265,6 +12799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thứ Ba"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuesday"
           }
         }
       }

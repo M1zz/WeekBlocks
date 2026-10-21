@@ -141,6 +141,12 @@
             "state" : "translated",
             "value" : "Bộ hẹn giờ Rainbow Craft"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Timer"
+          }
         }
       }
     },

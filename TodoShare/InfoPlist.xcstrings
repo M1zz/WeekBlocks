@@ -141,6 +141,12 @@
             "state" : "translated",
             "value" : "Thêm vào Việc cần làm"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to To-dos"
+          }
         }
       }
     },

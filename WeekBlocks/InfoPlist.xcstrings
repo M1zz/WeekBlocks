@@ -141,6 +141,12 @@
             "state" : "translated",
             "value" : "Rainbow Craft"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
         }
       }
     },
@@ -280,6 +286,12 @@
           }
         },
         "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft"
+          }
+        },
+        "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rainbow Craft"
@@ -426,6 +438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đưa sự kiện từ lịch trên Mac vào kế hoạch tuần. Nếu bật, kế hoạch cũng được ghi vào một lịch riêng tên “Rainbow Craft” do ứng dụng tạo; các lịch khác của bạn không bao giờ bị thay đổi."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brings events from your Mac calendar into your weekly plan. If you turn it on, your plan is also written to a separate “Rainbow Craft” calendar the app creates; your other calendars are never changed."
           }
         }
       }
