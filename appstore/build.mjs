@@ -750,7 +750,7 @@ for (const file of readdirSync(join(HERE, 'strings')).filter(f => f.endsWith('.j
 
 const LOCALES = process.env.ONLY ? process.env.ONLY.split(',') : Object.keys(STRINGS)
 // App Store Connect 의 로케일 이름. 이 폴더를 DeployBar 가 그대로 그 언어 칸에 올린다.
-const STORE_LOCALE = { en:'en-US', ko:'ko', 'zh-Hant':'zh-Hant', 'zh-Hans':'zh-Hans',
+const STORE_LOCALE = { en:'en-US', 'en-GB':'en-GB', ko:'ko', 'zh-Hant':'zh-Hant', 'zh-Hans':'zh-Hans',
   ja:'ja', de:'de-DE', es:'es-ES', fr:'fr-FR', it:'it', 'pt-BR':'pt-BR', ru:'ru', cs:'cs', da:'da',
   el:'el', fi:'fi', id:'id', nb:'nb', nl:'nl-NL', pl:'pl', sv:'sv', th:'th', tr:'tr', vi:'vi' }
 for (const loc of LOCALES) {

@@ -1,5 +1,175 @@
 # 릴리즈 노트
 
+## 1.1.14
+
+### 앱스토어 (한국어)
+
+영국 영어로도 쓸 수 있습니다
+일간 화면에 그날의 장기 플랜이 보입니다
+무지개 칸에 마우스를 올리면 일정이 보입니다
+루틴을 지워도 일정이 제자리에 남습니다
+
+### App Store (English)
+
+Now available in British English
+Day view now shows long-term plans
+Hover over the Rainbow to see events
+Events stay put after deleting routines
+
+### App Store (en-GB)
+
+Now available in British English
+Day view now shows long-term plans
+Hover over the Rainbow to see events
+Events stay put after deleting routines
+
+### App Store (繁體中文, zh-Hant)
+
+現在支援英式英文
+「日」檢視會顯示當天的長期計畫
+滑鼠移到彩虹格上即可看到行程
+刪除作息後行程仍會留在原位
+
+### App Store (简体中文, zh-Hans)
+
+现已支持英式英语
+“日”视图会显示当天的长期计划
+鼠标移到彩虹格子上即可查看日程
+删除作息后日程仍会留在原位
+
+### App Store (日本語, ja)
+
+イギリス英語に対応しました
+「日」表示にその日の長期プランが出ます
+虹のマスにポインタを合わせると予定が見えます
+ルーティンを削除しても予定は元の位置のままです
+
+### App Store (Deutsch, de)
+
+Jetzt auch auf britischem Englisch
+Tagesansicht zeigt langfristige Pläne
+Termine im Regenbogen beim Überfahren
+Termine bleiben trotz gelöschter Routine
+
+### App Store (Español, es)
+
+Ahora también en inglés británico
+Vista Día con tus planes a largo plazo
+Ve eventos con el cursor en el arcoíris
+Borrar una rutina ya no mueve eventos
+
+### App Store (Français, fr)
+
+Disponible en anglais britannique
+Vue Jour avec vos plans à long terme
+L’arc-en-ciel affiche l’agenda au survol
+Les événements restent sans leur routine
+
+### App Store (Italiano, it)
+
+Ora disponibile in inglese britannico
+Vista Giorno con i piani a lungo termine
+Eventi visibili passando sull’arcobaleno
+Senza routine gli eventi restano lì
+
+### App Store (Português (Brasil), pt-BR)
+
+Agora também em inglês britânico
+Vista Dia com seus planos de longo prazo
+Cursor sobre o arco-íris mostra eventos
+Apagar uma rotina não move mais eventos
+
+### App Store (Русский, ru)
+
+Теперь есть британский английский
+Вид «День» показывает долгосрочные планы
+Наведите на радугу и увидите события
+События остаются на месте без рутины
+
+### App Store (Čeština, cs)
+
+Nově také v britské angličtině
+Zobrazení Den ukáže dlouhodobé plány
+Najeďte na duhu a uvidíte události
+Smazání rutiny už nepřesouvá události
+
+### App Store (Dansk, da)
+
+Nu også på britisk engelsk
+Dagsvisningen viser langsigtede planer
+Peg på regnbuen for at se aftaler
+Sletning af rutiner flytter ikke aftaler
+
+### App Store (Ελληνικά, el)
+
+Τώρα και στα βρετανικά αγγλικά
+Η Ημέρα δείχνει τα μακροπρόθεσμα πλάνα
+Συμβάντα με τον δείκτη στο ουράνιο τόξο
+Τα συμβάντα μένουν στη θέση τους
+
+### App Store (Suomi, fi)
+
+Nyt myös brittienglanniksi
+Päivä-näkymä näyttää pitkät suunnitelmat
+Näe tapahtumat osoittamalla sateenkaarta
+Rutiinin poisto ei siirrä tapahtumia
+
+### App Store (Bahasa Indonesia, id)
+
+Kini ada bahasa Inggris Britania
+Rencana jangka panjang tampil di Hari
+Lihat acara dengan kursor di pelangi
+Hapus rutinitas tak lagi menggeser acara
+
+### App Store (Norsk bokmål, nb)
+
+Nå også på britisk engelsk
+Dagsvisningen viser langsiktige planer
+Pek på regnbuen for å se avtaler
+Sletting av rutiner flytter ikke avtaler
+
+### App Store (Nederlands, nl)
+
+Nu ook in Brits Engels
+Dagweergave toont langetermijnplannen
+Beweeg over de regenboog voor afspraken
+Afspraken blijven staan zonder routine
+
+### App Store (Polski, pl)
+
+Teraz także brytyjski angielski
+Dzień pokazuje plany długoterminowe
+Najedź na tęczę, by zobaczyć wydarzenia
+Usunięcie rutyny nie przesuwa wydarzeń
+
+### App Store (Svenska, sv)
+
+Nu även på brittisk engelska
+Dagvyn visar långsiktiga planer
+Peka på regnbågen för att se händelser
+Händelser ligger kvar utan rutin
+
+### App Store (ไทย, th)
+
+รองรับภาษาอังกฤษแบบบริติชแล้ว
+มุมมองวันแสดงแผนระยะยาวของวันนั้น
+ชี้เมาส์ที่สายรุ้งเพื่อดูกิจกรรม
+ลบกิจวัตรแล้วกิจกรรมยังอยู่ที่เดิม
+
+### App Store (Türkçe, tr)
+
+Artık İngiliz İngilizcesiyle de
+Gün görünümünde uzun vadeli planlar
+İmleçle gökkuşağında etkinlikleri görün
+Rutin silinse de etkinlikler yerinde
+
+### App Store (Tiếng Việt, vi)
+
+Nay có tiếng Anh kiểu Anh
+Chế độ Ngày hiện kế hoạch dài hạn
+Di chuột lên cầu vồng để xem sự kiện
+Xoá thói quen không còn làm lệch sự kiện
+
 ## 1.1.13
 
 ### 앱스토어 (한국어)

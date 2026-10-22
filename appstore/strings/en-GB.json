@@ -1,0 +1,215 @@
+{
+ "lang": "en-GB",
+ "app": "Rainbow Craft",
+ "timer": "Timer",
+ "review": "Review",
+ "settings": "Settings",
+ "more": "More",
+ "weekRange": "3 Mar – 9 Mar",
+ "thisWeek": "This week",
+ "lensPlan": "Block view",
+ "lensDay": "Timeline view",
+ "summary": "Summary",
+ "hideSummary": "Hide summary",
+ "mWeek": "The week",
+ "mWeekSub": "24h a day",
+ "mFixed": "Fixed routines",
+ "mFixedSub": "about 17.4h a day",
+ "mFree": "Free time left",
+ "mFreeSub": "about 6.6h a day",
+ "legRoutines": "Routines 122h",
+ "legPlanned": "Planned 10h",
+ "legFree": "Free (unplanned) 37h",
+ "days": [
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+  "Sun"
+ ],
+ "rSleep": "Sleep",
+ "rMeals": "Meals",
+ "rWork": "Work",
+ "rGym": "Exercise",
+ "rSleepWhen": "Every day · 23:00 · 8h",
+ "rSleepSum": "56h a week",
+ "rMealsWhen": "17.5h a week · 3× a day",
+ "rMealsSum": "flexible hours",
+ "rWorkWhen": "Mon–Fri · 09:00 · 9h",
+ "rWorkSum": "45h a week",
+ "rGymWhen": "Mon, Wed, Fri · 07:00 · 1h",
+ "rGymSum": "3h a week",
+ "routinesHead": "Fixed routines · what can't move",
+ "addRoutine": "Add routine",
+ "todos": "To-dos",
+ "newTodo": "New to-do",
+ "showAll": "Show all",
+ "todoCount": "4 · 11h 30m",
+ "hoursLeft": "{v}h left",
+ "blocks": [
+  "Learn Swift Combine",
+  "Draft the Q2 proposal",
+  "Review the PR backlog",
+  "Call the dentist",
+  "Rewrite the onboarding copy",
+  "Ship the release notes",
+  "Deep Work, chapter 4",
+  "Weekly food shop",
+  "Plan next week"
+ ],
+ "todoList": [
+  {
+   "t": "Learn Swift Combine",
+   "step": "Write up sink vs assign",
+   "hrs": "4h",
+   "on": "Monday"
+  },
+  {
+   "t": "Draft the Q2 proposal",
+   "step": "Pull last quarter’s numbers",
+   "hrs": "6h",
+   "on": "Tuesday"
+  },
+  {
+   "t": "Ship the release notes",
+   "step": "Post it to the site",
+   "hrs": "1h",
+   "frag": "5 min"
+  },
+  {
+   "t": "Call the dentist",
+   "hrs": "0.5h"
+  }
+ ],
+ "currentStep": "Current step",
+ "done": "Done",
+ "allDone": "{v} when it's all done",
+ "splitAcross": "= 100%, split across 4 steps",
+ "steps": "Steps",
+ "fragment": "Pick up in five minutes",
+ "addStep": "Add a step",
+ "splitHelper": "Split it for me",
+ "stepList": [
+  [
+   "ok",
+   "Collect the sample projects",
+   "1",
+   "25"
+  ],
+  [
+   "cur",
+   "Write up sink vs assign",
+   "1.5",
+   "38"
+  ],
+  [
+   "",
+   "Get the sample running",
+   "1",
+   "25"
+  ],
+  [
+   "frag",
+   "Push the notes to the repo",
+   "0.5",
+   "12"
+  ]
+ ],
+ "totalHours": "4h",
+ "tRange": "20:00–21:00 · 1 hour",
+ "tLeft": "left",
+ "tEnds": "Ends at 21:00",
+ "tPause": "Pause",
+ "tPlus5": "+5 min",
+ "tPlus10": "+10 min",
+ "tStop": "Stop",
+ "tRest": "The rest of the day from here",
+ "tUpNext": [
+  [
+   "Call the dentist",
+   "21:30 · 30m"
+  ],
+  [
+   "Sleep",
+   "23:00 · 8h"
+  ]
+ ],
+ "rvTitle": "Weekly review",
+ "rvDone": "Done",
+ "rvPartial": "Partial",
+ "rvSkipped": "Skipped",
+ "rvPending": "Not reviewed",
+ "rvNotePlaceholder": "One line of review — what went well, what didn't",
+ "rvRows": [
+  [
+   "done",
+   0,
+   0,
+   "Evening · 1.5h",
+   "Notes written and the sample runs"
+  ],
+  [
+   "done",
+   1,
+   1,
+   "Evening · 2.0h",
+   "Outline plus the numbers section"
+  ],
+  [
+   "part",
+   2,
+   2,
+   "Evening · 1.0h",
+   "Got through 6 of 11"
+  ],
+  [
+   "skip",
+   2,
+   3,
+   "Evening · 0.5h",
+   ""
+  ],
+  [
+   "done",
+   3,
+   4,
+   "Evening · 1.5h",
+   "First screen rewritten"
+  ],
+  [
+   "done",
+   4,
+   5,
+   "Evening · 1.0h",
+   "Published to the site"
+  ]
+ ],
+ "caps": [
+  [
+   "Lay down the hours you can’t take back",
+   "A week is 168 hours. Sleep, meals and work take their share — the app shows you what is actually left."
+  ],
+  [
+   "Drag a to-do onto the day it fits",
+   "It lands as a plan block. Move it to another day, drop it into a gap, or drag it back to the list."
+  ],
+  [
+   "See a whole day on a 24-hour ruler",
+   "Drag sideways to move the time, up or down to move the day. Gaps and collisions show up at a glance."
+  ],
+  [
+   "Split a job into steps that close",
+   "Two questions per step: can you start without spinning up, and does it finish within five minutes?"
+  ],
+  [
+   "Always know what’s left",
+   "The timer follows the times in your plan, so what you are doing now — and how much of it remains — is never a guess."
+  ],
+  [
+   "Close the week with a checklist",
+   "Mark what you did, what you half did and what you skipped, and build the next week out of the answer."
+  ]
+ ]
+}

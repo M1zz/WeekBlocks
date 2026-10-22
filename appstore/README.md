@@ -6,6 +6,7 @@ App Store Connect ▸ 앱 스토어 ▸ 각 언어의 미리보기·스크린샷
 
 - 한국어 — [`ko/`](../docs/screenshots/marketing/ko)
 - English (U.S.) — [`en-US/`](../docs/screenshots/marketing/en-US)
+- English (U.K.) — [`en-GB/`](../docs/screenshots/marketing/en-GB) — 영국식 날짜(3 Mar – 9 Mar)·낱말, `strings/en-GB.json`
 - 繁體中文 — [`zh-Hant/`](../docs/screenshots/marketing/zh-Hant)
 - 简体中文 — [`zh-Hans/`](../docs/screenshots/marketing/zh-Hans)
 
