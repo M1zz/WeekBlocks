@@ -52,17 +52,20 @@ struct DayScheduleView: View {
     var onEditRoutineSchedule: (Routine) -> Void = { _ in }
     /// 빈 시간을 눌러 고를 수 있는 할 일 — 아직 요일을 안 정한 것.
     var candidates: [GapCandidate] = []
-    /// 빈 시간에 새 블록을 세운다. (시작 시각, 빈 시간 길이 — **제안**이라 두 시간으로 깎인다)
-    var onAddBlock: (Double, Double) -> Void = { _, _ in }
+    /// 빈 시간에 새 블록을 세운다. (시작 시각, 빈 시간 길이 — **제안**이라 두 시간으로 깎인다, 제목)
+    ///
+    /// 제목은 채우기 판에 찾느라 쳐 둔 말이다. 찾는 할 일이 없어 새로 세우는 것이니
+    /// 그 말이 곧 이름이다 — 창에서 처음부터 다시 치게 하지 않는다.
+    var onAddBlock: (Double, Double, String) -> Void = { _, _, _ in }
     /// 채우기 판에서 할 일을 골랐다. (드래그 토큰, 시작 시각, 정한 길이 — nil이면 할 일 제 길이)
     ///
     /// 끌어다 놓는 길(`onDropBacklog`)과 달리 **길이를 여기서 정할 수 있다.**
     /// 다섯 시간 빈자리에 두 시간짜리를 "오늘은 한 시간만" 넣는 일이 실제로 잦다.
     var onFillGap: (String, Double, Double?) -> Void = { _, _, _ in }
-    /// 빈 시간을 위아래로 훑어 범위를 그렸다. (시작 시각, 그린 길이)
+    /// 빈 시간을 위아래로 훑어 범위를 그렸다. (시작 시각, 그린 길이, 판에 쳐 둔 제목)
     ///
     /// 사람이 손으로 그은 길이라 **그대로 쓴다** — `onAddBlock`처럼 깎지 않는다.
-    var onDrawBlock: (Double, Double) -> Void = { _, _ in }
+    var onDrawBlock: (Double, Double, String) -> Void = { _, _, _ in }
     /// 루틴 시간 **안**에 겹쳐 세운다. (시작 시각, 길이)
     ///
     /// 회사 09–18시 같은 띠는 하루를 통째로 덮고 있어서 그 안에는 누를 빈 시간이 없고,
@@ -722,7 +725,7 @@ struct DayScheduleView: View {
     /// 그때 무엇을 넣을지 고른다 — 캘린더에서 빈 칸을 훑어 일정을 잡는 것과 같은 결이다.
     struct GapSelection {
         let gapId: String
-        /// 이 빈자리의 경계. 잡은 시간은 여기서 못 벗어난다 — 앞뒤 일정 위로 넘치지 않는다.
+        /// 잡은 시간이 못 벗어나는 경계 — 하루의 처음과 끝 (→ `gapLow`). 앞뒤 일정 위로는 넘쳐도 된다.
         let low: Double
         let high: Double
         var start: Double
@@ -1062,10 +1065,10 @@ struct DayScheduleView: View {
                         openGap = nil
                         reopenGapAt = hour + (length ?? duration(of: token) ?? 0) + 1e-3
                         onFillGap(token, hour, length)
-                    } onAddBlock: { hour, hours in
+                    } onAddBlock: { hour, hours, title in
                         openGap = nil
                         reopenGapAt = nil
-                        onAddBlock(hour, hours)
+                        onAddBlock(hour, hours, title)
                     }
                 }
         }
@@ -1145,9 +1148,9 @@ struct DayScheduleView: View {
                 selection = nil
                 onFillGap(token, hour, length)
             },
-            onAddBlock: { hour, hours in
+            onAddBlock: { hour, hours, title in
                 selection = nil
-                onDrawBlock(hour, hours)
+                onDrawBlock(hour, hours, title)
             },
             onCancel: { selection = nil })
         .floatingBackdrop(in: RoundedRectangle.soft(Corner.panel))
@@ -1176,7 +1179,7 @@ struct DayScheduleView: View {
             .onEnded { _ in Haptic.snap() }
     }
 
-    /// 몸통을 끌어 통째로 옮긴다. 길이는 그대로, 빈자리 밖으로는 안 나간다.
+    /// 몸통을 끌어 통째로 옮긴다. 길이는 그대로, 하루 밖으로는 안 나간다.
     private func moveGesture(_ sel: GapSelection) -> some Gesture {
         DragGesture(minimumDistance: 2, coordinateSpace: .named(Self.trackSpace))
             .onChanged { v in
@@ -1195,35 +1198,20 @@ struct DayScheduleView: View {
             .onEnded { _ in moveOrigin = nil; Haptic.snap() }
     }
 
-    /// **그어 잡은 시간이 넘어설 수 없는 것들** — 고정 루틴과 계획 블록.
+    /// 잡은 시간이 움직일 수 있는 끝 — **하루의 처음과 끝**이다 (15분 격자).
     ///
-    /// 끼니(시간 유연)는 여기 없다. 겹쳐도 되고 옮겨도 되는 것이라 **무른 경계**다 —
-    /// 07–08시 식사 하나 때문에 06시부터 09시까지 세 시간을 그을 수 없으면,
-    /// 사람은 한 시간짜리 둘로 쪼개 적고 그 둘이 같은 일이라는 것은 아무 데도 안 남는다.
-    private var hardIntervals: [(start: Double, end: Double)] {
-        segments
-            .filter { !$0.isGhost && !$0.isNested && !$0.isFlexible }
-            .compactMap { window.clamp($0.start, $0.end) }
-    }
-
-    /// 빈자리의 앞머리·끝 (15분 격자). 잡은 시간은 이 사이를 못 벗어난다.
-    ///
-    /// 경계는 **이 빈 시간의 끝이 아니라 그 너머 첫 단단한 일정**이다. 사이에 낀 끼니는
-    /// 가로질러 그을 수 있고, 그렇게 선 일정 위에 끼니가 오른쪽으로 얹힌다
-    /// (회의가 회사 위에 얹히는 것과 같은 자리 → `frame(for:)`의 `overlaysOther`).
-    /// '빈 시간 N시간' 글씨는 그대로 둔다 — 식사 한 시간은 실제로 비어 있지 않다.
+    /// ⚠️ 한때 그 너머 첫 단단한 일정(고정 루틴·계획 블록)에서 멈췄다. 앞뒤 일정 위로 넘치지
+    ///    않게 하려던 것인데, 21:00 운동이 있는 날 20:00–22:00 코칭을 잡으려면 손잡이가 21:00에서
+    ///    걸려 더 내려가지 않았다. 일정은 실제로 겹친다 — 겹쳐 세우면 칸 나누기가 나란히 세운다
+    ///    (→ `frame(for:)`). 잡는 손을 막을 까닭이 없다.
     private func gapLow(_ c: Connector) -> Double {
-        var low = window.start
-        for h in hardIntervals where h.end <= c.startHour + 1e-6 { low = max(low, h.end) }
-        return (max(low, window.start) * 4).rounded(.up) / 4
+        (window.start * 4).rounded(.up) / 4
     }
     private func gapHigh(_ c: Connector) -> Double {
-        var high = window.end
-        for h in hardIntervals where h.start >= c.endHour - 1e-6 { high = min(high, h.start) }
-        return (min(high, window.end) * 4).rounded(.down) / 4
+        (window.end * 4).rounded(.down) / 4
     }
 
-    /// 하루 시간표의 자 위 높이 → 시각. 15분 격자에 붙이고, 단단한 이웃 밖으로는 못 나간다.
+    /// 하루 시간표의 자 위 높이 → 시각. 15분 격자에 붙이고, 하루 밖으로는 못 나간다.
     private func gapHour(_ y: CGFloat, in c: Connector) -> Double {
         let low = gapLow(c), high = gapHigh(c)
         return min(max(trackHour(y), low), max(low, high))
@@ -2172,9 +2160,13 @@ struct DayScheduleView: View {
                 labelY = max(labelY, y(seg.end))
             }
             // 글씨가 막대 끝을 넘어가면 내리지 않는다 — 시작에 붙은 것들은 오른쪽에 둔다.
-            // 사람이 1열로 고른 것은 글씨와 좀 부딪쳐도 그대로 둔다 — 고른 자리를 앱이 무르면 안 된다.
-            // 좁게: 아무것도 빼지 않는다 — 글씨는 막대 위에서 40pt가 비는 첫 자리로 옮긴다(없으면 맨 위에 겹쳐서).
-            let isPinned = { (seg: TimeSegment) in pinned(seg) == 1 || mode == .compact }
+            // 사람이 1열로 고른 것은 그대로 둔다 — 고른 자리를 앱이 무르면 안 된다.
+            // 좁게: 글씨는 막대 위에서 40pt가 비는 첫 자리로 옮긴다. 그런 자리가 없으면 자동과 같이 오른쪽에 둔다.
+            //
+            // ⚠️ 한때 좁게에서는 아무것도 빼지 않고 자리가 없으면 글씨를 맨 위에 겹쳐 두었다. 21:00–22:30 운동 안에
+            //    21:00–22:00 코칭이 들어가자 두 줄의 시각·제목이 한 자리에 포개져 어느 것도 읽히지 않았다.
+            //    '좁게'는 겹치지 않는 한 좁게다 — 글씨가 겹치는 것도 겹치는 것이다.
+            let isPinned = { (seg: TimeSegment) in pinned(seg) == 1 }
             if mode == .compact {
                 labelY = y(h.start)
                 for seg in picked {
@@ -2189,6 +2181,11 @@ struct DayScheduleView: View {
             }
             // 글씨 자리와 부딪치는 것은 빼낸다 (내린 글씨 바로 아래에서 시작하는 것).
             picked.removeAll { y($0.start) >= labelY && y($0.start) < labelY + labelRoom && !isPinned($0) }
+            // 사람이 1열로 고른 것이 글씨 자리에 남았으면 글씨를 그 아래로 내린다 —
+            // 막대 끝을 조금 넘더라도 두 글씨가 한 자리에 포개지는 것보다 낫다.
+            for seg in picked where y(seg.start) < labelY + labelRoom && y(seg.end) > labelY + 0.5 {
+                labelY = max(labelY, y(seg.end))
+            }
             if labelY > y(h.start) + 0.5 { drops[h.id] = labelY - y(h.start) }
             dug.formUnion(picked.map(\.id))
         }
@@ -2548,7 +2545,8 @@ struct GapFillPopover: View {
     var adjustable: Bool = true
     /// (드래그 토큰, 시작 시각, 정한 길이 — nil이면 할 일 제 길이)
     let onPick: (String, Double, Double?) -> Void
-    let onAddBlock: (Double, Double) -> Void
+    /// (시작 시각, 길이, 찾느라 쳐 둔 말 — 새 블록의 제목으로 이어진다)
+    let onAddBlock: (Double, Double, String) -> Void
     /// 잡아 둔 시간을 놓는다. 손잡이로 잡은 판에만 있다.
     var onCancel: (() -> Void)? = nil
 
@@ -2587,6 +2585,9 @@ struct GapFillPopover: View {
         if available >= 0.25 { v.append(available) }
         return v
     }
+
+    /// 찾느라 쳐 둔 말. 새 블록을 세우면 그 제목으로 넘어간다.
+    private var typedTitle: String { search.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private var shown: [GapCandidate] {
         let q = search.trimmingCharacters(in: .whitespaces).lowercased()
@@ -2631,6 +2632,11 @@ struct GapFillPopover: View {
                 TextField("할 일 찾기", text: $search)
                     .textFieldStyle(.roundedBorder)
                     .font(.callout)
+                    // 찾는 게 없으면 리턴이 곧 '이 이름으로 새 블록'이다.
+                    .onSubmit {
+                        guard shown.isEmpty, !typedTitle.isEmpty, available >= 0.25 else { return }
+                        onAddBlock(start, available, typedTitle)
+                    }
             }
 
             list
@@ -2639,7 +2645,7 @@ struct GapFillPopover: View {
 
             HStack(spacing: 10) {
                 Button {
-                    onAddBlock(start, available)
+                    onAddBlock(start, available, typedTitle)
                 } label: {
                     Label("이 시간에 새 블록…", systemImage: "plus.circle.fill")
                         .font(.callout.weight(.medium))

@@ -460,6 +460,7 @@ struct ContentView: View {
                 ),
                 initialStartHour: ctx.startHour,
                 initialDuration: ctx.duration,
+                initialTitle: ctx.title,
                 initialDurationIsExplicit: ctx.durationIsExplicit,
                 initialWithinRoutine: ctx.withinRoutine
             )
@@ -964,17 +965,19 @@ struct ContentView: View {
                         routineSheet = RoutineSheetContext(routine: routine)
                     },
                     candidates: gapCandidates,
-                    onAddBlock: { hour, hours in
+                    onAddBlock: { hour, hours, title in
                         blockSheet = BlockSheetContext(day: selectedDay, block: nil,
-                                                       startHour: hour, duration: hours)
+                                                       startHour: hour, duration: hours,
+                                                       title: title)
                     },
                     onFillGap: { token, hour, duration in
                         dropBacklogItem(token: token, day: selectedDay, atHour: hour, duration: duration)
                     },
-                    onDrawBlock: { hour, hours in
+                    onDrawBlock: { hour, hours, title in
                         // 손으로 그은 길이다 — 두 시간으로 깎지 않는다.
                         blockSheet = BlockSheetContext(day: selectedDay, block: nil,
                                                        startHour: hour, duration: hours,
+                                                       title: title,
                                                        durationIsExplicit: true)
                     },
                     // 루틴 띠 안에 겹쳐 세운다 — 회사 시간 안의 회의. 자유 시간은 안 깎인다.
@@ -2471,6 +2474,8 @@ struct BlockSheetContext: Identifiable {
     /// 일간의 빈 시간에서 열었을 때 — 그 시각·길이로 새 블록을 채워 둔다.
     var startHour: Double? = nil
     var duration: Double? = nil
+    /// 채우기 판에 찾느라 쳐 둔 말 — 새 블록의 제목으로 채워 둔다.
+    var title: String = ""
     /// 길이를 **사람이 직접 그었는가** (빈 시간을 위아래로 훑어서).
     /// 빈 시간을 그냥 누른 것이면 그 길이는 제안일 뿐이라 두 시간으로 깎인다.
     var durationIsExplicit: Bool = false

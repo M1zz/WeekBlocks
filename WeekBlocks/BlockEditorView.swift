@@ -23,6 +23,8 @@ struct BlockEditorView: View {
     var initialStartHour: Double? = nil
     /// 새 블록의 처음 길이 — 빈 시간의 길이. 두 시간을 넘으면 기본값(2시간)을 둔다.
     var initialDuration: Double? = nil
+    /// 새 블록의 처음 제목 — 채우기 판에서 할 일을 찾다가 없어서 왔을 때 쳐 둔 말.
+    var initialTitle: String = ""
     /// 그 길이를 **사람이 직접 그었는가** — 빈 시간을 위아래로 훑어 범위를 그린 경우.
     /// 그때는 깎지 않는다. 다섯 시간 빈자리를 누른 것과 세 시간을 그은 것은 다른 말이다.
     var initialDurationIsExplicit: Bool = false
@@ -109,6 +111,7 @@ struct BlockEditorView: View {
                 timeBand = initialStartHour.map(TimeBand.containing) ?? suggestedBand
                 // 루틴 띠 오른쪽 절반을 훑어서 왔다 — 루틴 시간 안의 일정이다.
                 withinRoutine = initialWithinRoutine
+                if title.isEmpty { title = initialTitle }
                 // 빈 시간을 훑거나 눌러서 왔으면 그 시각이 이미 정해진 것이다.
                 if let h = initialStartHour { startHour = h; hasExactTime = true }
                 if let d = initialDuration {
