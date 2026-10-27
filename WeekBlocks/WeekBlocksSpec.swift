@@ -43,53 +43,72 @@ enum WeekBlocksSpec: LeeoAppSpec {
         )
     }
 
-    /// **파는 것은 「무지개 공방 Pro」다.** 연간·월간 구독과 평생 이용권, 셋 중 무엇을 사도 같은 Pro다.
+    /// **파는 것은 Plus · Pro 두 칸이다** (2026-10 개편). 칸마다 연 구독과 평생을 나란히 둔다.
     ///
-    /// 선은 이렇게 긋는다: **이번 주를 사는 데 필요한 것은 무료, 지난 주들이 쌓여야 보이는 것은 Pro.**
-    /// 주간·일간 계획, 루틴, 할 일, 이번 주 회고, 타이머, 아이폰과 오가기까지 전부 무료다.
-    /// Pro는 회고 추세(→ ReflectionTrendsView)와 다른 주 계획 가져오기(→ WeekCopyView)를 연다.
+    /// 선은 이렇게 긋는다: **이번 주를 사는 데 필요한 것은 무료, 지난 주들이 쌓여야 보이는 것은 Plus,
+    /// 남에게 내보내는 것과 아이폰까지 함께 여는 것은 Pro.**
+    ///  · 무료: 주간·일간 계획, 루틴, 할 일, 이번 주 회고(글로 복사 포함), 타이머, 캘린더 가져오기, 아이폰과 오가기
+    ///  · Plus: 회고 추세 8주, 요일별·시간대별·계획 대비 실제 카드, 다른 주 계획 가져오기
+    ///  · Pro: Plus 전부 + 내 일정 공유 링크 + 아이폰 '욕망의 무지개' Pro
     ///
-    /// ⚠️ 예전에 팔려던 것은 '아이폰으로 건너가기'(`legacySyncProductID`)였다. 원래 되던 것을
-    ///    막는 셈이라 뺏는 것으로 읽혀서 **동기화는 무료로 되돌렸다** (→ TodoAccess.swift).
-    ///    그 상품을 산 사람이 있다면 Pro로 인정한다 — `entitlementIDs`에 함께 넣어 둔다.
-    ///
-    /// ⚠️ **여기 선언했다고 팔기 시작하는 게 아니다.** 실제로 파는지는
-    ///    `MacEntitlement.sellsPro`가 정한다. 상품이 App Store Connect에 서기 전에 켜면
-    ///    아무도 못 사는 채로 Pro 기능만 잠긴다.
+    /// ⚠️ 예전에 팔려던 것은 '아이폰으로 건너가기'(`legacySyncProductID`)였다. 그 ID 는 지금 Pro 평생이다.
+    /// ⚠️ 판매를 멈춘 월 구독(`proMonthlyID`)도 권한 목록에는 남긴다. 구독자는 끝날 때까지 Pro 다.
+    /// ⚠️ **여기 선언했다고 팔기 시작하는 게 아니다.** 실제로 파는지는 `MacEntitlement.sellsPro`가 정한다.
     static let monetization = LeeoMonetization.freemiumSubscription(
         LeeoSubscriptionConfig(
-            productIDs: proProductIDs,
+            productIDs: saleProductIDs,
             // 자체 약관이 없으므로 애플 표준 사용권 계약(EULA)을 건다.
             // App Store Connect의 '사용권 계약'을 표준으로 두는 것과 짝이다.
             termsURL: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!,
-            entitlementIDs: Set(proProductIDs + [legacySyncProductID]),
+            // LeeoStore 의 hasPro 는 '무엇이든 유료 칸을 가졌는가'다. 어느 칸인지는 `tier(owned:)` 가 가른다.
+            entitlementIDs: plusEntitlementIDs.union(proEntitlementIDs),
             gate: LeeoGatePolicy(
                 // 무료로도 **써 보고 알 만큼**은 연다: 지난 2주 추세는 그냥 보인다.
-                // 여기 적힌 것은 '쌓여야 보이는 것'과 '남에게 내보내는 것'뿐이다.
                 freeLimits: [Gate.trendWeeks: ReflectionTrends.freeWeekCount],
-                proOnly: [Gate.trends, Gate.weekCopy, Gate.share, Gate.export])
+                proOnly: [Gate.trends, Gate.weekCopy, Gate.share])
         )
     )
 
+    // MARK: - 상품 ID
+
     /// App Store Connect의 상품 ID.
     /// ⚠️ 콘솔에 만든 것·`WeekBlocks.storekit`에 적은 것과 **글자 하나까지 같아야 한다.**
-    /// 연간·월간은 같은 구독 그룹(「무지개 공방 Pro」)에 넣어야 서로 갈아탈 수 있다.
+    /// Plus 연 · Pro 연(· 판매를 멈춘 Pro 월)은 같은 구독 그룹에 있어야 서로 갈아탈 수 있다.
+    static let plusYearlyID = "com.devkoan.ScheduleDensityApp.plus.yearly"
+    static let plusLifetimeID = "com.devkoan.ScheduleDensityApp.plus"
     static let proYearlyID = "com.devkoan.ScheduleDensityApp.pro.yearly"
-    /// **평생 이용권은 예전 '함께 쓰기' 상품을 이어 쓴다** (2026-10-13).
-    /// 판 적이 없어 산 사람이 없고, 이름·설명·가격은 콘솔에서 고칠 수 있다. 평생 상품을 하나 더 만들면
-    /// 페이월에 평생이 둘 서고 산 사람도 헷갈린다. ID에 'sync'가 남지만 사용자에게는 안 보인다.
+    /// **Pro 평생은 예전 '함께 쓰기' 상품을 이어 쓴다** (2026-10-13). ID에 'sync'가 남지만 사용자에게는 안 보인다.
     static let proLifetimeID = legacySyncProductID
+    /// Plus 평생을 산 사람이 Pro 평생으로 올리는 값.
+    static let proUpgradeID = "com.devkoan.ScheduleDensityApp.pro.upgrade"
+    /// 구독 졸업: 구독 중인 사람에게만 보이는 Pro 평생.
+    static let proGraduateID = "com.devkoan.ScheduleDensityApp.pro.graduate"
+    /// 판매 중지(2026-10). 구독자는 끝날 때까지 Pro 다.
     static let proMonthlyID = "com.devkoan.ScheduleDensityApp.pro.monthly"
-
-    /// 페이월에 서는 차례 그대로 — 연간이 먼저, 평생, 월간은 비교 기준이라 마지막.
-    static let proProductIDs = [proYearlyID, proLifetimeID, proMonthlyID]
 
     /// 예전 '함께 쓰기'(비소모성). 지금은 Pro 평생 이용권이다 (→ proLifetimeID).
     static let legacySyncProductID = "com.devkoan.ScheduleDensityApp.sync"
 
-    /// 이 중 하나라도 있으면 Pro다. 아이폰에 남길 표를 만들 때도 이 목록으로 고른다
-    /// (→ ProMark.swift, MacEntitlement.syncCrossPlatformMark).
-    static let proEntitlementIDs = Set(proProductIDs + [legacySyncProductID])
+    /// 불러올 상품. 페이월의 칸 차례(Plus 연 → Plus 평생 → Pro 연 → Pro 평생)에 올리기 · 졸업이 붙는다.
+    static let saleProductIDs = [plusYearlyID, plusLifetimeID, proYearlyID, proLifetimeID,
+                                 proUpgradeID, proGraduateID]
+
+    /// Plus 를 여는 상품.
+    static let plusEntitlementIDs: Set<String> = [plusYearlyID, plusLifetimeID]
+    /// 이 중 하나라도 있으면 Pro 다. 판매를 멈춘 것도 빼지 않는다.
+    static let proEntitlementIDs: Set<String> = [proYearlyID, proLifetimeID, proMonthlyID,
+                                                 proUpgradeID, proGraduateID]
+    /// 자동 갱신 구독(졸업 제안의 대상).
+    static let subscriptionIDs: Set<String> = [plusYearlyID, proYearlyID, proMonthlyID]
+    /// 끝이 없는 Pro. 이걸 가진 사람에게는 졸업을 권하지 않고, 패스는 올리기 값으로 판다.
+    static let proLifetimeIDs: Set<String> = [proLifetimeID, proUpgradeID, proGraduateID]
+
+    /// **가진 상품이 어느 칸을 여는가.** 연 구독은 같은 칸의 평생과 같다.
+    static func tier(owned: Set<String>) -> MacTier {
+        if !owned.isDisjoint(with: proEntitlementIDs) { return .pro }
+        if !owned.isDisjoint(with: plusEntitlementIDs) { return .plus }
+        return .free
+    }
 
     /// 게이트 열쇠말. 문자열을 여기저기 흩어 적으면 오타 하나로 조용히 안 잠긴다.
     enum Gate {
@@ -99,10 +118,8 @@ enum WeekBlocksSpec: LeeoAppSpec {
         static let weekCopy = "weekCopy"
         /// 추세를 몇 주까지 거슬러 보는가 (무료는 2주).
         static let trendWeeks = "trendWeeks"
-        /// 내 일정을 남에게 보기 전용 링크로 공유하기.
+        /// 내 일정을 남에게 보기 전용 링크로 공유하기 (Pro). 회고 복사는 2026-10 부터 무료라 열쇠가 없다.
         static let share = "share"
-        /// 회고를 밖으로 내보내기 (복사·저장).
-        static let export = "export"
     }
 
     /// **익명 사용 통계를 피드백 허브로 보낸다** (→ Telemetry.swift).

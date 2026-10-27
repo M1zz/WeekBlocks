@@ -1,5 +1,199 @@
 # 릴리즈 노트
 
+## 1.1.15
+
+### 앱스토어 (한국어)
+
+요금제를 무료와 Plus, Pro로 정리했습니다
+Plus와 Pro는 연 구독과 평생 중에 고릅니다
+구독 중이라면 평생으로 바꿀 수 있습니다
+모든 앱을 여는 언제나 평생 패스가 생겼습니다
+이번 주 회고 복사는 이제 무료입니다
+
+### App Store (English)
+
+Plans are now Free, Plus and Pro
+Pick yearly or lifetime for Plus and Pro
+Subscribers can switch to lifetime
+New Forever Pass unlocks all our apps
+Copying this week’s review is now free
+
+### App Store (en-GB)
+
+Plans are now Free, Plus and Pro
+Pick yearly or lifetime for Plus and Pro
+Subscribers can switch to lifetime
+New Forever Pass unlocks all our apps
+Copying this week’s review is now free
+
+### App Store (繁體中文, zh-Hant)
+
+方案整理為免費、Plus 與 Pro
+Plus 與 Pro 可選年訂閱或永久
+訂閱中也能改為永久版
+新增可解鎖所有 App 的永久通行證
+複製本週回顧改為免費
+
+### App Store (简体中文, zh-Hans)
+
+方案整理为免费、Plus 和 Pro
+Plus 和 Pro 可选年订阅或永久
+订阅中也能改为永久版
+新增可解锁所有 App 的永久通行证
+复制本周复盘改为免费
+
+### App Store (日本語, ja)
+
+プランを無料とPlus、Proに整理しました
+PlusとProは年額か買い切りを選べます
+サブスク中でも買い切りに切り替えられます
+全アプリが使えるずっとパスが登場しました
+今週の振り返りのコピーが無料になりました
+
+### App Store (Deutsch, de)
+
+Die Tarife heißen jetzt Gratis, Plus, Pro
+Plus und Pro jährlich oder lebenslang
+Abos lassen sich in Lebenslang umwandeln
+Neuer Für-immer-Pass für alle unsere Apps
+Wochenrückblick kopieren ist jetzt gratis
+
+### App Store (Español, es)
+
+Ahora hay planes Gratis, Plus y Pro
+Elige Plus o Pro anual o de por vida
+Si te suscribes, puedes pasar a de por vida
+Nuevo Pase para siempre para todas las apps
+Copiar la revisión semanal ya es gratis
+
+### App Store (Français, fr)
+
+Les offres deviennent Gratuit, Plus et Pro
+Plus et Pro en annuel ou à vie
+Les abonnés peuvent passer à l’achat à vie
+Nouveau Pass à vie pour toutes nos apps
+Copier le bilan de la semaine est gratuit
+
+### App Store (Italiano, it)
+
+I piani ora sono Gratis, Plus e Pro
+Plus e Pro annuali o a vita
+Gli abbonati possono passare a vita
+Nuovo Pass per sempre per tutte le app
+Copiare la revisione della settimana è gratis
+
+### App Store (Português (Brasil), pt-BR)
+
+Os planos agora são Grátis, Plus e Pro
+Plus e Pro anuais ou vitalícios
+Assinantes podem mudar para o vitalício
+Novo Passe para sempre para todos os apps
+Copiar a revisão da semana agora é grátis
+
+### App Store (Русский, ru)
+
+Тарифы теперь Бесплатный, Plus и Pro
+Plus и Pro на год или навсегда
+Подписку можно сменить на покупку навсегда
+Новый Вечный пропуск для всех наших приложений
+Копировать итоги недели теперь бесплатно
+
+### App Store (Čeština, cs)
+
+Tarify jsou nyní Zdarma, Plus a Pro
+Plus a Pro ročně nebo doživotně
+Předplatné lze převést na doživotní verzi
+Nový Pas navždy pro všechny naše aplikace
+Kopírování ohlédnutí za týden je zdarma
+
+### App Store (Dansk, da)
+
+Planerne hedder nu Gratis, Plus og Pro
+Plus og Pro årligt eller på livstid
+Abonnenter kan skifte til livstid
+Nyt Evighedspas til alle vores apps
+Kopiering af ugens gennemgang er gratis
+
+### App Store (Ελληνικά, el)
+
+Τα προγράμματα είναι πλέον Δωρεάν, Plus και Pro
+Plus και Pro ετήσια ή εφ’ όρου ζωής
+Οι συνδρομητές περνούν σε εφ’ όρου ζωής
+Νέο Πάσο για πάντα για όλες τις εφαρμογές μας
+Η αντιγραφή της ανασκόπησης εβδομάδας είναι δωρεάν
+
+### App Store (Suomi, fi)
+
+Vaihtoehdot ovat nyt Ilmainen, Plus ja Pro
+Plus ja Pro vuosittain tai elinikäisenä
+Tilaajat voivat vaihtaa elinikäiseen
+Uusi Ikuinen passi kaikkiin sovelluksiimme
+Viikon katsauksen kopiointi on nyt ilmaista
+
+### App Store (Bahasa Indonesia, id)
+
+Paket kini Gratis, Plus, dan Pro
+Plus dan Pro tahunan atau seumur hidup
+Pelanggan bisa beralih ke seumur hidup
+Pass Selamanya baru untuk semua app kami
+Menyalin tinjauan minggu ini kini gratis
+
+### App Store (Norsk bokmål, nb)
+
+Planene heter nå Gratis, Plus og Pro
+Plus og Pro årlig eller for livstid
+Abonnenter kan bytte til livstid
+Nytt Evighetspass for alle appene våre
+Kopiering av ukens gjennomgang er gratis
+
+### App Store (Nederlands, nl)
+
+Kies nu uit Gratis, Plus en Pro
+Plus en Pro per jaar of levenslang
+Abonnees kunnen overstappen op levenslang
+Nieuwe Altijd-pas voor al onze apps
+Terugblik van de week kopiëren is gratis
+
+### App Store (Polski, pl)
+
+Plany to teraz Darmowy, Plus i Pro
+Plus i Pro rocznie lub dożywotnio
+Subskrybenci mogą przejść na dożywotni
+Nowa Przepustka na zawsze do wszystkich aplikacji
+Kopiowanie podsumowania tygodnia jest darmowe
+
+### App Store (Svenska, sv)
+
+Planerna heter nu Gratis, Plus och Pro
+Plus och Pro per år eller livstid
+Prenumeranter kan byta till livstid
+Nytt Evighetspass för alla våra appar
+Att kopiera veckans genomgång är gratis
+
+### App Store (ไทย, th)
+
+แพ็กเกจใหม่มีฟรี Plus และ Pro
+เลือก Plus และ Pro แบบรายปีหรือตลอดชีพ
+ผู้สมัครสมาชิกเปลี่ยนเป็นตลอดชีพได้
+พาสตลอดกาลใหม่ใช้ได้ทุกแอปของเรา
+คัดลอกการทบทวนสัปดาห์นี้ได้ฟรีแล้ว
+
+### App Store (Türkçe, tr)
+
+Planlar artık Ücretsiz, Plus ve Pro
+Plus ve Pro yıllık ya da ömür boyu
+Aboneler ömür boyuya geçebilir
+Tüm uygulamalarımız için yeni Sonsuz Geçiş
+Haftalık değerlendirmeyi kopyalamak artık ücretsiz
+
+### App Store (Tiếng Việt, vi)
+
+Các gói nay gồm Miễn phí, Plus và Pro
+Plus và Pro theo năm hoặc trọn đời
+Người đăng ký có thể chuyển sang trọn đời
+Vé trọn đời mới mở mọi ứng dụng của chúng tôi
+Chép phần nhìn lại tuần này nay miễn phí
+
 ## 1.1.14
 
 ### 앱스토어 (한국어)

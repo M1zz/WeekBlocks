@@ -2,7 +2,7 @@
 //  WeekCopyView.swift
 //  WeekBlocks
 //
-//  **잘 굴러간 주를 이번 주에 한 번에 깐다** — Pro.
+//  **잘 굴러간 주를 이번 주에 한 번에 깐다** — Plus.
 //
 //  한 주를 짜는 일은 대개 지난 주를 다시 짜는 일이다. 같은 수업, 같은 운동, 같은 마감 준비.
 //  블록을 하나씩 다시 끌어다 놓는 대신, 고른 주의 계획을 같은 요일·같은 시각으로 옮겨 적는다.
@@ -184,8 +184,8 @@ struct WeekCopyView: View {
     private var footer: some View {
         let targetCount = plan(of: targetWeek).count
         return HStack(spacing: 10) {
-            if !purchases.isPro {
-                Label("Pro 기능입니다", systemImage: "sparkles")
+            if !purchases.isPlus {
+                Label("Plus 기능입니다", systemImage: "sparkles")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             } else if targetCount > 0 {
@@ -196,7 +196,7 @@ struct WeekCopyView: View {
             Spacer()
             Button("취소") { dismiss() }
                 .keyboardShortcut(.cancelAction)
-            if purchases.isPro {
+            if purchases.isPlus {
                 Button("이 주에 깔기") { copy() }
                     .keyboardShortcut(.defaultAction)
                     .disabled(selectedWeek == nil)
@@ -204,7 +204,7 @@ struct WeekCopyView: View {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Label("Pro로 가져오기", systemImage: "sparkles")
+                    Label("Plus로 가져오기", systemImage: "sparkles")
                 }
                 .keyboardShortcut(.defaultAction)
             }
@@ -212,7 +212,7 @@ struct WeekCopyView: View {
     }
 
     private func copy() {
-        guard purchases.isPro, let source = selectedWeek else { return }
+        guard purchases.isPlus, let source = selectedWeek else { return }
         let existing = plan(of: targetWeek)
         for b in plan(of: source) {
             let duplicate = existing.contains {

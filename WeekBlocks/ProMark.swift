@@ -18,6 +18,10 @@
 //         평생 이용권은 끝이 없으므로 비워 둔다.
 //      3. 자기 영수증에서 권한이 사라지면 자기 표를 지운다. 해지가 다른 기기에도 닿아야 한다.
 //
+//  **등급(`tier`)도 함께 적는다** (2026-10, Plus · Pro 두 칸). 값은 "plus" · "pro" 둘뿐이고,
+//  등급이 없는 예전 기록은 "pro" 로 읽는다(그때는 Pro 하나뿐이었다). 각 앱은 자기 권한의 등급을
+//  적고, 읽을 때는 살아 있는 상대 표 중 **가장 높은 등급**을 쓴다.
+//
 //  ⚠️ 이 파일은 두 레포에 **같은 내용으로** 복제돼 있다. CloudKit 스키마를 함께 쓰므로
 //     한쪽만 고치면 다른 쪽에서 안 보이거나, 안 지워진다. 한쪽을 고치면 반드시 같이 고칠 것.
 //
@@ -36,20 +40,36 @@ final class ProMark {
     var validUntil: Date? = nil
     /// 마지막으로 확인한 때.
     var updatedAt: Date = Date()
+    /// 등급. "plus" · "pro". **nil(예전 기록)은 "pro"** 로 읽는다 (→ `markTier`).
+    var tier: String? = nil
 
-    init(platform: ProMarkPlatform, productID: String, validUntil: Date?) {
+    init(platform: ProMarkPlatform, productID: String, validUntil: Date?, tier: ProMarkTier = .pro) {
         self.platformRaw = platform.rawValue
         self.productID = productID
         self.validUntil = validUntil
+        self.tier = tier.rawValue
         self.updatedAt = Date()
     }
 
     var platform: ProMarkPlatform { ProMarkPlatform(rawValue: platformRaw) ?? .ios }
 
+    /// 이 표가 여는 등급. 없거나 모르는 값이면 Pro 다(예전 기록은 모두 Pro 였다).
+    var markTier: ProMarkTier { ProMarkTier(rawValue: tier ?? "") ?? .pro }
+
     /// 지금도 유효한 표인가.
     func isValid(at now: Date = Date()) -> Bool {
         guard let validUntil else { return true }
         return validUntil > now
+    }
+}
+
+/// 표에 적는 등급. 문자열이 CloudKit 필드 값이므로 두 앱에서 **글자 하나까지 같아야** 한다.
+enum ProMarkTier: String, Comparable, CaseIterable {
+    case plus
+    case pro
+
+    static func < (lhs: ProMarkTier, rhs: ProMarkTier) -> Bool {
+        allCases.firstIndex(of: lhs)! < allCases.firstIndex(of: rhs)!
     }
 }
 
@@ -69,22 +89,27 @@ enum ProMarkPlatform: String {
 
 enum ProMarkStore {
 
-    /// **다른 쪽 앱이 남긴 표가 살아 있는가.** 이것 하나면 열어 준다.
-    static func otherPlatformHasPro(in context: ModelContext, now: Date = Date()) -> Bool {
-        let mine = ProMarkPlatform.current.rawValue
+    /// **다른 쪽 앱이 남긴 살아 있는 표 중 가장 높은 등급.** 없으면 nil.
+    static func otherPlatformTier(in context: ModelContext, now: Date = Date()) -> ProMarkTier? {
         let marks = (try? context.fetch(FetchDescriptor<ProMark>())) ?? []
-        return marks.contains { $0.platformRaw != mine && $0.isValid(at: now) }
+        return bestOtherTier(marks, now: now)
+    }
+
+    /// 상대 표 중 가장 높은 등급 (순수 함수, 시험용).
+    static func bestOtherTier(_ marks: [ProMark], now: Date = Date()) -> ProMarkTier? {
+        let mine = ProMarkPlatform.current.rawValue
+        return marks.filter { $0.platformRaw != mine && $0.isValid(at: now) }.map(\.markTier).max()
     }
 
     /// **내 영수증을 표로 옮겨 적고, 상대의 표를 읽어 온다.** 두 앱이 같은 규칙을 쓴다.
     ///
     /// - Parameters:
-    ///   - hasPro: 내 영수증이 말하는 답. false면 내 표를 지운다 — 해지가 다른 기기에도 닿아야 한다.
-    ///   - entitlementIDs: Pro로 인정하는 상품들. 구독은 끝나는 날을 함께 적는다.
-    /// - Returns: 상대 쪽 표가 살아 있는가.
-    static func sync(hasPro: Bool, entitlementIDs: Set<String>,
-                     defaultProductID: String, in context: ModelContext) async -> Bool {
-        if hasPro {
+    ///   - tier: 내 영수증이 말하는 등급. nil(무료)이면 내 표를 지운다. 해지가 다른 기기에도 닿아야 한다.
+    ///   - entitlementIDs: 그 등급을 여는 상품들. 구독은 끝나는 날을 함께 적는다.
+    /// - Returns: 상대 쪽 살아 있는 표의 가장 높은 등급.
+    static func sync(tier: ProMarkTier?, entitlementIDs: Set<String>,
+                     defaultProductID: String, in context: ModelContext) async -> ProMarkTier? {
+        if let tier {
             var expiry: Date?
             var productID = defaultProductID
             var lifetime = false
@@ -99,33 +124,35 @@ enum ProMarkStore {
                     lifetime = true   // 평생 이용권·옛 1회 구매
                 }
             }
-            stamp(productID: productID, validUntil: lifetime ? nil : expiry, in: context)
+            stamp(productID: productID, validUntil: lifetime ? nil : expiry, tier: tier, in: context)
         } else {
             clearMine(in: context)
         }
-        return otherPlatformHasPro(in: context)
+        return otherPlatformTier(in: context)
     }
 
     /// 내 표를 적거나 고친다. 같은 앱의 표는 늘 하나만 둔다.
     ///
     /// ⚠️ **값이 그대로면 아무것도 쓰지 않는다.** 이 스토어는 CloudKit 미러라, 앱이 앞으로 나올
     ///    때마다 `updatedAt`만 새로 찍으면 그때마다 레코드 하나가 올라가고 상대 기기에는
-    ///    원격 변경 알림이 간다 — 아무것도 안 바뀌었는데.
-    static func stamp(productID: String, validUntil: Date?, in context: ModelContext) {
+    ///    원격 변경 알림이 간다. 아무것도 안 바뀌었는데.
+    static func stamp(productID: String, validUntil: Date?, tier: ProMarkTier, in context: ModelContext) {
         let mine = ProMarkPlatform.current
         let marks = ((try? context.fetch(FetchDescriptor<ProMark>())) ?? [])
             .filter { $0.platform == mine }
 
         if let existing = marks.first {
             let unchanged = existing.productID == productID && existing.validUntil == validUntil
+                && existing.tier == tier.rawValue
             // 어쩌다 둘 이상 생겼으면 하나만 남긴다 (두 기기가 같은 순간에 적은 경우).
             for extra in marks.dropFirst() { context.delete(extra) }
             guard !unchanged || marks.count > 1 else { return }
             existing.productID = productID
             existing.validUntil = validUntil
+            existing.tier = tier.rawValue
             existing.updatedAt = Date()
         } else {
-            context.insert(ProMark(platform: mine, productID: productID, validUntil: validUntil))
+            context.insert(ProMark(platform: mine, productID: productID, validUntil: validUntil, tier: tier))
         }
         try? context.save()
     }

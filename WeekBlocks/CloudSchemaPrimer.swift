@@ -25,7 +25,7 @@
 //  ⚠️ **모델에 칸을 더할 때마다 여기도 함께 고칠 것.** 안 고치면 이 파일이 있으나 마나다.
 //     지금 채우는 것: BacklogItem·PlanBlock의 옵셔널 전부, 세 모델
 //     (BacklogItem·PlanBlock·Routine)의 함께 쓰기 칸(isShared·originInstallID),
-//     ProMark 타입 자체와 그 옵셔널(validUntil), Project 타입 자체와 그 옵셔널(completedAt),
+//     ProMark 타입 자체와 그 옵셔널(validUntil · tier), Project 타입 자체와 그 옵셔널(completedAt),
 //     BacklogItem.projectID, RainbowEvent 타입 자체와 그 옵셔널 다섯 칸, 그리고 DeletionMark 타입.
 //
 
@@ -116,6 +116,7 @@ enum CloudSchemaPrimer {
         // 한쪽에서 샀다는 표 (→ ProMark.swift). 이 타입은 Pro를 산 사람만 적으므로, 여기서
         // 안 만들면 Development 스키마에 타입부터 없다. 끝나는 날은 **이미 지난 날**로 둔다 —
         // 올라가 있는 25초 사이에 아이폰이 이 표를 보고 Pro를 열면 안 된다.
+        // 등급(tier) 칸도 여기서 생긴다 (init 이 "pro" 를 적는다).
         let mark = ProMark(platform: .current, productID: marker,
                            validUntil: Date(timeIntervalSince1970: 0))
 

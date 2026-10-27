@@ -2,14 +2,14 @@
 //  ReflectionTrendsView.swift
 //  WeekBlocks
 //
-//  **지난 주들을 겹쳐 본다** — Pro.
+//  **지난 주들을 겹쳐 본다** — Plus.
 //
 //  한 주 회고는 "이번 주에 무엇을 했나"에 답한다. 여러 주를 모으면 다른 질문에 답이 선다:
 //  나는 무슨 요일에 잘 해내는가, 몇 시대에 무너지는가, 무엇을 번번이 미루는가.
 //  다음 주를 짤 때 쓸모 있는 건 이쪽이다.
 //
 //  새로 저장하는 것은 없다. 매일 찍어 둔 `PlanBlock.reviewStatus`를 주마다 모아 셀 뿐이다
-//  (→ DayReflectionPanel · ReflectionView). 그래서 Pro를 산 날부터가 아니라
+//  (→ DayReflectionPanel · ReflectionView). 그래서 Plus를 산 날부터가 아니라
 //  **그동안 찍어 둔 회고가 전부** 추세로 선다.
 //
 
@@ -195,9 +195,9 @@ struct ReflectionTrendsView: View {
     @State private var purchases = PurchaseManager.shared
     @State private var showingPaywall = false
 
-    /// 무료는 2주, Pro는 8주.
+    /// 무료는 2주, Plus(와 Pro)는 8주.
     private var weekCount: Int {
-        purchases.isPro ? ReflectionTrends.weekCount : ReflectionTrends.freeWeekCount
+        purchases.isPlus ? ReflectionTrends.weekCount : ReflectionTrends.freeWeekCount
     }
 
     private var weeks: [ReflectionTrends.Week] {
@@ -236,7 +236,7 @@ struct ReflectionTrendsView: View {
             Button {
                 showingPaywall = true
             } label: {
-                Label("Pro 보기", systemImage: "sparkles")
+                Label("Plus 보기", systemImage: "sparkles")
             }
             .buttonStyle(.borderedProminent)
         }
@@ -254,7 +254,7 @@ struct ReflectionTrendsView: View {
             VStack(alignment: .leading, spacing: 18) {
                 summary(weeks)
                 weeklyChart(weeks)
-                if purchases.isPro {
+                if purchases.isPlus {
                     HStack(alignment: .top, spacing: 14) {
                         shareCard(title: "요일별", shares: ReflectionTrends.byDay(blocks))
                         shareCard(title: "시간대별", shares: ReflectionTrends.byBand(blocks))
@@ -436,7 +436,7 @@ struct ReflectionTrendsView: View {
             }
             Group {
                 if locked {
-                    Text("일마다 계획보다 얼마나 더 걸리는지는 Pro에서 봅니다.")
+                    Text("일마다 계획보다 얼마나 더 걸리는지는 Plus에서 봅니다.")
                 } else if let worst = paces.first(where: { $0.ratio >= 1.2 }) {
                     let more = "\(Int(((worst.ratio - 1) * 100).rounded()))%"
                     Text("‘\(worst.title)’ 일은 보통 계획보다 \(more) 더 걸립니다. 다음엔 그만큼 넉넉히 잡아 보세요.")
@@ -479,7 +479,7 @@ struct ReflectionTrendsView: View {
                 Text(label)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Label("Pro", systemImage: "lock.fill")
+                Label("Plus", systemImage: "lock.fill")
                     .font(.title3.weight(.medium))
                     .foregroundStyle(.tint)
             }
@@ -490,7 +490,7 @@ struct ReflectionTrendsView: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .help("Pro 기능입니다")
+        .help("Plus 기능입니다")
     }
 
     private func tile(label: LocalizedStringKey, value: String, color: Color) -> some View {

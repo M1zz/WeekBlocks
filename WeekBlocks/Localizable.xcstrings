@@ -2995,7 +2995,8 @@
             "value" : "/ year"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "/ 월" : {
       "localizations" : {
@@ -3137,7 +3138,8 @@
             "value" : "/ month"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "/ 일" : {
       "localizations" : {
@@ -3279,7 +3281,8 @@
             "value" : "/ day"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "/ 주" : {
       "localizations" : {
@@ -3421,7 +3424,8 @@
             "value" : "/ week"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "%@" : {
       "localizations" : {
@@ -14724,7 +14728,8 @@
             "value" : "Free for %lld days, then billed."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "%lld일 전" : {
       "localizations" : {
@@ -19272,6 +19277,149 @@
             "value" : "8-week trends, copying another week, exporting reviews and sharing your schedule are unlocked. They also unlock on your other Macs on the same Apple Account."
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "8주 추세와 요일별·시간대별 결, 계획 대비 실제, 다른 주 계획 가져오기가 열려 있습니다. 일정 공유는 Pro에서 엽니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osmitýdenní trendy, vzorce podle dne v týdnu a denní doby, plán a skutečnost i kopírování jiného týdne jsou odemčené. Sdílení rozvrhu přináší Pro."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tendenser over 8 uger, mønstre efter dag og tidspunkt, plan og virkelighed samt kopiering fra en anden uge er låst op. Deling af din plan følger med Pro."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8-Wochen-Trends, Muster nach Wochentag und Tageszeit, Plan und Wirklichkeit sowie Woche kopieren sind freigeschaltet. Zeitplan teilen gibt es mit Pro."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι τάσεις 8 εβδομάδων, τα μοτίβα ανά ημέρα και τμήμα της ημέρας, το πλάνο και η πραγματικότητα και η αντιγραφή άλλης εβδομάδας είναι ξεκλείδωτα. Η κοινή χρήση του προγράμματος έρχεται με το Pro."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8-week trends, day and time-of-day patterns, plan vs. actual and copying another week are unlocked. Sharing your schedule comes with Pro."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8-week trends, day and time-of-day patterns, plan vs. actual and copying another week are unlocked. Sharing your schedule comes with Pro."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Están desbloqueados las tendencias de 8 semanas, los patrones por día y por franja del día, el plan frente a lo real y copiar otra semana. Compartir tu agenda llega con Pro."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 viikon trendit, viikonpäivien ja vuorokaudenaikojen säännönmukaisuudet, suunniteltu ja toteutunut sekä toisen viikon kopiointi ovat käytössä. Aikataulun jakaminen kuuluu Prohon."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tendances sur 8 semaines, tendances par jour et par moment de la journée, prévu et réel, et copie d’une autre semaine sont déverrouillés. Le partage du planning vient avec Pro."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tren 8 minggu, pola menurut hari dan bagian hari, rencana vs. kenyataan, serta salin minggu lain kini terbuka. Berbagi jadwal tersedia di Pro."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tendenze di 8 settimane, andamento per giorno e per fascia oraria, previsto e reale e copia da un’altra settimana sono sbloccati. La condivisione del programma arriva con Pro."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8週間の推移、曜日別・時間帯別の傾向、計画と実際、別の週の予定のコピーが利用できます。スケジュールの共有はProで使えます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trender over 8 uker, mønstre etter dag og tid på dagen, plan og virkelighet og kopiering fra en annen uke er låst opp. Deling av planen din følger med Pro."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trends over 8 weken, patronen per dag en per dagdeel, plan en werkelijkheid en een andere week kopiëren zijn ontgrendeld. Je planning delen hoort bij Pro."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trendy z 8 tygodni, wzorce według dni i pory dnia, plan a rzeczywistość oraz kopiowanie innego tygodnia są odblokowane. Udostępnianie planu daje Pro."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tendências de 8 semanas, padrões por dia e por período do dia, planejado x real e copiar outra semana estão desbloqueados. Compartilhar sua agenda vem com o Pro."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыты тренды за 8 недель, закономерности по дням и частям дня, план и факт, а также копирование другой недели. Общий доступ к расписанию есть в Pro."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trender för 8 veckor, mönster per dag och tid på dagen, plan och verklighet samt kopiering från en annan vecka är upplåsta. Delning av schemat ingår i Pro."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปลดล็อกแนวโน้ม 8 สัปดาห์ รูปแบบตามวันและช่วงเวลาของวัน แผนเทียบกับจริง และการคัดลอกสัปดาห์อื่นแล้ว การแชร์ตารางมีใน Pro"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 haftalık eğilimler, güne ve günün bölümüne göre örüntüler, plan ve gerçek ile başka bir haftayı kopyalama açık. Programınızı paylaşmak Pro ile gelir."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xu hướng 8 tuần, quy luật theo ngày và theo khung giờ, kế hoạch và thực tế cùng chép tuần khác đã được mở khóa. Chia sẻ lịch có trong Pro."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 周趋势、按星期和时段的规律、计划与实际、导入其他周的计划均已解锁。共享日程需要 Pro。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 週趨勢、依星期與時段的規律、計畫與實際、匯入其他週的計畫都已解鎖。分享行程需要 Pro。"
+          }
+        }
       }
     },
     "10자 이상 · 모호한 표현 금지" : {
@@ -21834,6 +21982,858 @@
         }
       }
     },
+    "Plus" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        }
+      }
+    },
+    "Plus 기능입니다" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato funkce je součástí Plus"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dette er en Plus-funktion"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist eine Plus-Funktion"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αυτή είναι λειτουργία Plus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a Plus feature"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is a Plus feature"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es una función Plus"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tämä on Plus-ominaisuus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctionnalité Plus"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ini fitur Plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa è una funzione Plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plusの機能です"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dette er en Plus-funksjon"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit is een Plus-functie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To funkcja Plus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este é um recurso Plus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это функция Plus"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det här är en Plus-funktion"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "นี่คือฟีเจอร์ Plus"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu bir Plus özelliği"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đây là tính năng Plus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是 Plus 功能"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這是 Plus 功能"
+          }
+        }
+      }
+    },
+    "Plus 보기" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazit Plus"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se Plus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus ansehen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Προβολή Plus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Plus"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Plus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver Plus"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutustu Plussaan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Découvrir Plus"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lihat Plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scopri Plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plusを見る"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se Plus"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekijk Plus"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobacz Plus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver o Plus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробнее о Plus"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visa Plus"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ดู Plus"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus’ı incele"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xem Plus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看 Plus"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看 Plus"
+          }
+        }
+      }
+    },
+    "Plus로 가져오기" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovat s Plus"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiér med Plus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Plus kopieren"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αντιγραφή με Plus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy with Plus"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy with Plus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar con Plus"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopioi Plussalla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier avec Plus"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salin dengan Plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia con Plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plusでコピー"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopier med Plus"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieer met Plus"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skopiuj z Plus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar com o Plus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировать с Plus"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiera med Plus"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "คัดลอกด้วย Plus"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus ile kopyala"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chép với Plus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用 Plus 导入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用 Plus 匯入"
+          }
+        }
+      }
+    },
+    "Plus의 모든 것" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vše z Plus"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt i Plus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles aus Plus"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Όλα του Plus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in Plus"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in Plus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo lo de Plus"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaikki Plussan ominaisuudet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout Plus"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua fitur Plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutto di Plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plusのすべて"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt i Plus"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles van Plus"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystko z Plus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo do Plus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всё из Plus"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allt i Plus"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ทุกอย่างใน Plus"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus’taki her şey"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mọi thứ trong Plus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus 的全部功能"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus 的全部功能"
+          }
+        }
+      }
+    },
+    "Plus의 모든 것과 일정 공유가 열려 있고, 아이폰 앱도 Pro로 열립니다. 같은 Apple 계정의 다른 맥에서도 열립니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vše z Plus a sdílení rozvrhu je odemčené a v aplikaci pro iPhone se odemkne i Pro. Platí to i na vašich dalších Macích se stejným Apple účtem."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt i Plus og deling af din plan er låst op, og iPhone-appen får også Pro. Det gælder også dine andre Mac-computere med samme Apple-konto."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles aus Plus und das Teilen deines Zeitplans sind freigeschaltet, und in der iPhone-App gilt Pro ebenfalls. Das gilt auch auf deinen anderen Macs mit demselben Apple Account."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Όλα του Plus και η κοινή χρήση του προγράμματος είναι ξεκλείδωτα, και η εφαρμογή iPhone ξεκλειδώνει επίσης το Pro. Ξεκλειδώνονται και στα άλλα σου Mac με τον ίδιο Λογαριασμό Apple."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in Plus and schedule sharing are unlocked, and the iPhone app unlocks Pro too. They also unlock on your other Macs on the same Apple Account."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in Plus and schedule sharing are unlocked, and the iPhone app unlocks Pro too. They also unlock on your other Macs on the same Apple Account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo lo de Plus y compartir tu agenda están desbloqueados, y la app de iPhone también desbloquea Pro. También se desbloquean en tus otros Mac con la misma cuenta de Apple."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaikki Plussan ominaisuudet ja aikataulun jakaminen ovat käytössä, ja iPhone-apissa avautuu myös Pro. Ne avautuvat myös muilla Maceillasi samalla Apple-tilillä."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout Plus et le partage du planning sont déverrouillés, et l’app iPhone passe aussi en Pro. Ils le sont aussi sur vos autres Mac associés au même compte Apple."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua fitur Plus dan berbagi jadwal kini terbuka, dan Pro juga terbuka di app iPhone. Juga terbuka di Mac lain dengan Akun Apple yang sama."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutto di Plus e la condivisione del programma sono sbloccati, e anche l’app per iPhone passa a Pro. Si sbloccano anche sugli altri Mac con lo stesso Apple Account."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plusのすべてとスケジュールの共有が利用でき、iPhoneアプリでもProが使えます。同じApple Accountの他のMacでも利用できます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt i Plus og deling av planen din er låst opp, og iPhone-appen får også Pro. Det gjelder også de andre Mac-maskinene dine med samme Apple-konto."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles van Plus en je planning delen zijn ontgrendeld, en ook de iPhone-app krijgt Pro. Ze zijn ook ontgrendeld op je andere Macs met hetzelfde Apple Account."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystko z Plus i udostępnianie planu są odblokowane, a w aplikacji na iPhone’a odblokowuje się też Pro. Odblokują się też na innych Twoich Macach z tym samym Apple Account."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo do Plus e o compartilhamento da agenda estão desbloqueados, e o app do iPhone também libera o Pro. Também ficam desbloqueados nos seus outros Macs com a mesma Conta Apple."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыто всё из Plus и общий доступ к расписанию, а в приложении для iPhone тоже открыт Pro. Это работает и на других ваших Mac с тем же Apple Account."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allt i Plus och delning av schemat är upplåsta, och iPhone-appen får också Pro. De låses också upp på dina andra Mac-datorer med samma Apple-konto."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปลดล็อกทุกอย่างใน Plus และการแชร์ตารางแล้ว แอปบน iPhone ก็ปลดล็อก Pro ด้วย ใช้ได้บน Mac เครื่องอื่นที่ใช้บัญชี Apple เดียวกันด้วย"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus’taki her şey ve programınızı paylaşma açık; iPhone uygulamasında da Pro açılır. Aynı Apple Hesabı’ndaki diğer Mac’lerinizde de açılır."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mọi thứ trong Plus và chia sẻ lịch đã được mở khóa, ứng dụng iPhone cũng mở khóa Pro. Chúng cũng được mở khóa trên các máy Mac khác dùng cùng Tài khoản Apple."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus 的全部功能和共享日程均已解锁，iPhone App 也会一起解锁 Pro。在同一 Apple 账户的其他 Mac 上也会解锁。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus 的全部功能和分享行程都已解鎖，iPhone App 也會一起解鎖 Pro。在同一 Apple 帳號的其他 Mac 上也會解鎖。"
+          }
+        }
+      }
+    },
     "Pro" : {
       "localizations" : {
         "cs" : {
@@ -22116,7 +23116,8 @@
             "value" : "This is a Pro feature"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Pro 버전 구매 · %@" : {
       "extractionState" : "stale",
@@ -22401,7 +23402,8 @@
             "value" : "See Pro"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Pro 보기 · 연 %@부터" : {
       "localizations" : {
@@ -22543,7 +23545,8 @@
             "value" : "See Pro · from %@ a year"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Pro로 가져오기" : {
       "localizations" : {
@@ -22685,7 +23688,8 @@
             "value" : "Copy with Pro"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Pro로 추세 보기" : {
       "extractionState" : "stale",
@@ -22826,6 +23830,148 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "See trends with Pro"
+          }
+        }
+      }
+    },
+    "Pro에 포함" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Součást Pro"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med i Pro"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Pro enthalten"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Περιλαμβάνεται στο Pro"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Included in Pro"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Included in Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluido en Pro"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kuuluu Prohon"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclus dans Pro"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termasuk di Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluso in Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proに含まれます"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inkludert i Pro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inbegrepen bij Pro"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W pakiecie Pro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluído no Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Входит в Pro"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingår i Pro"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "รวมอยู่ใน Pro"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro’ya dahil"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có trong Pro"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已含在 Pro 中"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已含在 Pro 中"
           }
         }
       }
@@ -28524,6 +29670,149 @@
             "value" : "Planning, routines, to-dos, reviews, the timer and iPhone sync stay free, and you can see the last 2 weeks of trends for free. Pro unlocks 8-week trends, copying another week, exporting reviews and sharing your schedule. Changed Macs? Restore brings it back."
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "계획·루틴·할 일·회고·타이머·캘린더 가져오기·아이폰과 오가기는 계속 무료이고, 추세도 지난 2주까지는 무료로 보입니다. Plus는 8주 추세와 다른 주 계획 가져오기를, Pro는 여기에 일정 공유를 더합니다. 기기를 바꿨다면 복원으로 되찾습니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plánování, rutiny, úkoly, ohlédnutí, časovač, import z kalendáře a synchronizace s iPhonem zůstávají zdarma a trendy za poslední 2 týdny také uvidíte zdarma. Plus odemyká osmitýdenní trendy a kopírování jiného týdne, Pro k tomu přidává sdílení rozvrhu. Nový Mac? Obnovení nákupu vše vrátí."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planlægning, rutiner, opgaver, gennemgange, timeren, import fra kalenderen og synkronisering med iPhone forbliver gratis, og du kan se tendenserne for de seneste 2 uger gratis. Plus låser op for tendenser over 8 uger og kopiering fra en anden uge, og Pro lægger deling af din plan oveni. Skiftet Mac? Gendan henter det tilbage."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planen, Routinen, Aufgaben, Rückblicke, der Timer, der Kalenderimport und die iPhone-Synchronisierung bleiben kostenlos, und die Trends der letzten 2 Wochen siehst du ebenfalls gratis. Plus schaltet 8-Wochen-Trends und das Kopieren einer anderen Woche frei, Pro dazu das Teilen deines Zeitplans. Neuer Mac? „Wiederherstellen“ holt es zurück."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ο προγραμματισμός, οι ρουτίνες, οι εργασίες, οι ανασκοπήσεις, το χρονόμετρο, η εισαγωγή από το ημερολόγιο και ο συγχρονισμός με το iPhone μένουν δωρεάν, και βλέπεις δωρεάν τις τάσεις των τελευταίων 2 εβδομάδων. Το Plus ξεκλειδώνει τάσεις 8 εβδομάδων και αντιγραφή άλλης εβδομάδας, και το Pro προσθέτει την κοινή χρήση του προγράμματός σου. Άλλαξες Mac; Η επαναφορά το φέρνει πίσω."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning, routines, to-dos, reviews, the timer, calendar import and iPhone sync stay free, and you can see the last 2 weeks of trends for free. Plus unlocks 8-week trends and copying another week; Pro adds schedule sharing. Changed Macs? Restore brings it back."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning, routines, to-dos, reviews, the timer, calendar import and iPhone sync stay free, and you can see the last 2 weeks of trends for free. Plus unlocks 8-week trends and copying another week; Pro adds schedule sharing. Changed Macs? Restore brings it back."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planificar, las rutinas, las tareas, las revisiones, el temporizador, importar del calendario y la sincronización con el iPhone siguen siendo gratis, y puedes ver gratis las tendencias de las últimas 2 semanas. Plus desbloquea las tendencias de 8 semanas y copiar otra semana; Pro añade compartir tu agenda. ¿Has cambiado de Mac? Restaurar lo recupera."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suunnittelu, rutiinit, tehtävät, katsaukset, ajastin, kalenterista tuonti ja iPhone-synkronointi pysyvät ilmaisina, ja kahden viimeisen viikon trendit näet ilmaiseksi. Plus avaa 8 viikon trendit ja toisen viikon kopioinnin, ja Pro lisää aikataulun jakamisen. Vaihdoitko Macia? Palauta tuo sen takaisin."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planification, routines, tâches, bilans, minuteur, import du calendrier et synchronisation avec l’iPhone restent gratuits, et les tendances des 2 dernières semaines aussi. Plus déverrouille les tendances sur 8 semaines et la copie d’une autre semaine ; Pro y ajoute le partage de votre planning. Nouveau Mac ? Restaurer vous le rend."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perencanaan, rutinitas, tugas, tinjauan, timer, impor dari kalender, dan sinkronisasi iPhone tetap gratis, dan tren 2 minggu terakhir bisa dilihat gratis. Plus membuka tren 8 minggu dan menyalin minggu lain, sedangkan Pro menambahkan berbagi jadwal. Ganti Mac? Pulihkan akan mengembalikannya."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pianificazione, routine, attività, revisioni, timer, importazione dal calendario e sincronizzazione con iPhone restano gratuiti, e le tendenze delle ultime 2 settimane sono visibili gratis. Plus sblocca le tendenze di 8 settimane e la copia da un’altra settimana; Pro aggiunge la condivisione del programma. Hai cambiato Mac? Con Ripristina lo recuperi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "予定・ルーティン・やること・振り返り・タイマー・カレンダーからの読み込み・iPhoneとの同期はずっと無料で、推移も直近2週間までは無料で見られます。Plusでは8週間の推移と別の週の予定のコピーが、Proではさらにスケジュールの共有が使えます。Macを替えたら「購入を復元」で戻せます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planlegging, rutiner, oppgaver, gjennomganger, tidtakeren, import fra kalenderen og synkronisering med iPhone er fortsatt gratis, og du kan se trendene for de siste 2 ukene gratis. Plus låser opp trender over 8 uker og kopiering fra en annen uke, og Pro legger til deling av planen din. Byttet Mac? Gjenopprett henter det tilbake."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plannen, routines, taken, terugblikken, de timer, importeren uit de agenda en synchronisatie met de iPhone blijven gratis, en de trends van de afgelopen 2 weken zie je gratis. Plus ontgrendelt trends over 8 weken en een andere week kopiëren; Pro voegt daar je planning delen aan toe. Andere Mac? Via Herstel aankoop krijg je het terug."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planowanie, rutyny, zadania, podsumowania, timer, import z kalendarza i synchronizacja z iPhonem pozostają darmowe, a trendy z ostatnich 2 tygodni też są za darmo. Plus odblokowuje trendy z 8 tygodni i kopiowanie innego tygodnia, a Pro dodaje udostępnianie planu. Nowy Mac? Przywróć zakup."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planejamento, rotinas, tarefas, revisões, o timer, a importação do calendário e a sincronização com o iPhone continuam grátis, e você vê as tendências das últimas 2 semanas de graça. O Plus desbloqueia tendências de 8 semanas e copiar outra semana; o Pro acrescenta o compartilhamento da agenda. Trocou de Mac? Restaurar traz tudo de volta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Планирование, рутины, задачи, итоги, таймер, импорт из календаря и синхронизация с iPhone остаются бесплатными, а тренды за последние 2 недели тоже доступны даром. Plus открывает тренды за 8 недель и копирование другой недели, Pro добавляет общий доступ к расписанию. Сменили Mac? Восстановите покупку."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planering, rutiner, uppgifter, genomgångar, timern, import från kalendern och synkning med iPhone är fortfarande gratis, och trenderna för de senaste 2 veckorna kan du se gratis. Plus låser upp trender för 8 veckor och kopiering från en annan vecka, och Pro lägger till delning av schemat. Bytt Mac? Återställ hämtar tillbaka det."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "การวางแผน กิจวัตร สิ่งที่ต้องทำ การทบทวน ตัวจับเวลา การนำเข้าจากปฏิทิน และการซิงค์กับ iPhone ยังฟรีตลอด และดูแนวโน้ม 2 สัปดาห์ล่าสุดได้ฟรี Plus ปลดล็อกแนวโน้ม 8 สัปดาห์และการคัดลอกสัปดาห์อื่น ส่วน Pro เพิ่มการแชร์ตาราง เปลี่ยน Mac ใหม่ก็กู้คืนได้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planlama, rutinler, görevler, değerlendirmeler, zamanlayıcı, takvimden içe aktarma ve iPhone eşzamanlaması ücretsiz kalır; son 2 haftanın eğilimlerini de ücretsiz görebilirsiniz. Plus 8 haftalık eğilimleri ve başka bir haftayı kopyalamayı açar, Pro buna programınızı paylaşmayı ekler. Mac’inizi mi değiştirdiniz? Geri Yükle ile geri gelir."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lập kế hoạch, thói quen, việc cần làm, nhìn lại, bộ hẹn giờ, nhập từ lịch và đồng bộ với iPhone vẫn miễn phí, và bạn xem miễn phí được xu hướng của 2 tuần gần nhất. Plus mở khóa xu hướng 8 tuần và chép tuần khác, còn Pro thêm chia sẻ lịch. Đổi máy Mac? Khôi phục sẽ lấy lại."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "计划、作息、待办、复盘、计时器、从日历导入以及与 iPhone 同步都持续免费，趋势也能免费查看最近 2 周。Plus 解锁 8 周趋势和导入其他周的计划，Pro 再加上共享日程。换了 Mac？用恢复购买即可找回。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計畫、作息、待辦、回顧、計時器、從行事曆匯入以及與 iPhone 同步都持續免費，趨勢也能免費查看最近 2 週。Plus 解鎖 8 週趨勢和匯入其他週的計畫，Pro 再加上分享行程。換了 Mac？用恢復購買即可找回。"
+          }
+        }
       }
     },
     "계획보다 %@ 넘겼습니다" : {
@@ -31790,7 +33079,8 @@
             "value" : "Subscriptions renew automatically at the same price unless cancelled at least 24 hours before the period ends, and are charged to your Apple Account. Cancel during the free trial and you won’t be charged. Manage or cancel in your App Store account settings."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "구매 복원" : {
       "localizations" : {
@@ -34348,7 +35638,8 @@
             "value" : "Still free"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "그대로 보입니다." : {
       "extractionState" : "stale",
@@ -49412,7 +50703,8 @@
             "value" : "Billed monthly. Cancel anytime."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "달성" : {
       "localizations" : {
@@ -58930,7 +60222,8 @@
             "value" : "Start Free Trial"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "무엇을 할 것인가?" : {
       "extractionState" : "stale",
@@ -59787,6 +61080,148 @@
         }
       }
     },
+    "무지개 공방 Plus · Pro" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Craft Plus · Pro"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊 Plus · Pro"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹工坊 Plus · Pro"
+          }
+        }
+      }
+    },
     "무지개 공방 Pro" : {
       "localizations" : {
         "cs" : {
@@ -59927,7 +61362,8 @@
             "value" : "Rainbow Craft Pro"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "무지개 공방 사용법" : {
       "localizations" : {
@@ -65903,7 +67339,8 @@
             "value" : "What buying opens up"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "사용 통계" : {
       "localizations" : {
@@ -83815,6 +85252,148 @@
         }
       }
     },
+    "연 구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 정가로 자동 갱신되며, Apple 계정으로 결제됩니다. 첫 해 할인은 처음 구독하는 분께 한 번만 적용됩니다. 해지와 관리는 App Store의 계정 설정에서 합니다. 평생은 한 번만 결제하고 갱신되지 않습니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roční předplatné se automaticky obnovuje za plnou cenu, pokud ho nezrušíte nejméně 24 hodin před koncem období, a účtuje se na váš Apple účet. Sleva na první rok platí jen jednou a jen pro nové předplatitele. Spravovat nebo zrušit ho můžete v nastavení účtu v App Storu. Doživotní přístup se platí jednou a neobnovuje se."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Årsabonnementer fornyes automatisk til fuld pris, medmindre de opsiges mindst 24 timer før periodens udløb, og opkræves via din Apple-konto. Rabatten det første år gælder kun én gang og kun for nye abonnenter. Administrer eller opsig i indstillingerne for din App Store-konto. Livstid betales én gang og fornyes aldrig."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jahresabos verlängern sich automatisch zum regulären Preis, sofern sie nicht mindestens 24 Stunden vor Ende des Zeitraums gekündigt werden, und werden über deinen Apple Account abgerechnet. Der Rabatt im ersten Jahr gilt nur einmal und nur für neue Abonnenten. Verwalten oder kündigen kannst du in den Accounteinstellungen des App Store. „Lebenslang“ zahlst du einmal, es verlängert sich nie."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι ετήσιες συνδρομές ανανεώνονται αυτόματα στην κανονική τιμή, εκτός αν ακυρωθούν τουλάχιστον 24 ώρες πριν από τη λήξη της περιόδου, και χρεώνονται στον Λογαριασμό Apple σας. Η έκπτωση του πρώτου έτους ισχύει μία φορά και μόνο για νέους συνδρομητές. Η διαχείριση και η ακύρωση γίνονται από τις ρυθμίσεις του λογαριασμού σας στο App Store. Η επιλογή εφ’ όρου ζωής πληρώνεται μία φορά και δεν ανανεώνεται."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yearly subscriptions renew automatically at the full price unless canceled at least 24 hours before the period ends, and are charged to your Apple Account. The first-year discount applies only once, to first-time subscribers. Manage or cancel in your App Store account settings. Lifetime is a single payment that never renews."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yearly subscriptions renew automatically at the full price unless cancelled at least 24 hours before the period ends, and are charged to your Apple Account. The first-year discount applies only once, to first-time subscribers. Manage or cancel in your App Store account settings. Lifetime is a single payment that never renews."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las suscripciones anuales se renuevan automáticamente al precio normal salvo que se cancelen al menos 24 horas antes de que termine el periodo, y se cobran a tu cuenta de Apple. El descuento del primer año se aplica una sola vez y solo a quien se suscribe por primera vez. Gestiona o cancela la suscripción en los ajustes de tu cuenta del App Store. De por vida es un único pago que no se renueva."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuositilaukset uusiutuvat automaattisesti täyteen hintaan, ellei niitä peruta vähintään 24 tuntia ennen jakson päättymistä, ja ne veloitetaan Apple-tililtäsi. Ensimmäisen vuoden alennus koskee vain uusia tilaajia ja vain kerran. Hallitse tai peru tilaus App Store -tilisi asetuksissa. Elinikäinen maksetaan kerran, eikä se uusiudu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les abonnements annuels se renouvellent automatiquement au prix normal, sauf résiliation au moins 24 heures avant la fin de la période, et sont facturés sur votre compte Apple. La réduction de la première année ne s’applique qu’une fois, aux nouveaux abonnés. Gérez ou résiliez dans les réglages de votre compte App Store. L’option à vie se paie une seule fois et ne se renouvelle pas."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langganan tahunan diperpanjang otomatis dengan harga normal kecuali dibatalkan setidaknya 24 jam sebelum periode berakhir, dan ditagihkan ke Akun Apple Anda. Diskon tahun pertama hanya berlaku sekali untuk pelanggan baru. Kelola atau batalkan di pengaturan akun App Store Anda. Seumur hidup dibayar sekali dan tidak diperpanjang."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gli abbonamenti annuali si rinnovano automaticamente a prezzo pieno, salvo disdetta almeno 24 ore prima della fine del periodo, e vengono addebitati sul tuo Apple Account. Lo sconto del primo anno vale una sola volta, solo per chi si abbona per la prima volta. Gestisci o disdici nelle impostazioni dell’account App Store. L’opzione a vita si paga una volta sola e non si rinnova."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年額プランは、期間終了の24時間前までに解約しない限り通常料金で自動更新され、Apple Accountに請求されます。初年度の割引は初めて登録する方に一度だけ適用されます。管理と解約はApp Storeのアカウント設定で行えます。買い切りは一度の支払いで、更新はありません。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Årsabonnementer fornyes automatisk til full pris med mindre de sies opp minst 24 timer før perioden utløper, og belastes Apple-kontoen din. Rabatten det første året gjelder bare én gang og bare for nye abonnenter. Administrer eller si opp i innstillingene for App Store-kontoen din. Livstid betales én gang og fornyes aldri."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jaarabonnementen worden automatisch verlengd tegen de volle prijs, tenzij je ze minstens 24 uur voor het einde van de periode opzegt, en worden in rekening gebracht via je Apple Account. De korting in het eerste jaar geldt maar één keer, alleen voor nieuwe abonnees. Beheer of zeg op in de accountinstellingen van de App Store. Levenslang betaal je één keer en wordt nooit verlengd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subskrypcja roczna odnawia się automatycznie w pełnej cenie, chyba że anulujesz ją co najmniej 24 godziny przed końcem okresu; opłata pobierana jest z Apple Account. Zniżka na pierwszy rok przysługuje tylko raz i tylko nowym subskrybentom. Zarządzaj subskrypcją lub ją anuluj w ustawieniach konta App Store. Opcję dożywotnią opłacasz raz i nie odnawia się."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As assinaturas anuais renovam automaticamente pelo preço cheio, a menos que sejam canceladas pelo menos 24 horas antes do fim do período, e são cobradas na sua Conta Apple. O desconto do primeiro ano vale uma única vez, só para quem assina pela primeira vez. Gerencie ou cancele nos ajustes da sua conta da App Store. O vitalício é um pagamento único que não se renova."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Годовая подписка продлевается автоматически по полной цене, если не отменить её хотя бы за 24 часа до конца периода, и оплачивается через Apple Account. Скидка на первый год действует один раз и только для новых подписчиков. Управлять подпиской и отменить её можно в настройках учётной записи App Store. Покупка навсегда оплачивается один раз и не продлевается."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Årsprenumerationer förnyas automatiskt till fullt pris om de inte sägs upp senast 24 timmar innan perioden slutar, och debiteras ditt Apple-konto. Rabatten första året gäller bara en gång och bara för nya prenumeranter. Hantera eller säg upp i kontoinställningarna för App Store. Livstid betalas en gång och förnyas aldrig."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "การสมัครสมาชิกรายปีจะต่ออายุอัตโนมัติในราคาปกติ เว้นแต่จะยกเลิกอย่างน้อย 24 ชั่วโมงก่อนสิ้นสุดรอบ และจะเรียกเก็บเงินจากบัญชี Apple ของคุณ ส่วนลดปีแรกใช้ได้ครั้งเดียวสำหรับผู้สมัครครั้งแรกเท่านั้น จัดการหรือยกเลิกได้ในการตั้งค่าบัญชี App Store แบบตลอดชีพจ่ายครั้งเดียวและไม่มีการต่ออายุ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yıllık abonelikler, dönem bitmeden en az 24 saat önce iptal edilmediği sürece tam fiyattan otomatik olarak yenilenir ve Apple Hesabınızdan ücretlendirilir. İlk yıl indirimi yalnızca ilk kez abone olanlara ve yalnızca bir kez uygulanır. App Store hesap ayarlarınızdan yönetin ya da iptal edin. Ömür boyu seçeneği tek seferlik ödemedir ve yenilenmez."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gói đăng ký năm tự động gia hạn với giá gốc trừ khi được hủy ít nhất 24 giờ trước khi kỳ hạn kết thúc, và được tính vào Tài khoản Apple của bạn. Ưu đãi năm đầu chỉ áp dụng một lần cho người đăng ký lần đầu. Quản lý hoặc hủy trong phần cài đặt tài khoản App Store. Gói trọn đời chỉ thanh toán một lần và không gia hạn."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除非在订阅期结束前至少 24 小时取消，否则年度订阅将按原价自动续订，费用从你的 Apple 账户扣除。首年优惠仅限首次订阅者享受一次。可在 App Store 的账户设置中管理或取消订阅。永久版只需付款一次，不会续订。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年度訂閱若未在期間結束前至少 24 小時取消，會以原價自動續訂，並向你的 Apple 帳號收費。首年優惠僅限首次訂閱者使用一次。可在 App Store 的帳號設定中管理或取消訂閱。永久版只需付款一次，不會續訂。"
+          }
+        }
+      }
+    },
     "연간" : {
       "localizations" : {
         "cs" : {
@@ -83955,7 +85534,8 @@
             "value" : "Yearly"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "열 배치" : {
       "localizations" : {
@@ -88080,6 +89660,148 @@
         }
       }
     },
+    "요금제 보기 · 연 %@부터" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazit tarify · od %@ ročně"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se abonnementer · fra %@ om året"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarife ansehen · ab %@ im Jahr"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Προβολή προγραμμάτων · από %@ τον χρόνο"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See plans · from %@ a year"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See plans · from %@ a year"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver planes · desde %@ al año"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katso vaihtoehdot · alkaen %@ vuodessa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir les offres · à partir de %@ par an"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lihat paket · mulai %@ per tahun"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scopri i piani · da %@ all’anno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プランを見る · 年額%@から"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se planer · fra %@ i året"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekijk de opties · vanaf %@ per jaar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobacz plany · od %@ rocznie"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver planos · a partir de %@ por ano"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тарифы · от %@ в год"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visa planer · från %@ per år"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ดูแพ็กเกจ · เริ่มต้น %@ ต่อปี"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planları incele · yıllık %@ itibarıyla"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xem các gói · từ %@ mỗi năm"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看方案 · 每年 %@ 起"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看方案 · 每年 %@ 起"
+          }
+        }
+      }
+    },
     "요금제를 불러오는 중…" : {
       "localizations" : {
         "cs" : {
@@ -90069,7 +91791,8 @@
             "value" : "Monthly"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "월요일" : {
       "localizations" : {
@@ -113251,6 +114974,148 @@
         }
       }
     },
+    "지금 쓰는 중" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš tarif"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I brug nu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller Tarif"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σε χρήση"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current plan"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current plan"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu plan actual"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käytössä nyt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offre actuelle"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sedang dipakai"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piano attuale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用中"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I bruk nå"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu in gebruik"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Używasz teraz"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu plano atual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш тариф"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Används nu"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "กำลังใช้อยู่"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şu an kullanılıyor"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang dùng"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前使用中"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前使用中"
+          }
+        }
+      }
+    },
     "지금 쓰시는 모든 기능은 무료입니다." : {
       "localizations" : {
         "cs" : {
@@ -124762,7 +126627,8 @@
             "value" : "Lifetime"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "평일 09:00부터 9시간" : {
       "localizations" : {
@@ -129452,7 +131318,8 @@
             "value" : "Pay once, keep it. Not a subscription."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "한 번 사면 끝입니다. 구독이 아니고, 같은 Apple 계정의 다른 맥에서도 열립니다." : {
       "extractionState" : "stale",
@@ -135276,7 +137143,8 @@
             "value" : "Billed yearly. Cancel anytime."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "해야 할 일 %lld개 · 남은 것 %lld개" : {
       "localizations" : {
@@ -137123,7 +138991,8 @@
             "value" : "Export reviews"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "회고 완료 · %@" : {
       "localizations" : {
@@ -140249,6 +142118,148 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Placed as a block in the day view"
+          }
+        }
+      }
+    },
+    "일마다 계획보다 얼마나 더 걸리는지는 Plus에서 봅니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kolik déle než podle plánu vám jednotlivé úkoly trvají, uvidíte v Plus."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med Plus kan du se, hvor meget længere hver opgave tager end planlagt."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie viel länger jede Aufgabe als geplant dauert, siehst du mit Plus."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Με το Plus βλέπετε πόσο περισσότερο από το πλάνο διαρκεί κάθε εργασία."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With Plus, see how much longer each task takes than planned."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With Plus, see how much longer each task takes than planned."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con Plus verás cuánto más de lo previsto te lleva cada tarea."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plussalla näet, kuinka paljon suunniteltua kauemmin kukin tehtävä kestää."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec Plus, voyez combien de temps chaque tâche prend en plus du prévu."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dengan Plus, lihat berapa lama tiap tugas melebihi rencana."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con Plus vedi quanto più del previsto richiede ogni attività."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タスクごとに計画よりどれだけ長くかかるかは、Plusで見られます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med Plus ser du hvor mye lenger hver oppgave tar enn planlagt."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Met Plus zie je per taak hoeveel langer die duurt dan gepland."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W Plus zobaczysz, o ile dłużej niż w planie trwa każde zadanie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com o Plus, veja quanto cada tarefa leva a mais do que o planejado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В Plus видно, насколько дольше плана занимает каждое дело."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med Plus ser du hur mycket längre varje uppgift tar än planerat."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ดูว่างานแต่ละอย่างใช้เวลานานกว่าแผนเท่าไรได้ใน Plus"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Her işin plandan ne kadar uzun sürdüğünü Plus ile görürsün."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Với Plus, bạn thấy mỗi việc mất lâu hơn kế hoạch bao nhiêu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每件事比计划多花多久，升级 Plus 即可查看。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每件事比計畫多花多久，升級 Plus 即可查看。"
           }
         }
       }
@@ -143943,7 +145954,8 @@
             "value" : "Save %@"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "월 %@ 꼴" : {
       "localizations" : {
@@ -144085,7 +146097,8 @@
             "value" : "%@/month"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "일마다 계획보다 얼마나 더 걸리는지는 Pro에서 봅니다." : {
       "localizations" : {
@@ -144227,7 +146240,8 @@
             "value" : "With Pro, see how much longer each task takes than planned."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "아직 돌아본 주가 적습니다. 회고가 두 주쯤 쌓인 뒤에 체험하면 추세가 더 많이 보입니다." : {
       "localizations" : {
@@ -144369,7 +146383,8 @@
             "value" : "You’ve reviewed only a few weeks so far. Start the trial after about two weeks of reviews to see more trends."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "VoiceOver로 더 편하게" : {
       "comment" : "Roadmap item: better VoiceOver support",

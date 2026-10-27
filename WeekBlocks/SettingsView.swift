@@ -56,6 +56,8 @@ struct SettingsView: View {
     /// 통계 화면은 남의 기록을 읽는 자리라 이 스위치 뒤에 둔다.
     @AppStorage("dev.masterMode") private var devMode = false
     @State private var showingPaywall = false
+    /// 구독을 평생으로 바꾸는 시트 (→ LeeoGraduationOfferView).
+    @State private var showingGraduation = false
     /// 프로모션 코드 넣는 시트 (→ OfferCode.swift).
     @State private var showingOfferCode = false
 
@@ -357,6 +359,12 @@ struct SettingsView: View {
             await purchases.refresh()
         }
         .sheet(isPresented: $showingPaywall) { PaywallView(reason: "settings") }
+        .sheet(isPresented: $showingGraduation) {
+            LeeoGraduationOfferView(graduate: purchases.graduateProduct) {
+                await purchases.refresh()
+            }
+            .frame(minWidth: 420, minHeight: 420)
+        }
         .offerCodeSheet(isPresented: $showingOfferCode)
         .alert("iCloud에서 다시 받아올까요?", isPresented: $showingRefetchAlert) {
             Button("취소", role: .cancel) { }
@@ -524,16 +532,16 @@ struct SettingsView: View {
         Section {
             HStack {
                 Image(systemName: !purchases.isKnown ? "hourglass"
-                                  : (isPro ? "checkmark.seal.fill" : "leaf"))
-                    .foregroundStyle(isPro ? (Color(hex: Rainbow.indigo) ?? .indigo)
-                                           : (Color(hex: Rainbow.green) ?? .green))
+                                  : (isPaid ? "checkmark.seal.fill" : "leaf"))
+                    .foregroundStyle(isPaid ? (Color(hex: Rainbow.indigo) ?? .indigo)
+                                            : (Color(hex: Rainbow.green) ?? .green))
                 Text("버전")
                 Spacer()
                 // 아직 애플에게 답을 못 받았으면 '무료'라고 단정하지 않는다 —
                 // 산 사람이 첫 실행에서 무료라고 읽으면 그건 거짓말이다.
-                Text(purchases.isKnown ? (isPro ? "Pro" : "무료") : "확인 중…")
-                    .foregroundStyle(isPro ? .primary : .secondary)
-                    .fontWeight(isPro ? .semibold : .regular)
+                Text(tierName)
+                    .foregroundStyle(isPaid ? .primary : .secondary)
+                    .fontWeight(isPaid ? .semibold : .regular)
             }
 
             // 동기화는 값을 받지 않는다고 **적어 둔다.** 한때 이걸 팔려 했던 앱이라,
@@ -547,15 +555,26 @@ struct SettingsView: View {
 
             // **살 수 있을 때만 단추를 낸다** — 그 판정을 플래그가 아니라
             // **상품이 실제로 불러와졌는가**로 한다. 애플이 상품을 내주면 살 수 있는 것이다.
+            // Pro 가 아니면 언제나 위 칸으로 가는 길이 있다 (Plus 를 쓰는 사람에게는 Pro).
             if purchases.offersPro, let product = purchases.featuredProduct, !isPro {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Label("Pro 보기 · 연 \(product.displayPrice)부터", systemImage: "sparkles")
+                    Label("요금제 보기 · 연 \(product.displayPrice)부터", systemImage: "sparkles")
                 }
             }
 
-            if purchases.offersPro, !purchases.products.isEmpty || isPro {
+            // **구독 중일 때만** 평생으로 옮겨 가는 길 (→ LeeoGraduationOfferView).
+            // 구독에 묶였다고 느끼는 사람이 언제든 나갈 수 있어야 한다.
+            if purchases.offersPro, purchases.subscription != nil, !purchases.ownsLifetimePro {
+                Button {
+                    showingGraduation = true
+                } label: {
+                    Label(LeeoLadderText.switchToLifetimeEntry, systemImage: "graduationcap")
+                }
+            }
+
+            if purchases.offersPro, !purchases.products.isEmpty || isPaid {
                 Button {
                     Task { await purchases.restore() }
                 } label: {
@@ -564,7 +583,7 @@ struct SettingsView: View {
                 .disabled(purchases.isWorking)
             }
 
-            // 받은 프로모션 코드를 여기서 바로 쓴다 — 이미 Pro 면 쓸 일이 없다.
+            // 받은 프로모션 코드를 여기서 바로 쓴다. 이미 Pro 면 쓸 일이 없다.
             if purchases.offersPro, !isPro, OfferCode.isAvailable {
                 Button {
                     showingOfferCode = true
@@ -585,11 +604,10 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         } header: {
-            // 팔기 전(출시 빌드)에는 살 것이 없으니 Pro라는 이름을 내걸지 않는다.
-            Text(purchases.offersPro ? "무지개 공방 Pro" : "요금")
+            Text("요금")
         }
         // 사고 나면 단추가 내려가고 문구가 바뀐다. 그 순간이 툭 갈리지 않게.
-        .animation(Motion.disclose, value: isPro)
+        .animation(Motion.disclose, value: purchases.tier)
         .animation(Motion.disclose, value: purchases.failureMessage)
     }
 
@@ -631,15 +649,30 @@ struct SettingsView: View {
         }
     }
 
-    /// Pro를 샀는가 (→ MacEntitlement.swift).
+    /// 지금 칸 (→ MacEntitlement.swift).
     private var isPro: Bool { purchases.isPro }
+    private var isPaid: Bool { purchases.tier > .free }
+
+    /// 아직 애플에게 답을 못 받았으면 '무료'라고 단정하지 않는다.
+    /// 산 사람이 첫 실행에서 무료라고 읽으면 그건 거짓말이다.
+    private var tierName: String {
+        guard purchases.isKnown else { return String(localized: "확인 중…") }
+        switch purchases.tier {
+        case .free: return String(localized: "무료")
+        case .plus: return String(localized: "Plus")
+        case .pro: return String(localized: "Pro")
+        }
+    }
 
     private var tierNote: String {
         if isPro {
-            return String(localized: "8주 추세·다른 주 계획 가져오기·회고 내보내기·일정 공유가 열려 있습니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
+            return String(localized: "Plus의 모든 것과 일정 공유가 열려 있고, 아이폰 앱도 Pro로 열립니다. 같은 Apple 계정의 다른 맥에서도 열립니다.")
+        }
+        if purchases.tier == .plus {
+            return String(localized: "8주 추세와 요일별·시간대별 결, 계획 대비 실제, 다른 주 계획 가져오기가 열려 있습니다. 일정 공유는 Pro에서 엽니다.")
         }
         if purchases.offersPro {
-            return String(localized: "계획·루틴·할 일·회고·타이머·아이폰과 오가기는 계속 무료이고, 추세도 지난 2주까지는 무료로 보입니다. Pro는 8주 추세와 다른 주 계획 가져오기, 회고 내보내기, 일정 공유를 엽니다. 기기를 바꿨다면 복원으로 되찾습니다.")
+            return String(localized: "계획·루틴·할 일·회고·타이머·캘린더 가져오기·아이폰과 오가기는 계속 무료이고, 추세도 지난 2주까지는 무료로 보입니다. Plus는 8주 추세와 다른 주 계획 가져오기를, Pro는 여기에 일정 공유를 더합니다. 기기를 바꿨다면 복원으로 되찾습니다.")
         }
         return String(localized: "지금 쓰시는 모든 기능은 무료입니다.")
     }

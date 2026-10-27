@@ -3,23 +3,83 @@
   "nonRenewingSubscriptions": [],
   "products": [
     {
-      "displayPrice": "59000",
+      "displayPrice": "8.99",
+      "familyShareable": true,
+      "internalID": "160BE520-B03C-4A43-8D16-44577EC27DA6",
+      "localizations": [
+        {
+          "description": "회고 추세 8주와 다른 주 계획 가져오기를 한 번 결제로 계속 씁니다.",
+          "displayName": "무지개 공방 Plus (평생)",
+          "locale": "ko"
+        },
+        {
+          "description": "8-week review trends and copying past weeks, with one payment.",
+          "displayName": "Rainbow Craft Plus (Lifetime)",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.plus",
+      "referenceName": "Plus 평생",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "17.99",
       "familyShareable": true,
       "internalID": "5214ABC8-8962-4B3E-938D-C0DE64DF3221",
       "localizations": [
         {
-          "description": "회고 추세와 계획 대비 실제를 한 번 결제로 계속 씁니다. 아이폰 앱도 함께 열립니다.",
+          "description": "Plus의 모든 것과 일정 공유를 한 번 결제로 계속 씁니다. 아이폰 앱도 함께 열립니다.",
           "displayName": "무지개 공방 Pro (평생)",
           "locale": "ko"
         },
         {
-          "description": "Review trends and plan vs. actual, with one payment. Unlocks the iPhone app too.",
+          "description": "Everything in Plus plus schedule sharing, with one payment. Unlocks the iPhone app too.",
           "displayName": "Rainbow Craft Pro (Lifetime)",
           "locale": "en_US"
         }
       ],
       "productID": "com.devkoan.ScheduleDensityApp.sync",
       "referenceName": "Pro 평생 (예전 '함께 쓰기' 상품을 이어 씀)",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "8.99",
+      "familyShareable": true,
+      "internalID": "28271307-6608-46EC-8151-294C69D6740A",
+      "localizations": [
+        {
+          "description": "Plus 평생을 산 분이 Pro 평생으로 올립니다.",
+          "displayName": "무지개 공방 Pro로 올리기",
+          "locale": "ko"
+        },
+        {
+          "description": "For Plus Lifetime owners: move up to Pro Lifetime.",
+          "displayName": "Upgrade to Rainbow Craft Pro",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.pro.upgrade",
+      "referenceName": "Plus 평생 → Pro 평생",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "12.99",
+      "familyShareable": true,
+      "internalID": "97B318A6-BD4D-4BF3-BED7-A6AAB8B97BA4",
+      "localizations": [
+        {
+          "description": "구독하신 분께만 드리는 Pro 평생입니다.",
+          "displayName": "무지개 공방 Pro 평생 (구독자)",
+          "locale": "ko"
+        },
+        {
+          "description": "Pro Lifetime offered only to subscribers.",
+          "displayName": "Rainbow Craft Pro Lifetime (Subscribers)",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.pro.graduate",
+      "referenceName": "구독 졸업 Pro 평생",
       "type": "NonConsumable"
     }
   ],
@@ -28,44 +88,45 @@
     "_developerTeamID": "QGAQ3AY3R3",
     "_failTransactionsEnabled": false,
     "_lastSynchronizedDate": 0,
-    "_locale": "ko_KR",
-    "_storefront": "KOR",
+    "_locale": "en_US",
+    "_storefront": "USA",
     "_storeKitErrors": []
   },
   "subscriptionGroups": [
     {
       "id": "9636BCA4-12FE-4833-B73C-6949C85818F7",
       "localizations": [],
-      "name": "무지개 공방 Pro",
+      "name": "무지개 공방",
       "subscriptions": [
         {
           "adHocOffers": [],
           "codeOffers": [],
-          "displayPrice": "22000",
+          "displayPrice": "5.99",
           "familyShareable": true,
           "groupNumber": 1,
           "internalID": "E03B4DAF-B0E1-4DA7-942F-F93DBC01F775",
           "introductoryOffer": {
-            "internalID": "110F8202-E7F9-4BF7-B4BA-F73FB542EA5A",
+            "displayPrice": "2.99",
+            "internalID": "480FCBA6-FC75-430B-848C-7A12F5D179F9",
             "numberOfPeriods": 1,
-            "paymentMode": "free",
-            "subscriptionPeriod": "P1W"
+            "paymentMode": "payUpFront",
+            "subscriptionPeriod": "P1Y"
           },
           "localizations": [
             {
-              "description": "회고 추세와 다른 주 계획 가져오기를 엽니다.",
-              "displayName": "무지개 공방 Pro 연간",
+              "description": "Plus의 모든 것과 일정 공유를 엽니다. 아이폰 앱도 함께 열립니다.",
+              "displayName": "무지개 공방 Pro 연 구독",
               "locale": "ko"
             },
             {
-              "description": "Unlocks reflection trends and copying past weeks.",
+              "description": "Everything in Plus plus schedule sharing. Unlocks the iPhone app too.",
               "displayName": "Rainbow Craft Pro Yearly",
               "locale": "en_US"
             }
           ],
           "productID": "com.devkoan.ScheduleDensityApp.pro.yearly",
           "recurringSubscriptionPeriod": "P1Y",
-          "referenceName": "Pro 연간",
+          "referenceName": "Pro 연",
           "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
           "type": "RecurringSubscription",
           "winbackOffers": []
@@ -73,7 +134,7 @@
         {
           "adHocOffers": [],
           "codeOffers": [],
-          "displayPrice": "4400",
+          "displayPrice": "1.99",
           "familyShareable": true,
           "groupNumber": 2,
           "internalID": "6F4606D7-D202-48C1-9279-33DCCF983E28",
@@ -92,7 +153,40 @@
           ],
           "productID": "com.devkoan.ScheduleDensityApp.pro.monthly",
           "recurringSubscriptionPeriod": "P1M",
-          "referenceName": "Pro 월간",
+          "referenceName": "Pro 월 (판매 중지, 권한 유지)",
+          "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "2.99",
+          "familyShareable": true,
+          "groupNumber": 3,
+          "internalID": "A4278F8E-3E60-411B-9803-5DEA5855565D",
+          "introductoryOffer": {
+            "displayPrice": "1.49",
+            "internalID": "A3F3F8DF-30A4-4FC1-94FB-B396DC3E326F",
+            "numberOfPeriods": 1,
+            "paymentMode": "payUpFront",
+            "subscriptionPeriod": "P1Y"
+          },
+          "localizations": [
+            {
+              "description": "회고 추세 8주와 다른 주 계획 가져오기를 엽니다.",
+              "displayName": "무지개 공방 Plus 연 구독",
+              "locale": "ko"
+            },
+            {
+              "description": "Unlocks 8-week review trends and copying past weeks.",
+              "displayName": "Rainbow Craft Plus Yearly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.devkoan.ScheduleDensityApp.plus.yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Plus 연",
           "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
           "type": "RecurringSubscription",
           "winbackOffers": []

@@ -49,6 +49,7 @@
 		73CB0B2619F0AE4E5130903F /* SegmentActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A9E5AA931F9F6D41838D03 /* SegmentActions.swift */; };
 		76C915985969A27F69724084 /* IPhoneCompanionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7825F06D743B533E2C379989 /* IPhoneCompanionView.swift */; };
 		7750BEAC0768CD61182505EE /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B8983B46095E5A0B4F39CE60 /* InfoPlist.xcstrings */; };
+		7A5AA03A00321AC216D90AA0 /* GraduationOffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059A8C64787ACE05D2433A9C /* GraduationOffer.swift */; };
 		7A7A396897A8460DCAB20CC1 /* PlanBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC172BAFFE573306711B4CE /* PlanBlock.swift */; };
 		7D757422C991FA2C9B300591 /* PreDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8A8D7902B2D88193F5F44 /* PreDecision.swift */; };
 		7EE825830848CC825A252ABD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5778B2501CA57BDDA85EEAC9 /* SettingsView.swift */; };
@@ -160,6 +161,7 @@
 
 /* Begin PBXFileReference section */
 		057B281BD7D45DD504A07D00 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		059A8C64787ACE05D2433A9C /* GraduationOffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraduationOffer.swift; sourceTree = "<group>"; };
 		0B332338ED7B9E880F7FBE51 /* Corner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corner.swift; sourceTree = "<group>"; };
 		0DAA819E703DC5BE377B3688 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		10227076947BFE4B02E2B004 /* Soft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Soft.swift; sourceTree = "<group>"; };
@@ -394,6 +396,7 @@
 				482967041DBF8581050A3138 /* DayTimelineView.swift */,
 				86EBBF057E9FC39FB6C47955 /* DeletionMark.swift */,
 				9FF423295556BDAC9E8FB687 /* DurationPicker.swift */,
+				059A8C64787ACE05D2433A9C /* GraduationOffer.swift */,
 				C368657EE69104A4BA70BA52 /* Info.plist */,
 				B8983B46095E5A0B4F39CE60 /* InfoPlist.xcstrings */,
 				7825F06D743B533E2C379989 /* IPhoneCompanionView.swift */,
@@ -821,6 +824,7 @@
 				4101900ED88674F2FA6D1829 /* DayTimelineView.swift in Sources */,
 				A958AF45D346B2BDA38B9869 /* DeletionMark.swift in Sources */,
 				6A311E412B547607487C976E /* DurationPicker.swift in Sources */,
+				7A5AA03A00321AC216D90AA0 /* GraduationOffer.swift in Sources */,
 				76C915985969A27F69724084 /* IPhoneCompanionView.swift in Sources */,
 				4BCB44E639E7BB537DE57CC0 /* LaunchEnvironment.swift in Sources */,
 				8660C861348202D9EAF3D1AC /* MacEntitlement.swift in Sources */,
@@ -1336,7 +1340,7 @@
 			repositoryURL = "https://github.com/M1zz/LeeoKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.20.0;
+				minimumVersion = 3.23.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

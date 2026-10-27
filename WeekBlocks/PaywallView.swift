@@ -2,22 +2,21 @@
 //  PaywallView.swift
 //  WeekBlocks
 //
-//  **「무지개 공방 Pro」를 사는 자리.**
+//  **무료 · Plus · Pro 세 칸을 나란히 보이는 자리** (2026-10 개편).
 //
 //  화면이 먼저 하는 말은 **무엇이 그대로인가**다. 잠긴 것부터 늘어놓으면 앱이 인질처럼
-//  보이는데, 실제로 이 앱의 본체는 잠겨 있지 않다 — 계획도, 루틴도, 적는 것도, 이번 주
-//  회고도, 아이폰과 오가는 것도 값을 안 받는다. 그 사실을 감추면 안 사는 사람이 앱을
-//  못 쓴다고 오해하고 지운다.
+//  보이는데, 실제로 이 앱의 본체는 잠겨 있지 않다. 계획도, 루틴도, 적는 것도, 이번 주
+//  회고와 그 복사도, 아이폰과 오가는 것도 값을 안 받는다. 그래서 무료 칸이 맨 앞에 선다.
 //
-//  값을 받는 것은 **지난 주들이 쌓여야 보이는 것**이다 (→ WeekBlocksSpec.monetization).
+//  값을 받는 것은 **지난 주들이 쌓여야 보이는 것(Plus)** 과 **남에게 내보내고 아이폰까지 여는 것(Pro)** 이다
+//  (→ WeekBlocksSpec.monetization). 유료 칸마다 연 구독과 평생을 고른다(`LeeoTermPicker`).
 //
-//  ⚠️ 구독을 파는 화면이라 심사가 보는 것이 있다: 가격과 기간, 체험 뒤 얼마가 나가는지,
+//  ⚠️ 구독을 파는 화면이라 심사가 보는 것이 있다: 가격과 기간, 첫 해 할인 뒤 얼마가 나가는지,
 //     자동 갱신과 해지 방법, 이용약관·개인정보 처리방침 링크, 구매 복원. 하나라도 빠지면 돌아온다.
 //
 
 import SwiftUI
 import StoreKit
-import SwiftData
 import LeeoKit
 
 struct PaywallView: View {
@@ -28,19 +27,16 @@ struct PaywallView: View {
     /// 어느 문 앞에서 열렸는가 (→ WeekBlocksSpec.Gate). 통계에서 "어디서 사고 싶어졌나"를 가른다.
     var reason: String = "settings"
 
-    /// 고른 상품. 처음엔 연간.
-    @State private var selectedID: String = WeekBlocksSpec.proYearlyID
-    /// 체험을 받을 수 있는 구독 상품들. 이미 한 번 받은 사람에게 '무료 체험'이라고 말하면 거짓말이다.
-    @State private var trialEligible: Set<String> = []
-    /// 회고를 찍어 둔 주가 몇 주인가. 추세는 쌓인 주가 있어야 서므로, 거의 없을 때
-    /// 체험을 시작하면 일주일이 빈 화면으로 지나간다 — 그때만 한 줄 일러 준다.
-    @State private var reviewedWeeks: Int?
+    @State private var plusTerm: LeeoPlanTerm = .yearly
+    @State private var proTerm: LeeoPlanTerm = .yearly
+    /// 첫 해 할인을 받을 수 있는 연 구독. 이미 한 번 받은 사람에게 할인가를 말하면 거짓말이다.
+    @State private var introEligible: Set<String> = []
     /// 프로모션 코드 넣는 시트 (→ OfferCode.swift).
     @State private var showingOfferCode = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("무지개 공방 Pro")
+            Text("무지개 공방 Plus · Pro")
                 .font(.system(size: 24, weight: .bold))
                 .tracking(-0.6)
                 .padding(.bottom, 6)
@@ -48,56 +44,29 @@ struct PaywallView: View {
             Text("지난 주들이 쌓이면 보이는 것을 엽니다.")
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
-                .padding(.bottom, 22)
+                .padding(.bottom, 18)
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text("사면 열리는 것")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                row("stopwatch", "계획 대비 실제",
-                    "계획한 시간 중 해낸 시간, 일마다 계획보다 얼마나 더 걸리는지 봅니다.")
-                row("chart.bar.xaxis", "회고 추세 8주",
-                    "잘 되는 요일과 시간대, 번번이 미루는 일까지. 무료로는 지난 2주가 보입니다.")
-                row("square.on.square", "다른 주 계획 가져오기",
-                    "잘 굴러간 주의 계획을 이번 주에 한 번에 깝니다.")
-                row("doc.on.doc", "회고 내보내기",
-                    "한 주의 회고를 글로 복사해 노트나 보고서에 붙입니다.")
-                row("person.crop.circle.badge.plus", "내 일정 공유",
-                    "내 주간 일정을 보기 전용 링크로 보냅니다.")
-            }
-            .padding(.bottom, 18)
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text("그대로 무료인 것")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                row("calendar", "주간·일간 계획과 루틴, 할 일", "개수 제한 없이 적고 배치합니다.")
-                row("checklist", "회고와 타이머, 다음 첫 동작", "매일 돌아보는 데 값을 받지 않습니다.")
-                row("sunrise", "내일 미리 정하기", "저녁에 내일을 닫고, 아침에 첫 걸음 하나를 봅니다.")
-                row("iphone", "아이폰과 오가기", "같은 Apple 계정이면 양쪽에서 보입니다.")
-            }
-            .padding(.bottom, 20)
-
-            plans
-                .padding(.bottom, 8)
-
-            if let reviewedWeeks, reviewedWeeks < ReflectionTrends.freeWeekCount,
-               trialEligible.contains(selectedID) {
-                Label("아직 돌아본 주가 적습니다. 회고가 두 주쯤 쌓인 뒤에 체험하면 추세가 더 많이 보입니다.",
-                      systemImage: "calendar.badge.clock")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.bottom, 8)
-                    .transition(.disclose)
+            if purchases.products.isEmpty {
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("요금제를 불러오는 중…")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.bottom, 10)
             }
 
-            // 두 앱은 서로 다른 앱이지만, 한쪽에서 산 것이 다른 쪽도 연다 (→ ProMark.swift).
-            // 두 번 사는 줄 알고 망설이는 사람이 가장 오래 쓸 사람이다 — 값 앞에서 말해 둔다.
-            Label("한 번 사면 아이폰 앱도 함께 Pro로 열립니다.", systemImage: "iphone")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .padding(.bottom, 12)
+            HStack(alignment: .top, spacing: 12) {
+                freeCard
+                plusCard
+                proCard
+            }
+            .padding(.bottom, 10)
+
+            // 세 칸 아래 한 줄: 이 개발자의 모든 앱을 평생으로 (→ LeeoForeverPass).
+            LeeoForeverPassLine(pass: purchases.pass, ownsLifetimePro: purchases.ownsLifetimePro)
+            LeeoLifetimePriceNotice()
+                .padding(.bottom, 10)
 
             if let message = purchases.failureMessage {
                 Label(message, systemImage: "exclamationmark.triangle")
@@ -107,77 +76,195 @@ struct PaywallView: View {
                     .transition(.disclose)
             }
 
-            // 단추 넷이 한 줄에 안 들어가면(독일어처럼 말이 긴 언어) 두 줄로 내린다.
-            // 줄여서 넣으면 '구매 복원'이 잘려 무슨 단추인지 모르게 된다.
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 10) {
-                    laterButton
-                    Spacer(minLength: 12)
-                    secondaryButtons
-                    buyButton
-                }
-                VStack(alignment: .trailing, spacing: 10) {
-                    HStack(spacing: 10) {
-                        Spacer(minLength: 0)
-                        secondaryButtons
-                    }
-                    HStack(spacing: 10) {
-                        laterButton
-                        Spacer(minLength: 0)
-                        buyButton
-                    }
-                }
+            HStack(spacing: 10) {
+                Button("나중에") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                Spacer(minLength: 12)
+                secondaryButtons
             }
 
             legal
                 .padding(.top, 12)
         }
         .padding(24)
-        .frame(width: 500)
+        .frame(width: 780)
         .offerCodeSheet(isPresented: $showingOfferCode)
         .animation(Motion.disclose, value: purchases.isWorking)
         .animation(Motion.disclose, value: purchases.failureMessage)
-        .animation(Motion.squish, value: selectedID)
+        .animation(Motion.squish, value: purchases.tier)
         .task {
             // 자체 화면이라 페이월 노출은 여기서 손으로 남긴다. 이게 없으면
             // "안 샀다"와 "볼 기회도 없었다"가 같아진다 (→ Telemetry.swift).
             LeeoAnalyticsCenter.track(.paywallShown(reason: reason))
             if purchases.products.isEmpty { await purchases.loadProducts() }
-            var eligible: Set<String> = []
-            for product in purchases.products {
-                if let sub = product.subscription, sub.introductoryOffer != nil,
-                   await sub.isEligibleForIntroOffer {
-                    eligible.insert(product.id)
+            await loadIntroEligibility()
+        }
+        .onChange(of: purchases.products.map(\.id)) { _, _ in
+            Task { await loadIntroEligibility() }
+        }
+        // 사거나 코드를 써서 칸이 올라갔으면 이 창은 할 일을 다 했다.
+        .onChange(of: purchases.tier) { old, new in
+            if new > old { dismiss() }
+        }
+    }
+
+    // MARK: 칸
+
+    private var freeCard: some View {
+        card(title: "무료", tier: .free) {
+            row("calendar", "주간·일간 계획과 루틴, 할 일", "개수 제한 없이 적고 배치합니다.")
+            row("checklist", "회고와 타이머, 다음 첫 동작", "매일 돌아보는 데 값을 받지 않습니다.")
+            row("doc.on.doc", "이번 주 회고를 글로 복사합니다", "한 주의 회고를 글로 복사해 노트나 보고서에 붙입니다.")
+            row("sunrise", "내일 미리 정하기", "저녁에 내일을 닫고, 아침에 첫 걸음 하나를 봅니다.")
+            row("calendar.badge.plus", "캘린더에서 가져오기")
+            row("iphone", "아이폰과 오가기", "같은 Apple 계정이면 양쪽에서 보입니다.")
+        } footer: {
+            EmptyView()
+        }
+    }
+
+    private var plusCard: some View {
+        card(title: "Plus", tier: .plus) {
+            row("chart.bar.xaxis", "회고 추세 8주",
+                "잘 되는 요일과 시간대, 번번이 미루는 일까지. 무료로는 지난 2주가 보입니다.")
+            row("stopwatch", "계획 대비 실제",
+                "계획한 시간 중 해낸 시간, 일마다 계획보다 얼마나 더 걸리는지 봅니다.")
+            row("square.on.square", "다른 주 계획 가져오기",
+                "잘 굴러간 주의 계획을 이번 주에 한 번에 깝니다.")
+        } footer: {
+            purchaseArea(term: $plusTerm,
+                         yearly: purchases.product(WeekBlocksSpec.plusYearlyID),
+                         lifetime: purchases.product(WeekBlocksSpec.plusLifetimeID),
+                         prominent: false)
+        }
+    }
+
+    private var proCard: some View {
+        card(title: "Pro", tier: .pro, recommended: true) {
+            row("checkmark.circle", "Plus의 모든 것")
+            row("person.crop.circle.badge.plus", "내 일정 공유", "내 주간 일정을 보기 전용 링크로 보냅니다.")
+            // 두 앱은 서로 다른 앱이지만, 한쪽에서 산 Pro 가 다른 쪽도 연다 (→ ProMark.swift).
+            row("iphone", "한 번 사면 아이폰 앱도 함께 Pro로 열립니다.")
+        } footer: {
+            // Plus 평생을 이미 산 사람에게 평생 Pro 는 차액(올리기 상품)이다.
+            purchaseArea(term: $proTerm,
+                         yearly: purchases.product(WeekBlocksSpec.proYearlyID),
+                         lifetime: purchases.product(purchases.ownsPlusLifetime
+                                                     ? WeekBlocksSpec.proUpgradeID
+                                                     : WeekBlocksSpec.proLifetimeID),
+                         prominent: true)
+        }
+    }
+
+    /// 칸 카드 하나. 지금 쓰는 칸이면 테두리를 세우고, 아래 단추 자리에 그 사실을 적는다.
+    private func card<Rows: View, Footer: View>(
+        title: LocalizedStringKey, tier: MacTier, recommended: Bool = false,
+        @ViewBuilder rows: () -> Rows, @ViewBuilder footer: () -> Footer
+    ) -> some View {
+        let current = purchases.isKnown && purchases.tier == tier
+        let included = purchases.tier > tier && tier != .free
+        let shape = RoundedRectangle.soft(Corner.card)
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.system(size: 17, weight: .bold))
+                if recommended, !current {
+                    Text("추천")
+                        .font(.system(size: 10.5, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 1)
+                        .background(Color.accentColor, in: Capsule())
                 }
             }
-            trialEligible = eligible
-            reviewedWeeks = Self.countReviewedWeeks()
+            VStack(alignment: .leading, spacing: 8) { rows() }
+            Spacer(minLength: 0)
+            if current {
+                Label("지금 쓰는 중", systemImage: "checkmark.seal.fill")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.tint)
+            } else if included {
+                Label("Pro에 포함", systemImage: "checkmark")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } else {
+                footer()
+            }
         }
-        // 고른 상품이 목록에 없으면(구독이 아직 승인 전 등) 선 것 중 첫째를 고른다 —
-        // 안 그러면 결제 단추가 아무것도 가리키지 않아 눌러도 안 된다.
-        .onChange(of: purchases.products.map(\.id), initial: true) { _, ids in
-            if !ids.contains(selectedID), let first = ids.first { selectedID = first }
+        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background {
+            shape.fill(recommended ? Color.accentColor.opacity(0.06) : Color.primary.opacity(0.03))
+            shape.strokeBorder(current || recommended ? Color.accentColor : Color.primary.opacity(0.08),
+                               lineWidth: current || recommended ? 1.5 : 1)
         }
-        // 코드를 써서 Pro 가 열렸으면 이 창은 할 일을 다 했다.
-        .onChange(of: purchases.isPro) { _, isPro in
-            if isPro { dismiss() }
+    }
+
+    /// 유료 칸의 아래: 연 구독 / 평생 고르기와 고른 길의 결제 단추.
+    @ViewBuilder
+    private func purchaseArea(term: Binding<LeeoPlanTerm>, yearly: Product?, lifetime: Product?,
+                              prominent: Bool) -> some View {
+        let chosen = term.wrappedValue == .yearly ? yearly : lifetime
+        VStack(alignment: .leading, spacing: 10) {
+            LeeoTermPicker(term: term, yearly: yearly, lifetime: lifetime)
+            Button {
+                guard let chosen else { return }
+                Task { await purchases.purchase(chosen) }
+            } label: {
+                Group {
+                    if purchases.isWorking {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Text(buyTitle(chosen))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .controlSize(.large)
+            .modifier(Prominence(prominent: prominent))
+            .disabled(purchases.isWorking || chosen == nil)
         }
+    }
+
+    private struct Prominence: ViewModifier {
+        let prominent: Bool
+        func body(content: Content) -> some View {
+            if prominent {
+                content.buttonStyle(.borderedProminent).keyboardShortcut(.defaultAction)
+            } else {
+                content.buttonStyle(.bordered)
+            }
+        }
+    }
+
+    /// "₩2,200 결제". 첫 해 할인을 받을 수 있으면 실제로 나갈 할인가를 적는다.
+    private func buyTitle(_ product: Product?) -> String {
+        guard let product else { return String(localized: "계속") }
+        var price = product.displayPrice
+        if introEligible.contains(product.id), let offer = product.subscription?.introductoryOffer,
+           offer.paymentMode == .payUpFront || offer.paymentMode == .payAsYouGo {
+            price = offer.displayPrice
+        }
+        return String(localized: "\(price) 결제")
+    }
+
+    private func loadIntroEligibility() async {
+        var eligible: Set<String> = []
+        for product in purchases.products {
+            if let sub = product.subscription, sub.introductoryOffer != nil,
+               await sub.isEligibleForIntroOffer {
+                eligible.insert(product.id)
+            }
+        }
+        introEligible = eligible
     }
 
     // MARK: 단추
 
-    private var laterButton: some View {
-        Button("나중에") { dismiss() }
-            .keyboardShortcut(.cancelAction)
-    }
-
     @ViewBuilder
     private var secondaryButtons: some View {
         Button("구매 복원") {
-            Task {
-                await purchases.restore()
-                if purchases.isPro { dismiss() }
-            }
+            Task { await purchases.restore() }
         }
         .disabled(purchases.isWorking)
 
@@ -188,212 +275,11 @@ struct PaywallView: View {
         }
     }
 
-    private var buyButton: some View {
-        Button {
-            guard let product = selectedProduct else { return }
-            Task {
-                await purchases.purchase(product)
-                if purchases.isPro { dismiss() }
-            }
-        } label: {
-            if purchases.isWorking {
-                ProgressView().controlSize(.small)
-                    .transition(.opacity)
-            } else {
-                Text(buyTitle)
-                    .transition(.opacity)
-            }
-        }
-        .keyboardShortcut(.defaultAction)
-        .disabled(purchases.isWorking || selectedProduct == nil)
-    }
-
-    // MARK: 요금제
-
-    private var selectedProduct: Product? {
-        purchases.products.first { $0.id == selectedID }
-    }
-
-    @ViewBuilder
-    private var plans: some View {
-        if purchases.products.isEmpty {
-            HStack(spacing: 8) {
-                ProgressView().controlSize(.small)
-                Text("요금제를 불러오는 중…")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, minHeight: 64)
-        } else {
-            VStack(spacing: 8) {
-                ForEach(purchases.products, id: \.id) { product in
-                    planRow(product)
-                }
-            }
-        }
-    }
-
-    private func planRow(_ product: Product) -> some View {
-        let selected = product.id == selectedID
-        let shape = RoundedRectangle.soft(Corner.card)
-        return Button {
-            guard !selected else { return }
-            Haptic.tick()
-            withAnimation(Motion.squish) { selectedID = product.id }
-        } label: {
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: selected ? "largecircle.fill.circle" : "circle")
-                    .font(.system(size: 15))
-                    .foregroundStyle(selected ? Color.accentColor : .secondary)
-                    .contentTransition(.symbolEffect(.replace))
-                    .symbolEffect(.bounce, value: selected)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(planName(product))
-                            .font(.system(size: 14, weight: .semibold))
-                        if product.id == WeekBlocksSpec.proYearlyID {
-                            Text("추천")
-                                .font(.system(size: 10.5, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 1)
-                                .background(Color.accentColor, in: Capsule())
-                            if let saving = yearlySaving(product) {
-                                Text("\(saving) 절약")
-                                    .font(.system(size: 10.5, weight: .semibold))
-                                    .foregroundStyle(Color.accentColor)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 1)
-                                    .background(Color.accentColor.opacity(0.12), in: Capsule())
-                            }
-                        }
-                    }
-                    Text(planNote(product))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 8)
-
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text(product.displayPrice)
-                        .font(.system(size: 15, weight: .semibold))
-                        .monospacedDigit()
-                    if let unit = periodUnit(product) {
-                        Text(unit)
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
-                    }
-                    if let perMonth = perMonthPrice(product) {
-                        Text("월 \(perMonth) 꼴")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    }
-                }
-                .fixedSize()
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background {
-                shape.fill(selected ? Color.accentColor.opacity(0.08) : Color.primary.opacity(0.03))
-                shape.strokeBorder(selected ? Color.accentColor : Color.primary.opacity(0.08),
-                                   lineWidth: selected ? 1.5 : 1)
-            }
-            .contentShape(shape)
-        }
-        .buttonStyle(.squish)
-    }
-
-    private func planName(_ product: Product) -> String {
-        switch product.id {
-        case WeekBlocksSpec.proYearlyID: String(localized: "연간")
-        case WeekBlocksSpec.proLifetimeID: String(localized: "평생")
-        case WeekBlocksSpec.proMonthlyID: String(localized: "월간")
-        default: product.displayName
-        }
-    }
-
-    private func planNote(_ product: Product) -> String {
-        if trialEligible.contains(product.id), let days = trialDays(product) {
-            return String(localized: "\(days)일 무료로 써 보고, 그 뒤에 결제됩니다.")
-        }
-        switch product.id {
-        case WeekBlocksSpec.proLifetimeID: return String(localized: "한 번 결제로 계속 씁니다. 구독이 아닙니다.")
-        case WeekBlocksSpec.proMonthlyID: return String(localized: "달마다 결제되고 언제든 해지합니다.")
-        default: return String(localized: "해마다 결제되고 언제든 해지합니다.")
-        }
-    }
-
-    // MARK: 연간이 얼마나 이득인가
-
-    /// 연간을 열두 달로 나눈 값 ("₩1,833"). 가격만 있으면 연간을 고를 이유가 안 보인다.
-    /// 통화 표기는 상품의 것을 그대로 쓴다 — 나라마다 값과 소수 자리가 다르다.
-    private func perMonthPrice(_ product: Product) -> String? {
-        guard product.id == WeekBlocksSpec.proYearlyID else { return nil }
-        return (product.price / 12).formatted(product.priceFormatStyle)
-    }
-
-    /// 월간으로 열두 달 냈을 때보다 얼마나 싼가 ("39%"). 월간이 안 섰거나 싸지 않으면 말하지 않는다.
-    private func yearlySaving(_ yearly: Product) -> String? {
-        guard let monthly = purchases.products.first(where: { $0.id == WeekBlocksSpec.proMonthlyID }),
-              monthly.price > 0 else { return nil }
-        let ratio = 1 - NSDecimalNumber(decimal: yearly.price / (monthly.price * 12)).doubleValue
-        // 내려 버린다 — 39.1%를 40%라 하면 과장이다.
-        let points = Int((ratio * 100).rounded(.down))
-        guard points >= 5 else { return nil }
-        return (Double(points) / 100).formatted(.percent.precision(.fractionLength(0)))
-    }
-
-    /// 회고를 찍어 둔 주의 수 (→ reviewedWeeks).
-    private static func countReviewedWeeks() -> Int {
-        let blocks = (try? PlanStore.shared.context.fetch(
-            FetchDescriptor<PlanBlock>(predicate: #Predicate { $0.reviewStatusRaw != nil }))) ?? []
-        let cal = Calendar(identifier: .iso8601)
-        return Set(blocks.map { cal.startOfDay(for: $0.weekStartDate) }).count
-    }
-
-    /// "/ 년" · "/ 월". 평생 이용권에는 없다.
-    private func periodUnit(_ product: Product) -> String? {
-        guard let period = product.subscription?.subscriptionPeriod else { return nil }
-        switch period.unit {
-        case .year: return String(localized: "/ 년")
-        case .month: return String(localized: "/ 월")
-        case .week: return String(localized: "/ 주")
-        case .day: return String(localized: "/ 일")
-        @unknown default: return nil
-        }
-    }
-
-    /// 체험 기간을 날수로. 체험이 아닌 할인 제안이면 nil.
-    private func trialDays(_ product: Product) -> Int? {
-        guard let offer = product.subscription?.introductoryOffer,
-              offer.paymentMode == .freeTrial else { return nil }
-        let per = offer.period
-        let unitDays: Int
-        switch per.unit {
-        case .day: unitDays = 1
-        case .week: unitDays = 7
-        case .month: unitDays = 30
-        case .year: unitDays = 365
-        @unknown default: return nil
-        }
-        return per.value * unitDays * max(1, offer.periodCount)
-    }
-
-    private var buyTitle: String {
-        guard let product = selectedProduct else { return String(localized: "계속") }
-        if trialEligible.contains(product.id) { return String(localized: "무료 체험 시작") }
-        return String(localized: "\(product.displayPrice) 결제")
-    }
-
     // MARK: 약관
 
     private var legal: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 같은 요금으로 자동 갱신되며, Apple 계정으로 결제됩니다. 무료 체험 중에 해지하면 요금이 나가지 않습니다. 해지와 관리는 App Store의 계정 설정에서 합니다.")
+            Text("연 구독은 기간이 끝나기 24시간 전까지 해지하지 않으면 정가로 자동 갱신되며, Apple 계정으로 결제됩니다. 첫 해 할인은 처음 구독하는 분께 한 번만 적용됩니다. 해지와 관리는 App Store의 계정 설정에서 합니다. 평생은 한 번만 결제하고 갱신되지 않습니다.")
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -408,16 +294,19 @@ struct PaywallView: View {
         }
     }
 
-    private func row(_ icon: String, _ title: LocalizedStringKey, _ note: LocalizedStringKey) -> some View {
-        HStack(alignment: .top, spacing: 10) {
+    private func row(_ icon: String, _ title: LocalizedStringKey, _ note: LocalizedStringKey? = nil) -> some View {
+        HStack(alignment: .top, spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.tint)
-                .frame(width: 18)
+                .frame(width: 16)
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 14, weight: .medium))
-                Text(note).font(.system(size: 12)).foregroundStyle(.secondary)
+                Text(title).font(.system(size: 13, weight: .medium))
                     .fixedSize(horizontal: false, vertical: true)
+                if let note {
+                    Text(note).font(.system(size: 11.5)).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 0)
         }

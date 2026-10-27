@@ -42,11 +42,10 @@ struct ReflectionView: View {
     /// 화면에 세우는 요일 차례.
     private var shownDays: [DayOfWeek] { DayOfWeek.displayOrder(sundayFirst: weekStartsOnSunday) }
 
-    /// 이번 주를 돌아보는가, 지난 주들을 겹쳐 보는가 (→ ReflectionTrendsView, Pro).
+    /// 이번 주를 돌아보는가, 지난 주들을 겹쳐 보는가 (→ ReflectionTrendsView, Plus).
     enum Tab: Hashable { case week, trends }
     @State private var tab: Tab = .week
     @State private var purchases = PurchaseManager.shared
-    @State private var showingPaywall = false
     /// 방금 복사했다. 단추 글씨가 잠깐 바뀐다 — 조용히 끝나면 눌린 줄도 모른다.
     @State private var copied = false
 
@@ -191,9 +190,6 @@ struct ReflectionView: View {
             }
             .padding(20)
         }
-        .sheet(isPresented: $showingPaywall) {
-            PaywallView(reason: WeekBlocksSpec.Gate.export)
-        }
     }
 
     private func header(_ stats: ReflectionStats) -> some View {
@@ -215,20 +211,20 @@ struct ReflectionView: View {
                     .pickerStyle(.segmented)
                     .labelsHidden()
                     .fixedSize()
-
-                    // 밖으로 내보내는 일은 Pro. 적어 둔 것을 보는 데는 값을 받지 않는다.
-                    Button {
-                        if purchases.isPro { copyWeek() } else { showingPaywall = true }
-                    } label: {
-                        Label(copied ? "복사했습니다" : "내보내기",
-                              systemImage: copied ? "checkmark" : (purchases.isPro ? "doc.on.doc" : "sparkles"))
-                            .font(.body)
-                            .contentTransition(.symbolEffect(.replace))
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(weekBlocks.isEmpty)
-                    .help(purchases.isPro ? "이번 주 회고를 글로 복사합니다" : "Pro 기능입니다")
                 }
+
+                // 이번 주 회고를 글로 복사하는 일은 무료다 (2026-10). 제 기록을 꺼내 쓰는 데 값을 받지 않는다.
+                Button {
+                    copyWeek()
+                } label: {
+                    Label(copied ? "복사했습니다" : "내보내기",
+                          systemImage: copied ? "checkmark" : "doc.on.doc")
+                        .font(.body)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .buttonStyle(.bordered)
+                .disabled(weekBlocks.isEmpty)
+                .help("이번 주 회고를 글로 복사합니다")
             }
 
             if tab == .week || !purchases.offersPro {

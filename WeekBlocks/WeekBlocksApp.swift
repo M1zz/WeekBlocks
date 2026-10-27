@@ -161,6 +161,8 @@ struct WeekBlocksApp: App {
                 .whatsNewOnUpdate()
                 // 사람이 지우지 않았는데 없어진 것이 있으면 되살릴지 묻는다 (→ VaultMonitor.swift).
                 .vaultRecoveryPrompt()
+                // 구독 중이면 6개월째 · 갱신 7일 전에 한 번 평생가를 보인다 (→ GraduationOffer.swift).
+                .graduationOfferOnLaunch()
                 // 다른 앱에서 공유한 할 일 받기. 공유 익스텐션은 SwiftData에 직접 못 쓰고
                 // App Group에 쌓아만 두므로, 앱이 켜지고 앞으로 나올 때 그 상자를 비운다.
                 // 받은 할 일은 할 일 스토어로 들어간다.
