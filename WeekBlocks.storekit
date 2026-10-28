@@ -81,6 +81,26 @@
       "productID": "com.devkoan.ScheduleDensityApp.pro.graduate",
       "referenceName": "구독 졸업 Pro 평생",
       "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "17.99",
+      "familyShareable": false,
+      "internalID": "61B84B0F-AB8B-4E08-AD16-9858D724FD23",
+      "localizations": [
+        {
+          "description": "다른 사람에게 Pro 를 선물합니다. 코드를 보내 주세요.",
+          "displayName": "무지개 공방 Pro 선물",
+          "locale": "ko"
+        },
+        {
+          "description": "Give Pro to someone else with a gift code.",
+          "displayName": "Gift Rainbow Craft Pro",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.gift.pro",
+      "referenceName": "Gift Pro",
+      "type": "Consumable"
     }
   ],
   "settings": {

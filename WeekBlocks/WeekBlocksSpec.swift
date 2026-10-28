@@ -65,7 +65,15 @@ enum WeekBlocksSpec: LeeoAppSpec {
             gate: LeeoGatePolicy(
                 // 무료로도 **써 보고 알 만큼**은 연다: 지난 2주 추세는 그냥 보인다.
                 freeLimits: [Gate.trendWeeks: ReflectionTrends.freeWeekCount],
-                proOnly: [Gate.trends, Gate.weekCopy, Gate.share])
+                proOnly: [Gate.trends, Gate.weekCopy, Gate.share]),
+            // Pro 선물하기. 보내는 사람은 소모성 선물 상품을 사고, 받는 사람은 Pro 평생을 산 것과 같아진다.
+            // 선물 기록은 피드백과 같은 허브 컨테이너의 공개 DB 에 둔다. WeekBlocks.entitlements 에 이미 있다.
+            // ⚠️ 선물 상품은 productIDs · entitlementIDs 에 넣지 않는다. 넣으면 선물을 산 사람이 Pro 가 된다.
+            gift: LeeoGiftConfig(
+                productID: giftProductID,
+                grantsProductID: proLifetimeID,
+                containerIdentifier: "iCloud.com.Ysoup.FeedbackHub"
+            )
         )
     )
 
@@ -88,6 +96,11 @@ enum WeekBlocksSpec: LeeoAppSpec {
 
     /// 예전 '함께 쓰기'(비소모성). 지금은 Pro 평생 이용권이다 (→ proLifetimeID).
     static let legacySyncProductID = "com.devkoan.ScheduleDensityApp.sync"
+
+    /// Pro 선물 (소모성). 산 사람이 아니라 **코드를 받은 사람**에게 Pro 평생(`proLifetimeID`)을 연다(`LeeoGiftStore`).
+    /// ⚠️ `saleProductIDs` · 권한 목록에 넣지 않는다 — 넣으면 선물을 산 사람이 Pro 가 되고, 결제가 코드 없이 끝난다.
+    /// App Store Connect 에 소모성 상품으로 만들어야 뜬다. 없으면 설정의 선물 줄이 숨는다.
+    static let giftProductID = "com.devkoan.ScheduleDensityApp.gift.pro"
 
     /// 불러올 상품. 페이월의 칸 차례(Plus 연 → Plus 평생 → Pro 연 → Pro 평생)에 올리기 · 졸업이 붙는다.
     static let saleProductIDs = [plusYearlyID, plusLifetimeID, proYearlyID, proLifetimeID,

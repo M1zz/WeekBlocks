@@ -30,7 +30,7 @@ extension WeekBlocksSpec {
         .init(id: "whatsnew", status: .shipped("1.1.13"),
               title: String(localized: "업데이트 소식", comment: "Roadmap item: what's new after an update"),
               detail: String(localized: "업데이트 뒤 처음 열 때 무엇이 새로 생겼는지 알려 줘요.", comment: "Roadmap item detail: what's new after an update")),
-        .init(id: "gift", status: .planned,
+        .init(id: "gift", status: .building,
               title: String(localized: "Pro 선물하기", comment: "Roadmap item: gift Pro"),
               detail: String(localized: "무지개 공방 Pro를 다른 사람에게 선물할 수 있어요.", comment: "Roadmap item detail: gift Pro")),
         .init(id: "shortcuts", status: .planned,
