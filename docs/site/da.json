@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: ugeplanlæggeren til Mac, der starter med dine faste rutiner",
+  "description": "Læg først søvn, måltider og arbejde ind, og træk så opgaverne ind i de timer, der reelt er tilbage. Se hvad ugen kan rumme, før du siger ja.",
+  "hero": {
+    "headline": "Kan det hele virkelig\nnås i denne uge?",
+    "lead": "Rainbow Craft lægger din uge ud på Mac’en dag for dag og time for time. Start med den tid, du ikke kan give slip på, som søvn, måltider og arbejde, træk opgaverne ind i hullerne og se, hvad der faktisk kan være der.",
+    "cta": "Hent gratis i Mac App Store",
+    "note": "Planlægning, rutiner, opgaver, gennemgang, timer og kalenderimport er gratis."
+  },
+  "demo": {
+    "title": "Planlæg en uge her",
+    "lead": "Vi har lagt de fire rutiner ind, som appen foreslår første gang, du åbner den. Slå dem til og fra, og læg opgaver på dagene.",
+    "routinesLabel": "Faste rutiner",
+    "routines": [
+      {
+        "name": "Søvn",
+        "detail": "Hver dag, 8 timer fra kl. 23.00"
+      },
+      {
+        "name": "Måltider",
+        "detail": "17,5 timer om ugen · tre om dagen"
+      },
+      {
+        "name": "Arbejde · skole",
+        "detail": "Hverdage, 9 timer fra kl. 09.00"
+      },
+      {
+        "name": "Motion",
+        "detail": "Man, ons, fre, 1 time"
+      }
+    ],
+    "week": "Uge",
+    "fixed": "Faste rutiner",
+    "planned": "Planlagt",
+    "left": "Tilbage",
+    "h": "{n} t",
+    "dayLeft": "{h} tilbage",
+    "todos": [
+      "Udkast til tilbud",
+      "Ring til tandlægen",
+      "Flyttetilbud",
+      "Gennemgå PR’er",
+      "Læs et kapitel"
+    ],
+    "hint": "Træk en opgave hen på en dag, eller klik på opgaven og så på dagen. Klik på en placeret opgave for at sende den tilbage til listen. Hver dags regnbue fylder ét felt pr. opgave.",
+    "allPlaced": "Alt er placeret. Klik på en opgave i en dag for at hente den tilbage."
+  },
+  "problem": {
+    "title": "Listen vokser. Ugen gør ikke.",
+    "text": "En opgaveliste fortæller ikke, om din uge kan rumme den. Når søvn, mad og transport har taget deres del, er der mindre tilbage, end du tror. Rainbow Craft viser de timer som tal og felter og lader dig prøve hver opgave af på en rigtig plads."
+  },
+  "features": [
+    {
+      "title": "Se en dag på en 24-timers lineal",
+      "text": "Tidslinjevisningen lægger dagen ud på en lineal over 24 timer. Huller og overlap springer i øjnene, og du vælger, hvordan overlappende aftaler placeres.\nHent møder og aftaler fra Kalender på Mac’en i stedet for at skrive dem to gange. Hvis du vil, kan planerne også ryge i en separat Rainbow Craft-kalender, som du ser på iPhonen. Dine andre kalendere bliver aldrig ændret.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Del store opgaver op i trin, der bliver færdige",
+      "text": "Store opgaver går i stå, når noget stadig står i vejen. Appen stiller to spørgsmål til hvert trin: Kan du gå i gang uden opvarmning? Kan det klares på fem minutter?\nDet, der består begge, er en stump, du kan tage, når der opstår fem ledige minutter. Resten kræver afsat tid. Tager appen fejl, bestemmer du.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Hvad du er i gang med, og hvor længe endnu",
+      "text": "Når starttiden kommer, skifter planen til i gang, og når tiden er gået, spørger appen, om du blev færdig. Timeren følger din plan.\nWidgetten Nu-timer viser, hvad du laver, og hvor meget tid der er tilbage, uden at du åbner appen.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Luk ugen med en tjekliste",
+      "text": "Ugegennemgangen er ét kort pr. dag. Markér, hvad du nåede, halvt nåede eller sprang over, og brug det til at planlægge næste uge.\nMed samme iCloud-konto går opgaverne frem og tilbage mellem denne app og Rainbow of Desire på iPhone, så dagen, du planlagde på Mac’en, er med dig ude.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Kom i gang i tre trin",
+    "items": [
+      {
+        "title": "Læg de faste timer ind",
+        "text": "Det, der kommer igen hver uge, som søvn, måltider og arbejde, bliver til rutiner. Appen udfylder intet for dig."
+      },
+      {
+        "title": "Skriv dine opgaver",
+        "text": "Én pr. linje under Opgaver nederst. Hvornår du gør dem, behøver du ikke vide endnu."
+      },
+      {
+        "title": "Træk dem hen på dagene",
+        "text": "Lagt på en dag bliver det en plan. Rykker datoen? Træk den til en anden dag eller tilbage på listen."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Regnestykket med de foreslåede rutiner",
+    "rows": [
+      [
+        "En uge",
+        "168 timer"
+      ],
+      [
+        "Søvn · 8 timer om dagen",
+        "56 timer"
+      ],
+      [
+        "Måltider · tre om dagen",
+        "17,5 timer"
+      ],
+      [
+        "Arbejde · skole · 9 timer på hverdage",
+        "45 timer"
+      ],
+      [
+        "Motion · 1 time man, ons, fre",
+        "3 timer"
+      ],
+      [
+        "Tid, du reelt har i denne uge",
+        "46,5 timer"
+      ]
+    ],
+    "note": "Det er kun forslag. Vælg og tilpas rutinerne til dit liv. På ferie- eller rejsedage fjerner du blot arbejdet fra netop den dag."
+  },
+  "pricing": {
+    "title": "Alt, du behøver for at leve denne uge, er gratis",
+    "free": {
+      "name": "Gratis",
+      "items": [
+        "Uge- og dagsplaner, rutiner og opgaver uden grænse",
+        "Tidslinjevisning og opdeling i trin",
+        "Ugegennemgang, som også kan kopieres som tekst",
+        "Timer og Nu-timer-widget",
+        "Kalenderimport",
+        "Synkronisering med Rainbow of Desire på iPhone",
+        "Tendenser for de seneste 2 uger"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: tendenser over 8 uger, dine bedste dage og tidspunkter",
+        "Plus: plan og virkelighed side om side",
+        "Plus: læg planen fra en god uge ind i denne uge på én gang",
+        "Pro: alt i Plus og deling af din plan via et skrivebeskyttet link",
+        "Pro: ét køb låser også Pro op i iPhone-appen"
+      ],
+      "note": "Hvert niveau som årsabonnement eller ét køb for altid"
+    },
+    "note": "Priserne står i appen og i App Store. Årsabonnementet fornyes automatisk, medmindre du opsiger det senest 24 timer før periodens udløb. Pro købt på iPhone gælder også på en Mac med samme iCloud-konto."
+  },
+  "faq": {
+    "title": "Ofte stillede spørgsmål",
+    "items": [
+      {
+        "q": "Skal jeg være logget ind på iCloud?",
+        "a": "Ikke hvis du kun bruger den på Mac’en. Det kræves for at synkronisere med iPhonen og dele din plan."
+      },
+      {
+        "q": "Ændrer appen mine kalendere?",
+        "a": "Aldrig dem, du allerede har. Importen læser kun de kalendere, du vælger. Slår du skrivning til Rainbow Craft-kalenderen til, opretter appen den separate kalender og skriver kun dér. Du kan til enhver tid slette den i appen Kalender."
+      },
+      {
+        "q": "Opgaver fra Mac’en dukker ikke op på iPhonen.",
+        "a": "Tjek, at begge enheder bruger samme iCloud-konto, og at Rainbow of Desire er installeret på iPhonen. Synkroniseringen går via iCloud og kan tage et par minutter."
+      },
+      {
+        "q": "Lukker appen, når jeg lukker vinduet?",
+        "a": "Nej. Appen kører videre. Åbn vinduet igen fra menuen Vindue eller ved at klikke på ikonet i Dock."
+      },
+      {
+        "q": "Hvad sker der med mine opgaver og planer ved en opdatering?",
+        "a": "De bliver præcis, som de er. Opdateringer ændrer eller sletter ikke noget, du har skrevet."
+      },
+      {
+        "q": "Hvordan skifter jeg appens sprog?",
+        "a": "Vælg det øverst i Indstillinger under Language · 언어 · 語言, så åbner appen igen på det sprog. Der er 23 sprog. Rutinenavne og opgaver, du selv har skrevet, oversættes ikke."
+      },
+      {
+        "q": "Ny Mac, og Plus eller Pro er væk.",
+        "a": "Log ind med samme Apple-konto, og klik på Gendan køb i Indstillinger. Opsigelse sker i dine kontoindstillinger i App Store."
+      },
+      {
+        "q": "Hvor gemmes det, jeg skriver?",
+        "a": "Ingen konto, ingen tilmelding og ingen udviklerserver med dine planer. Det, du skriver, bliver på dine enheder og i din egen iCloud. Appen sender anonym brugsstatistik uden dit indhold, og du kan slå det fra i Indstillinger under Send anonym brugsstatistik."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Læg ugens opgaver der,\nhvor de faktisk kan være",
+    "cta": "Hent gratis i Mac App Store"
+  },
+  "ui": {
+    "skip": "Gå til indhold",
+    "languages": "Sprog",
+    "privacy": "Privatlivspolitik",
+    "contact": "Sidder du fast, eller er der noget galt? Skriv til {email}. Du kan også kontakte os fra appens indstillinger."
+  }
+}

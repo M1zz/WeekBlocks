@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: lịch tuần trên Mac bắt đầu từ thói quen cố định",
+  "description": "Đặt giấc ngủ, bữa ăn và công việc trước, rồi kéo việc cần làm vào những giờ thật sự còn lại. Xem tuần này chứa được gì trước khi nhận lời.",
+  "hero": {
+    "headline": "Tuần này có thật sự\nchứa hết được không?",
+    "lead": "Rainbow Craft trải tuần của bạn trên Mac theo từng ngày, từng giờ. Bắt đầu từ khoảng thời gian không thể bỏ, như ngủ, ăn và làm việc, kéo việc cần làm vào các khoảng trống còn lại và xem việc nào thật sự vừa.",
+    "cta": "Tải miễn phí trên Mac App Store",
+    "note": "Lập kế hoạch, thói quen, việc cần làm, nhìn lại tuần, hẹn giờ và nhập lịch đều miễn phí."
+  },
+  "demo": {
+    "title": "Thử xếp một tuần ngay tại đây",
+    "lead": "Chúng tôi đã đặt sẵn bốn thói quen mà ứng dụng gợi ý khi mở lần đầu. Bật tắt từng thói quen rồi đặt việc vào các ngày.",
+    "routinesLabel": "Thói quen cố định",
+    "routines": [
+      {
+        "name": "Ngủ",
+        "detail": "Hằng ngày, 8 giờ từ 23:00"
+      },
+      {
+        "name": "Bữa ăn",
+        "detail": "17,5 giờ mỗi tuần · ba bữa mỗi ngày"
+      },
+      {
+        "name": "Công việc · học tập",
+        "detail": "Ngày thường, 9 giờ từ 09:00"
+      },
+      {
+        "name": "Tập thể dục",
+        "detail": "T2, T4, T6, 1 giờ"
+      }
+    ],
+    "week": "Một tuần",
+    "fixed": "Thói quen cố định",
+    "planned": "Đã lên kế hoạch",
+    "left": "Còn lại",
+    "h": "{n} giờ",
+    "dayLeft": "còn {h}",
+    "todos": [
+      "Nháp bản đề xuất",
+      "Gọi đặt lịch nha sĩ",
+      "So giá chuyển nhà",
+      "Xem lại PR",
+      "Đọc một chương sách"
+    ],
+    "hint": "Kéo một việc vào một ngày, hoặc bấm vào việc rồi bấm vào ngày. Bấm vào việc đã đặt để đưa nó về danh sách. Cầu vồng của mỗi ngày tô một ô cho mỗi việc.",
+    "allPlaced": "Đã đặt hết. Bấm vào một việc trong ngày để lấy lại."
+  },
+  "problem": {
+    "title": "Danh sách cứ dài ra, còn tuần thì không.",
+    "text": "Một danh sách việc cần làm không cho bạn biết tuần này có gánh nổi nó không. Sau khi giấc ngủ, bữa ăn và đường đi đã lấy phần của chúng, thời gian còn lại ít hơn bạn nghĩ. Rainbow Craft cho bạn thấy số giờ đó bằng con số và ô vuông, và để bạn thử từng việc ở một chỗ thật."
+  },
+  "features": [
+    {
+      "title": "Xem một ngày trên thước 24 giờ",
+      "text": "Chế độ dòng thời gian trải một ngày lên thước 24 giờ. Khoảng trống và chỗ chồng lấn hiện ra ngay, và bạn chọn cách sắp xếp những việc chồng lên nhau.\nLấy cuộc họp và cuộc hẹn từ ứng dụng Lịch trên Mac mà không phải gõ lại. Nếu muốn, kế hoạch còn được ghi vào một lịch Rainbow Craft riêng mà bạn xem được trên iPhone. Các lịch khác không bao giờ bị thay đổi.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Chia việc lớn thành những bước làm xong được",
+      "text": "Việc lớn hay bị kẹt khi vẫn còn thứ gì đó cản đường. Ứng dụng hỏi hai điều cho mỗi bước: có thể bắt đầu ngay không cần khởi động? Có xong trong năm phút không?\nBước nào đạt cả hai là một mảnh nhỏ để làm mỗi khi rảnh năm phút. Phần còn lại cần thời gian dành riêng. Ứng dụng đoán sai thì bạn quyết.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Đang làm gì, còn bao lâu",
+      "text": "Đến giờ bắt đầu, kế hoạch chuyển sang đang làm, và khi hết giờ ứng dụng hỏi bạn đã xong chưa. Bộ hẹn giờ chạy theo thời gian biểu của bạn.\nWidget Bộ hẹn giờ Hiện tại cho thấy việc đang làm và thời gian còn lại mà không cần mở ứng dụng.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Khép lại tuần bằng một danh sách đánh dấu",
+      "text": "Nhìn lại tuần gồm mỗi ngày một thẻ. Đánh dấu việc đã xong, xong một nửa hay bỏ qua, rồi dùng nó để lên kế hoạch tuần sau.\nCùng một tài khoản iCloud, việc cần làm đi lại giữa ứng dụng này và Rainbow of Desire trên iPhone, nên kế hoạch hôm nay xếp trên Mac luôn theo bạn ra ngoài.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Bắt đầu chỉ với ba bước",
+    "items": [
+      {
+        "title": "Đặt những giờ cố định",
+        "text": "Những gì lặp lại mỗi tuần như ngủ, ăn và làm việc thì đặt thành thói quen. Ứng dụng không tự điền gì thay bạn."
+      },
+      {
+        "title": "Ghi việc cần làm",
+        "text": "Mỗi dòng một việc trong mục Việc cần làm ở dưới. Chưa cần quyết định khi nào làm."
+      },
+      {
+        "title": "Kéo vào các ngày",
+        "text": "Thả vào một ngày là thành kế hoạch. Ngày bị lệch? Kéo sang ngày khác hoặc về lại danh sách."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Tính thử với các thói quen được gợi ý",
+    "rows": [
+      [
+        "Một tuần",
+        "168 giờ"
+      ],
+      [
+        "Ngủ · 8 giờ mỗi ngày",
+        "56 giờ"
+      ],
+      [
+        "Bữa ăn · ba bữa mỗi ngày",
+        "17,5 giờ"
+      ],
+      [
+        "Công việc · học tập · 9 giờ ngày thường",
+        "45 giờ"
+      ],
+      [
+        "Tập thể dục · 1 giờ T2, T4, T6",
+        "3 giờ"
+      ],
+      [
+        "Thời gian bạn thật sự có trong tuần này",
+        "46,5 giờ"
+      ]
+    ],
+    "note": "Đây chỉ là gợi ý. Hãy chọn và chỉnh thói quen cho hợp với cuộc sống của bạn. Ngày nghỉ phép hay đi công tác, chỉ cần bỏ phần công việc của riêng ngày đó."
+  },
+  "pricing": {
+    "title": "Mọi thứ cần cho tuần này đều miễn phí",
+    "free": {
+      "name": "Miễn phí",
+      "items": [
+        "Kế hoạch tuần và ngày, thói quen và việc cần làm không giới hạn",
+        "Dòng thời gian và chia bước",
+        "Nhìn lại tuần, có thể sao chép thành văn bản",
+        "Hẹn giờ và widget Bộ hẹn giờ Hiện tại",
+        "Nhập từ lịch",
+        "Đồng bộ với Rainbow of Desire trên iPhone",
+        "Xu hướng 2 tuần gần nhất"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: xu hướng 8 tuần, ngày và khung giờ bạn làm tốt nhất",
+        "Plus: kế hoạch và thực tế",
+        "Plus: áp nguyên kế hoạch của một tuần suôn sẻ vào tuần này",
+        "Pro: mọi thứ của Plus và chia sẻ lịch bằng liên kết chỉ xem",
+        "Pro: mua một lần, ứng dụng iPhone cũng mở Pro"
+      ],
+      "note": "Mỗi gói có thể đăng ký theo năm hoặc mua một lần dùng trọn đời"
+    },
+    "note": "Xem giá trong ứng dụng và trên App Store. Gói năm tự động gia hạn trừ khi bạn hủy ít nhất 24 giờ trước khi hết kỳ. Pro mua trên iPhone cũng dùng được trên Mac cùng tài khoản iCloud."
+  },
+  "faq": {
+    "title": "Câu hỏi thường gặp",
+    "items": [
+      {
+        "q": "Có bắt buộc đăng nhập iCloud không?",
+        "a": "Không, nếu bạn chỉ dùng trên Mac. Cần iCloud để đồng bộ với iPhone và chia sẻ lịch."
+      },
+      {
+        "q": "Ứng dụng có sửa lịch của tôi không?",
+        "a": "Không bao giờ sửa các lịch sẵn có. Nhập lịch chỉ đọc những lịch bạn chọn. Nếu bật ghi kế hoạch vào lịch Rainbow Craft, ứng dụng tạo lịch riêng đó và chỉ ghi vào đó. Bạn có thể xóa nó bất cứ lúc nào trong ứng dụng Lịch."
+      },
+      {
+        "q": "Việc viết trên Mac không hiện trên iPhone.",
+        "a": "Hãy kiểm tra hai thiết bị dùng cùng tài khoản iCloud và iPhone đã cài Rainbow of Desire. Đồng bộ đi qua iCloud nên có thể mất vài phút."
+      },
+      {
+        "q": "Đóng cửa sổ có thoát ứng dụng không?",
+        "a": "Không. Ứng dụng vẫn chạy. Mở lại cửa sổ từ menu Cửa sổ hoặc bấm vào biểu tượng trên Dock."
+      },
+      {
+        "q": "Cập nhật xong thì việc và kế hoạch của tôi ra sao?",
+        "a": "Vẫn y nguyên. Bản cập nhật không đổi hay xóa những gì bạn đã viết."
+      },
+      {
+        "q": "Đổi ngôn ngữ ứng dụng thế nào?",
+        "a": "Chọn ở trên cùng phần Cài đặt, mục Language · 언어 · 語言, ứng dụng sẽ mở lại bằng ngôn ngữ đó. Có 23 ngôn ngữ. Tên thói quen và việc bạn tự viết sẽ không được dịch."
+      },
+      {
+        "q": "Đổi Mac mới thì mất Plus hoặc Pro.",
+        "a": "Đăng nhập cùng Tài khoản Apple rồi bấm Khôi phục giao dịch mua trong Cài đặt. Muốn hủy, vào phần cài đặt tài khoản trên App Store."
+      },
+      {
+        "q": "Những gì tôi viết được lưu ở đâu?",
+        "a": "Không tài khoản, không đăng ký, không có máy chủ của nhà phát triển giữ kế hoạch của bạn. Những gì bạn viết nằm trên thiết bị và trong iCloud của chính bạn. Ứng dụng gửi thống kê sử dụng ẩn danh không chứa nội dung bạn viết, và bạn có thể tắt trong Cài đặt ở mục Gửi thống kê sử dụng ẩn danh."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Đặt việc của tuần này\nvào đúng chỗ chúng vừa",
+    "cta": "Tải miễn phí trên Mac App Store"
+  },
+  "ui": {
+    "skip": "Đến nội dung chính",
+    "languages": "Ngôn ngữ",
+    "privacy": "Chính sách quyền riêng tư",
+    "contact": "Bị vướng hay thấy điều gì lạ? Hãy viết cho chúng tôi qua {email}. Trong phần cài đặt của ứng dụng cũng có mục liên hệ."
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: planner semanal para Mac que começa pelas rotinas fixas",
+  "description": "Primeiro coloque sono, refeições e trabalho; depois arraste as tarefas para as horas que sobram de verdade. Veja o que cabe na semana antes de assumir compromisso.",
+  "hero": {
+    "headline": "Cabe mesmo tudo\nnesta semana?",
+    "lead": "O Rainbow Craft abre a sua semana por dia e por hora no Mac. Comece pelo tempo de que você não abre mão, como sono, refeições e trabalho, arraste as tarefas para os espaços livres e veja o que realmente cabe.",
+    "cta": "Baixe grátis na Mac App Store",
+    "note": "Planejamento, rotinas, tarefas, revisão, timer e importação da agenda são grátis."
+  },
+  "demo": {
+    "title": "Planeje uma semana aqui mesmo",
+    "lead": "Colocamos as quatro rotinas que o app sugere na primeira abertura. Ligue e desligue cada uma e solte tarefas nos dias.",
+    "routinesLabel": "Rotinas fixas",
+    "routines": [
+      {
+        "name": "Sono",
+        "detail": "Todos os dias, 8 horas a partir das 23:00"
+      },
+      {
+        "name": "Refeições",
+        "detail": "17,5 horas por semana · três ao dia"
+      },
+      {
+        "name": "Trabalho · estudos",
+        "detail": "Dias úteis, 9 horas a partir das 09:00"
+      },
+      {
+        "name": "Exercício",
+        "detail": "Seg, qua e sex, 1 hora"
+      }
+    ],
+    "week": "Semana",
+    "fixed": "Rotinas fixas",
+    "planned": "Planejado",
+    "left": "Sobra",
+    "h": "{n} h",
+    "dayLeft": "sobram {h}",
+    "todos": [
+      "Rascunho da proposta",
+      "Ligar para o dentista",
+      "Orçamento de mudança",
+      "Revisar PRs abertos",
+      "Ler um capítulo"
+    ],
+    "hint": "Arraste uma tarefa para um dia, ou clique na tarefa e depois no dia. Clique numa tarefa já colocada para devolvê-la à lista. O arco-íris de cada dia preenche um quadrinho por tarefa.",
+    "allPlaced": "Tudo no lugar. Clique numa tarefa de um dia para devolvê-la."
+  },
+  "problem": {
+    "title": "A lista só cresce. A semana, não.",
+    "text": "Uma lista de tarefas não diz se a sua semana dá conta dela. Depois que sono, refeições e deslocamento levam a parte deles, sobra menos do que você imagina. O Rainbow Craft mostra essas horas em números e quadrinhos e deixa você testar cada tarefa num espaço de verdade."
+  },
+  "features": [
+    {
+      "title": "Veja o dia numa régua de 24 horas",
+      "text": "A linha do tempo estende o dia sobre uma régua de 24 horas. Buracos e sobreposições aparecem na hora, e você escolhe como os compromissos que se cruzam ficam dispostos.\nTraga reuniões e compromissos do Calendário do Mac sem digitar duas vezes. Se quiser, os planos também vão para uma agenda separada do Rainbow Craft, que você vê no iPhone. Suas outras agendas nunca são alteradas.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Quebre o que é grande em passos que terminam",
+      "text": "Tarefas grandes empacam quando ainda tem algo no caminho. O app faz duas perguntas sobre cada passo: dá para começar sem aquecimento? Dá para terminar em cinco minutos?\nO que passa nas duas é um fragmento para qualquer brecha de cinco minutos. O resto precisa de tempo reservado. Se o app errar, você decide.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "O que você está fazendo e quanto falta",
+      "text": "Na hora de começar, o plano passa para em andamento, e quando o tempo acaba o app pergunta se você terminou. O timer acompanha a sua programação.\nO widget Timer Agora mostra a tarefa da vez e o tempo que falta sem abrir o app.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Feche a semana com uma checklist",
+      "text": "A revisão semanal é um cartão por dia. Marque o que fez, fez pela metade ou pulou, e use isso para planejar a próxima semana.\nNa mesma conta do iCloud, as tarefas vão e voltam entre este app e o Rainbow of Desire no iPhone, então o dia planejado no Mac vai com você.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Comece em três passos",
+    "items": [
+      {
+        "title": "Defina as horas fixas",
+        "text": "O que se repete toda semana, como dormir, comer e trabalhar, vira rotina. O app não preenche nada por você."
+      },
+      {
+        "title": "Anote as tarefas",
+        "text": "Uma por linha em Tarefas, lá embaixo. Ainda não precisa decidir quando."
+      },
+      {
+        "title": "Arraste para os dias",
+        "text": "Solta num dia, a tarefa vira plano. A data mudou? Arraste para outro dia ou de volta para a lista."
+      }
+    ]
+  },
+  "reference": {
+    "title": "A conta com as rotinas sugeridas",
+    "rows": [
+      [
+        "Uma semana",
+        "168 horas"
+      ],
+      [
+        "Sono · 8 horas por dia",
+        "56 horas"
+      ],
+      [
+        "Refeições · três ao dia",
+        "17,5 horas"
+      ],
+      [
+        "Trabalho · estudos · 9 horas nos dias úteis",
+        "45 horas"
+      ],
+      [
+        "Exercício · 1 hora seg, qua e sex",
+        "3 horas"
+      ],
+      [
+        "Tempo que você tem de verdade nesta semana",
+        "46,5 horas"
+      ]
+    ],
+    "note": "São só sugestões. Escolha e ajuste as rotinas à sua vida. Em dia de folga ou viagem, tire o trabalho só daquele dia."
+  },
+  "pricing": {
+    "title": "Tudo o que você precisa para viver esta semana é grátis",
+    "free": {
+      "name": "Grátis",
+      "items": [
+        "Planos da semana e do dia, rotinas e tarefas sem limite",
+        "Linha do tempo e divisão em passos",
+        "Revisão semanal, também copiável como texto",
+        "Timer e widget Timer Agora",
+        "Importação da agenda",
+        "Sincronização com o Rainbow of Desire no iPhone",
+        "Tendências das últimas 2 semanas"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: 8 semanas de tendências, seus melhores dias e horários",
+        "Plus: planejado x real",
+        "Plus: aplicar de uma vez o plano de uma semana que deu certo",
+        "Pro: tudo do Plus e compartilhar sua agenda por link só de leitura",
+        "Pro: uma compra libera o Pro também no app do iPhone"
+      ],
+      "note": "Cada nível em assinatura anual ou compra única vitalícia"
+    },
+    "note": "Veja os preços no app ou na App Store. A assinatura anual renova automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período. O Pro comprado no iPhone também vale num Mac com a mesma conta do iCloud."
+  },
+  "faq": {
+    "title": "Perguntas frequentes",
+    "items": [
+      {
+        "q": "Preciso entrar no iCloud?",
+        "a": "Não, se você só usa no Mac. É preciso para sincronizar com o iPhone e para compartilhar a agenda."
+      },
+      {
+        "q": "O app altera minhas agendas?",
+        "a": "Nunca as agendas que você já tem. A importação só lê as que você escolhe. Se você ativar a escrita dos planos na agenda do Rainbow Craft, o app cria essa agenda separada e escreve só nela. Dá para apagá-la no app Calendário quando quiser."
+      },
+      {
+        "q": "As tarefas do Mac não aparecem no iPhone.",
+        "a": "Confira se os dois aparelhos usam a mesma conta do iCloud e se o Rainbow of Desire está instalado no iPhone. A sincronização passa pelo iCloud e pode levar alguns minutos."
+      },
+      {
+        "q": "Fechar a janela fecha o app?",
+        "a": "Não. O app continua aberto. Reabra a janela pelo menu Janela ou clicando no ícone do Dock."
+      },
+      {
+        "q": "O que acontece com minhas tarefas e planos quando atualizo?",
+        "a": "Ficam exatamente como estão. As atualizações não mudam nem apagam o que você escreveu."
+      },
+      {
+        "q": "Como mudo o idioma do app?",
+        "a": "Escolha no topo dos Ajustes, em Language · 언어 · 語言, e o app reabre nesse idioma. São 23 idiomas. Nomes de rotinas e tarefas que você escreveu não são traduzidos."
+      },
+      {
+        "q": "Troquei de Mac e perdi o Plus ou o Pro.",
+        "a": "Entre com a mesma Conta Apple e clique em Restaurar compra nos Ajustes. Para cancelar, use os ajustes da sua conta na App Store."
+      },
+      {
+        "q": "Onde fica o que eu escrevo?",
+        "a": "Sem conta, sem cadastro e sem servidor do desenvolvedor guardando seus planos. O que você escreve fica nos seus aparelhos e no seu próprio iCloud. O app envia estatísticas de uso anônimas que nunca incluem o que você escreve, e dá para desligar nos Ajustes em Enviar estatísticas de uso anônimas."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Coloque as tarefas desta semana\nonde elas cabem de verdade",
+    "cta": "Baixe grátis na Mac App Store"
+  },
+  "ui": {
+    "skip": "Pular para o conteúdo",
+    "languages": "Idioma",
+    "privacy": "Política de Privacidade",
+    "contact": "Travou ou viu algo estranho? Escreva para {email}. Nos Ajustes do app também tem uma opção de contato."
+  }
+}

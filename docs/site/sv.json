@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: veckoplaneraren för Mac som börjar med dina fasta rutiner",
+  "description": "Lägg in sömn, måltider och arbete först och dra sedan uppgifterna till timmarna som faktiskt är kvar. Se vad veckan rymmer innan du säger ja.",
+  "hero": {
+    "headline": "Får allt verkligen\nplats den här veckan?",
+    "lead": "Rainbow Craft lägger ut din vecka dag för dag och timme för timme på Macen. Börja med tiden du inte kan avstå, som sömn, måltider och arbete, dra in uppgifterna i luckorna och se vad som faktiskt får plats.",
+    "cta": "Hämta gratis på Mac App Store",
+    "note": "Planering, rutiner, uppgifter, genomgång, timer och kalenderimport är gratis."
+  },
+  "demo": {
+    "title": "Planera en vecka här",
+    "lead": "Vi har lagt in de fyra rutiner som appen föreslår första gången du öppnar den. Slå av och på dem och lägg uppgifter på dagarna.",
+    "routinesLabel": "Fasta rutiner",
+    "routines": [
+      {
+        "name": "Sömn",
+        "detail": "Varje dag, 8 timmar från 23:00"
+      },
+      {
+        "name": "Måltider",
+        "detail": "17,5 timmar i veckan · tre om dagen"
+      },
+      {
+        "name": "Arbete · skola",
+        "detail": "Vardagar, 9 timmar från 09:00"
+      },
+      {
+        "name": "Träning",
+        "detail": "Mån, ons, fre, 1 timme"
+      }
+    ],
+    "week": "Vecka",
+    "fixed": "Fasta rutiner",
+    "planned": "Planerat",
+    "left": "Kvar",
+    "h": "{n} h",
+    "dayLeft": "{h} kvar",
+    "todos": [
+      "Utkast till offert",
+      "Ring tandläkaren",
+      "Flyttofferter",
+      "Granska PR:er",
+      "Läs ett kapitel"
+    ],
+    "hint": "Dra en uppgift till en dag, eller klicka på uppgiften och sedan på dagen. Klicka på en placerad uppgift för att skicka tillbaka den till listan. Varje dags regnbåge fyller en ruta per uppgift.",
+    "allPlaced": "Allt är placerat. Klicka på en uppgift i en dag för att hämta tillbaka den."
+  },
+  "problem": {
+    "title": "Listan växer. Veckan gör det inte.",
+    "text": "En uppgiftslista säger inte om veckan klarar av den. När sömn, mat och pendling har tagit sitt finns mindre kvar än du tror. Rainbow Craft visar de timmarna som siffror och rutor och låter dig prova varje uppgift på en riktig plats."
+  },
+  "features": [
+    {
+      "title": "Se en dag på en 24-timmarslinjal",
+      "text": "Tidslinjevyn lägger ut dagen på en linjal över 24 timmar. Luckor och överlapp syns direkt, och du väljer hur överlappande saker ska ligga.\nHämta möten och avtalade tider från Kalender på Macen i stället för att skriva dem två gånger. Om du vill kan planerna också hamna i en separat Rainbow Craft-kalender som du ser på iPhone. Dina andra kalendrar ändras aldrig.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Dela upp stora jobb i steg som blir klara",
+      "text": "Stora jobb fastnar när något fortfarande står i vägen. Appen ställer två frågor om varje steg: kan du börja utan uppvärmning? Går det att göra klart på fem minuter?\nDet som klarar båda är en bit att ta när fem minuter blir lediga. Resten behöver avsatt tid. Har appen fel bestämmer du.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Vad du håller på med och hur länge till",
+      "text": "När starttiden kommer blir planen pågående, och när tiden är slut frågar appen om du blev klar. Timern följer ditt schema.\nWidgeten Nu-timer visar vad du gör och hur lång tid som är kvar utan att du öppnar appen.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Avsluta veckan med en checklista",
+      "text": "Veckogenomgången är ett kort per dag. Markera vad du gjorde, gjorde till hälften eller hoppade över, och använd det när du planerar nästa vecka.\nMed samma iCloud-konto går uppgifterna mellan den här appen och Rainbow of Desire på iPhone, så dagen du planerade på Macen följer med dig ut.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Kom igång i tre steg",
+    "items": [
+      {
+        "title": "Lägg in de fasta timmarna",
+        "text": "Det som återkommer varje vecka, som sömn, måltider och arbete, blir rutiner. Appen fyller inte i något åt dig."
+      },
+      {
+        "title": "Skriv dina uppgifter",
+        "text": "En per rad under Uppgifter längst ned. När du ska göra dem behöver du inte veta än."
+      },
+      {
+        "title": "Dra dem till dagarna",
+        "text": "Släppt på en dag blir det en plan. Flyttas datumet? Dra den till en annan dag eller tillbaka till listan."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Räkneexemplet med de föreslagna rutinerna",
+    "rows": [
+      [
+        "En vecka",
+        "168 timmar"
+      ],
+      [
+        "Sömn · 8 timmar om dagen",
+        "56 timmar"
+      ],
+      [
+        "Måltider · tre om dagen",
+        "17,5 timmar"
+      ],
+      [
+        "Arbete · skola · 9 timmar på vardagar",
+        "45 timmar"
+      ],
+      [
+        "Träning · 1 timme mån, ons, fre",
+        "3 timmar"
+      ],
+      [
+        "Tid du faktiskt har den här veckan",
+        "46,5 timmar"
+      ]
+    ],
+    "note": "Det är bara förslag. Välj och justera rutinerna efter ditt liv. På semester- eller resdagar tar du bara bort arbetet den dagen."
+  },
+  "pricing": {
+    "title": "Allt du behöver för att leva den här veckan är gratis",
+    "free": {
+      "name": "Gratis",
+      "items": [
+        "Vecko- och dagsplaner, rutiner och uppgifter utan gräns",
+        "Tidslinjevy och uppdelning i steg",
+        "Veckogenomgång som också kan kopieras som text",
+        "Timer och Nu-timer-widget",
+        "Kalenderimport",
+        "Synk med Rainbow of Desire på iPhone",
+        "Trender för de senaste 2 veckorna"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: trender över 8 veckor, dina bästa dagar och tider",
+        "Plus: plan och verklighet sida vid sida",
+        "Plus: lägg in planen från en bra vecka i den här veckan på en gång",
+        "Pro: allt i Plus och dela ditt schema med en skrivskyddad länk",
+        "Pro: ett köp låser upp Pro även i iPhone-appen"
+      ],
+      "note": "Varje nivå som årsprenumeration eller ett engångsköp för alltid"
+    },
+    "note": "Priserna ser du i appen och på App Store. Årsprenumerationen förnyas automatiskt om du inte säger upp den senast 24 timmar innan perioden slutar. Pro köpt på iPhone gäller också på en Mac med samma iCloud-konto."
+  },
+  "faq": {
+    "title": "Vanliga frågor",
+    "items": [
+      {
+        "q": "Måste jag vara inloggad på iCloud?",
+        "a": "Inte om du bara använder den på Macen. Det krävs för att synka med iPhone och dela ditt schema."
+      },
+      {
+        "q": "Ändrar appen mina kalendrar?",
+        "a": "Aldrig dem du redan har. Importen läser bara kalendrarna du väljer. Slår du på att skriva planer till Rainbow Craft-kalendern skapar appen den separata kalendern och skriver bara där. Du kan ta bort den när som helst i appen Kalender."
+      },
+      {
+        "q": "Uppgifter från Macen syns inte på iPhone.",
+        "a": "Kontrollera att båda enheterna använder samma iCloud-konto och att Rainbow of Desire är installerad på iPhone. Synken går via iCloud och kan ta några minuter."
+      },
+      {
+        "q": "Avslutas appen när jag stänger fönstret?",
+        "a": "Nej. Appen fortsätter köras. Öppna fönstret igen från menyn Fönster eller genom att klicka på symbolen i Dock."
+      },
+      {
+        "q": "Vad händer med mina uppgifter och planer vid en uppdatering?",
+        "a": "De blir kvar precis som de är. Uppdateringar ändrar eller raderar aldrig det du har skrivit."
+      },
+      {
+        "q": "Hur byter jag appens språk?",
+        "a": "Välj det högst upp i Inställningar under Language · 언어 · 語言, så öppnas appen igen på det språket. Det finns 23 språk. Rutinnamn och uppgifter som du själv skrivit översätts inte."
+      },
+      {
+        "q": "Ny Mac och Plus eller Pro är borta.",
+        "a": "Logga in med samma Apple-konto och klicka på Återställ köp i Inställningar. Uppsägning gör du i kontoinställningarna i App Store."
+      },
+      {
+        "q": "Var sparas det jag skriver?",
+        "a": "Inget konto, ingen registrering och ingen utvecklarserver med dina planer. Det du skriver stannar på dina enheter och i din egen iCloud. Appen skickar anonym användningsstatistik utan ditt innehåll, och du kan stänga av den i Inställningar under Skicka anonym användningsstatistik."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Lägg veckans uppgifter där\nde faktiskt får plats",
+    "cta": "Hämta gratis på Mac App Store"
+  },
+  "ui": {
+    "skip": "Hoppa till innehållet",
+    "languages": "Språk",
+    "privacy": "Integritetspolicy",
+    "contact": "Kört fast eller ser något konstigt ut? Mejla {email}. Det finns också en kontaktpunkt i appens inställningar."
+  }
+}

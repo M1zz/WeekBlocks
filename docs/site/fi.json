@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: Macin viikkokalenteri, joka alkaa kiinteistä rutiineista",
+  "description": "Merkitse ensin uni, ateriat ja työ, ja vedä sitten tehtävät tunteihin, jotka oikeasti jäävät jäljelle. Näe, mitä viikkoon mahtuu, ennen kuin lupaat.",
+  "hero": {
+    "headline": "Mahtuuko tämä kaikki\noikeasti tälle viikolle?",
+    "lead": "Rainbow Craft levittää viikkosi Macilla päivien ja tuntien mukaan. Aloita ajasta, josta et voi luopua, kuten unesta, aterioista ja työstä, vedä tehtävät jäljelle jääviin väleihin ja katso, mikä oikeasti mahtuu.",
+    "cta": "Lataa ilmaiseksi Mac App Storesta",
+    "note": "Suunnittelu, rutiinit, tehtävät, katsaus, ajastin ja kalenterin tuonti ovat ilmaisia."
+  },
+  "demo": {
+    "title": "Suunnittele viikko tässä",
+    "lead": "Lisäsimme valmiiksi neljä rutiinia, joita sovellus ehdottaa ensimmäisellä avauskerralla. Kytke niitä päälle ja pois ja aseta tehtäviä päiville.",
+    "routinesLabel": "Kiinteät rutiinit",
+    "routines": [
+      {
+        "name": "Uni",
+        "detail": "Joka päivä, 8 tuntia klo 23 alkaen"
+      },
+      {
+        "name": "Ateriat",
+        "detail": "17,5 tuntia viikossa · kolmesti päivässä"
+      },
+      {
+        "name": "Työ · opiskelu",
+        "detail": "Arkipäivisin, 9 tuntia klo 9.00 alkaen"
+      },
+      {
+        "name": "Liikunta",
+        "detail": "ma, ke, pe, 1 tunti"
+      }
+    ],
+    "week": "Viikko",
+    "fixed": "Kiinteät rutiinit",
+    "planned": "Suunniteltu",
+    "left": "Jäljellä",
+    "h": "{n} h",
+    "dayLeft": "{h} jäljellä",
+    "todos": [
+      "Tarjouksen luonnos",
+      "Soita hammaslääkärille",
+      "Muuttotarjoukset",
+      "Käy läpi PR:t",
+      "Lue luku kirjasta"
+    ],
+    "hint": "Vedä tehtävä päivälle, tai napsauta ensin tehtävää ja sitten päivää. Napsauta sijoitettua tehtävää palauttaaksesi sen listalle. Jokaisen päivän sateenkaari täyttää yhden ruudun tehtävää kohden.",
+    "allPlaced": "Kaikki on sijoitettu. Napsauta päivän tehtävää palauttaaksesi sen."
+  },
+  "problem": {
+    "title": "Lista kasvaa, viikko ei.",
+    "text": "Tehtävälista ei kerro, mahtuuko se viikkoosi. Kun uni, syöminen ja työmatkat ovat vieneet osansa, jäljellä on vähemmän kuin luulet. Rainbow Craft näyttää nuo tunnit numeroina ja ruutuina ja antaa kokeilla jokaista tehtävää oikealla paikalla."
+  },
+  "features": [
+    {
+      "title": "Päivä 24 tunnin viivaimella",
+      "text": "Aikajananäkymä levittää päivän 24 tunnin viivaimelle. Aukot ja päällekkäisyydet näkyvät heti, ja sinä valitset, miten päällekkäiset asiat asettuvat.\nTuo kokoukset ja tapaamiset Macin Kalenterista kirjoittamatta niitä kahteen kertaan. Halutessasi suunnitelmat menevät myös erilliseen Rainbow Craft -kalenteriin, jonka näet iPhonessa. Muita kalentereitasi ei koskaan muuteta.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Pilko isot työt vaiheiksi, jotka valmistuvat",
+      "text": "Isot työt jumittuvat, kun jokin on vielä tiellä. Sovellus kysyy jokaisesta vaiheesta kaksi asiaa: voitko aloittaa ilman lämmittelyä? Saatko sen valmiiksi viidessä minuutissa?\nMolemmat täyttävä vaihe on pala, jonka voi napata aina, kun viisi minuuttia vapautuu. Muu vaatii varattua aikaa. Jos sovellus arvioi väärin, päätät sinä.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Mitä teet nyt ja kauanko on jäljellä",
+      "text": "Kun aloitusaika koittaa, suunnitelma siirtyy käynnissä olevaksi, ja kun aika loppuu, sovellus kysyy, saitko valmista. Ajastin seuraa aikatauluasi.\nNyt-ajastin-widget näyttää käynnissä olevan tehtävän ja jäljellä olevan ajan avaamatta sovellusta.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Päätä viikko tarkistuslistalla",
+      "text": "Viikkokatsaus on yksi kortti päivää kohden. Merkitse, mitkä tehtiin, tehtiin puoliksi tai ohitettiin, ja käytä sitä seuraavan viikon suunnitteluun.\nSamalla iCloud-tilillä tehtävät kulkevat tämän sovelluksen ja iPhonen Rainbow of Desiren välillä, joten Macilla suunniteltu päivä kulkee mukanasi.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Alkuun kolmessa vaiheessa",
+    "items": [
+      {
+        "title": "Merkitse kiinteät tunnit",
+        "text": "Joka viikko toistuvat asiat, kuten uni, ateriat ja työ, ovat rutiineja. Sovellus ei täytä mitään puolestasi."
+      },
+      {
+        "title": "Kirjoita tehtäväsi",
+        "text": "Yksi riville alhaalla kohdassa Tehtävät. Milloin ne teet, ei tarvitse vielä tietää."
+      },
+      {
+        "title": "Vedä ne päiville",
+        "text": "Päivälle pudotettuna tehtävästä tulee suunnitelma. Siirtyykö päivä? Vedä se toiselle päivälle tai takaisin listalle."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Laskelma ehdotetuilla rutiineilla",
+    "rows": [
+      [
+        "Viikko",
+        "168 tuntia"
+      ],
+      [
+        "Uni · 8 tuntia päivässä",
+        "56 tuntia"
+      ],
+      [
+        "Ateriat · kolmesti päivässä",
+        "17,5 tuntia"
+      ],
+      [
+        "Työ · opiskelu · 9 tuntia arkisin",
+        "45 tuntia"
+      ],
+      [
+        "Liikunta · 1 tunti ma, ke, pe",
+        "3 tuntia"
+      ],
+      [
+        "Aika, joka sinulla oikeasti on tällä viikolla",
+        "46,5 tuntia"
+      ]
+    ],
+    "note": "Nämä ovat vain ehdotuksia. Valitse ja säädä rutiinit omaan elämääsi. Loma- tai matkapäivinä poistat työn vain siltä päivältä."
+  },
+  "pricing": {
+    "title": "Kaikki, mitä tämän viikon elämiseen tarvitaan, on ilmaista",
+    "free": {
+      "name": "Ilmainen",
+      "items": [
+        "Viikko- ja päiväsuunnitelmat, rutiinit ja tehtävät ilman rajaa",
+        "Aikajananäkymä ja vaiheisiin pilkkominen",
+        "Viikkokatsaus, jonka voi myös kopioida tekstinä",
+        "Ajastin ja Nyt-ajastin-widget",
+        "Kalenterin tuonti",
+        "Synkronointi iPhonen Rainbow of Desiren kanssa",
+        "Trendit kahdelta viime viikolta"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: 8 viikon trendit, parhaat päiväsi ja kellonaikasi",
+        "Plus: suunniteltu ja toteutunut rinnakkain",
+        "Plus: hyvän viikon suunnitelma tälle viikolle kerralla",
+        "Pro: kaikki Plussasta ja aikataulun jakaminen vain luku -linkillä",
+        "Pro: yksi osto avaa Pron myös iPhone-sovelluksessa"
+      ],
+      "note": "Kumpikin tasona vuositilaus tai kertaosto ikuisesti"
+    },
+    "note": "Hinnat näet sovelluksessa ja App Storessa. Vuositilaus uusiutuu automaattisesti, ellet peru sitä viimeistään 24 tuntia ennen kauden loppua. iPhonella ostettu Pro toimii myös Macilla samalla iCloud-tilillä."
+  },
+  "faq": {
+    "title": "Usein kysyttyä",
+    "items": [
+      {
+        "q": "Pitääkö olla kirjautuneena iCloudiin?",
+        "a": "Ei, jos käytät sitä vain Macilla. Sitä tarvitaan iPhonen kanssa synkronointiin ja aikataulun jakamiseen."
+      },
+      {
+        "q": "Muuttaako sovellus kalentereitani?",
+        "a": "Ei koskaan olemassa olevia kalentereita. Tuonti vain lukee valitsemasi kalenterit. Jos otat käyttöön suunnitelmien kirjoittamisen Rainbow Craft -kalenteriin, sovellus luo sen erillisen kalenterin ja kirjoittaa vain sinne. Voit poistaa sen milloin tahansa Kalenteri-sovelluksessa."
+      },
+      {
+        "q": "Macilla kirjoitetut tehtävät eivät näy iPhonessa.",
+        "a": "Tarkista, että molemmat laitteet käyttävät samaa iCloud-tiliä ja että Rainbow of Desire on asennettu iPhoneen. Synkronointi kulkee iCloudin kautta ja voi kestää muutaman minuutin."
+      },
+      {
+        "q": "Sulkeutuuko sovellus, kun suljen ikkunan?",
+        "a": "Ei. Sovellus jatkaa toimintaansa. Avaa ikkuna uudelleen Ikkuna-valikosta tai osoittamalla Dockin symbolia."
+      },
+      {
+        "q": "Mitä tehtävilleni ja suunnitelmilleni tapahtuu päivityksessä?",
+        "a": "Ne pysyvät täsmälleen ennallaan. Päivitykset eivät muuta tai poista kirjoittamaasi."
+      },
+      {
+        "q": "Miten vaihdan sovelluksen kielen?",
+        "a": "Valitse se Asetusten yläreunasta kohdasta Language · 언어 · 語言, niin sovellus avautuu uudelleen sillä kielellä. Kieliä on 23. Itse kirjoittamiasi rutiinien nimiä ja tehtäviä ei käännetä."
+      },
+      {
+        "q": "Uusi Mac, ja Plus tai Pro katosi.",
+        "a": "Kirjaudu samalla Apple-tilillä ja osoita Asetuksissa Palauta osto. Peruutus tehdään App Storen tiliasetuksista."
+      },
+      {
+        "q": "Mihin kirjoittamani tallentuu?",
+        "a": "Ei tiliä, ei rekisteröitymistä eikä kehittäjän palvelinta suunnitelmillesi. Kirjoittamasi pysyy laitteillasi ja omassa iCloudissasi. Sovellus lähettää nimettömiä käyttötilastoja ilman sisältöäsi, ja ne voi poistaa käytöstä Asetuksista kohdasta Lähetä anonyymejä käyttötilastoja."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Laita viikon tehtävät sinne,\nmihin ne oikeasti mahtuvat",
+    "cta": "Lataa ilmaiseksi Mac App Storesta"
+  },
+  "ui": {
+    "skip": "Siirry sisältöön",
+    "languages": "Kieli",
+    "privacy": "Tietosuojakäytäntö",
+    "contact": "Jäitkö jumiin tai näyttääkö jokin oudolta? Kirjoita osoitteeseen {email}. Sovelluksen asetuksista löytyy myös yhteydenottokohta."
+  }
+}

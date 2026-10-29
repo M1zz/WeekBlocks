@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: sabit rutinlerden başlayan Mac haftalık ajandası",
+  "description": "Önce uyku, yemek ve işi yerleştir, sonra görevleri gerçekten kalan saatlere sürükle. Söz vermeden önce haftaya neyin sığdığını gör.",
+  "hero": {
+    "headline": "Hepsi bu haftaya\ngerçekten sığacak mı?",
+    "lead": "Rainbow Craft, haftanı Mac’te gün gün, saat saat açar. Vazgeçemeyeceğin zamanla başla, uyku, yemek ve iş gibi, görevleri kalan boşluklara sürükle ve neyin gerçekten sığdığını gör.",
+    "cta": "Mac App Store’dan ücretsiz indir",
+    "note": "Planlama, rutinler, görevler, değerlendirme, zamanlayıcı ve takvimden içe aktarma ücretsiz."
+  },
+  "demo": {
+    "title": "Haftayı burada planla",
+    "lead": "Uygulamanın ilk açılışta önerdiği dört rutini yerleştirdik. Rutinleri açıp kapat, görevleri günlere bırak.",
+    "routinesLabel": "Sabit rutinler",
+    "routines": [
+      {
+        "name": "Uyku",
+        "detail": "Her gün, 23:00’ten itibaren 8 saat"
+      },
+      {
+        "name": "Öğünler",
+        "detail": "Haftada 17,5 saat · günde üç kez"
+      },
+      {
+        "name": "İş · okul",
+        "detail": "Hafta içi, 09:00’dan itibaren 9 saat"
+      },
+      {
+        "name": "Spor",
+        "detail": "Pzt, Çar, Cum, 1 saat"
+      }
+    ],
+    "week": "Hafta",
+    "fixed": "Sabit rutinler",
+    "planned": "Planlanan",
+    "left": "Kalan",
+    "h": "{n} sa",
+    "dayLeft": "{h} kaldı",
+    "todos": [
+      "Teklif taslağı",
+      "Dişçiyi ara",
+      "Nakliyat teklifleri",
+      "PR’ları incele",
+      "Bir bölüm oku"
+    ],
+    "hint": "Bir görevi güne sürükle ya da önce göreve, sonra güne tıkla. Yerleştirilmiş bir göreve tıklarsan listeye döner. Her günün gökkuşağı, görev başına bir kutu dolar.",
+    "allPlaced": "Hepsi yerleşti. Bir gündeki göreve tıklayarak geri alabilirsin."
+  },
+  "problem": {
+    "title": "Liste uzuyor, hafta uzamıyor.",
+    "text": "Bir yapılacaklar listesi, haftanın onu kaldırıp kaldıramayacağını söylemez. Uyku, yemek ve yol kendi payını aldıktan sonra kalan zaman sandığından az olur. Rainbow Craft o saatleri sayılar ve kutularla gösterir, her görevi gerçek bir yerde denemeni sağlar."
+  },
+  "features": [
+    {
+      "title": "Günü 24 saatlik cetvelde gör",
+      "text": "Zaman çizelgesi günü 24 saatlik bir cetvele yayar. Boşluklar ve çakışmalar hemen göze çarpar, çakışan işlerin nasıl dizileceğini sen seçersin.\nMac’teki Takvim’den toplantı ve randevuları iki kez yazmadan al. İstersen planların, iPhone’da da gördüğün ayrı bir Rainbow Craft takvimine yazılır. Diğer takvimlerin asla değiştirilmez.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Büyük işleri biten adımlara böl",
+      "text": "Büyük işler, önünde hâlâ bir engel olduğunda takılır. Uygulama her adım için iki şey sorar: Isınmadan başlayabilir misin? Beş dakikada bitirebilir misin?\nİkisini de geçen adım, her boş beş dakikada alabileceğin bir parçadır. Gerisi ayrılmış zaman ister. Uygulama yanılırsa karar senindir.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Şu an ne yapıyorsun, ne kadar kaldı",
+      "text": "Başlangıç saati gelince plan devam ediyor durumuna geçer, süre dolunca uygulama bitirip bitirmediğini sorar. Zamanlayıcı programını takip eder.\nAnlık Zamanlayıcı widget’ı, uygulamayı açmadan o anki işini ve kalan süreyi gösterir.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Haftayı bir kontrol listesiyle kapat",
+      "text": "Haftalık değerlendirme, gün başına bir kart. Yaptığını, yarım yaptığını ve atladığını işaretle, bir sonraki haftayı buna göre planla.\nAynı iCloud hesabında görevler bu uygulama ile iPhone’daki Rainbow of Desire arasında gidip gelir, yani Mac’te planladığın gün dışarıda da yanında.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Üç adımda başla",
+    "items": [
+      {
+        "title": "Sabit saatleri belirle",
+        "text": "Her hafta tekrar eden uyku, yemek ve iş gibi zamanları rutin olarak ekle. Uygulama senin yerine hiçbir şey doldurmaz."
+      },
+      {
+        "title": "Görevlerini yaz",
+        "text": "Alttaki Görevler bölümüne her satıra bir tane. Ne zaman yapacağına henüz karar vermen gerekmez."
+      },
+      {
+        "title": "Günlere sürükle",
+        "text": "Bir güne bıraktığında plan olur. Tarih mi kaydı? Başka bir güne ya da listeye geri sürükle."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Önerilen rutinlerle hesap",
+    "rows": [
+      [
+        "Bir hafta",
+        "168 saat"
+      ],
+      [
+        "Uyku · günde 8 saat",
+        "56 saat"
+      ],
+      [
+        "Öğünler · günde üç kez",
+        "17,5 saat"
+      ],
+      [
+        "İş · okul · hafta içi 9 saat",
+        "45 saat"
+      ],
+      [
+        "Spor · Pzt, Çar, Cum 1 saat",
+        "3 saat"
+      ],
+      [
+        "Bu hafta gerçekten elindeki zaman",
+        "46,5 saat"
+      ]
+    ],
+    "note": "Bunlar yalnızca öneri. Rutinleri kendi hayatına göre seç ve düzenle. İzin ya da seyahat gününde işi sadece o günden çıkar."
+  },
+  "pricing": {
+    "title": "Bu haftayı yaşamak için gereken her şey ücretsiz",
+    "free": {
+      "name": "Ücretsiz",
+      "items": [
+        "Haftalık ve günlük planlar, rutinler ve görevler, sınırsız",
+        "Zaman çizelgesi ve adımlara bölme",
+        "Haftalık değerlendirme, metin olarak da kopyalanabilir",
+        "Zamanlayıcı ve Anlık Zamanlayıcı widget’ı",
+        "Takvimden içe aktarma",
+        "iPhone’daki Rainbow of Desire ile eşzamanlama",
+        "Son 2 haftanın eğilimleri"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: 8 haftalık eğilimler, en iyi günlerin ve saatlerin",
+        "Plus: plan ve gerçek karşılaştırması",
+        "Plus: iyi giden bir haftanın planını bu haftaya tek seferde aktar",
+        "Pro: Plus’taki her şey ve programını salt okunur bağlantıyla paylaşma",
+        "Pro: tek satın alma iPhone uygulamasında da Pro’yu açar"
+      ],
+      "note": "Her seviye yıllık abonelik ya da tek seferlik ömür boyu satın alma"
+    },
+    "note": "Fiyatları uygulamada ve App Store’da görebilirsin. Yıllık abonelik, dönem bitmeden en az 24 saat önce iptal edilmezse otomatik yenilenir. iPhone’da alınan Pro, aynı iCloud hesabındaki Mac’te de geçerlidir."
+  },
+  "faq": {
+    "title": "Sık sorulan sorular",
+    "items": [
+      {
+        "q": "iCloud’a giriş yapmak şart mı?",
+        "a": "Sadece Mac’te kullanıyorsan hayır. iPhone ile eşzamanlama ve programını paylaşmak için gerekir."
+      },
+      {
+        "q": "Uygulama takvimlerimi değiştirir mi?",
+        "a": "Var olan takvimlerine asla dokunmaz. İçe aktarma yalnızca seçtiğin takvimleri okur. Planları Rainbow Craft takvimine yazmayı açarsan uygulama o ayrı takvimi oluşturur ve sadece oraya yazar. Onu Takvim uygulamasından istediğin zaman silebilirsin."
+      },
+      {
+        "q": "Mac’te yazdığım görevler iPhone’da görünmüyor.",
+        "a": "İki cihazın da aynı iCloud hesabını kullandığını ve iPhone’da Rainbow of Desire’ın yüklü olduğunu kontrol et. Eşzamanlama iCloud üzerinden olduğu için birkaç dakika sürebilir."
+      },
+      {
+        "q": "Pencereyi kapatınca uygulama kapanır mı?",
+        "a": "Hayır. Uygulama çalışmaya devam eder. Pencereyi Pencere menüsünden ya da Dock’taki simgeye tıklayarak yeniden aç."
+      },
+      {
+        "q": "Güncellemede görevlerime ve planlarıma ne olur?",
+        "a": "Oldukları gibi kalırlar. Güncellemeler yazdıklarını değiştirmez ya da silmez."
+      },
+      {
+        "q": "Uygulamanın dilini nasıl değiştiririm?",
+        "a": "Ayarlar’ın en üstündeki Language · 언어 · 語言 bölümünden seç, uygulama o dilde yeniden açılır. 23 dil var. Kendi yazdığın rutin adları ve görevler çevrilmez."
+      },
+      {
+        "q": "Yeni Mac aldım, Plus ya da Pro gitti.",
+        "a": "Aynı Apple Hesabı ile giriş yap ve Ayarlar’da Satın alımı geri yükle’ye tıkla. İptal için App Store’daki hesap ayarlarını kullan."
+      },
+      {
+        "q": "Yazdıklarım nerede saklanıyor?",
+        "a": "Hesap yok, kayıt yok, planlarını tutan bir geliştirici sunucusu yok. Yazdıkların cihazlarında ve kendi iCloud’unda kalır. Uygulama, yazdıklarını asla içermeyen anonim kullanım istatistikleri gönderir; bunu Ayarlar’da Anonim kullanım istatistikleri gönder seçeneğinden kapatabilirsin."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Bu haftanın görevlerini\ngerçekten sığdıkları yere koy",
+    "cta": "Mac App Store’dan ücretsiz indir"
+  },
+  "ui": {
+    "skip": "İçeriğe geç",
+    "languages": "Dil",
+    "privacy": "Gizlilik Politikası",
+    "contact": "Takıldın mı ya da bir şey tuhaf mı görünüyor? {email} adresine yaz. Uygulamanın ayarlarında da iletişim bölümü var."
+  }
+}

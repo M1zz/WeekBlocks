@@ -1,236 +1,198 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<title>彩虹工坊 — 每週時間區塊規劃</title>
-<meta name="description" content="依星期與時段規劃一週的 Mac App。先排好固定作息，再把待辦放進剩下的時間。" />
-<meta property="og:title" content="彩虹工坊" />
-<meta property="og:description" content="依星期與時段規劃一週的 Mac App。先排好固定作息，再把待辦放進剩下的時間。" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
-<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
-<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
-<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
-<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
-<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
-<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
-<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
-<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
-<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
-<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
-<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
-<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
-<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
-<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
-<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
-<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
-<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
-<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
-<style>
-  :root {
-    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
-    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
-    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
-    line-height:1.7; -webkit-font-smoothing:antialiased;
-  }
-  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
-  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
-  header.hero { text-align:center; padding:72px 24px 56px; }
-  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
-  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
-  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
-  section { padding:40px 0; border-top:1px solid var(--line); }
-  section:first-of-type { border-top:none; }
-  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
-  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
-  .lead { color:var(--sub); margin:0 0 24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
-  .card h3 { margin:0 0 6px; font-size:17px; }
-  .card p { margin:0; color:var(--sub); font-size:15px; }
-  .emoji { font-size:22px; display:block; margin-bottom:10px; }
-  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
-  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
-  ol.steps li:last-child { border-bottom:none; }
-  ol.steps li::before {
-    counter-increment:s; content:counter(s);
-    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
-    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
-  }
-  ol.steps b { display:block; }
-  ol.steps span { color:var(--sub); font-size:15px; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
-  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
-  details summary::-webkit-details-marker { display:none; }
-  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
-  details[open] summary::after { content:"\2013"; }
-  details p { margin:0 0 16px; color:var(--sub); }
-  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
-  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
-  .contact a.btn:hover { opacity:.9; }
-  a { color:var(--blue); }
-  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
-  footer .fam { margin-top:6px; font-size:13px; }
-  .muted { color:var(--sub); font-size:14px; }
-  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
-  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
-  table.attrs tr:last-child td { border-bottom:none; }
-  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
-  table.attrs td.v { color:var(--sub); }
-  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
-  h3.sub { font-size:17px; margin:26px 0 6px; }
-  ul.plain { padding-left:20px; color:var(--sub); }
-  ul.plain li { margin:6px 0; }
-  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
-  nav.langs { padding:14px 16px 0; }
-  nav.pages { padding:8px 16px 0; }
-  nav.langs a, nav.pages a { text-decoration:none; }
-  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
-  footer nav { margin-top:10px; }
-  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>彩虹工坊：先排固定作息，再排一週計畫的 Mac App</title>
+  <meta name="description" content="先放下睡眠、用餐、工作這些省不掉的時間，再把待辦拖進真正剩下的時間。答應別人之前，先看清這週到底排不排得下。">
+  <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-itunes-app" content="app-id=6777737322">
+  <link rel="canonical" href="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/">
+  <link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/">
+  <link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/">
+  <link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/">
+  <link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/">
+  <link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/">
+  <link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/">
+  <link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/">
+  <link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/">
+  <link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/">
+  <link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/">
+  <link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/">
+  <link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/">
+  <link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/">
+  <link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/">
+  <link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/">
+  <link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/">
+  <link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/">
+  <link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/">
+  <link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/">
+  <link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/">
+  <link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="彩虹工坊：先排固定作息，再排一週計畫的 Mac App">
+  <meta property="og:description" content="先放下睡眠、用餐、工作這些省不掉的時間，再把待辦拖進真正剩下的時間。答應別人之前，先看清這週到底排不排得下。">
+  <meta property="og:url" content="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <meta property="og:image" content="https://m1zz.github.io/WeekBlocks/img/zh-Hant/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../icon.png">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="../demo.css">
+  <style>:root{--accent:#007AFF}@media (prefers-color-scheme:dark){:root{--accent:#0A84FF}}</style>
+  <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <header class="bar">
+    <a class="brand" href="../zh-Hant/"><img src="../icon.png" alt="" width="32" height="32">彩虹工坊</a>
+    <a class="lang-link" href="#languages">語言</a>
+  </header>
 
-<div class="rainbow-bar"></div>
-<nav class="langs" aria-label="語言">
-  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
-  <a href="../en/index.html" hreflang="en" lang="en">English</a>
-  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
-  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
-  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant" aria-current="true">繁體中文</a>
-  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
-  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
-  <a href="../fr/index.html" hreflang="fr" lang="fr">Français</a>
-  <a href="../it/index.html" hreflang="it" lang="it">Italiano</a>
-  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
-  <a href="../nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
-  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
-  <a href="../sv/index.html" hreflang="sv" lang="sv">Svenska</a>
-  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
-  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
-  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
-  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
-  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
-  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
-  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
-  <a href="../id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
-  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
-  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
-</nav>
-<nav class="pages" aria-label="頁面">
-  <a href="index.html" aria-current="page">介紹</a>
-  <a href="support.html">支援</a>
-  <a href="privacy.html">隱私權政策</a>
-</nav>
+  <main id="main">
+    <section class="hero">
+      <div class="copy">
+        <h1>這一週，<br>真的排得下嗎？</h1>
+        <p class="lead">彩虹工坊是一款依星期和時段攤開一週的 Mac App。先放下睡眠、用餐、工作這些省不掉的時間，再把待辦拖到剩下的空位，親眼確認哪些放得進去。</p>
+        <div class="actions"><a class="cta" href="https://apps.apple.com/app/id6777737322">在 Mac App Store 免費下載</a><a class="try" href="#try">在這裡排一週看看 ↓</a></div>
+        <p class="muted small">計畫、作息、待辦、回顧、計時器和匯入行事曆都能免費使用。</p>
+      </div>
+      <div class="plain"><img src="../img/zh-Hant/01-week.jpg" alt="這一週， 真的排得下嗎？" width="600" height="375" decoding="async"></div>
+    </section>
 
-<header class="hero">
-  <span class="badge">macOS App</span>
-  <h1>彩虹工坊</h1>
-  <p class="tagline">依星期與時段規劃一週的工作台。先放下睡眠、用餐、工作這些拿不走的時間，再把待辦放進剩下的空檔，親眼看清這週到底放得下什麼。</p>
-</header>
 
-<main class="wrap">
+    <section class="reveal" id="try">
+      <h2>在這裡排一週看看</h2>
+      <p class="muted">我們先放好了 App 第一次開啟時建議的四項作息。試著開關作息，再把待辦放到某一天。</p>
+      <div id="demo" class="card demo-card" data-text="{&quot;title&quot;: &quot;在這裡排一週看看&quot;, &quot;lead&quot;: &quot;我們先放好了 App 第一次開啟時建議的四項作息。試著開關作息，再把待辦放到某一天。&quot;, &quot;routinesLabel&quot;: &quot;固定作息&quot;, &quot;routines&quot;: [{&quot;name&quot;: &quot;睡眠&quot;, &quot;detail&quot;: &quot;每天 23:00 起 8 小時&quot;}, {&quot;name&quot;: &quot;用餐&quot;, &quot;detail&quot;: &quot;每週 17.5 小時 · 每天三次&quot;}, {&quot;name&quot;: &quot;工作 · 學校&quot;, &quot;detail&quot;: &quot;平日 09:00 起 9 小時&quot;}, {&quot;name&quot;: &quot;運動&quot;, &quot;detail&quot;: &quot;週一、三、五 1 小時&quot;}], &quot;week&quot;: &quot;一週&quot;, &quot;fixed&quot;: &quot;固定作息&quot;, &quot;planned&quot;: &quot;計畫&quot;, &quot;left&quot;: &quot;剩餘時間&quot;, &quot;h&quot;: &quot;{n} 小時&quot;, &quot;dayLeft&quot;: &quot;剩 {h}&quot;, &quot;todos&quot;: [&quot;季度提案初稿&quot;, &quot;打電話約牙醫&quot;, &quot;比較搬家報價&quot;, &quot;審查待處理 PR&quot;, &quot;讀一章書&quot;], &quot;hint&quot;: &quot;把待辦拖到某一天，或先點待辦再點某一天。點一下已放好的待辦，就會回到清單。每天的彩虹，一個待辦佔一格。&quot;, &quot;allPlaced&quot;: &quot;待辦都放好了。點一下某天裡的待辦，就能放回清單。&quot;}"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--blue)"></span>規劃你真正擁有的一週</h2>
-  <p class="lead">光看待辦清單，看不出這一週到底放不放得下。要先放上去才知道。</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">🕒</span>
-      <h3>先排固定作息</h3>
-      <p>一週有 168 小時。固定作息先占去它的份，剩下的時間會以數字清楚呈現。</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📐</span>
-      <h3>拖到哪天就是計畫</h3>
-      <p>把待辦拖到某一天，它就成了計畫區塊。可以移到別天、調整時間，日期不再合適時也能拖回清單。</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📊</span>
-      <h3>在 24 小時上看一天</h3>
-      <p>時間軸檢視把一天攤在 24 小時的尺規上。空檔和重疊一目了然，重疊的行程要怎麼排列也由你決定。</p>
-    </div>
-  </div>
-</section>
+    <section class="problem reveal">
+      <h2>待辦越列越長，一週卻總是不夠用？</h2>
+      <p>只看清單，看不出這週能不能全部做完。扣掉睡眠、吃飯和通勤早已佔走的時間，剩下的往往比想像中少。彩虹工坊用數字和格子把剩下的時間擺在眼前，讓你把每件待辦放到真實的位置試試看。</p>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--green)"></span>拆成能收尾的步驟</h2>
-  <p class="lead">大工作會卡住，往往不是因為懶，而是動手之前還有東西擋著。</p>
-  <p>App 會對每個步驟問兩個問題。</p>
-  <ul class="plain">
-    <li><b>不用暖機就能直接開始嗎？</b>需要重新載入脈絡的工作，放進五分鐘的空檔裡，整段時間都會花在暖機上。</li>
-    <li><b>能在五分鐘內做完嗎？</b>沒做完的事會留下尾巴，連下一段時間也被吃掉。</li>
-  </ul>
-  <p>兩個都是「能」，就是碎片，有五分鐘空檔隨時可以拿起來做。其他的，都需要你事先留好的時間。App 會先依文字與時長做出判斷，判斷錯了，你隨時可以推翻。</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>在 24 小時刻度上看一天</h2>
+        <p>時間軸檢視把一天攤在 24 小時刻度上，空檔和重疊一目瞭然，重疊的行程要怎麼排也由你決定。<br>Mac 行事曆裡的會議和約會直接匯入，不必再寫一次。需要的話，也能把計畫寫進 App 另外建立的彩虹工坊行事曆，在 iPhone 行事曆裡也看得到。其他行事曆一律不動。</p>
+      </div>
+      <div class="plain"><img src="../img/zh-Hant/03-timeline.jpg" alt="在 24 小時刻度上看一天" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--purple)"></span>跟著時間走，再回頭看</h2>
-  <p class="lead">計畫排好之後，才是真正要緊的時候。</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">⏱️</span>
-      <h3>目前計時</h3>
-      <p>計畫到了開始時間會轉為進行中，時間過了會問你做完沒。「目前計時」小工具不必打開 App，就能看到正在做的事和剩餘時間。</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📅</span>
-      <h3>與 Mac 行事曆相通</h3>
-      <p>把會議和約會帶進來，不必再打一次。若你願意，計畫也可以寫進 App 建立的「彩虹工坊」行事曆。其他行事曆一律不會更動。</p>
-    </div>
-    <div class="card">
-      <span class="emoji">✅</span>
-      <h3>每週回顧</h3>
-      <p>每天一張卡片。標出做完的、做了一半的、跳過的，拿來排下一週。</p>
-    </div>
-  </div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>拆成做得完的大小</h2>
+        <p>大工作卡住，通常是因為還有什麼擋在前面。App 會對每一步問兩件事：能不能不用準備就開始？能不能在 5 分鐘內做完？<br>兩個都是，就是一塊「碎片」，每空出 5 分鐘就能拿來做。其他的需要另外留時間。App 判斷錯了，改過來就好。</p>
+      </div>
+      <div class="plain"><img src="../img/zh-Hant/04-steps.jpg" alt="拆成做得完的大小" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--orange)"></span>與 iPhone 同步</h2>
-  <p>使用同一個 iCloud 帳號時，待辦事項會在本 App 與 iPhone 上的「欲望彩虹」之間同步。在 Mac 上排好今天，出門在外就用 iPhone 查看。</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>正在做什麼，還剩多久</h2>
+        <p>到了開始時間，計畫會變成進行中；時間一過，會問你做完沒有。計時器跟著時間表走。<br>目前計時小工具不用打開 App，就能顯示正在做的事和剩餘時間。</p>
+      </div>
+      <div class="plain"><img src="../img/zh-Hant/05-timer.jpg" alt="正在做什麼，還剩多久" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--yellow)"></span>隱私</h2>
-  <div class="note">不需要帳號，也不用註冊，更沒有存放你計畫的開發者伺服器。你寫下的內容只留在你的裝置和你自己的 iCloud。為了改善 App，會傳送不含任何書寫內容的匿名使用統計，你可以在設定中關閉。詳情請見<a href="privacy.html">隱私權政策</a>。</div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>用一張清單收尾一週</h2>
+        <p>每週回顧是每天一張卡片。標出做完、做一半、跳過，再用這些答案排下一週。<br>同一個 iCloud 帳號下，待辦會在這個 App 和 iPhone App Rainbow of Desire 之間同步，在 Mac 排好的今天，出門也能查看。</p>
+      </div>
+      <div class="plain"><img src="../img/zh-Hant/06-review.jpg" alt="用一張清單收尾一週" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <div class="contact">
-    <h2 style="margin-bottom:6px">需要協助嗎？</h2>
-    <p class="lead" style="margin-bottom:0">常見問題與聯絡方式都整理在支援頁面。</p>
-    <a class="btn" href="support.html">前往支援頁面</a>
-  </div>
-</section>
+    <section class="reveal">
+      <h2>三個步驟就能開始</h2>
+      <ol class="steps"><li class="card"><span class="n">1</span><h3>先定下省不掉的時間</h3><p>把睡眠、用餐、工作這類每週都有的時間設成作息。App 不會先幫你填任何東西。</p></li>
+<li class="card"><span class="n">2</span><h3>寫下待辦</h3><p>在畫面下方的待辦事項裡一行寫一件。什麼時候做，現在還不用決定。</p></li>
+<li class="card"><span class="n">3</span><h3>拖到某一天</h3><p>放到哪天，就成了那天的計畫。日期變了，再拖到別天或拖回清單就好。</p></li></ol>
+    </section>
 
-</main>
+    <section class="reveal" id="commands">
+      <h2>照建議的作息算一算</h2>
+      <div class="card table">
+        <dl><div><dt>一週</dt><dd>168 小時</dd></div><div><dt>睡眠 · 每天 8 小時</dt><dd>56 小時</dd></div><div><dt>用餐 · 每天三次</dt><dd>17.5 小時</dd></div><div><dt>工作 · 學校 · 平日 9 小時</dt><dd>45 小時</dd></div><div><dt>運動 · 週一、三、五 1 小時</dt><dd>3 小時</dd></div><div><dt>這週真正能用的時間</dt><dd>46.5 小時</dd></div></dl>
+      </div>
+      <p class="muted">這些只是範例。作息依自己的生活來選、來改。休假或出差不上班的那天，單獨拿掉就好。</p>
+    </section>
 
-<footer>
-  <div>2026 彩虹工坊</div>
-  <div class="fam">彩虹工坊 (macOS) &middot; 欲望彩虹 (iOS)</div>
-  <nav class="pages"><a href="index.html">介紹</a> <a href="support.html">支援</a> <a href="privacy.html">隱私權政策</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">更新說明</a></nav>
-</footer>
 
+    <section class="reveal" id="pricing">
+      <h2>過好這一週需要的，全部免費</h2>
+      <div class="plans">
+        <div class="card plan free">
+          <h3>免費</h3>
+          <ul><li>週計畫與日計畫、作息、待辦（數量不限）</li><li>時間軸檢視和步驟拆分</li><li>每週回顧，並可複製成文字</li><li>計時器和目前計時小工具</li><li>從行事曆匯入</li><li>與 iPhone 上的 Rainbow of Desire 同步</li><li>最近 2 週的回顧趨勢</li></ul>
+          
+        </div>
+        <div class="card plan pro">
+          <h3>Plus · Pro</h3>
+          <ul><li>Plus：8 週回顧趨勢，看出狀態好的日子和時段</li><li>Plus：計畫與實際花費的時間</li><li>Plus：把順利的一週計畫一次鋪到本週</li><li>Pro：包含 Plus 全部內容，並可用唯讀連結分享我的行程</li><li>Pro：買一次，iPhone App 也一起開啟 Pro</li></ul>
+          <p class="muted">每一級都可選年度訂閱，或一次買斷終身使用</p>
+        </div>
+      </div>
+      <p class="muted">價格請在 App 或 App Store 查看。年度訂閱若未在當期結束前至少 24 小時取消，將自動續訂。在 iPhone 上買的 Pro，在同一個 iCloud 帳號的 Mac 上也能用。</p>
+    </section>
+
+    <section class="reveal" id="faq">
+      <h2>常見問題</h2>
+      <div class="faq"><details><summary>一定要登入 iCloud 嗎？</summary><p>只在 Mac 上自己用就不需要。要和 iPhone 同步、要分享行程時才需要。</p></details>
+<details><summary>App 會改動我的行事曆嗎？</summary><p>原本的行事曆一律不改。從行事曆匯入只會讀取你選的行事曆。開啟「把計畫寫入彩虹工坊行事曆」後，App 會另外建立彩虹工坊行事曆，只寫在那裡。這個行事曆隨時可以在行事曆 App 裡刪除。</p></details>
+<details><summary>在 Mac 寫的待辦，iPhone 上看不到。</summary><p>請確認兩台裝置登入的是同一個 iCloud 帳號，而且 iPhone 上有安裝 Rainbow of Desire。同步會經過 iCloud，可能需要幾分鐘。</p></details>
+<details><summary>關掉視窗，App 就結束了嗎？</summary><p>不會。關掉視窗後 App 仍在執行，可以從選單列的「視窗」重新打開，點 Dock 圖像也可以。</p></details>
+<details><summary>更新後，寫好的待辦和計畫還在嗎？</summary><p>都在。更新不會更改或刪除你寫下的內容。</p></details>
+<details><summary>想換介面語言。</summary><p>在設定最上方的 Language · 언어 · 語言 選擇，App 會重新開啟並切換。支援 23 種語言。你自己寫的作息名稱和待辦不會被翻譯。</p></details>
+<details><summary>換了 Mac，Plus 或 Pro 不見了。</summary><p>用同一個 Apple 帳號登入後，點設定裡的「恢復購買」。取消訂閱請到 App Store 的帳號設定。</p></details>
+<details><summary>我寫的內容存在哪裡？</summary><p>沒有帳號、不用註冊，也沒有存放計畫的開發者伺服器。寫下的內容只在你的裝置和你自己的 iCloud 裡。App 會傳送不含你所寫內容的匿名使用統計，可以在設定裡關閉「傳送匿名使用統計」。</p></details></div>
+      <p class="contact">用起來卡住或發現怪怪的地方，請寫信到 <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>。App 的設定裡也有聯絡我們的選項。</p>
+    </section>
+
+    <section class="closing reveal">
+      <h2>先把這週放得下的事，<br>擺到真實的位置上</h2>
+      <a class="cta" href="https://apps.apple.com/app/id6777737322">在 Mac App Store 免費下載</a>
+    </section>
+  </main>
+
+  <footer>
+    <nav id="languages" class="langs" aria-label="語言"><a href="../" hreflang="ko" lang="ko">한국어</a>
+<a href="../en/" hreflang="en" lang="en">English</a>
+<a href="../ja/" hreflang="ja" lang="ja">日本語</a>
+<a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+<a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant" aria-current="page">繁體中文</a>
+<a href="../de/" hreflang="de" lang="de">Deutsch</a>
+<a href="../es/" hreflang="es" lang="es">Español</a>
+<a href="../fr/" hreflang="fr" lang="fr">Français</a>
+<a href="../it/" hreflang="it" lang="it">Italiano</a>
+<a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+<a href="../nl/" hreflang="nl" lang="nl">Nederlands</a>
+<a href="../da/" hreflang="da" lang="da">Dansk</a>
+<a href="../sv/" hreflang="sv" lang="sv">Svenska</a>
+<a href="../nb/" hreflang="nb" lang="nb">Norsk bokmål</a>
+<a href="../fi/" hreflang="fi" lang="fi">Suomi</a>
+<a href="../pl/" hreflang="pl" lang="pl">Polski</a>
+<a href="../cs/" hreflang="cs" lang="cs">Čeština</a>
+<a href="../el/" hreflang="el" lang="el">Ελληνικά</a>
+<a href="../ru/" hreflang="ru" lang="ru">Русский</a>
+<a href="../tr/" hreflang="tr" lang="tr">Türkçe</a>
+<a href="../id/" hreflang="id" lang="id">Bahasa Indonesia</a>
+<a href="../vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
+<a href="../th/" hreflang="th" lang="th">ไทย</a></nav>
+    <p><a href="privacy.html">隱私權政策</a> · <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a> · © 2026 Rainbow Craft</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+    }), { rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  </script>
+  <script src="../demo.js"></script>
 </body>
 </html>

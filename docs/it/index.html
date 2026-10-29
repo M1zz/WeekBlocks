@@ -1,236 +1,198 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<title>Rainbow Craft — Settimana a blocchi</title>
-<meta name="description" content="Un’app per Mac per pianificare la settimana per giorni e per ore. Fissa prima le routine, poi metti le attività nel tempo che resta." />
-<meta property="og:title" content="Rainbow Craft" />
-<meta property="og:description" content="Un’app per Mac per pianificare la settimana per giorni e per ore. Fissa prima le routine, poi metti le attività nel tempo che resta." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
-<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
-<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
-<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
-<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
-<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
-<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
-<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
-<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
-<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
-<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
-<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
-<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
-<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
-<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
-<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
-<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
-<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
-<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
-<style>
-  :root {
-    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
-    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
-    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
-    line-height:1.7; -webkit-font-smoothing:antialiased;
-  }
-  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
-  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
-  header.hero { text-align:center; padding:72px 24px 56px; }
-  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
-  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
-  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
-  section { padding:40px 0; border-top:1px solid var(--line); }
-  section:first-of-type { border-top:none; }
-  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
-  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
-  .lead { color:var(--sub); margin:0 0 24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
-  .card h3 { margin:0 0 6px; font-size:17px; }
-  .card p { margin:0; color:var(--sub); font-size:15px; }
-  .emoji { font-size:22px; display:block; margin-bottom:10px; }
-  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
-  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
-  ol.steps li:last-child { border-bottom:none; }
-  ol.steps li::before {
-    counter-increment:s; content:counter(s);
-    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
-    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
-  }
-  ol.steps b { display:block; }
-  ol.steps span { color:var(--sub); font-size:15px; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
-  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
-  details summary::-webkit-details-marker { display:none; }
-  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
-  details[open] summary::after { content:"\2013"; }
-  details p { margin:0 0 16px; color:var(--sub); }
-  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
-  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
-  .contact a.btn:hover { opacity:.9; }
-  a { color:var(--blue); }
-  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
-  footer .fam { margin-top:6px; font-size:13px; }
-  .muted { color:var(--sub); font-size:14px; }
-  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
-  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
-  table.attrs tr:last-child td { border-bottom:none; }
-  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
-  table.attrs td.v { color:var(--sub); }
-  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
-  h3.sub { font-size:17px; margin:26px 0 6px; }
-  ul.plain { padding-left:20px; color:var(--sub); }
-  ul.plain li { margin:6px 0; }
-  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
-  nav.langs { padding:14px 16px 0; }
-  nav.pages { padding:8px 16px 0; }
-  nav.langs a, nav.pages a { text-decoration:none; }
-  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
-  footer nav { margin-top:10px; }
-  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rainbow Craft: il planner settimanale per Mac che parte dalle routine fisse</title>
+  <meta name="description" content="Prima metti sonno, pasti e lavoro, poi trascina le attività nelle ore che restano davvero. Vedi cosa entra nella settimana prima di dire di sì.">
+  <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-itunes-app" content="app-id=6777737322">
+  <link rel="canonical" href="https://m1zz.github.io/WeekBlocks/it/">
+  <link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/">
+  <link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/">
+  <link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/">
+  <link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/">
+  <link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/">
+  <link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/">
+  <link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/">
+  <link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/">
+  <link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/">
+  <link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/">
+  <link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/">
+  <link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/">
+  <link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/">
+  <link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/">
+  <link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/">
+  <link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/">
+  <link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/">
+  <link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/">
+  <link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/">
+  <link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/">
+  <link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/">
+  <link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rainbow Craft: il planner settimanale per Mac che parte dalle routine fisse">
+  <meta property="og:description" content="Prima metti sonno, pasti e lavoro, poi trascina le attività nelle ore che restano davvero. Vedi cosa entra nella settimana prima di dire di sì.">
+  <meta property="og:url" content="https://m1zz.github.io/WeekBlocks/it/">
+  <meta property="og:image" content="https://m1zz.github.io/WeekBlocks/img/it/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../icon.png">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="../demo.css">
+  <style>:root{--accent:#007AFF}@media (prefers-color-scheme:dark){:root{--accent:#0A84FF}}</style>
+  <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
+  <a class="skip" href="#main">Vai al contenuto</a>
+  <header class="bar">
+    <a class="brand" href="../it/"><img src="../icon.png" alt="" width="32" height="32">Rainbow Craft</a>
+    <a class="lang-link" href="#languages">Lingua</a>
+  </header>
 
-<div class="rainbow-bar"></div>
-<nav class="langs" aria-label="Language">
-  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
-  <a href="../en/index.html" hreflang="en" lang="en">English</a>
-  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
-  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
-  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
-  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
-  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
-  <a href="../fr/index.html" hreflang="fr" lang="fr">Français</a>
-  <a href="../it/index.html" hreflang="it" lang="it" aria-current="true">Italiano</a>
-  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
-  <a href="../nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
-  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
-  <a href="../sv/index.html" hreflang="sv" lang="sv">Svenska</a>
-  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
-  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
-  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
-  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
-  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
-  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
-  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
-  <a href="../id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
-  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
-  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
-</nav>
-<nav class="pages" aria-label="Pagine">
-  <a href="index.html" aria-current="page">Informazioni</a>
-  <a href="support.html">Supporto</a>
-  <a href="privacy.html">Informativa sulla privacy</a>
-</nav>
+  <main id="main">
+    <section class="hero">
+      <div class="copy">
+        <h1>Ci sta davvero tutto<br>in questa settimana?</h1>
+        <p class="lead">Rainbow Craft distende la tua settimana per giorni e ore sul Mac. Parti dal tempo a cui non puoi rinunciare, come sonno, pasti e lavoro, trascina le attività negli spazi rimasti e guarda cosa ci sta davvero.</p>
+        <div class="actions"><a class="cta" href="https://apps.apple.com/app/id6777737322">Scaricala gratis dal Mac App Store</a><a class="try" href="#try">Pianifica una settimana qui ↓</a></div>
+        <p class="muted small">Pianificazione, routine, attività, revisione, timer e importazione del calendario sono gratis.</p>
+      </div>
+      <div class="plain"><img src="../img/it/01-week.jpg" alt="Ci sta davvero tutto in questa settimana?" width="600" height="375" decoding="async"></div>
+    </section>
 
-<header class="hero">
-  <span class="badge">App per macOS</span>
-  <h1>Rainbow Craft</h1>
-  <p class="tagline">Un banco di lavoro per pianificare la settimana per giorni e per ore. Fissa le ore a cui non puoi rinunciare, come sonno, pasti e lavoro, poi metti le attività in ciò che resta e guarda cosa ci sta davvero.</p>
-</header>
 
-<main class="wrap">
+    <section class="reveal" id="try">
+      <h2>Pianifica una settimana qui</h2>
+      <p class="muted">Abbiamo messo le quattro routine che l’app propone alla prima apertura. Attivale e disattivale, poi posa le attività sui giorni.</p>
+      <div id="demo" class="card demo-card" data-text="{&quot;title&quot;: &quot;Pianifica una settimana qui&quot;, &quot;lead&quot;: &quot;Abbiamo messo le quattro routine che l’app propone alla prima apertura. Attivale e disattivale, poi posa le attività sui giorni.&quot;, &quot;routinesLabel&quot;: &quot;Routine fisse&quot;, &quot;routines&quot;: [{&quot;name&quot;: &quot;Sonno&quot;, &quot;detail&quot;: &quot;Ogni giorno, 8 ore dalle 23:00&quot;}, {&quot;name&quot;: &quot;Pasti&quot;, &quot;detail&quot;: &quot;17,5 ore a settimana · tre al giorno&quot;}, {&quot;name&quot;: &quot;Lavoro · scuola&quot;, &quot;detail&quot;: &quot;Giorni feriali, 9 ore dalle 09:00&quot;}, {&quot;name&quot;: &quot;Sport&quot;, &quot;detail&quot;: &quot;Lun, mer, ven, 1 ora&quot;}], &quot;week&quot;: &quot;Settimana&quot;, &quot;fixed&quot;: &quot;Routine fisse&quot;, &quot;planned&quot;: &quot;Pianificato&quot;, &quot;left&quot;: &quot;Restano&quot;, &quot;h&quot;: &quot;{n} h&quot;, &quot;dayLeft&quot;: &quot;restano {h}&quot;, &quot;todos&quot;: [&quot;Bozza della proposta&quot;, &quot;Chiamare il dentista&quot;, &quot;Preventivi trasloco&quot;, &quot;Rivedere le PR&quot;, &quot;Leggere un capitolo&quot;], &quot;hint&quot;: &quot;Trascina un’attività su un giorno, oppure clicca l’attività e poi il giorno. Clicca un’attività già posata per rimandarla all’elenco. L’arcobaleno di ogni giorno riempie una casella per attività.&quot;, &quot;allPlaced&quot;: &quot;Tutto posato. Clicca un’attività in un giorno per rimandarla indietro.&quot;}"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--blue)"></span>Pianifica la settimana che hai davvero</h2>
-  <p class="lead">Un elenco di cose da fare non ti dice se la settimana riesce a contenerle. Devi metterle giù e guardare.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">🕒</span>
-      <h3>Prima le routine fisse</h3>
-      <p>Una settimana ha 168 ore. Le routine fisse prendono per prime la loro parte e l’app ti mostra in numeri chiari cosa rimane.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📐</span>
-      <h3>Trascina ogni cosa al suo posto</h3>
-      <p>Trascina un’attività su un giorno e diventa un blocco pianificato. Spostala, cambiane l’orario o riportala nell’elenco quando la data non va più bene.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📊</span>
-      <h3>Una giornata su 24 ore</h3>
-      <p>La vista timeline dispone la giornata su una linea di 24 ore. Spazi e sovrapposizioni si notano subito, e scegli tu come disporre gli elementi sovrapposti.</p>
-    </div>
-  </div>
-</section>
+    <section class="problem reveal">
+      <h2>La lista si allunga, la settimana no.</h2>
+      <p>Un elenco di cose da fare non ti dice se la tua settimana ce la fa a contenerlo. Quando sonno, pasti e spostamenti si sono presi la loro parte, resta meno di quanto pensi. Rainbow Craft ti mostra quelle ore in numeri e caselle, e ti fa provare ogni attività in uno spazio vero.</p>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--green)"></span>Dividi i lavori grandi in fasi che si chiudono</h2>
-  <p class="lead">Di solito un lavoro grande si blocca non per pigrizia, ma perché c’è ancora qualcosa di mezzo prima di poterci mettere mano.</p>
-  <p>Per ogni fase l’app fa due domande.</p>
-  <ul class="plain">
-    <li><b>Riesci a iniziare senza tempo di avvio?</b> Il lavoro che richiede di riprendere il filo consuma un intero spazio di cinque minuti solo per partire.</li>
-    <li><b>Si finisce in cinque minuti?</b> Il lavoro lasciato a metà lascia residui che si mangiano il tempo successivo.</li>
-  </ul>
-  <p>Se rispondi sì a entrambe, è un frammento: qualcosa da prendere ogni volta che si aprono cinque minuti. Tutto il resto richiede tempo dedicato. L’app risponde per prima in base alla formulazione e alla durata, e puoi correggerla ogni volta che sbaglia.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Una giornata su un righello di 24 ore</h2>
+        <p>La vista timeline stende la giornata su un righello di 24 ore. Buchi e sovrapposizioni saltano all’occhio, e scegli tu come disporre gli impegni che si accavallano.<br>Importa riunioni e appuntamenti da Calendario sul Mac invece di riscriverli. Se vuoi, i piani possono finire anche in un calendario Rainbow Craft separato, visibile sull’iPhone. Gli altri calendari non vengono mai toccati.</p>
+      </div>
+      <div class="plain"><img src="../img/it/03-timeline.jpg" alt="Una giornata su un righello di 24 ore" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--purple)"></span>Rispetta i tempi, poi fai il punto</h2>
-  <p class="lead">Un piano conta soprattutto dopo averlo fatto.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">⏱️</span>
-      <h3>Timer attuale</h3>
-      <p>All’ora di inizio un piano passa in corso e, allo scadere del tempo, l’app ti chiede se l’hai finito. Il widget Timer attuale mostra cosa stai facendo e quanto manca, senza aprire l’app.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📅</span>
-      <h3>Funziona con Calendario</h3>
-      <p>Porta dentro riunioni e appuntamenti dall’app Calendario del Mac invece di scriverli due volte. Se vuoi, i piani possono finire in un calendario separato Rainbow Craft. Gli altri calendari non vengono mai modificati.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">✅</span>
-      <h3>Revisione settimanale</h3>
-      <p>Una scheda per ogni giorno. Segna cosa hai fatto, fatto a metà o saltato, e usalo per pianificare la settimana dopo.</p>
-    </div>
-  </div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Spezza i lavori grossi in passi che si chiudono</h2>
+        <p>I lavori grossi si bloccano quando qualcosa è ancora d’intralcio. L’app fa due domande su ogni passo: puoi iniziare senza riscaldamento? Lo finisci in cinque minuti?<br>Ciò che passa entrambe è un frammento da prendere appena si liberano cinque minuti. Il resto richiede tempo dedicato. Se l’app sbaglia, decidi tu.</p>
+      </div>
+      <div class="plain"><img src="../img/it/04-steps.jpg" alt="Spezza i lavori grossi in passi che si chiudono" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--orange)"></span>Funziona con il tuo iPhone</h2>
-  <p>Con lo stesso account iCloud, le attività passano tra questa app e Rainbow of Desire su iPhone. Pianifica la giornata sul Mac e controllala sull’iPhone quando sei fuori.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Cosa stai facendo, e quanto manca</h2>
+        <p>All’ora d’inizio il piano passa a in corso, e allo scadere l’app ti chiede se hai finito. Il timer segue il tuo programma.<br>Il widget Timer attuale mostra l’attività del momento e il tempo rimasto senza aprire l’app.</p>
+      </div>
+      <div class="plain"><img src="../img/it/05-timer.jpg" alt="Cosa stai facendo, e quanto manca" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--yellow)"></span>Privacy</h2>
-  <div class="note">Nessun account, nessuna registrazione e nessun server dello sviluppatore che conserva i tuoi piani. Ciò che scrivi resta sui tuoi dispositivi e nel tuo iCloud. Per migliorare l’app vengono inviati conteggi di utilizzo anonimi che non includono mai ciò che scrivi, e puoi disattivarli in Impostazioni. I dettagli sono nell’<a href="privacy.html">Informativa sulla privacy</a>.</div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Chiudi la settimana con una checklist</h2>
+        <p>La revisione settimanale è una scheda per giorno. Segna cosa hai fatto, fatto a metà o saltato, e usalo per pianificare la settimana dopo.<br>Con lo stesso account iCloud le attività passano tra questa app e Rainbow of Desire su iPhone: la giornata pianificata sul Mac viene con te.</p>
+      </div>
+      <div class="plain"><img src="../img/it/06-review.jpg" alt="Chiudi la settimana con una checklist" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <div class="contact">
-    <h2 style="margin-bottom:6px">Serve aiuto?</h2>
-    <p class="lead" style="margin-bottom:0">Nella pagina di supporto trovi le risposte alle domande frequenti e come contattarmi.</p>
-    <a class="btn" href="support.html">Vai al supporto</a>
-  </div>
-</section>
+    <section class="reveal">
+      <h2>Si comincia in tre passi</h2>
+      <ol class="steps"><li class="card"><span class="n">1</span><h3>Fissa le ore che non si toccano</h3><p>Ciò che torna ogni settimana, come dormire, mangiare e lavorare, diventa una routine. L’app non compila nulla al posto tuo.</p></li>
+<li class="card"><span class="n">2</span><h3>Scrivi le attività</h3><p>Una per riga in Attività, in basso. Per ora non serve decidere quando.</p></li>
+<li class="card"><span class="n">3</span><h3>Trascinale sui giorni</h3><p>Posata su un giorno, diventa un piano. Cambia la data? Trascinala su un altro giorno o di nuovo nell’elenco.</p></li></ol>
+    </section>
 
-</main>
+    <section class="reveal" id="commands">
+      <h2>I conti con le routine proposte</h2>
+      <div class="card table">
+        <dl><div><dt>Una settimana</dt><dd>168 ore</dd></div><div><dt>Sonno · 8 ore al giorno</dt><dd>56 ore</dd></div><div><dt>Pasti · tre al giorno</dt><dd>17,5 ore</dd></div><div><dt>Lavoro · scuola · 9 ore nei giorni feriali</dt><dd>45 ore</dd></div><div><dt>Sport · 1 ora lun, mer, ven</dt><dd>3 ore</dd></div><div><dt>Tempo che hai davvero questa settimana</dt><dd>46,5 ore</dd></div></dl>
+      </div>
+      <p class="muted">Sono solo proposte. Scegli e adatta le routine alla tua vita. Nei giorni di ferie o di viaggio, togli il lavoro solo da quel giorno.</p>
+    </section>
 
-<footer>
-  <div>2026 Rainbow Craft</div>
-  <div class="fam">Rainbow Craft (macOS) &middot; Rainbow of Desire (iOS)</div>
-  <nav class="pages"><a href="index.html">Informazioni</a> <a href="support.html">Supporto</a> <a href="privacy.html">Informativa sulla privacy</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">Note di versione</a></nav>
-</footer>
 
+    <section class="reveal" id="pricing">
+      <h2>Tutto ciò che serve per vivere questa settimana è gratis</h2>
+      <div class="plans">
+        <div class="card plan free">
+          <h3>Gratis</h3>
+          <ul><li>Piani della settimana e del giorno, routine e attività senza limiti</li><li>Vista timeline e suddivisione in passi</li><li>Revisione settimanale, copiabile come testo</li><li>Timer e widget Timer attuale</li><li>Importazione del calendario</li><li>Sincronizzazione con Rainbow of Desire su iPhone</li><li>Tendenze delle ultime 2 settimane</li></ul>
+          
+        </div>
+        <div class="card plan pro">
+          <h3>Plus · Pro</h3>
+          <ul><li>Plus: tendenze di 8 settimane, i tuoi giorni e orari migliori</li><li>Plus: previsto e reale a confronto</li><li>Plus: riporta in un colpo il piano di una settimana riuscita</li><li>Pro: tutto Plus, più la condivisione del programma con un link di sola lettura</li><li>Pro: un solo acquisto sblocca Pro anche nell’app per iPhone</li></ul>
+          <p class="muted">Ogni livello come abbonamento annuale o acquisto unico a vita</p>
+        </div>
+      </div>
+      <p class="muted">Trovi i prezzi nell’app e sull’App Store. L’abbonamento annuale si rinnova da solo se non lo disdici almeno 24 ore prima della fine del periodo. Il Pro comprato su iPhone vale anche su un Mac con lo stesso account iCloud.</p>
+    </section>
+
+    <section class="reveal" id="faq">
+      <h2>Domande frequenti</h2>
+      <div class="faq"><details><summary>Devo per forza accedere a iCloud?</summary><p>No, se usi l’app solo sul Mac. Serve per sincronizzare con l’iPhone e per condividere il programma.</p></details>
+<details><summary>L’app modifica i miei calendari?</summary><p>Mai quelli che hai già. L’importazione legge soltanto i calendari che scegli. Se attivi la scrittura dei piani nel calendario Rainbow Craft, l’app crea quel calendario a parte e scrive solo lì. Puoi eliminarlo quando vuoi dall’app Calendario.</p></details>
+<details><summary>Le attività scritte sul Mac non compaiono sull’iPhone.</summary><p>Controlla che entrambi i dispositivi usino lo stesso account iCloud e che sull’iPhone sia installata Rainbow of Desire. La sincronizzazione passa da iCloud e può richiedere qualche minuto.</p></details>
+<details><summary>Chiudendo la finestra si chiude l’app?</summary><p>No. L’app resta aperta. Riapri la finestra dal menu Finestra o facendo clic sull’icona nel Dock.</p></details>
+<details><summary>Con un aggiornamento cosa succede ad attività e piani?</summary><p>Restano esattamente come sono. Gli aggiornamenti non cambiano né cancellano ciò che hai scritto.</p></details>
+<details><summary>Come cambio la lingua dell’app?</summary><p>Sceglila in cima alle Impostazioni, sotto Language · 언어 · 語言, e l’app si riapre in quella lingua. Le lingue sono 23. I nomi delle routine e le attività scritte da te non vengono tradotti.</p></details>
+<details><summary>Ho cambiato Mac e non ho più Plus o Pro.</summary><p>Accedi con lo stesso Account Apple e fai clic su Ripristina acquisto nelle Impostazioni. Per disdire, usa le impostazioni dell’account nell’App Store.</p></details>
+<details><summary>Dove finisce quello che scrivo?</summary><p>Niente account, niente registrazione, nessun server dello sviluppatore con i tuoi piani. Quello che scrivi resta sui tuoi dispositivi e nel tuo iCloud. L’app invia statistiche d’uso anonime che non contengono mai ciò che scrivi, e puoi disattivarle nelle Impostazioni con Invia statistiche di utilizzo anonime.</p></details></div>
+      <p class="contact">Ti sei bloccato o qualcosa non torna? Scrivi a <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>. Anche nelle Impostazioni dell’app c’è una voce per contattarci.</p>
+    </section>
+
+    <section class="closing reveal">
+      <h2>Metti le attività di questa settimana<br>dove ci stanno davvero</h2>
+      <a class="cta" href="https://apps.apple.com/app/id6777737322">Scaricala gratis dal Mac App Store</a>
+    </section>
+  </main>
+
+  <footer>
+    <nav id="languages" class="langs" aria-label="Lingua"><a href="../" hreflang="ko" lang="ko">한국어</a>
+<a href="../en/" hreflang="en" lang="en">English</a>
+<a href="../ja/" hreflang="ja" lang="ja">日本語</a>
+<a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+<a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+<a href="../de/" hreflang="de" lang="de">Deutsch</a>
+<a href="../es/" hreflang="es" lang="es">Español</a>
+<a href="../fr/" hreflang="fr" lang="fr">Français</a>
+<a href="../it/" hreflang="it" lang="it" aria-current="page">Italiano</a>
+<a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+<a href="../nl/" hreflang="nl" lang="nl">Nederlands</a>
+<a href="../da/" hreflang="da" lang="da">Dansk</a>
+<a href="../sv/" hreflang="sv" lang="sv">Svenska</a>
+<a href="../nb/" hreflang="nb" lang="nb">Norsk bokmål</a>
+<a href="../fi/" hreflang="fi" lang="fi">Suomi</a>
+<a href="../pl/" hreflang="pl" lang="pl">Polski</a>
+<a href="../cs/" hreflang="cs" lang="cs">Čeština</a>
+<a href="../el/" hreflang="el" lang="el">Ελληνικά</a>
+<a href="../ru/" hreflang="ru" lang="ru">Русский</a>
+<a href="../tr/" hreflang="tr" lang="tr">Türkçe</a>
+<a href="../id/" hreflang="id" lang="id">Bahasa Indonesia</a>
+<a href="../vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
+<a href="../th/" hreflang="th" lang="th">ไทย</a></nav>
+    <p><a href="privacy.html">Informativa sulla privacy</a> · <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a> · © 2026 Rainbow Craft</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+    }), { rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  </script>
+  <script src="../demo.js"></script>
 </body>
 </html>

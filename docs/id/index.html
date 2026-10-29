@@ -1,236 +1,198 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<title>Rainbow Craft — Jadwal Mingguan dengan Blok Waktu</title>
-<meta name="description" content="App Mac untuk merencanakan minggu Anda per hari dan per jam. Letakkan dulu rutinitas tetap, lalu tempatkan tugas di waktu yang tersisa." />
-<meta property="og:title" content="Rainbow Craft" />
-<meta property="og:description" content="App Mac untuk merencanakan minggu Anda per hari dan per jam. Letakkan dulu rutinitas tetap, lalu tempatkan tugas di waktu yang tersisa." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
-<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
-<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
-<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
-<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
-<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
-<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
-<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
-<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
-<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
-<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
-<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
-<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
-<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
-<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
-<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
-<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
-<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
-<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
-<style>
-  :root {
-    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
-    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
-    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
-    line-height:1.7; -webkit-font-smoothing:antialiased;
-  }
-  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
-  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
-  header.hero { text-align:center; padding:72px 24px 56px; }
-  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
-  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
-  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
-  section { padding:40px 0; border-top:1px solid var(--line); }
-  section:first-of-type { border-top:none; }
-  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
-  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
-  .lead { color:var(--sub); margin:0 0 24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
-  .card h3 { margin:0 0 6px; font-size:17px; }
-  .card p { margin:0; color:var(--sub); font-size:15px; }
-  .emoji { font-size:22px; display:block; margin-bottom:10px; }
-  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
-  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
-  ol.steps li:last-child { border-bottom:none; }
-  ol.steps li::before {
-    counter-increment:s; content:counter(s);
-    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
-    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
-  }
-  ol.steps b { display:block; }
-  ol.steps span { color:var(--sub); font-size:15px; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
-  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
-  details summary::-webkit-details-marker { display:none; }
-  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
-  details[open] summary::after { content:"\2013"; }
-  details p { margin:0 0 16px; color:var(--sub); }
-  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
-  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
-  .contact a.btn:hover { opacity:.9; }
-  a { color:var(--blue); }
-  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
-  footer .fam { margin-top:6px; font-size:13px; }
-  .muted { color:var(--sub); font-size:14px; }
-  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
-  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
-  table.attrs tr:last-child td { border-bottom:none; }
-  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
-  table.attrs td.v { color:var(--sub); }
-  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
-  h3.sub { font-size:17px; margin:26px 0 6px; }
-  ul.plain { padding-left:20px; color:var(--sub); }
-  ul.plain li { margin:6px 0; }
-  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
-  nav.langs { padding:14px 16px 0; }
-  nav.pages { padding:8px 16px 0; }
-  nav.langs a, nav.pages a { text-decoration:none; }
-  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
-  footer nav { margin-top:10px; }
-  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rainbow Craft: jadwal mingguan di Mac yang dimulai dari rutinitas tetap</title>
+  <meta name="description" content="Masukkan dulu tidur, makan, dan kerja, lalu seret tugas ke jam yang benar-benar tersisa. Lihat apa yang muat dalam seminggu sebelum kamu mengiyakan.">
+  <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-itunes-app" content="app-id=6777737322">
+  <link rel="canonical" href="https://m1zz.github.io/WeekBlocks/id/">
+  <link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/">
+  <link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/">
+  <link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/">
+  <link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/">
+  <link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/">
+  <link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/">
+  <link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/">
+  <link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/">
+  <link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/">
+  <link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/">
+  <link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/">
+  <link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/">
+  <link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/">
+  <link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/">
+  <link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/">
+  <link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/">
+  <link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/">
+  <link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/">
+  <link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/">
+  <link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/">
+  <link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/">
+  <link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rainbow Craft: jadwal mingguan di Mac yang dimulai dari rutinitas tetap">
+  <meta property="og:description" content="Masukkan dulu tidur, makan, dan kerja, lalu seret tugas ke jam yang benar-benar tersisa. Lihat apa yang muat dalam seminggu sebelum kamu mengiyakan.">
+  <meta property="og:url" content="https://m1zz.github.io/WeekBlocks/id/">
+  <meta property="og:image" content="https://m1zz.github.io/WeekBlocks/img/id/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../icon.png">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="../demo.css">
+  <style>:root{--accent:#007AFF}@media (prefers-color-scheme:dark){:root{--accent:#0A84FF}}</style>
+  <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
+  <a class="skip" href="#main">Langsung ke konten</a>
+  <header class="bar">
+    <a class="brand" href="../id/"><img src="../icon.png" alt="" width="32" height="32">Rainbow Craft</a>
+    <a class="lang-link" href="#languages">Bahasa</a>
+  </header>
 
-<div class="rainbow-bar"></div>
-<nav class="langs" aria-label="Language">
-  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
-  <a href="../en/index.html" hreflang="en" lang="en">English</a>
-  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
-  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
-  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
-  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
-  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
-  <a href="../fr/index.html" hreflang="fr" lang="fr">Français</a>
-  <a href="../it/index.html" hreflang="it" lang="it">Italiano</a>
-  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
-  <a href="../nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
-  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
-  <a href="../sv/index.html" hreflang="sv" lang="sv">Svenska</a>
-  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
-  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
-  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
-  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
-  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
-  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
-  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
-  <a href="../id/index.html" hreflang="id" lang="id" aria-current="true">Bahasa Indonesia</a>
-  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
-  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
-</nav>
-<nav class="pages" aria-label="Halaman">
-  <a href="index.html" aria-current="page">Tentang</a>
-  <a href="support.html">Dukungan</a>
-  <a href="privacy.html">Kebijakan Privasi</a>
-</nav>
+  <main id="main">
+    <section class="hero">
+      <div class="copy">
+        <h1>Semuanya benar-benar muat<br>minggu ini?</h1>
+        <p class="lead">Rainbow Craft membentangkan minggumu di Mac per hari dan per jam. Mulai dari waktu yang tidak bisa dikorbankan, seperti tidur, makan, dan kerja, seret tugas ke celah yang tersisa, lalu lihat apa yang benar-benar muat.</p>
+        <div class="actions"><a class="cta" href="https://apps.apple.com/app/id6777737322">Unduh gratis di Mac App Store</a><a class="try" href="#try">Coba susun seminggu di sini ↓</a></div>
+        <p class="muted small">Perencanaan, rutinitas, tugas, tinjauan, timer, dan impor kalender gratis.</p>
+      </div>
+      <div class="plain"><img src="../img/id/01-week.jpg" alt="Semuanya benar-benar muat minggu ini?" width="600" height="375" decoding="async"></div>
+    </section>
 
-<header class="hero">
-  <span class="badge">App macOS</span>
-  <h1>Rainbow Craft</h1>
-  <p class="tagline">Meja kerja untuk merencanakan minggu Anda per hari dan per jam. Letakkan dulu jam yang tidak bisa diganggu gugat, seperti tidur, makan, dan kerja, lalu tempatkan tugas di sisanya dan lihat apa yang benar-benar muat.</p>
-</header>
 
-<main class="wrap">
+    <section class="reveal" id="try">
+      <h2>Coba susun seminggu di sini</h2>
+      <p class="muted">Kami sudah memasang empat rutinitas yang disarankan aplikasi saat pertama dibuka. Nyalakan dan matikan, lalu taruh tugas di hari-harinya.</p>
+      <div id="demo" class="card demo-card" data-text="{&quot;title&quot;: &quot;Coba susun seminggu di sini&quot;, &quot;lead&quot;: &quot;Kami sudah memasang empat rutinitas yang disarankan aplikasi saat pertama dibuka. Nyalakan dan matikan, lalu taruh tugas di hari-harinya.&quot;, &quot;routinesLabel&quot;: &quot;Rutinitas tetap&quot;, &quot;routines&quot;: [{&quot;name&quot;: &quot;Tidur&quot;, &quot;detail&quot;: &quot;Setiap hari, 8 jam mulai 23.00&quot;}, {&quot;name&quot;: &quot;Makan&quot;, &quot;detail&quot;: &quot;17,5 jam per minggu · tiga kali sehari&quot;}, {&quot;name&quot;: &quot;Kerja · sekolah&quot;, &quot;detail&quot;: &quot;Hari kerja, 9 jam mulai 09.00&quot;}, {&quot;name&quot;: &quot;Olahraga&quot;, &quot;detail&quot;: &quot;Sen, Rab, Jum, 1 jam&quot;}], &quot;week&quot;: &quot;Seminggu&quot;, &quot;fixed&quot;: &quot;Rutinitas tetap&quot;, &quot;planned&quot;: &quot;Direncanakan&quot;, &quot;left&quot;: &quot;Sisa&quot;, &quot;h&quot;: &quot;{n} jam&quot;, &quot;dayLeft&quot;: &quot;sisa {h}&quot;, &quot;todos&quot;: [&quot;Draf proposal&quot;, &quot;Telepon dokter gigi&quot;, &quot;Bandingkan biaya pindahan&quot;, &quot;Tinjau PR&quot;, &quot;Baca satu bab&quot;], &quot;hint&quot;: &quot;Seret tugas ke sebuah hari, atau klik tugasnya lalu klik harinya. Klik tugas yang sudah ditaruh untuk mengembalikannya ke daftar. Pelangi tiap hari terisi satu kotak per tugas.&quot;, &quot;allPlaced&quot;: &quot;Semua sudah ditaruh. Klik tugas di sebuah hari untuk mengembalikannya.&quot;}"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--blue)"></span>Rencanakan minggu yang benar-benar Anda punya</h2>
-  <p class="lead">Daftar tugas tidak bisa memberi tahu apakah minggu Anda sanggup menampungnya. Anda harus meletakkannya dan melihat sendiri.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">🕒</span>
-      <h3>Rutinitas tetap lebih dulu</h3>
-      <p>Satu minggu itu 168 jam. Rutinitas tetap mengambil bagiannya lebih dulu, dan app menunjukkan sisanya dalam angka yang jelas.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📐</span>
-      <h3>Seret ke tempatnya</h3>
-      <p>Seret tugas ke suatu hari, dan tugas itu jadi blok rencana. Pindahkan, ubah jamnya, atau seret kembali ke daftar jika tanggalnya tidak cocok lagi.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📊</span>
-      <h3>Sehari dalam 24 jam</h3>
-      <p>Tampilan linimasa menata satu hari di penggaris 24 jam. Celah dan tumpang tindih mudah terlihat, dan Anda memilih cara item yang bertumpuk ditata.</p>
-    </div>
-  </div>
-</section>
+    <section class="problem reveal">
+      <h2>Daftarnya makin panjang, minggunya tidak.</h2>
+      <p>Daftar tugas tidak bisa memberi tahu apakah minggumu sanggup menampungnya. Setelah tidur, makan, dan perjalanan mengambil jatahnya, sisanya lebih sedikit dari yang kamu kira. Rainbow Craft menampilkan jam-jam itu sebagai angka dan kotak, dan membiarkanmu mencoba setiap tugas di tempat yang nyata.</p>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--green)"></span>Pecah pekerjaan besar jadi langkah yang tuntas</h2>
-  <p class="lead">Pekerjaan besar biasanya macet bukan karena Anda malas, tapi karena masih ada yang menghalangi sebelum Anda bisa menyentuhnya.</p>
-  <p>App mengajukan dua pertanyaan untuk setiap langkah.</p>
-  <ul class="plain">
-    <li><b>Bisa mulai tanpa pemanasan?</b> Pekerjaan yang mengharuskan Anda memuat ulang konteks akan menghabiskan seluruh celah lima menit hanya untuk memulai.</li>
-    <li><b>Selesai dalam lima menit?</b> Pekerjaan yang belum tuntas meninggalkan sisa yang menggerogoti waktu berikutnya.</li>
-  </ul>
-  <p>Jika jawabannya ya untuk keduanya, itu kepingan, sesuatu yang bisa Anda ambil setiap kali ada lima menit luang. Sisanya butuh waktu yang Anda sisihkan. App menjawab lebih dulu berdasarkan kata-kata dan durasinya, dan Anda bisa mengubahnya kapan saja jika keliru.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Lihat sehari di penggaris 24 jam</h2>
+        <p>Tampilan linimasa membentangkan sehari di atas penggaris 24 jam. Celah dan bentrokan langsung terlihat, dan kamu yang memilih cara menata acara yang bertumpuk.<br>Ambil rapat dan janji dari Kalender di Mac tanpa mengetik dua kali. Kalau mau, rencanamu juga bisa masuk ke kalender Rainbow Craft terpisah yang terlihat di iPhone. Kalender lainnya tidak pernah diubah.</p>
+      </div>
+      <div class="plain"><img src="../img/id/03-timeline.jpg" alt="Lihat sehari di penggaris 24 jam" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--purple)"></span>Tetap sesuai jadwal, lalu tinjau</h2>
-  <p class="lead">Rencana paling berarti setelah dibuat.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">⏱️</span>
-      <h3>Timer Saat Ini</h3>
-      <p>Saat jam mulai rencana tiba, statusnya jadi sedang berjalan, dan begitu waktunya habis app bertanya apakah sudah selesai. Widget Timer Saat Ini menampilkan yang sedang Anda kerjakan dan sisa waktunya tanpa membuka app.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📅</span>
-      <h3>Terhubung dengan Kalender</h3>
-      <p>Bawa rapat dan janji dari Kalender di Mac tanpa mengetik dua kali. Jika mau, rencana bisa masuk ke kalender Rainbow Craft terpisah. Kalender Anda yang lain tidak pernah diubah.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">✅</span>
-      <h3>Tinjauan mingguan</h3>
-      <p>Satu kartu per hari. Tandai yang selesai, selesai sebagian, atau dilewati, lalu pakai untuk merencanakan minggu depan.</p>
-    </div>
-  </div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Pecah pekerjaan besar jadi langkah yang bisa selesai</h2>
+        <p>Pekerjaan besar macet saat masih ada yang menghalangi. Aplikasi menanyakan dua hal untuk tiap langkah: bisa mulai tanpa pemanasan? Bisa selesai dalam lima menit?<br>Yang lolos keduanya adalah kepingan untuk setiap lima menit yang kosong. Sisanya butuh waktu khusus. Kalau aplikasi salah menebak, kamu yang memutuskan.</p>
+      </div>
+      <div class="plain"><img src="../img/id/04-steps.jpg" alt="Pecah pekerjaan besar jadi langkah yang bisa selesai" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--orange)"></span>Terhubung dengan iPhone</h2>
-  <p>Dengan akun iCloud yang sama, tugas berpindah antara app ini dan Rainbow of Desire di iPhone. Rencanakan hari ini di Mac dan cek di iPhone saat bepergian.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Sedang mengerjakan apa, dan berapa lama lagi</h2>
+        <p>Saat waktunya tiba, rencana berubah jadi sedang berjalan, dan begitu waktunya habis aplikasi bertanya apakah sudah selesai. Timer mengikuti jadwalmu.<br>Widget Timer Saat Ini menampilkan yang sedang kamu kerjakan dan sisa waktunya tanpa membuka aplikasi.</p>
+      </div>
+      <div class="plain"><img src="../img/id/05-timer.jpg" alt="Sedang mengerjakan apa, dan berapa lama lagi" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--yellow)"></span>Privasi</h2>
-  <div class="note">Tanpa akun, tanpa pendaftaran, dan tanpa server pengembang yang menyimpan rencana Anda. Apa yang Anda tulis tetap di perangkat Anda dan di iCloud Anda sendiri. Untuk menyempurnakan app, app mengirim hitungan penggunaan anonim yang tidak pernah memuat tulisan Anda, dan Anda bisa mematikannya di Pengaturan. Detailnya ada di <a href="privacy.html">Kebijakan Privasi</a>.</div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Tutup minggu dengan daftar centang</h2>
+        <p>Tinjauan mingguan berisi satu kartu per hari. Tandai yang selesai, setengah selesai, atau dilewati, lalu pakai untuk menyusun minggu berikutnya.<br>Dengan akun iCloud yang sama, tugas berpindah antara aplikasi ini dan Rainbow of Desire di iPhone, jadi rencana hari ini dari Mac ikut ke mana pun kamu pergi.</p>
+      </div>
+      <div class="plain"><img src="../img/id/06-review.jpg" alt="Tutup minggu dengan daftar centang" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <div class="contact">
-    <h2 style="margin-bottom:6px">Butuh bantuan?</h2>
-    <p class="lead" style="margin-bottom:0">Jawaban atas pertanyaan umum dan cara menghubungi saya ada di halaman dukungan.</p>
-    <a class="btn" href="support.html">Ke Dukungan</a>
-  </div>
-</section>
+    <section class="reveal">
+      <h2>Mulai dalam tiga langkah</h2>
+      <ol class="steps"><li class="card"><span class="n">1</span><h3>Tetapkan jam yang tidak bisa diganggu</h3><p>Yang berulang tiap minggu, seperti tidur, makan, dan kerja, dijadikan rutinitas. Aplikasi tidak mengisi apa pun untukmu.</p></li>
+<li class="card"><span class="n">2</span><h3>Tulis tugasmu</h3><p>Satu per baris di Tugas di bagian bawah. Kapan mengerjakannya belum perlu diputuskan.</p></li>
+<li class="card"><span class="n">3</span><h3>Seret ke hari</h3><p>Begitu ditaruh di sebuah hari, tugas jadi rencana. Tanggalnya bergeser? Seret ke hari lain atau kembali ke daftar.</p></li></ol>
+    </section>
 
-</main>
+    <section class="reveal" id="commands">
+      <h2>Hitungan dengan rutinitas yang disarankan</h2>
+      <div class="card table">
+        <dl><div><dt>Seminggu</dt><dd>168 jam</dd></div><div><dt>Tidur · 8 jam sehari</dt><dd>56 jam</dd></div><div><dt>Makan · tiga kali sehari</dt><dd>17,5 jam</dd></div><div><dt>Kerja · sekolah · 9 jam di hari kerja</dt><dd>45 jam</dd></div><div><dt>Olahraga · 1 jam Sen, Rab, Jum</dt><dd>3 jam</dd></div><div><dt>Waktu yang benar-benar kamu punya minggu ini</dt><dd>46,5 jam</dd></div></dl>
+      </div>
+      <p class="muted">Ini hanya saran. Pilih dan sesuaikan rutinitas dengan hidupmu. Saat cuti atau dinas, hapus kerja dari hari itu saja.</p>
+    </section>
 
-<footer>
-  <div>2026 Rainbow Craft</div>
-  <div class="fam">Rainbow Craft (macOS) &middot; Rainbow of Desire (iOS)</div>
-  <nav class="pages"><a href="index.html">Tentang</a> <a href="support.html">Dukungan</a> <a href="privacy.html">Kebijakan Privasi</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">Catatan rilis</a></nav>
-</footer>
 
+    <section class="reveal" id="pricing">
+      <h2>Semua yang kamu perlukan untuk minggu ini gratis</h2>
+      <div class="plans">
+        <div class="card plan free">
+          <h3>Gratis</h3>
+          <ul><li>Rencana mingguan dan harian, rutinitas, dan tugas tanpa batas</li><li>Tampilan linimasa dan pemecahan langkah</li><li>Tinjauan mingguan, bisa disalin sebagai teks</li><li>Timer dan widget Timer Saat Ini</li><li>Impor kalender</li><li>Sinkron dengan Rainbow of Desire di iPhone</li><li>Tren 2 minggu terakhir</li></ul>
+          
+        </div>
+        <div class="card plan pro">
+          <h3>Plus · Pro</h3>
+          <ul><li>Plus: tren 8 minggu, hari dan jam terbaikmu</li><li>Plus: rencana vs. kenyataan</li><li>Plus: pasang sekaligus rencana minggu yang berjalan lancar</li><li>Pro: semua isi Plus dan berbagi jadwal lewat tautan hanya-lihat</li><li>Pro: sekali beli, aplikasi iPhone juga jadi Pro</li></ul>
+          <p class="muted">Tiap tingkat bisa langganan tahunan atau sekali bayar seumur hidup</p>
+        </div>
+      </div>
+      <p class="muted">Lihat harganya di aplikasi dan App Store. Langganan tahunan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periodenya berakhir. Pro yang dibeli di iPhone juga berlaku di Mac dengan akun iCloud yang sama.</p>
+    </section>
+
+    <section class="reveal" id="faq">
+      <h2>Pertanyaan umum</h2>
+      <div class="faq"><details><summary>Harus masuk ke iCloud?</summary><p>Tidak, kalau hanya dipakai di Mac. iCloud diperlukan untuk sinkron dengan iPhone dan untuk membagikan jadwal.</p></details>
+<details><summary>Apakah aplikasi mengubah kalenderku?</summary><p>Kalender yang sudah ada tidak pernah diubah. Impor hanya membaca kalender yang kamu pilih. Kalau kamu menyalakan penulisan rencana ke kalender Rainbow Craft, aplikasi membuat kalender terpisah itu dan hanya menulis di sana. Kalender itu bisa kamu hapus kapan saja di aplikasi Kalender.</p></details>
+<details><summary>Tugas dari Mac tidak muncul di iPhone.</summary><p>Pastikan kedua perangkat memakai akun iCloud yang sama dan Rainbow of Desire terpasang di iPhone. Sinkron lewat iCloud, jadi bisa butuh beberapa menit.</p></details>
+<details><summary>Kalau jendela ditutup, aplikasinya ikut keluar?</summary><p>Tidak. Aplikasi tetap berjalan. Buka lagi jendelanya dari menu Jendela atau dengan mengeklik ikon di Dock.</p></details>
+<details><summary>Apa yang terjadi pada tugas dan rencanaku saat pembaruan?</summary><p>Tetap seperti semula. Pembaruan tidak mengubah atau menghapus apa yang kamu tulis.</p></details>
+<details><summary>Bagaimana mengganti bahasa aplikasi?</summary><p>Pilih di bagian paling atas Pengaturan, di Language · 언어 · 語言, lalu aplikasi dibuka ulang dalam bahasa itu. Ada 23 bahasa. Nama rutinitas dan tugas yang kamu tulis sendiri tidak diterjemahkan.</p></details>
+<details><summary>Ganti Mac, Plus atau Pro hilang.</summary><p>Masuk dengan Akun Apple yang sama lalu klik Pulihkan Pembelian di Pengaturan. Pembatalan dilakukan di pengaturan akun App Store.</p></details>
+<details><summary>Di mana tulisanku disimpan?</summary><p>Tanpa akun, tanpa daftar, dan tanpa server pengembang yang menyimpan rencanamu. Yang kamu tulis tetap di perangkatmu dan di iCloud-mu sendiri. Aplikasi mengirim statistik penggunaan anonim tanpa isi tulisanmu, dan bisa dimatikan di Pengaturan lewat Kirim statistik penggunaan anonim.</p></details></div>
+      <p class="contact">Mentok atau ada yang aneh? Kirim email ke <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>. Di Pengaturan aplikasi juga ada menu untuk menghubungi kami.</p>
+    </section>
+
+    <section class="closing reveal">
+      <h2>Taruh tugas minggu ini<br>di tempat yang benar-benar muat</h2>
+      <a class="cta" href="https://apps.apple.com/app/id6777737322">Unduh gratis di Mac App Store</a>
+    </section>
+  </main>
+
+  <footer>
+    <nav id="languages" class="langs" aria-label="Bahasa"><a href="../" hreflang="ko" lang="ko">한국어</a>
+<a href="../en/" hreflang="en" lang="en">English</a>
+<a href="../ja/" hreflang="ja" lang="ja">日本語</a>
+<a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+<a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+<a href="../de/" hreflang="de" lang="de">Deutsch</a>
+<a href="../es/" hreflang="es" lang="es">Español</a>
+<a href="../fr/" hreflang="fr" lang="fr">Français</a>
+<a href="../it/" hreflang="it" lang="it">Italiano</a>
+<a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+<a href="../nl/" hreflang="nl" lang="nl">Nederlands</a>
+<a href="../da/" hreflang="da" lang="da">Dansk</a>
+<a href="../sv/" hreflang="sv" lang="sv">Svenska</a>
+<a href="../nb/" hreflang="nb" lang="nb">Norsk bokmål</a>
+<a href="../fi/" hreflang="fi" lang="fi">Suomi</a>
+<a href="../pl/" hreflang="pl" lang="pl">Polski</a>
+<a href="../cs/" hreflang="cs" lang="cs">Čeština</a>
+<a href="../el/" hreflang="el" lang="el">Ελληνικά</a>
+<a href="../ru/" hreflang="ru" lang="ru">Русский</a>
+<a href="../tr/" hreflang="tr" lang="tr">Türkçe</a>
+<a href="../id/" hreflang="id" lang="id" aria-current="page">Bahasa Indonesia</a>
+<a href="../vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
+<a href="../th/" hreflang="th" lang="th">ไทย</a></nav>
+    <p><a href="privacy.html">Kebijakan Privasi</a> · <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a> · © 2026 Rainbow Craft</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+    }), { rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  </script>
+  <script src="../demo.js"></script>
 </body>
 </html>

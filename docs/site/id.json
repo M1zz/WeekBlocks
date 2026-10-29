@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: jadwal mingguan di Mac yang dimulai dari rutinitas tetap",
+  "description": "Masukkan dulu tidur, makan, dan kerja, lalu seret tugas ke jam yang benar-benar tersisa. Lihat apa yang muat dalam seminggu sebelum kamu mengiyakan.",
+  "hero": {
+    "headline": "Semuanya benar-benar muat\nminggu ini?",
+    "lead": "Rainbow Craft membentangkan minggumu di Mac per hari dan per jam. Mulai dari waktu yang tidak bisa dikorbankan, seperti tidur, makan, dan kerja, seret tugas ke celah yang tersisa, lalu lihat apa yang benar-benar muat.",
+    "cta": "Unduh gratis di Mac App Store",
+    "note": "Perencanaan, rutinitas, tugas, tinjauan, timer, dan impor kalender gratis."
+  },
+  "demo": {
+    "title": "Coba susun seminggu di sini",
+    "lead": "Kami sudah memasang empat rutinitas yang disarankan aplikasi saat pertama dibuka. Nyalakan dan matikan, lalu taruh tugas di hari-harinya.",
+    "routinesLabel": "Rutinitas tetap",
+    "routines": [
+      {
+        "name": "Tidur",
+        "detail": "Setiap hari, 8 jam mulai 23.00"
+      },
+      {
+        "name": "Makan",
+        "detail": "17,5 jam per minggu · tiga kali sehari"
+      },
+      {
+        "name": "Kerja · sekolah",
+        "detail": "Hari kerja, 9 jam mulai 09.00"
+      },
+      {
+        "name": "Olahraga",
+        "detail": "Sen, Rab, Jum, 1 jam"
+      }
+    ],
+    "week": "Seminggu",
+    "fixed": "Rutinitas tetap",
+    "planned": "Direncanakan",
+    "left": "Sisa",
+    "h": "{n} jam",
+    "dayLeft": "sisa {h}",
+    "todos": [
+      "Draf proposal",
+      "Telepon dokter gigi",
+      "Bandingkan biaya pindahan",
+      "Tinjau PR",
+      "Baca satu bab"
+    ],
+    "hint": "Seret tugas ke sebuah hari, atau klik tugasnya lalu klik harinya. Klik tugas yang sudah ditaruh untuk mengembalikannya ke daftar. Pelangi tiap hari terisi satu kotak per tugas.",
+    "allPlaced": "Semua sudah ditaruh. Klik tugas di sebuah hari untuk mengembalikannya."
+  },
+  "problem": {
+    "title": "Daftarnya makin panjang, minggunya tidak.",
+    "text": "Daftar tugas tidak bisa memberi tahu apakah minggumu sanggup menampungnya. Setelah tidur, makan, dan perjalanan mengambil jatahnya, sisanya lebih sedikit dari yang kamu kira. Rainbow Craft menampilkan jam-jam itu sebagai angka dan kotak, dan membiarkanmu mencoba setiap tugas di tempat yang nyata."
+  },
+  "features": [
+    {
+      "title": "Lihat sehari di penggaris 24 jam",
+      "text": "Tampilan linimasa membentangkan sehari di atas penggaris 24 jam. Celah dan bentrokan langsung terlihat, dan kamu yang memilih cara menata acara yang bertumpuk.\nAmbil rapat dan janji dari Kalender di Mac tanpa mengetik dua kali. Kalau mau, rencanamu juga bisa masuk ke kalender Rainbow Craft terpisah yang terlihat di iPhone. Kalender lainnya tidak pernah diubah.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Pecah pekerjaan besar jadi langkah yang bisa selesai",
+      "text": "Pekerjaan besar macet saat masih ada yang menghalangi. Aplikasi menanyakan dua hal untuk tiap langkah: bisa mulai tanpa pemanasan? Bisa selesai dalam lima menit?\nYang lolos keduanya adalah kepingan untuk setiap lima menit yang kosong. Sisanya butuh waktu khusus. Kalau aplikasi salah menebak, kamu yang memutuskan.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Sedang mengerjakan apa, dan berapa lama lagi",
+      "text": "Saat waktunya tiba, rencana berubah jadi sedang berjalan, dan begitu waktunya habis aplikasi bertanya apakah sudah selesai. Timer mengikuti jadwalmu.\nWidget Timer Saat Ini menampilkan yang sedang kamu kerjakan dan sisa waktunya tanpa membuka aplikasi.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Tutup minggu dengan daftar centang",
+      "text": "Tinjauan mingguan berisi satu kartu per hari. Tandai yang selesai, setengah selesai, atau dilewati, lalu pakai untuk menyusun minggu berikutnya.\nDengan akun iCloud yang sama, tugas berpindah antara aplikasi ini dan Rainbow of Desire di iPhone, jadi rencana hari ini dari Mac ikut ke mana pun kamu pergi.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Mulai dalam tiga langkah",
+    "items": [
+      {
+        "title": "Tetapkan jam yang tidak bisa diganggu",
+        "text": "Yang berulang tiap minggu, seperti tidur, makan, dan kerja, dijadikan rutinitas. Aplikasi tidak mengisi apa pun untukmu."
+      },
+      {
+        "title": "Tulis tugasmu",
+        "text": "Satu per baris di Tugas di bagian bawah. Kapan mengerjakannya belum perlu diputuskan."
+      },
+      {
+        "title": "Seret ke hari",
+        "text": "Begitu ditaruh di sebuah hari, tugas jadi rencana. Tanggalnya bergeser? Seret ke hari lain atau kembali ke daftar."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Hitungan dengan rutinitas yang disarankan",
+    "rows": [
+      [
+        "Seminggu",
+        "168 jam"
+      ],
+      [
+        "Tidur · 8 jam sehari",
+        "56 jam"
+      ],
+      [
+        "Makan · tiga kali sehari",
+        "17,5 jam"
+      ],
+      [
+        "Kerja · sekolah · 9 jam di hari kerja",
+        "45 jam"
+      ],
+      [
+        "Olahraga · 1 jam Sen, Rab, Jum",
+        "3 jam"
+      ],
+      [
+        "Waktu yang benar-benar kamu punya minggu ini",
+        "46,5 jam"
+      ]
+    ],
+    "note": "Ini hanya saran. Pilih dan sesuaikan rutinitas dengan hidupmu. Saat cuti atau dinas, hapus kerja dari hari itu saja."
+  },
+  "pricing": {
+    "title": "Semua yang kamu perlukan untuk minggu ini gratis",
+    "free": {
+      "name": "Gratis",
+      "items": [
+        "Rencana mingguan dan harian, rutinitas, dan tugas tanpa batas",
+        "Tampilan linimasa dan pemecahan langkah",
+        "Tinjauan mingguan, bisa disalin sebagai teks",
+        "Timer dan widget Timer Saat Ini",
+        "Impor kalender",
+        "Sinkron dengan Rainbow of Desire di iPhone",
+        "Tren 2 minggu terakhir"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: tren 8 minggu, hari dan jam terbaikmu",
+        "Plus: rencana vs. kenyataan",
+        "Plus: pasang sekaligus rencana minggu yang berjalan lancar",
+        "Pro: semua isi Plus dan berbagi jadwal lewat tautan hanya-lihat",
+        "Pro: sekali beli, aplikasi iPhone juga jadi Pro"
+      ],
+      "note": "Tiap tingkat bisa langganan tahunan atau sekali bayar seumur hidup"
+    },
+    "note": "Lihat harganya di aplikasi dan App Store. Langganan tahunan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periodenya berakhir. Pro yang dibeli di iPhone juga berlaku di Mac dengan akun iCloud yang sama."
+  },
+  "faq": {
+    "title": "Pertanyaan umum",
+    "items": [
+      {
+        "q": "Harus masuk ke iCloud?",
+        "a": "Tidak, kalau hanya dipakai di Mac. iCloud diperlukan untuk sinkron dengan iPhone dan untuk membagikan jadwal."
+      },
+      {
+        "q": "Apakah aplikasi mengubah kalenderku?",
+        "a": "Kalender yang sudah ada tidak pernah diubah. Impor hanya membaca kalender yang kamu pilih. Kalau kamu menyalakan penulisan rencana ke kalender Rainbow Craft, aplikasi membuat kalender terpisah itu dan hanya menulis di sana. Kalender itu bisa kamu hapus kapan saja di aplikasi Kalender."
+      },
+      {
+        "q": "Tugas dari Mac tidak muncul di iPhone.",
+        "a": "Pastikan kedua perangkat memakai akun iCloud yang sama dan Rainbow of Desire terpasang di iPhone. Sinkron lewat iCloud, jadi bisa butuh beberapa menit."
+      },
+      {
+        "q": "Kalau jendela ditutup, aplikasinya ikut keluar?",
+        "a": "Tidak. Aplikasi tetap berjalan. Buka lagi jendelanya dari menu Jendela atau dengan mengeklik ikon di Dock."
+      },
+      {
+        "q": "Apa yang terjadi pada tugas dan rencanaku saat pembaruan?",
+        "a": "Tetap seperti semula. Pembaruan tidak mengubah atau menghapus apa yang kamu tulis."
+      },
+      {
+        "q": "Bagaimana mengganti bahasa aplikasi?",
+        "a": "Pilih di bagian paling atas Pengaturan, di Language · 언어 · 語言, lalu aplikasi dibuka ulang dalam bahasa itu. Ada 23 bahasa. Nama rutinitas dan tugas yang kamu tulis sendiri tidak diterjemahkan."
+      },
+      {
+        "q": "Ganti Mac, Plus atau Pro hilang.",
+        "a": "Masuk dengan Akun Apple yang sama lalu klik Pulihkan Pembelian di Pengaturan. Pembatalan dilakukan di pengaturan akun App Store."
+      },
+      {
+        "q": "Di mana tulisanku disimpan?",
+        "a": "Tanpa akun, tanpa daftar, dan tanpa server pengembang yang menyimpan rencanamu. Yang kamu tulis tetap di perangkatmu dan di iCloud-mu sendiri. Aplikasi mengirim statistik penggunaan anonim tanpa isi tulisanmu, dan bisa dimatikan di Pengaturan lewat Kirim statistik penggunaan anonim."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Taruh tugas minggu ini\ndi tempat yang benar-benar muat",
+    "cta": "Unduh gratis di Mac App Store"
+  },
+  "ui": {
+    "skip": "Langsung ke konten",
+    "languages": "Bahasa",
+    "privacy": "Kebijakan Privasi",
+    "contact": "Mentok atau ada yang aneh? Kirim email ke {email}. Di Pengaturan aplikasi juga ada menu untuk menghubungi kami."
+  }
+}

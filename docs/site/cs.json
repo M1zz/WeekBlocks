@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: týdenní plánovač pro Mac, který začíná pevnými rutinami",
+  "description": "Nejdřív zadejte spánek, jídlo a práci, potom přetáhněte úkoly do hodin, které opravdu zbývají. Uvidíte, co se do týdne vejde, dřív než něco slíbíte.",
+  "hero": {
+    "headline": "Vejde se to všechno\nopravdu do tohohle týdne?",
+    "lead": "Rainbow Craft rozloží váš týden na Macu po dnech a hodinách. Začněte časem, kterého se nevzdáte, jako je spánek, jídlo a práce, přetáhněte úkoly do zbylých mezer a uvidíte, co se skutečně vejde.",
+    "cta": "Stáhnout zdarma z Mac App Storu",
+    "note": "Plánování, rutiny, úkoly, ohlédnutí, časovač a import kalendáře jsou zdarma."
+  },
+  "demo": {
+    "title": "Naplánujte týden tady",
+    "lead": "Připravili jsme čtyři rutiny, které aplikace navrhne při prvním spuštění. Zapínejte je a vypínejte a pokládejte úkoly na dny.",
+    "routinesLabel": "Pevné rutiny",
+    "routines": [
+      {
+        "name": "Spánek",
+        "detail": "Každý den 8 hodin od 23:00"
+      },
+      {
+        "name": "Jídla",
+        "detail": "17,5 hodiny týdně · třikrát denně"
+      },
+      {
+        "name": "Práce · škola",
+        "detail": "Pracovní dny, 9 hodin od 09:00"
+      },
+      {
+        "name": "Cvičení",
+        "detail": "Po, St, Pá, 1 hodina"
+      }
+    ],
+    "week": "Týden",
+    "fixed": "Pevné rutiny",
+    "planned": "Naplánováno",
+    "left": "Zbývá",
+    "h": "{n} h",
+    "dayLeft": "zbývá {h}",
+    "todos": [
+      "Koncept nabídky",
+      "Zavolat zubaři",
+      "Nabídky na stěhování",
+      "Projít PR",
+      "Přečíst kapitolu"
+    ],
+    "hint": "Přetáhněte úkol na den, nebo klikněte na úkol a pak na den. Kliknutím na umístěný úkol ho vrátíte do seznamu. Duha každého dne vyplní jedno políčko za úkol.",
+    "allPlaced": "Vše je rozmístěné. Kliknutím na úkol ve dni ho vrátíte."
+  },
+  "problem": {
+    "title": "Seznam roste. Týden ne.",
+    "text": "Seznam úkolů vám neřekne, jestli ho váš týden unese. Když si spánek, jídlo a dojíždění vezmou své, zbývá méně, než si myslíte. Rainbow Craft ty hodiny ukáže v číslech a políčkách a nechá vás každý úkol vyzkoušet na skutečném místě."
+  },
+  "features": [
+    {
+      "title": "Den na 24hodinovém pravítku",
+      "text": "Časová osa rozloží den na pravítko o 24 hodinách. Mezery a překryvy jsou vidět hned a vy volíte, jak se překrývající věci uspořádají.\nSchůzky a události si stáhnete z Kalendáře na Macu, místo abyste je psali dvakrát. Pokud chcete, plány se mohou zapisovat i do samostatného kalendáře Rainbow Craft, který uvidíte na iPhonu. Ostatní kalendáře se nikdy nemění.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Rozdělte velké úkoly na kroky, které skončí",
+      "text": "Velké úkoly váznou, když něco ještě stojí v cestě. Aplikace se u každého kroku ptá na dvě věci: Můžete začít bez rozjezdu? Zvládnete ho za pět minut?\nCo splní obojí, je drobek na každých volných pět minut. Zbytek potřebuje vyhrazený čas. Když se aplikace splete, rozhodnete vy.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Na čem právě jste a kolik zbývá",
+      "text": "V čase začátku se plán přepne na probíhající, a když čas vyprší, aplikace se zeptá, jestli jste hotovi. Časovač jde podle vašeho rozvrhu.\nWidget Časovač Teď ukáže aktuální úkol a zbývající čas, aniž byste aplikaci otvírali.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Uzavřete týden kontrolním seznamem",
+      "text": "Týdenní ohlédnutí je jedna karta na den. Označte, co je hotové, napůl hotové nebo přeskočené, a použijte to při plánování dalšího týdne.\nNa stejném účtu iCloud putují úkoly mezi touto aplikací a Rainbow of Desire na iPhonu, takže den naplánovaný na Macu máte s sebou i venku.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Začít jde ve třech krocích",
+    "items": [
+      {
+        "title": "Zadejte pevné hodiny",
+        "text": "Co se každý týden opakuje, jako spánek, jídlo a práce, nastavte jako rutiny. Aplikace za vás nic nevyplní."
+      },
+      {
+        "title": "Sepište úkoly",
+        "text": "Jeden na řádek v části Úkoly dole. Kdy je uděláte, zatím vědět nemusíte."
+      },
+      {
+        "title": "Přetáhněte je na dny",
+        "text": "Úkol puštěný na den se stane plánem. Posunulo se datum? Přetáhněte ho na jiný den nebo zpět do seznamu."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Počty s navrženými rutinami",
+    "rows": [
+      [
+        "Týden",
+        "168 hodin"
+      ],
+      [
+        "Spánek · 8 hodin denně",
+        "56 hodin"
+      ],
+      [
+        "Jídla · třikrát denně",
+        "17,5 hodiny"
+      ],
+      [
+        "Práce · škola · 9 hodin v pracovní dny",
+        "45 hodin"
+      ],
+      [
+        "Cvičení · 1 hodina po, st, pá",
+        "3 hodiny"
+      ],
+      [
+        "Čas, který tento týden opravdu máte",
+        "46,5 hodiny"
+      ]
+    ],
+    "note": "Jsou to jen návrhy. Vyberte a upravte rutiny podle svého života. O dovolené nebo na cestách odeberte práci jen z toho jednoho dne."
+  },
+  "pricing": {
+    "title": "Vše, co potřebujete pro tento týden, je zdarma",
+    "free": {
+      "name": "Zdarma",
+      "items": [
+        "Týdenní a denní plány, rutiny a úkoly bez omezení",
+        "Časová osa a dělení na kroky",
+        "Týdenní ohlédnutí, které jde zkopírovat i jako text",
+        "Časovač a widget Časovač Teď",
+        "Import kalendáře",
+        "Synchronizace s Rainbow of Desire na iPhonu",
+        "Trendy za poslední 2 týdny"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: trendy za 8 týdnů, vaše nejlepší dny a hodiny",
+        "Plus: plán a skutečnost vedle sebe",
+        "Plus: přenést plán vydařeného týdne najednou do tohoto týdne",
+        "Pro: vše z Plus a sdílení rozvrhu odkazem jen pro čtení",
+        "Pro: jeden nákup odemkne Pro i v aplikaci pro iPhone"
+      ],
+      "note": "Každá úroveň jako roční předplatné nebo jednorázový nákup navždy"
+    },
+    "note": "Ceny najdete v aplikaci a v App Storu. Roční předplatné se automaticky obnoví, pokud ho nezrušíte nejpozději 24 hodin před koncem období. Pro koupené na iPhonu platí i na Macu se stejným účtem iCloud."
+  },
+  "faq": {
+    "title": "Časté dotazy",
+    "items": [
+      {
+        "q": "Musím být přihlášený k iCloudu?",
+        "a": "Ne, pokud aplikaci používáte jen na Macu. iCloud je potřeba k synchronizaci s iPhonem a ke sdílení rozvrhu."
+      },
+      {
+        "q": "Mění aplikace mé kalendáře?",
+        "a": "Nikdy ty, které už máte. Import jen čte kalendáře, které vyberete. Když zapnete zápis plánů do kalendáře Rainbow Craft, aplikace vytvoří tento samostatný kalendář a píše jen do něj. Kdykoli ho můžete smazat v aplikaci Kalendář."
+      },
+      {
+        "q": "Úkoly z Macu se na iPhonu neobjevují.",
+        "a": "Zkontrolujte, že obě zařízení používají stejný účet iCloud a že je na iPhonu nainstalovaná Rainbow of Desire. Synchronizace jde přes iCloud a může trvat pár minut."
+      },
+      {
+        "q": "Zavře se aplikace se zavřením okna?",
+        "a": "Ne. Aplikace dál běží. Okno znovu otevřete z nabídky Okno nebo kliknutím na ikonu v Docku."
+      },
+      {
+        "q": "Co se při aktualizaci stane s mými úkoly a plány?",
+        "a": "Zůstanou přesně tak, jak jsou. Aktualizace nic z toho, co jste napsali, nemění ani nemaže."
+      },
+      {
+        "q": "Jak změním jazyk aplikace?",
+        "a": "Vyberte ho úplně nahoře v Nastavení v položce Language · 언어 · 語言 a aplikace se znovu otevře v tomto jazyce. Jazyků je 23. Názvy rutin a úkoly, které jste napsali sami, se nepřekládají."
+      },
+      {
+        "q": "Nový Mac a Plus nebo Pro zmizelo.",
+        "a": "Přihlaste se stejným Účtem Apple a v Nastavení klikněte na Obnovit nákup. Zrušit můžete v nastavení účtu v App Storu."
+      },
+      {
+        "q": "Kam se ukládá to, co píšu?",
+        "a": "Žádný účet, žádná registrace a žádný server vývojáře s vašimi plány. Co napíšete, zůstává na vašich zařízeních a ve vašem iCloudu. Aplikace posílá anonymní statistiky používání bez vašeho obsahu a vypnete je v Nastavení volbou Odesílat anonymní statistiky používání."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Dejte úkoly tohoto týdne tam,\nkam se opravdu vejdou",
+    "cta": "Stáhnout zdarma z Mac App Storu"
+  },
+  "ui": {
+    "skip": "Přejít na obsah",
+    "languages": "Jazyk",
+    "privacy": "Zásady ochrany soukromí",
+    "contact": "Zasekli jste se nebo něco nesedí? Napište na {email}. Kontakt najdete i v nastavení aplikace."
+  }
+}

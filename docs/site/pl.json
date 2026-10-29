@@ -1,0 +1,195 @@
+{
+  "title": "Rainbow Craft: planer tygodnia na Maca, który zaczyna od stałych rutyn",
+  "description": "Najpierw wstaw sen, posiłki i pracę, potem przeciągnij zadania w godziny, które naprawdę zostały. Zobacz, co zmieści się w tygodniu, zanim się zgodzisz.",
+  "hero": {
+    "headline": "Czy to wszystko naprawdę\nzmieści się w tym tygodniu?",
+    "lead": "Rainbow Craft rozkłada twój tydzień na Macu według dni i godzin. Zacznij od czasu, z którego nie zrezygnujesz, jak sen, posiłki i praca, przeciągnij zadania w wolne miejsca i zobacz, co faktycznie się mieści.",
+    "cta": "Pobierz za darmo z Mac App Store",
+    "note": "Planowanie, rutyny, zadania, podsumowanie, timer i import kalendarza są darmowe."
+  },
+  "demo": {
+    "title": "Zaplanuj tydzień tutaj",
+    "lead": "Wstawiliśmy cztery rutyny, które aplikacja proponuje przy pierwszym uruchomieniu. Włączaj je i wyłączaj, a potem kładź zadania na dni.",
+    "routinesLabel": "Stałe rutyny",
+    "routines": [
+      {
+        "name": "Sen",
+        "detail": "Codziennie, 8 godzin od 23:00"
+      },
+      {
+        "name": "Posiłki",
+        "detail": "17,5 godziny tygodniowo · trzy dziennie"
+      },
+      {
+        "name": "Praca · nauka",
+        "detail": "Dni robocze, 9 godzin od 09:00"
+      },
+      {
+        "name": "Ćwiczenia",
+        "detail": "Pn, Śr, Pt, 1 godzina"
+      }
+    ],
+    "week": "Tydzień",
+    "fixed": "Stałe rutyny",
+    "planned": "Zaplanowane",
+    "left": "Zostaje",
+    "h": "{n} godz.",
+    "dayLeft": "zostaje {h}",
+    "todos": [
+      "Szkic oferty",
+      "Zadzwonić do dentysty",
+      "Wyceny przeprowadzki",
+      "Przejrzeć PR-y",
+      "Przeczytać rozdział"
+    ],
+    "hint": "Przeciągnij zadanie na dzień albo kliknij zadanie, a potem dzień. Kliknij umieszczone zadanie, aby wróciło na listę. Tęcza każdego dnia wypełnia jedno pole na zadanie.",
+    "allPlaced": "Wszystko rozplanowane. Kliknij zadanie w danym dniu, żeby je cofnąć."
+  },
+  "problem": {
+    "title": "Lista rośnie. Tydzień nie.",
+    "text": "Lista zadań nie powie ci, czy twój tydzień ją pomieści. Gdy sen, jedzenie i dojazdy zabiorą swoje, zostaje mniej, niż myślisz. Rainbow Craft pokazuje te godziny w liczbach i polach i pozwala przymierzyć każde zadanie do prawdziwego miejsca."
+  },
+  "features": [
+    {
+      "title": "Dzień na 24-godzinnej linijce",
+      "text": "Oś czasu rozkłada dzień na linijce 24 godzin. Luki i nakładki widać od razu, a ty wybierasz, jak ułożyć nachodzące na siebie sprawy.\nSpotkania i wizyty pobierzesz z Kalendarza na Macu zamiast wpisywać je dwa razy. Jeśli chcesz, plany trafią też do osobnego kalendarza Rainbow Craft, widocznego na iPhonie. Twoje pozostałe kalendarze nigdy nie są zmieniane.",
+      "shot": "03-timeline"
+    },
+    {
+      "title": "Dziel duże sprawy na kroki, które się kończą",
+      "text": "Duże sprawy stają, gdy coś wciąż blokuje drogę. Aplikacja zadaje o każdy krok dwa pytania: czy zaczniesz bez rozgrzewki? Czy skończysz w pięć minut?\nTo, co spełnia oba warunki, jest okruchem na każde wolne pięć minut. Reszta wymaga zarezerwowanego czasu. Jeśli aplikacja się myli, decydujesz ty.",
+      "shot": "04-steps"
+    },
+    {
+      "title": "Czym się zajmujesz i ile jeszcze zostało",
+      "text": "O godzinie startu plan przechodzi w trwający, a gdy czas minie, aplikacja pyta, czy skończyłeś. Timer idzie za twoim planem.\nWidżet Timer Teraz pokazuje bieżące zadanie i pozostały czas bez otwierania aplikacji.",
+      "shot": "05-timer"
+    },
+    {
+      "title": "Zamknij tydzień listą kontrolną",
+      "text": "Podsumowanie tygodnia to jedna karta na dzień. Zaznacz, co zrobione, zrobione w połowie, a co pominięte, i wykorzystaj to przy planowaniu kolejnego tygodnia.\nNa tym samym koncie iCloud zadania krążą między tą aplikacją a Rainbow of Desire na iPhonie, więc dzień zaplanowany na Macu masz zawsze przy sobie.",
+      "shot": "06-review"
+    }
+  ],
+  "steps": {
+    "title": "Start w trzech krokach",
+    "items": [
+      {
+        "title": "Ustal stałe godziny",
+        "text": "To, co wraca co tydzień, jak sen, posiłki i praca, zapisz jako rutyny. Aplikacja nic nie wypełnia za ciebie."
+      },
+      {
+        "title": "Wypisz zadania",
+        "text": "Po jednym w wierszu w sekcji Zadania na dole. Kiedy je zrobisz, nie musisz jeszcze wiedzieć."
+      },
+      {
+        "title": "Przeciągnij na dni",
+        "text": "Upuszczone na dzień staje się planem. Data się przesunęła? Przeciągnij na inny dzień albo z powrotem na listę."
+      }
+    ]
+  },
+  "reference": {
+    "title": "Rachunek dla proponowanych rutyn",
+    "rows": [
+      [
+        "Tydzień",
+        "168 godzin"
+      ],
+      [
+        "Sen · 8 godzin dziennie",
+        "56 godzin"
+      ],
+      [
+        "Posiłki · trzy dziennie",
+        "17,5 godziny"
+      ],
+      [
+        "Praca · nauka · 9 godzin w dni robocze",
+        "45 godzin"
+      ],
+      [
+        "Ćwiczenia · 1 godzina pn, śr, pt",
+        "3 godziny"
+      ],
+      [
+        "Czas, który naprawdę masz w tym tygodniu",
+        "46,5 godziny"
+      ]
+    ],
+    "note": "To tylko propozycje. Wybierz i dopasuj rutyny do swojego życia. W dni urlopu lub wyjazdu usuń pracę tylko z tego jednego dnia."
+  },
+  "pricing": {
+    "title": "Wszystko, czego potrzebujesz na ten tydzień, jest za darmo",
+    "free": {
+      "name": "Za darmo",
+      "items": [
+        "Plany tygodnia i dnia, rutyny i zadania bez limitu",
+        "Oś czasu i dzielenie na kroki",
+        "Podsumowanie tygodnia, także do skopiowania jako tekst",
+        "Timer i widżet Timer Teraz",
+        "Import kalendarza",
+        "Synchronizacja z Rainbow of Desire na iPhonie",
+        "Trendy z ostatnich 2 tygodni"
+      ]
+    },
+    "pro": {
+      "name": "Plus · Pro",
+      "items": [
+        "Plus: trendy z 8 tygodni, twoje najlepsze dni i godziny",
+        "Plus: plan a rzeczywistość",
+        "Plus: przenieś plan udanego tygodnia na ten tydzień za jednym razem",
+        "Pro: wszystko z Plus oraz udostępnianie planu przez link tylko do odczytu",
+        "Pro: jeden zakup odblokowuje Pro także w aplikacji na iPhone’a"
+      ],
+      "note": "Każdy poziom jako subskrypcja roczna lub jednorazowy zakup na zawsze"
+    },
+    "note": "Ceny znajdziesz w aplikacji i w App Store. Subskrypcja roczna odnawia się automatycznie, jeśli nie anulujesz jej najpóźniej 24 godziny przed końcem okresu. Pro kupione na iPhonie działa też na Macu z tym samym kontem iCloud."
+  },
+  "faq": {
+    "title": "Częste pytania",
+    "items": [
+      {
+        "q": "Czy muszę być zalogowany do iCloud?",
+        "a": "Nie, jeśli używasz aplikacji tylko na Macu. iCloud jest potrzebny do synchronizacji z iPhone’em i udostępniania planu."
+      },
+      {
+        "q": "Czy aplikacja zmienia moje kalendarze?",
+        "a": "Nigdy tych, które już masz. Import tylko odczytuje wybrane kalendarze. Jeśli włączysz zapisywanie planów do kalendarza Rainbow Craft, aplikacja utworzy ten osobny kalendarz i będzie pisać tylko tam. Możesz go w każdej chwili usunąć w aplikacji Kalendarz."
+      },
+      {
+        "q": "Zadania z Maca nie pojawiają się na iPhonie.",
+        "a": "Sprawdź, czy oba urządzenia używają tego samego konta iCloud i czy na iPhonie jest zainstalowana Rainbow of Desire. Synchronizacja idzie przez iCloud i może potrwać kilka minut."
+      },
+      {
+        "q": "Czy zamknięcie okna zamyka aplikację?",
+        "a": "Nie. Aplikacja działa dalej. Okno otworzysz ponownie z menu Okno albo klikając ikonę w Docku."
+      },
+      {
+        "q": "Co się dzieje z moimi zadaniami i planami po aktualizacji?",
+        "a": "Zostają dokładnie takie, jakie były. Aktualizacje niczego, co napisałeś, nie zmieniają ani nie usuwają."
+      },
+      {
+        "q": "Jak zmienić język aplikacji?",
+        "a": "Wybierz go na samej górze Ustawień w Language · 언어 · 語言, a aplikacja uruchomi się ponownie w tym języku. Dostępne są 23 języki. Nazwy rutyn i zadania wpisane przez ciebie nie są tłumaczone."
+      },
+      {
+        "q": "Nowy Mac i zniknęło Plus albo Pro.",
+        "a": "Zaloguj się tym samym Kontem Apple i kliknij Odtwórz zakup w Ustawieniach. Anulować możesz w ustawieniach konta w App Store."
+      },
+      {
+        "q": "Gdzie trafia to, co piszę?",
+        "a": "Bez konta, bez rejestracji i bez serwera dewelopera z twoimi planami. To, co piszesz, zostaje na twoich urządzeniach i w twoim iCloud. Aplikacja wysyła anonimowe statystyki użycia bez twoich treści, a wyłączysz je w Ustawieniach opcją Wysyłaj anonimowe statystyki użycia."
+      }
+    ]
+  },
+  "closing": {
+    "headline": "Połóż zadania z tego tygodnia\ntam, gdzie naprawdę się mieszczą",
+    "cta": "Pobierz za darmo z Mac App Store"
+  },
+  "ui": {
+    "skip": "Przejdź do treści",
+    "languages": "Język",
+    "privacy": "Polityka prywatności",
+    "contact": "Utknąłeś albo coś wygląda dziwnie? Napisz na {email}. W ustawieniach aplikacji też znajdziesz kontakt."
+  }
+}

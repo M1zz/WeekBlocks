@@ -1,236 +1,198 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<title>Rainbow Craft — Veckoplanering i tidsblock</title>
-<meta name="description" content="En Mac-app för att planera veckan dag för dag och timme för timme. Lägg först ut dina fasta rutiner och placera sedan uppgifterna i tiden som blir kvar." />
-<meta property="og:title" content="Rainbow Craft" />
-<meta property="og:description" content="En Mac-app för att planera veckan dag för dag och timme för timme. Lägg först ut dina fasta rutiner och placera sedan uppgifterna i tiden som blir kvar." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
-<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
-<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
-<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
-<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
-<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
-<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
-<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
-<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
-<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
-<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
-<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
-<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
-<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
-<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
-<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
-<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
-<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
-<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
-<style>
-  :root {
-    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
-    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
-    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
-    line-height:1.7; -webkit-font-smoothing:antialiased;
-  }
-  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
-  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
-  header.hero { text-align:center; padding:72px 24px 56px; }
-  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
-  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
-  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
-  section { padding:40px 0; border-top:1px solid var(--line); }
-  section:first-of-type { border-top:none; }
-  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
-  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
-  .lead { color:var(--sub); margin:0 0 24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
-  .card h3 { margin:0 0 6px; font-size:17px; }
-  .card p { margin:0; color:var(--sub); font-size:15px; }
-  .emoji { font-size:22px; display:block; margin-bottom:10px; }
-  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
-  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
-  ol.steps li:last-child { border-bottom:none; }
-  ol.steps li::before {
-    counter-increment:s; content:counter(s);
-    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
-    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
-  }
-  ol.steps b { display:block; }
-  ol.steps span { color:var(--sub); font-size:15px; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
-  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
-  details summary::-webkit-details-marker { display:none; }
-  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
-  details[open] summary::after { content:"\2013"; }
-  details p { margin:0 0 16px; color:var(--sub); }
-  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
-  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
-  .contact a.btn:hover { opacity:.9; }
-  a { color:var(--blue); }
-  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
-  footer .fam { margin-top:6px; font-size:13px; }
-  .muted { color:var(--sub); font-size:14px; }
-  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
-  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
-  table.attrs tr:last-child td { border-bottom:none; }
-  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
-  table.attrs td.v { color:var(--sub); }
-  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
-  h3.sub { font-size:17px; margin:26px 0 6px; }
-  ul.plain { padding-left:20px; color:var(--sub); }
-  ul.plain li { margin:6px 0; }
-  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
-  nav.langs { padding:14px 16px 0; }
-  nav.pages { padding:8px 16px 0; }
-  nav.langs a, nav.pages a { text-decoration:none; }
-  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
-  footer nav { margin-top:10px; }
-  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rainbow Craft: veckoplaneraren för Mac som börjar med dina fasta rutiner</title>
+  <meta name="description" content="Lägg in sömn, måltider och arbete först och dra sedan uppgifterna till timmarna som faktiskt är kvar. Se vad veckan rymmer innan du säger ja.">
+  <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-itunes-app" content="app-id=6777737322">
+  <link rel="canonical" href="https://m1zz.github.io/WeekBlocks/sv/">
+  <link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/">
+  <link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/">
+  <link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/">
+  <link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/">
+  <link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/">
+  <link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/">
+  <link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/">
+  <link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/">
+  <link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/">
+  <link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/">
+  <link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/">
+  <link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/">
+  <link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/">
+  <link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/">
+  <link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/">
+  <link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/">
+  <link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/">
+  <link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/">
+  <link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/">
+  <link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/">
+  <link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/">
+  <link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rainbow Craft: veckoplaneraren för Mac som börjar med dina fasta rutiner">
+  <meta property="og:description" content="Lägg in sömn, måltider och arbete först och dra sedan uppgifterna till timmarna som faktiskt är kvar. Se vad veckan rymmer innan du säger ja.">
+  <meta property="og:url" content="https://m1zz.github.io/WeekBlocks/sv/">
+  <meta property="og:image" content="https://m1zz.github.io/WeekBlocks/img/sv/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../icon.png">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="../demo.css">
+  <style>:root{--accent:#007AFF}@media (prefers-color-scheme:dark){:root{--accent:#0A84FF}}</style>
+  <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
+  <a class="skip" href="#main">Hoppa till innehållet</a>
+  <header class="bar">
+    <a class="brand" href="../sv/"><img src="../icon.png" alt="" width="32" height="32">Rainbow Craft</a>
+    <a class="lang-link" href="#languages">Språk</a>
+  </header>
 
-<div class="rainbow-bar"></div>
-<nav class="langs" aria-label="Language">
-  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
-  <a href="../en/index.html" hreflang="en" lang="en">English</a>
-  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
-  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
-  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
-  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
-  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
-  <a href="../fr/index.html" hreflang="fr" lang="fr">Français</a>
-  <a href="../it/index.html" hreflang="it" lang="it">Italiano</a>
-  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
-  <a href="../nl/index.html" hreflang="nl" lang="nl">Nederlands</a>
-  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
-  <a href="../sv/index.html" hreflang="sv" lang="sv" aria-current="true">Svenska</a>
-  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
-  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
-  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
-  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
-  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
-  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
-  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
-  <a href="../id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
-  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
-  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
-</nav>
-<nav class="pages" aria-label="Sidor">
-  <a href="index.html" aria-current="page">Om appen</a>
-  <a href="support.html">Support</a>
-  <a href="privacy.html">Integritetspolicy</a>
-</nav>
+  <main id="main">
+    <section class="hero">
+      <div class="copy">
+        <h1>Får allt verkligen<br>plats den här veckan?</h1>
+        <p class="lead">Rainbow Craft lägger ut din vecka dag för dag och timme för timme på Macen. Börja med tiden du inte kan avstå, som sömn, måltider och arbete, dra in uppgifterna i luckorna och se vad som faktiskt får plats.</p>
+        <div class="actions"><a class="cta" href="https://apps.apple.com/app/id6777737322">Hämta gratis på Mac App Store</a><a class="try" href="#try">Planera en vecka här ↓</a></div>
+        <p class="muted small">Planering, rutiner, uppgifter, genomgång, timer och kalenderimport är gratis.</p>
+      </div>
+      <div class="plain"><img src="../img/sv/01-week.jpg" alt="Får allt verkligen plats den här veckan?" width="600" height="375" decoding="async"></div>
+    </section>
 
-<header class="hero">
-  <span class="badge">App för macOS</span>
-  <h1>Rainbow Craft</h1>
-  <p class="tagline">En arbetsbänk för att planera veckan dag för dag och timme för timme. Lägg först ut timmarna du inte kan avstå, som sömn, måltider och jobb, placera sedan dina uppgifter i det som blir kvar och se vad som faktiskt får plats.</p>
-</header>
 
-<main class="wrap">
+    <section class="reveal" id="try">
+      <h2>Planera en vecka här</h2>
+      <p class="muted">Vi har lagt in de fyra rutiner som appen föreslår första gången du öppnar den. Slå av och på dem och lägg uppgifter på dagarna.</p>
+      <div id="demo" class="card demo-card" data-text="{&quot;title&quot;: &quot;Planera en vecka här&quot;, &quot;lead&quot;: &quot;Vi har lagt in de fyra rutiner som appen föreslår första gången du öppnar den. Slå av och på dem och lägg uppgifter på dagarna.&quot;, &quot;routinesLabel&quot;: &quot;Fasta rutiner&quot;, &quot;routines&quot;: [{&quot;name&quot;: &quot;Sömn&quot;, &quot;detail&quot;: &quot;Varje dag, 8 timmar från 23:00&quot;}, {&quot;name&quot;: &quot;Måltider&quot;, &quot;detail&quot;: &quot;17,5 timmar i veckan · tre om dagen&quot;}, {&quot;name&quot;: &quot;Arbete · skola&quot;, &quot;detail&quot;: &quot;Vardagar, 9 timmar från 09:00&quot;}, {&quot;name&quot;: &quot;Träning&quot;, &quot;detail&quot;: &quot;Mån, ons, fre, 1 timme&quot;}], &quot;week&quot;: &quot;Vecka&quot;, &quot;fixed&quot;: &quot;Fasta rutiner&quot;, &quot;planned&quot;: &quot;Planerat&quot;, &quot;left&quot;: &quot;Kvar&quot;, &quot;h&quot;: &quot;{n} h&quot;, &quot;dayLeft&quot;: &quot;{h} kvar&quot;, &quot;todos&quot;: [&quot;Utkast till offert&quot;, &quot;Ring tandläkaren&quot;, &quot;Flyttofferter&quot;, &quot;Granska PR:er&quot;, &quot;Läs ett kapitel&quot;], &quot;hint&quot;: &quot;Dra en uppgift till en dag, eller klicka på uppgiften och sedan på dagen. Klicka på en placerad uppgift för att skicka tillbaka den till listan. Varje dags regnbåge fyller en ruta per uppgift.&quot;, &quot;allPlaced&quot;: &quot;Allt är placerat. Klicka på en uppgift i en dag för att hämta tillbaka den.&quot;}"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--blue)"></span>Planera veckan du verkligen har</h2>
-  <p class="lead">En att göra-lista kan inte berätta om din vecka rymmer allt. Du måste lägga ut sakerna och titta.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">🕒</span>
-      <h3>Fasta rutiner först</h3>
-      <p>En vecka har 168 timmar. Fasta rutiner tar sin del först, och appen visar med tydliga siffror vad som återstår.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📐</span>
-      <h3>Dra det dit det hör hemma</h3>
-      <p>Dra en uppgift till en dag så blir den ett planblock. Flytta den, ändra tiden eller dra tillbaka den till listan när datumet inte längre fungerar.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📊</span>
-      <h3>En dag över 24 timmar</h3>
-      <p>Tidslinjevyn lägger ut dagen på en 24-timmarslinjal. Luckor och överlappningar syns direkt, och du väljer själv hur överlappande poster ordnas.</p>
-    </div>
-  </div>
-</section>
+    <section class="problem reveal">
+      <h2>Listan växer. Veckan gör det inte.</h2>
+      <p>En uppgiftslista säger inte om veckan klarar av den. När sömn, mat och pendling har tagit sitt finns mindre kvar än du tror. Rainbow Craft visar de timmarna som siffror och rutor och låter dig prova varje uppgift på en riktig plats.</p>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--green)"></span>Dela upp stora jobb i steg som blir klara</h2>
-  <p class="lead">Ett stort jobb fastnar oftast inte för att du är lat, utan för att något fortfarande står i vägen innan du kan ta tag i det.</p>
-  <p>Appen ställer två frågor om varje steg.</p>
-  <ul class="plain">
-    <li><b>Kan du börja utan uppstart?</b> Arbete som kräver att du kommer in i sammanhanget igen förbrukar en hel femminuterslucka på att bara komma igång.</li>
-    <li><b>Blir det klart inom fem minuter?</b> Ofärdigt arbete lämnar rester som äter upp nästa stund.</li>
-  </ul>
-  <p>Svarar du ja på båda är det ett ministeg, något du kan ta så fort fem minuter öppnar sig. Allt annat kräver tid du avsätter. Appen svarar först utifrån formuleringen och längden, och du kan ändra svaret när den har fel.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Se en dag på en 24-timmarslinjal</h2>
+        <p>Tidslinjevyn lägger ut dagen på en linjal över 24 timmar. Luckor och överlapp syns direkt, och du väljer hur överlappande saker ska ligga.<br>Hämta möten och avtalade tider från Kalender på Macen i stället för att skriva dem två gånger. Om du vill kan planerna också hamna i en separat Rainbow Craft-kalender som du ser på iPhone. Dina andra kalendrar ändras aldrig.</p>
+      </div>
+      <div class="plain"><img src="../img/sv/03-timeline.jpg" alt="Se en dag på en 24-timmarslinjal" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--purple)"></span>Håll tiden och se tillbaka</h2>
-  <p class="lead">En plan betyder mest efter att du gjort den.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">⏱️</span>
-      <h3>Nu-timer</h3>
-      <p>När en plans starttid kommer blir den pågående, och när tiden är ute frågar appen om du blev klar. Widgeten Nu-timer visar vad du håller på med och hur lång tid som är kvar utan att du öppnar appen.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📅</span>
-      <h3>Fungerar med Kalender</h3>
-      <p>Hämta in möten och avtal från Kalender på din Mac i stället för att skriva dem två gånger. Om du vill kan planerna läggas i en separat kalender, Rainbow Craft. Dina andra kalendrar ändras aldrig.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">✅</span>
-      <h3>Veckogenomgång</h3>
-      <p>Ett kort per dag. Markera vad du gjorde, gjorde till hälften eller hoppade över, och använd det för att planera nästa vecka.</p>
-    </div>
-  </div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Dela upp stora jobb i steg som blir klara</h2>
+        <p>Stora jobb fastnar när något fortfarande står i vägen. Appen ställer två frågor om varje steg: kan du börja utan uppvärmning? Går det att göra klart på fem minuter?<br>Det som klarar båda är en bit att ta när fem minuter blir lediga. Resten behöver avsatt tid. Har appen fel bestämmer du.</p>
+      </div>
+      <div class="plain"><img src="../img/sv/04-steps.jpg" alt="Dela upp stora jobb i steg som blir klara" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--orange)"></span>Fungerar med din iPhone</h2>
-  <p>Med samma iCloud-konto flyttas uppgifter mellan den här appen och Rainbow of Desire på iPhone. Planera dagen på din Mac och kolla den på din iPhone när du är ute.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Vad du håller på med och hur länge till</h2>
+        <p>När starttiden kommer blir planen pågående, och när tiden är slut frågar appen om du blev klar. Timern följer ditt schema.<br>Widgeten Nu-timer visar vad du gör och hur lång tid som är kvar utan att du öppnar appen.</p>
+      </div>
+      <div class="plain"><img src="../img/sv/05-timer.jpg" alt="Vad du håller på med och hur länge till" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--yellow)"></span>Integritet</h2>
-  <div class="note">Inget konto, ingen registrering och ingen utvecklarserver som lagrar dina planer. Det du skriver stannar på dina enheter och i din egen iCloud. För att förbättra appen skickas anonyma användningssiffror som aldrig innehåller det du skriver, och du kan stänga av dem i Inställningar. Detaljerna finns i <a href="privacy.html">integritetspolicyn</a>.</div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Avsluta veckan med en checklista</h2>
+        <p>Veckogenomgången är ett kort per dag. Markera vad du gjorde, gjorde till hälften eller hoppade över, och använd det när du planerar nästa vecka.<br>Med samma iCloud-konto går uppgifterna mellan den här appen och Rainbow of Desire på iPhone, så dagen du planerade på Macen följer med dig ut.</p>
+      </div>
+      <div class="plain"><img src="../img/sv/06-review.jpg" alt="Avsluta veckan med en checklista" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <div class="contact">
-    <h2 style="margin-bottom:6px">Behöver du hjälp?</h2>
-    <p class="lead" style="margin-bottom:0">Svar på vanliga frågor och hur du når mig finns på supportsidan.</p>
-    <a class="btn" href="support.html">Till support</a>
-  </div>
-</section>
+    <section class="reveal">
+      <h2>Kom igång i tre steg</h2>
+      <ol class="steps"><li class="card"><span class="n">1</span><h3>Lägg in de fasta timmarna</h3><p>Det som återkommer varje vecka, som sömn, måltider och arbete, blir rutiner. Appen fyller inte i något åt dig.</p></li>
+<li class="card"><span class="n">2</span><h3>Skriv dina uppgifter</h3><p>En per rad under Uppgifter längst ned. När du ska göra dem behöver du inte veta än.</p></li>
+<li class="card"><span class="n">3</span><h3>Dra dem till dagarna</h3><p>Släppt på en dag blir det en plan. Flyttas datumet? Dra den till en annan dag eller tillbaka till listan.</p></li></ol>
+    </section>
 
-</main>
+    <section class="reveal" id="commands">
+      <h2>Räkneexemplet med de föreslagna rutinerna</h2>
+      <div class="card table">
+        <dl><div><dt>En vecka</dt><dd>168 timmar</dd></div><div><dt>Sömn · 8 timmar om dagen</dt><dd>56 timmar</dd></div><div><dt>Måltider · tre om dagen</dt><dd>17,5 timmar</dd></div><div><dt>Arbete · skola · 9 timmar på vardagar</dt><dd>45 timmar</dd></div><div><dt>Träning · 1 timme mån, ons, fre</dt><dd>3 timmar</dd></div><div><dt>Tid du faktiskt har den här veckan</dt><dd>46,5 timmar</dd></div></dl>
+      </div>
+      <p class="muted">Det är bara förslag. Välj och justera rutinerna efter ditt liv. På semester- eller resdagar tar du bara bort arbetet den dagen.</p>
+    </section>
 
-<footer>
-  <div>2026 Rainbow Craft</div>
-  <div class="fam">Rainbow Craft (macOS) &middot; Rainbow of Desire (iOS)</div>
-  <nav class="pages"><a href="index.html">Om appen</a> <a href="support.html">Support</a> <a href="privacy.html">Integritetspolicy</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">Versionsinformation</a></nav>
-</footer>
 
+    <section class="reveal" id="pricing">
+      <h2>Allt du behöver för att leva den här veckan är gratis</h2>
+      <div class="plans">
+        <div class="card plan free">
+          <h3>Gratis</h3>
+          <ul><li>Vecko- och dagsplaner, rutiner och uppgifter utan gräns</li><li>Tidslinjevy och uppdelning i steg</li><li>Veckogenomgång som också kan kopieras som text</li><li>Timer och Nu-timer-widget</li><li>Kalenderimport</li><li>Synk med Rainbow of Desire på iPhone</li><li>Trender för de senaste 2 veckorna</li></ul>
+          
+        </div>
+        <div class="card plan pro">
+          <h3>Plus · Pro</h3>
+          <ul><li>Plus: trender över 8 veckor, dina bästa dagar och tider</li><li>Plus: plan och verklighet sida vid sida</li><li>Plus: lägg in planen från en bra vecka i den här veckan på en gång</li><li>Pro: allt i Plus och dela ditt schema med en skrivskyddad länk</li><li>Pro: ett köp låser upp Pro även i iPhone-appen</li></ul>
+          <p class="muted">Varje nivå som årsprenumeration eller ett engångsköp för alltid</p>
+        </div>
+      </div>
+      <p class="muted">Priserna ser du i appen och på App Store. Årsprenumerationen förnyas automatiskt om du inte säger upp den senast 24 timmar innan perioden slutar. Pro köpt på iPhone gäller också på en Mac med samma iCloud-konto.</p>
+    </section>
+
+    <section class="reveal" id="faq">
+      <h2>Vanliga frågor</h2>
+      <div class="faq"><details><summary>Måste jag vara inloggad på iCloud?</summary><p>Inte om du bara använder den på Macen. Det krävs för att synka med iPhone och dela ditt schema.</p></details>
+<details><summary>Ändrar appen mina kalendrar?</summary><p>Aldrig dem du redan har. Importen läser bara kalendrarna du väljer. Slår du på att skriva planer till Rainbow Craft-kalendern skapar appen den separata kalendern och skriver bara där. Du kan ta bort den när som helst i appen Kalender.</p></details>
+<details><summary>Uppgifter från Macen syns inte på iPhone.</summary><p>Kontrollera att båda enheterna använder samma iCloud-konto och att Rainbow of Desire är installerad på iPhone. Synken går via iCloud och kan ta några minuter.</p></details>
+<details><summary>Avslutas appen när jag stänger fönstret?</summary><p>Nej. Appen fortsätter köras. Öppna fönstret igen från menyn Fönster eller genom att klicka på symbolen i Dock.</p></details>
+<details><summary>Vad händer med mina uppgifter och planer vid en uppdatering?</summary><p>De blir kvar precis som de är. Uppdateringar ändrar eller raderar aldrig det du har skrivit.</p></details>
+<details><summary>Hur byter jag appens språk?</summary><p>Välj det högst upp i Inställningar under Language · 언어 · 語言, så öppnas appen igen på det språket. Det finns 23 språk. Rutinnamn och uppgifter som du själv skrivit översätts inte.</p></details>
+<details><summary>Ny Mac och Plus eller Pro är borta.</summary><p>Logga in med samma Apple-konto och klicka på Återställ köp i Inställningar. Uppsägning gör du i kontoinställningarna i App Store.</p></details>
+<details><summary>Var sparas det jag skriver?</summary><p>Inget konto, ingen registrering och ingen utvecklarserver med dina planer. Det du skriver stannar på dina enheter och i din egen iCloud. Appen skickar anonym användningsstatistik utan ditt innehåll, och du kan stänga av den i Inställningar under Skicka anonym användningsstatistik.</p></details></div>
+      <p class="contact">Kört fast eller ser något konstigt ut? Mejla <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>. Det finns också en kontaktpunkt i appens inställningar.</p>
+    </section>
+
+    <section class="closing reveal">
+      <h2>Lägg veckans uppgifter där<br>de faktiskt får plats</h2>
+      <a class="cta" href="https://apps.apple.com/app/id6777737322">Hämta gratis på Mac App Store</a>
+    </section>
+  </main>
+
+  <footer>
+    <nav id="languages" class="langs" aria-label="Språk"><a href="../" hreflang="ko" lang="ko">한국어</a>
+<a href="../en/" hreflang="en" lang="en">English</a>
+<a href="../ja/" hreflang="ja" lang="ja">日本語</a>
+<a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+<a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+<a href="../de/" hreflang="de" lang="de">Deutsch</a>
+<a href="../es/" hreflang="es" lang="es">Español</a>
+<a href="../fr/" hreflang="fr" lang="fr">Français</a>
+<a href="../it/" hreflang="it" lang="it">Italiano</a>
+<a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+<a href="../nl/" hreflang="nl" lang="nl">Nederlands</a>
+<a href="../da/" hreflang="da" lang="da">Dansk</a>
+<a href="../sv/" hreflang="sv" lang="sv" aria-current="page">Svenska</a>
+<a href="../nb/" hreflang="nb" lang="nb">Norsk bokmål</a>
+<a href="../fi/" hreflang="fi" lang="fi">Suomi</a>
+<a href="../pl/" hreflang="pl" lang="pl">Polski</a>
+<a href="../cs/" hreflang="cs" lang="cs">Čeština</a>
+<a href="../el/" hreflang="el" lang="el">Ελληνικά</a>
+<a href="../ru/" hreflang="ru" lang="ru">Русский</a>
+<a href="../tr/" hreflang="tr" lang="tr">Türkçe</a>
+<a href="../id/" hreflang="id" lang="id">Bahasa Indonesia</a>
+<a href="../vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
+<a href="../th/" hreflang="th" lang="th">ไทย</a></nav>
+    <p><a href="privacy.html">Integritetspolicy</a> · <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a> · © 2026 Rainbow Craft</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+    }), { rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  </script>
+  <script src="../demo.js"></script>
 </body>
 </html>

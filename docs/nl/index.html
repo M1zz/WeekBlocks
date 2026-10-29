@@ -1,236 +1,198 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<title>Rainbow Craft — Timeblocking per week</title>
-<meta name="description" content="Een Mac-app om je week per dag en per uur te plannen. Leg eerst je vaste routines vast en zet je taken dan in de tijd die overblijft." />
-<meta property="og:title" content="Rainbow Craft" />
-<meta property="og:description" content="Een Mac-app om je week per dag en per uur te plannen. Leg eerst je vaste routines vast en zet je taken dan in de tijd die overblijft." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="canonical" href="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/" />
-<link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/" />
-<link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/" />
-<link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/" />
-<link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/" />
-<link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/" />
-<link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/" />
-<link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/" />
-<link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/" />
-<link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/" />
-<link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/" />
-<link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/" />
-<link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/" />
-<link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/" />
-<link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/" />
-<link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/" />
-<link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/" />
-<link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/" />
-<link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/" />
-<link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/" />
-<link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/" />
-<link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/" />
-<link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/" />
-<link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/" />
-<style>
-  :root {
-    --red:#FF3B30; --orange:#FF9500; --yellow:#FFCC00; --green:#34C759;
-    --blue:#007AFF; --indigo:#5856D6; --purple:#AF52DE;
-    --ink:#1c1c1e; --sub:#6b6b70; --line:#e6e6ea; --bg:#ffffff; --card:#f7f7f9;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#f2f2f7; --sub:#a1a1aa; --line:#2c2c2e; --bg:#000000; --card:#1c1c1e; }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
-    line-height:1.7; -webkit-font-smoothing:antialiased;
-  }
-  .rainbow-bar { height:6px; background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--indigo),var(--purple)); }
-  .wrap { max-width:780px; margin:0 auto; padding:0 24px; }
-  header.hero { text-align:center; padding:72px 24px 56px; }
-  .badge { display:inline-block; font-size:13px; font-weight:600; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, transparent); padding:5px 14px; border-radius:999px; letter-spacing:.02em; }
-  h1 { font-size:clamp(34px,6vw,52px); margin:18px 0 10px; letter-spacing:-0.02em; font-weight:800; }
-  .tagline { font-size:18px; color:var(--sub); margin:0 auto; max-width:560px; }
-  section { padding:40px 0; border-top:1px solid var(--line); }
-  section:first-of-type { border-top:none; }
-  h2 { font-size:24px; font-weight:700; margin:0 0 8px; letter-spacing:-0.01em; }
-  h2 .dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:10px; vertical-align:middle; }
-  .lead { color:var(--sub); margin:0 0 24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
-  .card h3 { margin:0 0 6px; font-size:17px; }
-  .card p { margin:0; color:var(--sub); font-size:15px; }
-  .emoji { font-size:22px; display:block; margin-bottom:10px; }
-  ol.steps { counter-reset:s; list-style:none; padding:0; margin:0; }
-  ol.steps li { position:relative; padding:14px 0 14px 52px; border-bottom:1px solid var(--line); }
-  ol.steps li:last-child { border-bottom:none; }
-  ol.steps li::before {
-    counter-increment:s; content:counter(s);
-    position:absolute; left:0; top:12px; width:34px; height:34px; border-radius:50%;
-    background:var(--blue); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px;
-  }
-  ol.steps b { display:block; }
-  ol.steps span { color:var(--sub); font-size:15px; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-bottom:12px; }
-  details summary { cursor:pointer; font-weight:600; padding:14px 0; list-style:none; outline:none; }
-  details summary::-webkit-details-marker { display:none; }
-  details summary::after { content:"+"; float:right; color:var(--sub); font-weight:400; font-size:20px; line-height:1; }
-  details[open] summary::after { content:"\2013"; }
-  details p { margin:0 0 16px; color:var(--sub); }
-  .contact { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; }
-  .contact a.btn { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; font-weight:600; padding:12px 26px; border-radius:12px; }
-  .contact a.btn:hover { opacity:.9; }
-  a { color:var(--blue); }
-  footer { text-align:center; color:var(--sub); font-size:14px; padding:48px 24px 64px; border-top:1px solid var(--line); }
-  footer .fam { margin-top:6px; font-size:13px; }
-  .muted { color:var(--sub); font-size:14px; }
-  table.attrs { width:100%; border-collapse:collapse; margin-top:8px; }
-  table.attrs td { padding:12px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:15px; }
-  table.attrs tr:last-child td { border-bottom:none; }
-  table.attrs td.k { white-space:nowrap; font-weight:700; width:1%; padding-right:18px; }
-  table.attrs td.v { color:var(--sub); }
-  .note { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:16px 18px; color:var(--sub); font-size:15px; }
-  h3.sub { font-size:17px; margin:26px 0 6px; }
-  ul.plain { padding-left:20px; color:var(--sub); }
-  ul.plain li { margin:6px 0; }
-  nav.langs, nav.pages { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; font-size:14px; }
-  nav.langs { padding:14px 16px 0; }
-  nav.pages { padding:8px 16px 0; }
-  nav.langs a, nav.pages a { text-decoration:none; }
-  nav.langs a[aria-current], nav.pages a[aria-current] { color:var(--ink); font-weight:700; }
-  footer nav { margin-top:10px; }
-  @media (max-width:480px) { .wrap { padding:0 16px; } header.hero { padding:56px 16px 40px; } }
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rainbow Craft: de weekplanner voor de Mac die begint bij je vaste routines</title>
+  <meta name="description" content="Zet eerst slaap, maaltijden en werk erin en sleep je taken dan naar de uren die echt over zijn. Zie wat in je week past voordat je ja zegt.">
+  <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-itunes-app" content="app-id=6777737322">
+  <link rel="canonical" href="https://m1zz.github.io/WeekBlocks/nl/">
+  <link rel="alternate" hreflang="ko" href="https://m1zz.github.io/WeekBlocks/">
+  <link rel="alternate" hreflang="en" href="https://m1zz.github.io/WeekBlocks/en/">
+  <link rel="alternate" hreflang="ja" href="https://m1zz.github.io/WeekBlocks/ja/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://m1zz.github.io/WeekBlocks/zh-Hans/">
+  <link rel="alternate" hreflang="zh-Hant" href="https://m1zz.github.io/WeekBlocks/zh-Hant/">
+  <link rel="alternate" hreflang="de" href="https://m1zz.github.io/WeekBlocks/de/">
+  <link rel="alternate" hreflang="es" href="https://m1zz.github.io/WeekBlocks/es/">
+  <link rel="alternate" hreflang="fr" href="https://m1zz.github.io/WeekBlocks/fr/">
+  <link rel="alternate" hreflang="it" href="https://m1zz.github.io/WeekBlocks/it/">
+  <link rel="alternate" hreflang="pt-BR" href="https://m1zz.github.io/WeekBlocks/pt-BR/">
+  <link rel="alternate" hreflang="nl" href="https://m1zz.github.io/WeekBlocks/nl/">
+  <link rel="alternate" hreflang="da" href="https://m1zz.github.io/WeekBlocks/da/">
+  <link rel="alternate" hreflang="sv" href="https://m1zz.github.io/WeekBlocks/sv/">
+  <link rel="alternate" hreflang="nb" href="https://m1zz.github.io/WeekBlocks/nb/">
+  <link rel="alternate" hreflang="fi" href="https://m1zz.github.io/WeekBlocks/fi/">
+  <link rel="alternate" hreflang="pl" href="https://m1zz.github.io/WeekBlocks/pl/">
+  <link rel="alternate" hreflang="cs" href="https://m1zz.github.io/WeekBlocks/cs/">
+  <link rel="alternate" hreflang="el" href="https://m1zz.github.io/WeekBlocks/el/">
+  <link rel="alternate" hreflang="ru" href="https://m1zz.github.io/WeekBlocks/ru/">
+  <link rel="alternate" hreflang="tr" href="https://m1zz.github.io/WeekBlocks/tr/">
+  <link rel="alternate" hreflang="id" href="https://m1zz.github.io/WeekBlocks/id/">
+  <link rel="alternate" hreflang="vi" href="https://m1zz.github.io/WeekBlocks/vi/">
+  <link rel="alternate" hreflang="th" href="https://m1zz.github.io/WeekBlocks/th/">
+  <link rel="alternate" hreflang="x-default" href="https://m1zz.github.io/WeekBlocks/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rainbow Craft: de weekplanner voor de Mac die begint bij je vaste routines">
+  <meta property="og:description" content="Zet eerst slaap, maaltijden en werk erin en sleep je taken dan naar de uren die echt over zijn. Zie wat in je week past voordat je ja zegt.">
+  <meta property="og:url" content="https://m1zz.github.io/WeekBlocks/nl/">
+  <meta property="og:image" content="https://m1zz.github.io/WeekBlocks/img/nl/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../icon.png">
+  <link rel="apple-touch-icon" href="../icon.png">
+  <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="../demo.css">
+  <style>:root{--accent:#007AFF}@media (prefers-color-scheme:dark){:root{--accent:#0A84FF}}</style>
+  <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
+  <a class="skip" href="#main">Naar de inhoud</a>
+  <header class="bar">
+    <a class="brand" href="../nl/"><img src="../icon.png" alt="" width="32" height="32">Rainbow Craft</a>
+    <a class="lang-link" href="#languages">Taal</a>
+  </header>
 
-<div class="rainbow-bar"></div>
-<nav class="langs" aria-label="Language">
-  <a href="../index.html" hreflang="ko" lang="ko">한국어</a>
-  <a href="../en/index.html" hreflang="en" lang="en">English</a>
-  <a href="../ja/index.html" hreflang="ja" lang="ja">日本語</a>
-  <a href="../zh-Hans/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
-  <a href="../zh-Hant/index.html" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
-  <a href="../de/index.html" hreflang="de" lang="de">Deutsch</a>
-  <a href="../es/index.html" hreflang="es" lang="es">Español</a>
-  <a href="../fr/index.html" hreflang="fr" lang="fr">Français</a>
-  <a href="../it/index.html" hreflang="it" lang="it">Italiano</a>
-  <a href="../pt-BR/index.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
-  <a href="../nl/index.html" hreflang="nl" lang="nl" aria-current="true">Nederlands</a>
-  <a href="../da/index.html" hreflang="da" lang="da">Dansk</a>
-  <a href="../sv/index.html" hreflang="sv" lang="sv">Svenska</a>
-  <a href="../nb/index.html" hreflang="nb" lang="nb">Norsk bokmål</a>
-  <a href="../fi/index.html" hreflang="fi" lang="fi">Suomi</a>
-  <a href="../pl/index.html" hreflang="pl" lang="pl">Polski</a>
-  <a href="../cs/index.html" hreflang="cs" lang="cs">Čeština</a>
-  <a href="../el/index.html" hreflang="el" lang="el">Ελληνικά</a>
-  <a href="../ru/index.html" hreflang="ru" lang="ru">Русский</a>
-  <a href="../tr/index.html" hreflang="tr" lang="tr">Türkçe</a>
-  <a href="../id/index.html" hreflang="id" lang="id">Bahasa Indonesia</a>
-  <a href="../vi/index.html" hreflang="vi" lang="vi">Tiếng Việt</a>
-  <a href="../th/index.html" hreflang="th" lang="th">ไทย</a>
-</nav>
-<nav class="pages" aria-label="Pagina&#39;s">
-  <a href="index.html" aria-current="page">Over</a>
-  <a href="support.html">Ondersteuning</a>
-  <a href="privacy.html">Privacybeleid</a>
-</nav>
+  <main id="main">
+    <section class="hero">
+      <div class="copy">
+        <h1>Past dit echt allemaal<br>in deze week?</h1>
+        <p class="lead">Rainbow Craft legt je week op de Mac uit per dag en per uur. Begin met de tijd die vastligt, zoals slaap, maaltijden en werk, sleep taken naar de gaten die overblijven en zie wat er echt in past.</p>
+        <div class="actions"><a class="cta" href="https://apps.apple.com/app/id6777737322">Gratis in de Mac App Store</a><a class="try" href="#try">Plan hier een week ↓</a></div>
+        <p class="muted small">Plannen, routines, taken, terugblik, timer en agenda-import zijn gratis.</p>
+      </div>
+      <div class="plain"><img src="../img/nl/01-week.jpg" alt="Past dit echt allemaal in deze week?" width="600" height="375" decoding="async"></div>
+    </section>
 
-<header class="hero">
-  <span class="badge">macOS-app</span>
-  <h1>Rainbow Craft</h1>
-  <p class="tagline">Een werkbank om je week per dag en per uur te plannen. Leg eerst de uren vast die je niet kunt missen, zoals slaap, eten en werk, zet je taken dan in wat overblijft en zie wat er echt past.</p>
-</header>
 
-<main class="wrap">
+    <section class="reveal" id="try">
+      <h2>Plan hier een week</h2>
+      <p class="muted">We hebben de vier routines klaargezet die de app bij de eerste start voorstelt. Zet ze aan en uit en leg taken op de dagen.</p>
+      <div id="demo" class="card demo-card" data-text="{&quot;title&quot;: &quot;Plan hier een week&quot;, &quot;lead&quot;: &quot;We hebben de vier routines klaargezet die de app bij de eerste start voorstelt. Zet ze aan en uit en leg taken op de dagen.&quot;, &quot;routinesLabel&quot;: &quot;Vaste routines&quot;, &quot;routines&quot;: [{&quot;name&quot;: &quot;Slaap&quot;, &quot;detail&quot;: &quot;Elke dag, 8 uur vanaf 23:00&quot;}, {&quot;name&quot;: &quot;Maaltijden&quot;, &quot;detail&quot;: &quot;17,5 uur per week · drie per dag&quot;}, {&quot;name&quot;: &quot;Werk · school&quot;, &quot;detail&quot;: &quot;Werkdagen, 9 uur vanaf 09:00&quot;}, {&quot;name&quot;: &quot;Sport&quot;, &quot;detail&quot;: &quot;Ma, wo, vr, 1 uur&quot;}], &quot;week&quot;: &quot;Week&quot;, &quot;fixed&quot;: &quot;Vaste routines&quot;, &quot;planned&quot;: &quot;Gepland&quot;, &quot;left&quot;: &quot;Over&quot;, &quot;h&quot;: &quot;{n} u&quot;, &quot;dayLeft&quot;: &quot;nog {h}&quot;, &quot;todos&quot;: [&quot;Offerte opzetten&quot;, &quot;Tandarts bellen&quot;, &quot;Verhuisoffertes&quot;, &quot;Open PR’s nakijken&quot;, &quot;Hoofdstuk lezen&quot;], &quot;hint&quot;: &quot;Sleep een taak naar een dag, of klik eerst op de taak en dan op de dag. Klik op een geplaatste taak om hem terug naar de lijst te sturen. De regenboog van elke dag vult één vakje per taak.&quot;, &quot;allPlaced&quot;: &quot;Alles staat ingepland. Klik op een taak in een dag om hem terug te halen.&quot;}"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--blue)"></span>Plan de week die je echt hebt</h2>
-  <p class="lead">Een takenlijst vertelt je niet of je week het aankan. Je moet de dingen neerzetten en kijken.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">🕒</span>
-      <h3>Eerst de vaste routines</h3>
-      <p>Een week heeft 168 uur. Vaste routines nemen eerst hun deel, en de app laat in heldere getallen zien wat er overblijft.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📐</span>
-      <h3>Sleep het naar waar het hoort</h3>
-      <p>Sleep een taak naar een dag en hij wordt een planblok. Verplaats hem, wijzig de tijd of sleep hem terug naar de lijst als de datum niet meer uitkomt.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📊</span>
-      <h3>Een dag over 24 uur</h3>
-      <p>De tijdlijn zet een dag uit op een liniaal van 24 uur. Gaten en overlappingen zie je in één oogopslag, en je bepaalt zelf hoe overlappende items worden geordend.</p>
-    </div>
-  </div>
-</section>
+    <section class="problem reveal">
+      <h2>De lijst groeit. De week niet.</h2>
+      <p>Een takenlijst vertelt je niet of je week het allemaal aankan. Als slaap, eten en reistijd hun deel hebben genomen, blijft er minder over dan je denkt. Rainbow Craft laat die uren zien in cijfers en vakjes, en laat je elke taak uitproberen op een echte plek.</p>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--green)"></span>Splits grote klussen in stappen die af komen</h2>
-  <p class="lead">Een grote klus loopt meestal niet vast omdat je lui bent, maar omdat er nog iets in de weg zit voordat je eraan kunt beginnen.</p>
-  <p>De app stelt bij elke stap twee vragen.</p>
-  <ul class="plain">
-    <li><b>Kun je beginnen zonder opstarttijd?</b> Werk waarvoor je de context opnieuw moet laden, kost een heel gaatje van vijf minuten alleen al aan op gang komen.</li>
-    <li><b>Is het binnen vijf minuten klaar?</b> Onafgemaakt werk laat restanten achter die aan het volgende blok tijd vreten.</li>
-  </ul>
-  <p>Twee keer ja betekent een fragment: iets wat je oppakt zodra er vijf minuten vrijkomen. Al het andere heeft tijd nodig die je vrijhoudt. De app antwoordt eerst op basis van de formulering en de duur, en je kunt dat altijd overrulen als het niet klopt.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Een dag op een liniaal van 24 uur</h2>
+        <p>De tijdlijnweergave legt een dag op een liniaal van 24 uur. Gaten en overlappingen zie je meteen, en jij kiest hoe overlappende afspraken naast elkaar staan.<br>Haal vergaderingen en afspraken uit Agenda op je Mac in plaats van ze dubbel te typen. Als je wilt, gaan je plannen ook naar een aparte Rainbow Craft-agenda die je op je iPhone ziet. Je andere agenda’s blijven onaangeroerd.</p>
+      </div>
+      <div class="plain"><img src="../img/nl/03-timeline.jpg" alt="Een dag op een liniaal van 24 uur" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--purple)"></span>Blijf bij de tijd, blik daarna terug</h2>
-  <p class="lead">Een plan telt pas echt nadat je het hebt gemaakt.</p>
-  <div class="grid">
-    <div class="card">
-      <span class="emoji">⏱️</span>
-      <h3>Nu-timer</h3>
-      <p>Als de begintijd van een plan aanbreekt, staat het op bezig, en als de tijd om is, vraagt de app of je klaar bent. De Nu-timer-widget laat zien waar je mee bezig bent en hoelang het nog duurt, zonder de app te openen.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">📅</span>
-      <h3>Werkt met Agenda</h3>
-      <p>Haal vergaderingen en afspraken uit Agenda op je Mac in plaats van ze twee keer te typen. Als je wilt, kunnen plannen in een aparte agenda Rainbow Craft komen. Je andere agenda's worden nooit gewijzigd.</p>
-    </div>
-    <div class="card">
-      <span class="emoji">✅</span>
-      <h3>Weekterugblik</h3>
-      <p>Eén kaart per dag. Vink aan wat je deed, half deed of oversloeg, en gebruik dat om de volgende week te plannen.</p>
-    </div>
-  </div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Grote klussen opdelen in stappen die af komen</h2>
+        <p>Grote klussen lopen vast als er nog iets in de weg zit. De app stelt bij elke stap twee vragen: kun je zonder aanloop beginnen? Is het in vijf minuten klaar?<br>Wat aan allebei voldoet, is een brokje voor elk gat van vijf minuten. De rest vraagt geplande tijd. Zit de app ernaast, dan beslis jij.</p>
+      </div>
+      <div class="plain"><img src="../img/nl/04-steps.jpg" alt="Grote klussen opdelen in stappen die af komen" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--orange)"></span>Werkt met je iPhone</h2>
-  <p>Met hetzelfde iCloud-account gaan taken heen en weer tussen deze app en Rainbow of Desire op de iPhone. Plan vandaag op je Mac en check het onderweg op je iPhone.</p>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Waar je mee bezig bent, en hoelang nog</h2>
+        <p>Op de starttijd springt een plan op bezig, en als de tijd om is vraagt de app of je klaar bent. De timer volgt je planning.<br>De Nu-timer-widget toont waar je mee bezig bent en hoeveel tijd er over is, zonder de app te openen.</p>
+      </div>
+      <div class="plain"><img src="../img/nl/05-timer.jpg" alt="Waar je mee bezig bent, en hoelang nog" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <h2><span class="dot" style="background:var(--yellow)"></span>Privacy</h2>
-  <div class="note">Er is geen account, geen registratie en geen server van de ontwikkelaar die je plannen bewaart. Wat je schrijft, blijft op je apparaten en in je eigen iCloud. Om de app te verbeteren, stuurt hij anonieme gebruikstellingen die nooit bevatten wat je schrijft, en je kunt ze uitzetten in Instellingen. De details staan in het <a href="privacy.html">privacybeleid</a>.</div>
-</section>
+    <section class="feature reveal">
+      <div class="copy">
+        <h2>Sluit de week af met een checklist</h2>
+        <p>De weekterugblik is één kaart per dag. Vink aan wat gedaan, half gedaan of overgeslagen is, en gebruik dat voor de volgende week.<br>Met hetzelfde iCloud-account gaan taken heen en weer tussen deze app en Rainbow of Desire op de iPhone, dus de dag die je op de Mac plande gaat met je mee.</p>
+      </div>
+      <div class="plain"><img src="../img/nl/06-review.jpg" alt="Sluit de week af met een checklist" width="600" height="375" loading="lazy" decoding="async"></div>
+    </section>
 
-<section>
-  <div class="contact">
-    <h2 style="margin-bottom:6px">Hulp nodig?</h2>
-    <p class="lead" style="margin-bottom:0">Antwoorden op veelgestelde vragen en hoe je me bereikt, vind je op de ondersteuningspagina.</p>
-    <a class="btn" href="support.html">Naar ondersteuning</a>
-  </div>
-</section>
+    <section class="reveal">
+      <h2>In drie stappen aan de slag</h2>
+      <ol class="steps"><li class="card"><span class="n">1</span><h3>Leg de vaste uren vast</h3><p>Wat elke week terugkomt, zoals slapen, eten en werken, zet je als routine. De app vult niets voor je in.</p></li>
+<li class="card"><span class="n">2</span><h3>Schrijf je taken op</h3><p>Eén per regel onder Taken, onderaan. Wanneer je ze doet, hoef je nog niet te weten.</p></li>
+<li class="card"><span class="n">3</span><h3>Sleep ze naar dagen</h3><p>Op een dag gezet, wordt het een plan. Schuift de datum? Sleep hem naar een andere dag of terug naar de lijst.</p></li></ol>
+    </section>
 
-</main>
+    <section class="reveal" id="commands">
+      <h2>De rekensom met de voorgestelde routines</h2>
+      <div class="card table">
+        <dl><div><dt>Een week</dt><dd>168 uur</dd></div><div><dt>Slaap · 8 uur per dag</dt><dd>56 uur</dd></div><div><dt>Maaltijden · drie per dag</dt><dd>17,5 uur</dd></div><div><dt>Werk · school · 9 uur op werkdagen</dt><dd>45 uur</dd></div><div><dt>Sport · 1 uur ma, wo, vr</dt><dd>3 uur</dd></div><div><dt>Tijd die je deze week echt hebt</dt><dd>46,5 uur</dd></div></dl>
+      </div>
+      <p class="muted">Dit zijn maar voorstellen. Kies en pas de routines aan op je eigen leven. Op een vrije dag of reisdag haal je het werk alleen voor die dag weg.</p>
+    </section>
 
-<footer>
-  <div>2026 Rainbow Craft</div>
-  <div class="fam">Rainbow Craft (macOS) &middot; Rainbow of Desire (iOS)</div>
-  <nav class="pages"><a href="index.html">Over</a> <a href="support.html">Ondersteuning</a> <a href="privacy.html">Privacybeleid</a> <a href="https://github.com/M1zz/WeekBlocks/blob/main/docs/RELEASE_NOTES.md">Releasenotes</a></nav>
-</footer>
 
+    <section class="reveal" id="pricing">
+      <h2>Alles wat je nodig hebt om deze week te leven is gratis</h2>
+      <div class="plans">
+        <div class="card plan free">
+          <h3>Gratis</h3>
+          <ul><li>Week- en dagplannen, routines en taken zonder limiet</li><li>Tijdlijnweergave en opdelen in stappen</li><li>Weekterugblik, ook te kopiëren als tekst</li><li>Timer en Nu-timer-widget</li><li>Agenda-import</li><li>Synchronisatie met Rainbow of Desire op de iPhone</li><li>Trends van de laatste 2 weken</li></ul>
+          
+        </div>
+        <div class="card plan pro">
+          <h3>Plus · Pro</h3>
+          <ul><li>Plus: 8 weken trends, je beste dagen en tijden</li><li>Plus: plan en werkelijkheid naast elkaar</li><li>Plus: het plan van een goede week in één keer overnemen</li><li>Pro: alles van Plus, plus je planning delen via een alleen-lezen-link</li><li>Pro: één aankoop ontgrendelt Pro ook in de iPhone-app</li></ul>
+          <p class="muted">Elk niveau als jaarabonnement of eenmalige aankoop voor altijd</p>
+        </div>
+      </div>
+      <p class="muted">Prijzen zie je in de app en in de App Store. Het jaarabonnement wordt automatisch verlengd, tenzij je het uiterlijk 24 uur voor het einde van de periode opzegt. Pro gekocht op de iPhone werkt ook op een Mac met hetzelfde iCloud-account.</p>
+    </section>
+
+    <section class="reveal" id="faq">
+      <h2>Veelgestelde vragen</h2>
+      <div class="faq"><details><summary>Moet ik ingelogd zijn bij iCloud?</summary><p>Niet als je alleen op de Mac plant. Je hebt het nodig om met je iPhone te synchroniseren en om je planning te delen.</p></details>
+<details><summary>Past de app mijn agenda’s aan?</summary><p>Je bestaande agenda’s worden nooit gewijzigd. De import leest alleen de agenda’s die je kiest. Zet je het schrijven naar de Rainbow Craft-agenda aan, dan maakt de app die aparte agenda en schrijft alleen daarin. Je kunt hem altijd verwijderen in de Agenda-app.</p></details>
+<details><summary>Taken van de Mac verschijnen niet op de iPhone.</summary><p>Controleer of beide apparaten hetzelfde iCloud-account gebruiken en of Rainbow of Desire op de iPhone staat. Synchroniseren gaat via iCloud en kan een paar minuten duren.</p></details>
+<details><summary>Sluit de app als ik het venster sluit?</summary><p>Nee. De app blijft draaien. Open het venster opnieuw via het menu Venster of door op het Dock-symbool te klikken.</p></details>
+<details><summary>Wat gebeurt er met mijn taken en plannen bij een update?</summary><p>Die blijven precies zoals ze zijn. Updates veranderen of wissen niets van wat je hebt geschreven.</p></details>
+<details><summary>Hoe verander ik de taal van de app?</summary><p>Kies helemaal bovenaan in Instellingen bij Language · 언어 · 語言, dan opent de app opnieuw in die taal. Er zijn 23 talen. Zelf ingevoerde routinenamen en taken worden niet vertaald.</p></details>
+<details><summary>Nieuwe Mac en Plus of Pro is weg.</summary><p>Log in met hetzelfde Apple Account en klik in Instellingen op Herstel aankoop. Opzeggen doe je via je accountinstellingen in de App Store.</p></details>
+<details><summary>Waar blijft wat ik schrijf?</summary><p>Geen account, geen registratie en geen server van de ontwikkelaar met je plannen. Wat je schrijft blijft op je apparaten en in je eigen iCloud. De app stuurt anonieme gebruiksgegevens zonder je inhoud, en die zet je uit in Instellingen met Stuur anonieme gebruiksstatistieken.</p></details></div>
+      <p class="contact">Loop je vast of klopt er iets niet? Mail naar <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a>. Ook in de instellingen van de app vind je een contactmogelijkheid.</p>
+    </section>
+
+    <section class="closing reveal">
+      <h2>Zet de taken van deze week<br>waar ze echt passen</h2>
+      <a class="cta" href="https://apps.apple.com/app/id6777737322">Gratis in de Mac App Store</a>
+    </section>
+  </main>
+
+  <footer>
+    <nav id="languages" class="langs" aria-label="Taal"><a href="../" hreflang="ko" lang="ko">한국어</a>
+<a href="../en/" hreflang="en" lang="en">English</a>
+<a href="../ja/" hreflang="ja" lang="ja">日本語</a>
+<a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a>
+<a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant">繁體中文</a>
+<a href="../de/" hreflang="de" lang="de">Deutsch</a>
+<a href="../es/" hreflang="es" lang="es">Español</a>
+<a href="../fr/" hreflang="fr" lang="fr">Français</a>
+<a href="../it/" hreflang="it" lang="it">Italiano</a>
+<a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a>
+<a href="../nl/" hreflang="nl" lang="nl" aria-current="page">Nederlands</a>
+<a href="../da/" hreflang="da" lang="da">Dansk</a>
+<a href="../sv/" hreflang="sv" lang="sv">Svenska</a>
+<a href="../nb/" hreflang="nb" lang="nb">Norsk bokmål</a>
+<a href="../fi/" hreflang="fi" lang="fi">Suomi</a>
+<a href="../pl/" hreflang="pl" lang="pl">Polski</a>
+<a href="../cs/" hreflang="cs" lang="cs">Čeština</a>
+<a href="../el/" hreflang="el" lang="el">Ελληνικά</a>
+<a href="../ru/" hreflang="ru" lang="ru">Русский</a>
+<a href="../tr/" hreflang="tr" lang="tr">Türkçe</a>
+<a href="../id/" hreflang="id" lang="id">Bahasa Indonesia</a>
+<a href="../vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
+<a href="../th/" hreflang="th" lang="th">ไทย</a></nav>
+    <p><a href="privacy.html">Privacybeleid</a> · <a href="mailto:mizzking75@gmail.com">mizzking75@gmail.com</a> · © 2026 Rainbow Craft</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+    }), { rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  </script>
+  <script src="../demo.js"></script>
 </body>
 </html>
