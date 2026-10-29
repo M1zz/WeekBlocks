@@ -1025,6 +1025,15 @@ struct DayScheduleView: View {
                     gapSearch = ""
                     openGap = c.id
                 }
+                // 할 일을 끌어다 놓는 길 말고도 — VoiceOver·음성 제어로는 빈 시간을 눌러 채우기 판을 연다.
+                .accessibilityElement()
+                .accessibilityLabel(Text(String(localized: "빈 시간 \(formatDuration(c.hours))")))
+                .accessibilityValue(Text(verbatim: "\(formatHour(c.startHour)) – \(formatHour(c.startHour + c.hours))"))
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction {
+                    gapSearch = ""
+                    openGap = c.id
+                }
                 .gesture(
                     DragGesture(minimumDistance: 4, coordinateSpace: .named(Self.trackSpace))
                         .onChanged { v in
@@ -1564,6 +1573,21 @@ struct DayScheduleView: View {
                         actions.move(seg, deltaHours: delta)
                     }
             )
+            // **VoiceOver·음성 제어로도 한 칸을 다 다룬다.** 누르기·끌기를 한 제스처가 맡아서
+            // 그대로는 이름도 누를 길도 없었다. 누르면 편집기, 지우기·되살리기는 동작으로.
+            // 시각을 옮기는 것은 편집기에서 한다.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: seg.title))
+            .accessibilityValue(done ? Text(verbatim: timeRange(seg) + ", ") + Text("끝냄") : Text(verbatim: timeRange(seg)))
+            .accessibilityAddTraits(seg.isGhost ? [] : .isButton)
+            .accessibilityAction { edit(seg) }
+            .accessibilityActions {
+                if seg.isGhost {
+                    Button(seg.restoreLabel) { actions.restore(seg) }
+                } else {
+                    Button(seg.deleteLabel(on: day, isToday: isToday), role: .destructive) { actions.delete(seg) }
+                }
+            }
 
             if showsCheck, let block {
                 HStack(spacing: 6) {
@@ -2692,6 +2716,19 @@ struct GapFillPopover: View {
         }
     }
 
+    private func canStepStart(_ sign: Double) -> Bool {
+        sign < 0 ? start > gapStart + 1e-6 : start < lastStart - 1e-6
+    }
+
+    /// 15분 앞(−1)·뒤(+1)로. 빈 시간 밖으로는 안 나간다.
+    private func stepStart(_ sign: Double) {
+        let at = sign < 0
+            ? max(gapStart, ((start - 0.25) * 4).rounded() / 4)
+            : min(lastStart, ((start + 0.25) * 4).rounded() / 4)
+        startOverride = at
+        clampLength(after: at)
+    }
+
     /// 시작 시각 — 15분씩 앞뒤로. 오른쪽에 그 시각부터 남는 시간을 같이 적는다.
     private var startRow: some View {
         HStack(spacing: 6) {
@@ -2700,20 +2737,25 @@ struct GapFillPopover: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 26, alignment: .leading)
 
-            stepButton("chevron.left", enabled: start > gapStart + 1e-6) {
-                let at = max(gapStart, ((start - 0.25) * 4).rounded() / 4)
-                startOverride = at
-                clampLength(after: at)
+            HStack(spacing: 6) {
+                stepButton("chevron.left", enabled: canStepStart(-1)) { stepStart(-1) }
+                Text(formatHour(start))
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                    .frame(minWidth: 52)
+                stepButton("chevron.right", enabled: canStepStart(1)) { stepStart(1) }
             }
-            Text(formatHour(start))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .contentTransition(.numericText())
-                .frame(minWidth: 52)
-            stepButton("chevron.right", enabled: start < lastStart - 1e-6) {
-                let at = min(lastStart, ((start + 0.25) * 4).rounded() / 4)
-                startOverride = at
-                clampLength(after: at)
+            // 화살표 둘은 이름이 없다 — VoiceOver 에는 '시작' 한 칸으로, 위·아래로 15분씩.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("시작")
+            .accessibilityValue(formatHour(start))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: if canStepStart(1) { stepStart(1) }
+                case .decrement: if canStepStart(-1) { stepStart(-1) }
+                @unknown default: break
+                }
             }
 
             if let n = snappedNow {

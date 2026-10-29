@@ -353,6 +353,11 @@ struct DayColumn: View {
             .onTapGesture { onOpenDay?() }
             .pointingCursor(enabled: onOpenDay != nil)
             .help(String(localized: "\(day.longLabel) 하루 보기"))
+            // 요일 머리는 누르는 자리다 — VoiceOver 에는 날짜 하나와 '하루 보기' 동작으로.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: day.longLabel))
+            .accessibilityAddTraits(onOpenDay != nil ? [.isHeader, .isButton] : .isHeader)
+            .accessibilityAction { onOpenDay?() }
 
             // 그날의 무지개 — 한 주를 가로로 훑으면 어느 날에 일이 몰렸는지가 색으로 읽힌다.
             if let todoLoad {
@@ -404,6 +409,7 @@ struct DayColumn: View {
             .buttonStyle(.squish)
             .disabled(!canPlan)
             .help(canPlan ? "\(day.longLabel)에 블록 추가" : "고정 루틴을 먼저 추가하세요")
+            .accessibilityLabel(canPlan ? Text("\(day.longLabel)에 블록 추가") : Text("고정 루틴을 먼저 추가하세요"))
         }
         .padding(8)
         // 이웃 칸과 키를 맞춘다 — 들쭉날쭉한 카드는 대시보드가 아니라 쌓아 둔 종이로 읽힌다.
@@ -484,6 +490,9 @@ struct RoutineChip: View {
             .hoverLift(hovering && dragToken != nil)
             .grabCursor(enabled: dragToken != nil)
             .animation(Motion.hover, value: hovering)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { onTap() }
             .contextMenu {
                 if let onEdit {
                     Button(action: onEdit) {

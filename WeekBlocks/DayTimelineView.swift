@@ -534,6 +534,10 @@ struct DayTimelineRow: View {
             .onTapGesture(perform: onOpenDay)
             .pointingCursor()
             .help(String(localized: "\(day.longLabel) 하루 보기"))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: day.longLabel))
+            .accessibilityAddTraits([.isHeader, .isButton])
+            .accessibilityAction { onOpenDay() }
 
             GeometryReader { geo in
                 let w = geo.size.width
@@ -833,6 +837,20 @@ struct DayTimelineRow: View {
             }
         }
         .help(dragHelp(seg))
+        // 띠는 누르기·끌기를 한 제스처가 맡아 VoiceOver 에는 이름도 누를 길도 없었다.
+        // 한 칸 = 제목과 시각, 누르면 편집기, 지우기·되살리기는 동작으로 (일간 화면과 같은 길).
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: seg.title))
+        .accessibilityValue(Text(verbatim: "\(formatHour(seg.logicalStart)) – \(formatHour(seg.logicalStart + seg.logicalDuration))"))
+        .accessibilityAddTraits(ghost ? [] : .isButton)
+        .accessibilityAction { edit(seg) }
+        .accessibilityActions {
+            if ghost {
+                Button(restoreLabel(seg)) { restoreSegment(seg) }
+            } else {
+                Button(deleteLabel(seg), role: .destructive) { deleteSegment(seg) }
+            }
+        }
     }
 
     /// 요일까지 넘나들 수 있는 것(계획 블록)인가. 떠 있게 그릴지 여기서 정한다.

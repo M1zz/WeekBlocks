@@ -338,6 +338,7 @@ struct TodoStepsView: View {
                         Image(systemName: "xmark.circle.fill")
                     }
                     .buttonStyle(.squish)
+                    .accessibilityLabel("취소")
                 }
                 .foregroundStyle(.secondary)
                 .transition(.row)
@@ -551,6 +552,12 @@ private struct StepRow: View {
             Divider()
             Button("삭제", role: .destructive, action: onDelete)
         }
+        // 오른쪽 단추들은 가리킬 때만 선다 — 같은 일을 VoiceOver·음성 제어의 동작으로 둔다.
+        .accessibilityElement(children: .contain)
+        .accessibilityAction(named: Text("하위 단계 추가"), onAddChild)
+        .accessibilityAction(named: Text("위로"), onMoveUp)
+        .accessibilityAction(named: Text("아래로"), onMoveDown)
+        .accessibilityAction(named: Text("삭제"), onDelete)
     }
 
     private var content: some View {
@@ -563,6 +570,7 @@ private struct StepRow: View {
                     .foregroundStyle(item.isCompleted ? .green : (isCurrent ? .orange : Color.secondary))
             }
             .buttonStyle(.squish)
+            .accessibilityLabel(item.isCompleted ? Text("안 끝낸 것으로 되돌리기") : Text("끝냈다"))
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
@@ -627,12 +635,14 @@ private struct StepRow: View {
                 }
                 .buttonStyle(.squish)
                 .help("하위 단계 추가")
+                .accessibilityLabel("하위 단계 추가")
                 .transition(.control)
                 Button(action: onDelete) {
                     Image(systemName: "xmark").font(.system(size: 11))
                 }
                 .buttonStyle(.squish)
                 .help("삭제")
+                .accessibilityLabel("삭제")
                 .transition(.control)
             }
         }

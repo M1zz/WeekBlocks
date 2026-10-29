@@ -1626,6 +1626,7 @@ struct ContentView: View {
                 Image(systemName: "xmark").font(.system(size: 11, weight: .semibold))
             }
             .buttonStyle(.squish)
+            .accessibilityLabel("닫기")
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 12)

@@ -38,6 +38,7 @@ struct RoutineRow: View {
                     Image(systemName: "pencil")
                 }
                 .buttonStyle(.borderless)
+                .accessibilityLabel("수정")
 
                 if routine.kind == .fixed {
                     // 중요한 고정 루틴은 실수 삭제 방지를 위해 목록에선 잠금.
@@ -48,10 +49,12 @@ struct RoutineRow: View {
                     .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
                     .help("중요한 고정 루틴 — 편집에서 삭제할 수 있습니다")
+                    .accessibilityLabel("수정")
                 } else {
                     Button(role: .destructive) { onDelete() } label: {
                         Image(systemName: "trash")
                     }
+                    .accessibilityLabel("삭제")
                     .buttonStyle(.borderless)
                     .foregroundStyle(.red)
                 }
@@ -72,6 +75,7 @@ struct RoutineRow: View {
         .animation(Motion.hover, value: hovering)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) { onEdit() }
+        .modifier(RoutineAccessibility(routine: routine, onEdit: onEdit, onDelete: onDelete))
     }
 }
 
@@ -100,6 +104,7 @@ struct RoutineBlock: View {
                         Image(systemName: "pencil").font(.system(size: 13))
                     }
                     .buttonStyle(.squish)
+                    .accessibilityLabel("수정")
                     if routine.kind == .fixed {
                         // 중요한 고정 루틴 — 실수 삭제 방지로 잠금(편집에서만 삭제).
                         Image(systemName: "lock.fill").font(.system(size: 12)).foregroundStyle(.secondary)
@@ -108,6 +113,7 @@ struct RoutineBlock: View {
                             Image(systemName: "trash").font(.system(size: 13))
                         }
                         .buttonStyle(.squish)
+                        .accessibilityLabel("삭제")
                         .foregroundStyle(.red)
                     }
                 } else if routine.kind == .fixed {
@@ -146,6 +152,29 @@ struct RoutineBlock: View {
         .animation(Motion.hover, value: hovering)
         .onTapGesture(count: 2) { onEdit() }
         .help(routine.scheduleDescription)
+        .modifier(RoutineAccessibility(routine: routine, onEdit: onEdit, onDelete: onDelete))
+    }
+}
+
+/// 루틴 카드를 VoiceOver·음성 제어로 다루는 길. 연필·휴지통은 가리킬 때만 서고 여는 것은
+/// 두 번 누르기라, 카드 하나를 '누르면 수정'으로 읽히게 하고 지우기는 동작으로 둔다.
+/// 중요한 고정 루틴은 목록에서 못 지우는 그대로 — 편집기에서만.
+private struct RoutineAccessibility: ViewModifier {
+    let routine: Routine
+    let onEdit: () -> Void
+    let onDelete: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { onEdit() }
+            .accessibilityAction(named: Text("수정")) { onEdit() }
+            .accessibilityActions {
+                if routine.kind != .fixed {
+                    Button("삭제", role: .destructive) { onDelete() }
+                }
+            }
     }
 }
 

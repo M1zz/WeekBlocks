@@ -243,6 +243,7 @@ private struct ReceivedScheduleCard: View {
                     Image(systemName: "chevron.left")
                 }
                 .buttonStyle(.borderless)
+                .accessibilityLabel("지난주")
                 .disabled(safeIndex <= 0)
 
                 Text("\(safeIndex + 1) / \(weeks.count)주")
@@ -259,6 +260,7 @@ private struct ReceivedScheduleCard: View {
                     Image(systemName: "chevron.right")
                 }
                 .buttonStyle(.borderless)
+                .accessibilityLabel("다음 주")
                 .disabled(safeIndex >= weeks.count - 1)
 
                 Button(action: onLeave) {

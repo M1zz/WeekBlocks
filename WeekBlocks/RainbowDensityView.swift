@@ -192,6 +192,12 @@ struct RainbowDensityView: View {
                 .contentShape(Rectangle())
                 .onTapGesture(count: 2) { onAdd(day) }
                 .help("가로로 끌어 기간을 고르거나, 두 번 눌러 이날부터 장기 플랜 추가")
+                // 두 번 누르기·끌기 대신 — VoiceOver·음성 제어로는 날짜에서 바로 '장기 플랜 추가'.
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(day, format: .dateTime.month().day().weekday(.wide)))
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { onAdd(day) }
+                .accessibilityAction(named: Text("장기 플랜 추가")) { onAdd(day) }
             }
         }
     }
@@ -241,6 +247,14 @@ struct RainbowDensityView: View {
                         }
                     }
                     .help(event == nil ? String(localized: "가로로 끌어 기간을 고르면 장기 플랜 추가") : "")
+                    // 색 칸에는 글자가 없다 — 일정이 시작되는 칸 하나만 VoiceOver 에 이름·기간과 함께 서고,
+                    // 이어지는 칸과 빈 칸은 숨긴다 (같은 일정을 칸마다 되풀이해 읽지 않게).
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(verbatim: event?.title ?? ""))
+                    .accessibilityValue(Text(verbatim: event.map { Self.cardLines($0, on: day).joined(separator: ", ") } ?? ""))
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { if let event { onOpen(event) } }
+                    .accessibilityHidden(event == nil || joinsPrev)
                     .zIndex(hovered == HoverCell(lane: lane, day: i) ? 1 : 0)
             }
             .animation(.easeOut(duration: 0.12), value: hovered)

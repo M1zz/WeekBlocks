@@ -73,6 +73,20 @@ func paletteHex(_ name: String) -> String? {
     }
 }
 
+/// 팔레트 이름 → 사람이 읽는 색 이름. 색 동그라미에는 글자가 없어서, VoiceOver·도움말이 이 이름을 말한다.
+func paletteDisplayName(_ name: String) -> String {
+    switch name {
+    case "red":    String(localized: "빨강")
+    case "orange": String(localized: "주황")
+    case "yellow": String(localized: "노랑")
+    case "green":  String(localized: "초록")
+    case "blue":   String(localized: "파랑")
+    case "indigo": String(localized: "남색")
+    case "purple": String(localized: "보라")
+    default:       name
+    }
+}
+
 // 컬러 피커 옵션 — iOS와 동일한 7색 무지개를 스펙트럼 순서로 노출.
 let routineColorOptions: [(name: String, color: Color)] =
     Rainbow.spectrum.map { (name: $0.name, color: Color(hex: $0.hex) ?? .accentColor) }

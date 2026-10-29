@@ -180,6 +180,7 @@ struct OverlapNudgeBanner: View {
                 .buttonStyle(.borderless)
                 .foregroundStyle(.secondary)
                 .help("지금 기준대로 두고 더 묻지 않기")
+                .accessibilityLabel("닫기")
             }
 
             HStack(spacing: 10) {

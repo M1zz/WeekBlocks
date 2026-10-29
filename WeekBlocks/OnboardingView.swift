@@ -238,6 +238,7 @@ struct OnboardingView: View {
             .contentShape(.soft(Corner.card))
         }
         .buttonStyle(.squish)
+        .accessibilityAddTraits(isOn ? .isSelected : [])
         .animation(Motion.hover, value: isOn)
     }
 
@@ -491,6 +492,7 @@ struct NextStepBanner: View {
             .buttonStyle(.borderless)
             .foregroundStyle(.secondary)
             .help("이 안내를 더 보지 않기")
+            .accessibilityLabel("닫기")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 11)

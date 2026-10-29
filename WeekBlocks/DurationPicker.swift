@@ -122,6 +122,17 @@ struct DurationPicker: View {
                 .keyboardShortcut(.rightArrow, modifiers: [])
             }
             .animation(Motion.number, value: hours)
+            // −·＋ 동그라미는 이름이 없다 — VoiceOver 에는 하나의 조절 칸으로 (위·아래로 15분씩).
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("얼마나 걸릴지")
+            .accessibilityValue(formatDuration(hours))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: if hours < range.upperBound { nudge(Self.step) }
+                case .decrement: if hours > range.lowerBound { nudge(-Self.step) }
+                @unknown default: break
+                }
+            }
 
             Text("15분씩 · ← → 키로도")
                 .font(.body)

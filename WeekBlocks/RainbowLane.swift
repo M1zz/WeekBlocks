@@ -127,6 +127,12 @@ struct RainbowEventEditor: View {
                                 .frame(width: 18, height: 18)
                                 .overlay(Circle().strokeBorder(.primary.opacity(colorHex.uppercased() == swatch.hex.uppercased() ? 0.8 : 0), lineWidth: 2))
                                 .onTapGesture { colorHex = swatch.hex }
+                                // 색 동그라미는 이름이 없다 — 색 이름을 붙이고 누를 수 있게.
+                                .accessibilityElement()
+                                .accessibilityLabel(paletteDisplayName(swatch.name))
+                                .accessibilityAddTraits(colorHex.uppercased() == swatch.hex.uppercased()
+                                                        ? [.isButton, .isSelected] : .isButton)
+                                .accessibilityAction { colorHex = swatch.hex }
                         }
                     }
                 }
@@ -326,6 +332,7 @@ struct RainbowEventEditor: View {
                         }
                         .buttonStyle(.borderless)
                         .help("이 회차 빼기")
+                        .accessibilityLabel("이 회차 빼기")
                     }
                     HStack(spacing: 8) {
                         // 시각은 고르기 — 비워 두면 그날 몇 시간만 (블록은 저녁에 시각 없이 선다).
@@ -340,6 +347,7 @@ struct RainbowEventEditor: View {
                             }
                             .buttonStyle(.borderless)
                             .help("시각 지우기")
+                            .accessibilityLabel("시각 지우기")
                         } else {
                             Button {
                                 // 앞 회차의 시각을 이어받는다 — 과정은 대개 같은 시각이다.

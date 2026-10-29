@@ -538,6 +538,7 @@ struct TimerPill: View {
                 .menuIndicator(.hidden)
                 .fixedSize()
                 .help("겹친 일정 중 타이머로 셀 것 고르기")
+                .accessibilityLabel("타이머로 셀 일정")
             }
         }
     }

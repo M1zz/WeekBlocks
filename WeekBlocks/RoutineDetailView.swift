@@ -272,7 +272,9 @@ private struct ColorPicker: View {
                     }
                 }
                 .buttonStyle(.squish)
-                .help(option.name)
+                .help(paletteDisplayName(option.name))
+                .accessibilityLabel(paletteDisplayName(option.name))
+                .accessibilityAddTraits(selected == option.name ? .isSelected : [])
             }
         }
     }

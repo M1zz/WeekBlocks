@@ -307,6 +307,7 @@ struct BacklogSection: View {
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
+                .accessibilityLabel("더 보기")
                 .menuStyle(.borderlessButton)
                 .fixedSize()
             }
@@ -631,6 +632,7 @@ struct BacklogSection: View {
             }
             .buttonStyle(.plain)
             .help(isCollapsed ? String(localized: "펼치기") : String(localized: "접기"))
+            .accessibilityLabel(isCollapsed ? Text("펼치기") : Text("접기"))
             Circle()
                 .fill(group.project?.displayColor ?? Color.secondary.opacity(0.4))
                 .frame(width: 9, height: 9)
@@ -852,6 +854,7 @@ struct BacklogSection: View {
             .buttonStyle(.squish)
             .foregroundStyle(.secondary)
             .help("닫기 (Esc)")
+            .accessibilityLabel("닫기")
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 9)
@@ -1025,6 +1028,7 @@ struct BacklogSection: View {
                             }
                             .buttonStyle(.squish)
                             .help("끝냈다고 표시한다")
+                            .accessibilityLabel("끝내기")
 
                             Text(item.title)
                                 .font(.system(size: 13))
@@ -1951,12 +1955,16 @@ struct AllBacklogRow: View {
             .buttonStyle(.squish)
             .foregroundStyle(.secondary)
             .opacity(hovering ? 1 : 0)
+            .accessibilityLabel("이 할 일 삭제")
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
         .background(Color(nsColor: .controlBackgroundColor), in: .soft(Corner.chip))
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
+        // 지우기 단추는 가리킬 때만 선다 — VoiceOver·음성 제어에는 줄의 동작으로 둔다.
+        .accessibilityElement(children: .combine)
+        .accessibilityAction(named: Text("삭제"), onDelete)
     }
 }
 
@@ -2369,6 +2377,7 @@ struct ProjectManagerView: View {
             Image(systemName: "ellipsis.circle")
                 .font(.title3)
         }
+        .accessibilityLabel("더 보기")
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
@@ -2577,6 +2586,7 @@ struct ProjectTodoRow: View {
             }
             .buttonStyle(.plain)
             .help(item.isCompleted ? String(localized: "안 끝낸 것으로 되돌리기") : String(localized: "끝냈다"))
+            .accessibilityLabel(item.isCompleted ? Text("안 끝낸 것으로 되돌리기") : Text("끝냈다"))
 
             TextField("", text: $item.title)
                 .textFieldStyle(.plain)
@@ -2609,12 +2619,16 @@ struct ProjectTodoRow: View {
             .foregroundStyle(.secondary)
             .opacity(hovering ? 1 : 0)
             .help(String(localized: "이 할 일 삭제"))
+            .accessibilityLabel("이 할 일 삭제")
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
         .background(Color.primary.opacity(hovering ? 0.05 : 0), in: .soft(Corner.chip))
         .onHover { hovering = $0 }
         .animation(Motion.hover, value: hovering)
+        // 가리켜야 서는 지우기 단추 대신 — VoiceOver·음성 제어의 동작으로.
+        .accessibilityElement(children: .contain)
+        .accessibilityAction(named: Text("삭제"), onDelete)
         .contextMenu {
             Button(hasSteps ? "단계 보기·편집…" : "단계로 쪼개기…", action: onOpenSteps)
             Button("프로젝트에서 빼기", action: onRemoveFromProject)
@@ -2749,7 +2763,7 @@ struct ColorPickerMenu: View {
                 Button {
                     colorName = opt.name
                 } label: {
-                    Label(opt.name, systemImage: colorName == opt.name ? "checkmark.circle.fill" : "circle.fill")
+                    Label(paletteDisplayName(opt.name), systemImage: colorName == opt.name ? "checkmark.circle.fill" : "circle.fill")
                 }
             }
         } label: {
@@ -2761,6 +2775,8 @@ struct ColorPickerMenu: View {
         .menuStyle(.borderlessButton)
         .fixedSize()
         .help("색상 선택")
+        .accessibilityLabel("색상")
+        .accessibilityValue(paletteDisplayName(colorName))
     }
 }
 
@@ -2786,5 +2802,6 @@ struct IconPickerMenu: View {
         .menuStyle(.borderlessButton)
         .fixedSize()
         .help("아이콘 선택")
+        .accessibilityLabel("아이콘 선택")
     }
 }

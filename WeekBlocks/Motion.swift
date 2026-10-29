@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 // MARK: - 움직임의 어휘
 //
@@ -88,7 +89,9 @@ extension AnyTransition {
     /// 옆으로 한 장 넘긴다. **나가는 쪽과 들어오는 쪽이 같은 방향**으로 흘러야
     /// 한 장이 넘어간 것으로 읽힌다. 밀리는 거리는 짧게 — 화면이 통째로 날아다니면 산만하다.
     static func pageSlide(forward: Bool, distance: CGFloat = 28) -> AnyTransition {
-        .asymmetric(
+        // 동작 줄이기를 켠 사람에게는 옆으로 밀지 않고 겹쳐 바뀌기만 한다.
+        if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion { return .opacity }
+        return .asymmetric(
             insertion: .offset(x: forward ? distance : -distance).combined(with: .opacity),
             removal: .offset(x: forward ? -distance : distance).combined(with: .opacity)
         )

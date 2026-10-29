@@ -98,6 +98,18 @@ struct SoftCheck: View {
         }
         .buttonStyle(.squish)
         .animation(Motion.squish, value: status)
+        // 색과 표시만으로 말하던 동그라미 — 이름과 지금 상태를 말로.
+        .accessibilityLabel("끝냄")
+        .accessibilityValue(statusName)
+        .accessibilityAddTraits(status == .done ? .isSelected : [])
+    }
+
+    private var statusName: Text {
+        switch status {
+        case .partial: Text("부분")
+        case .skipped: Text("건너뜀")
+        default: Text(verbatim: "")   // 달성은 '선택됨'으로 읽힌다.
+        }
     }
 
     private var symbol: String {

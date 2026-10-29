@@ -182,6 +182,7 @@ struct PreDecisionBanner: View {
             }
             .buttonStyle(.squish)
             .help("오늘은 그만 보기")
+            .accessibilityLabel("오늘은 그만 보기")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

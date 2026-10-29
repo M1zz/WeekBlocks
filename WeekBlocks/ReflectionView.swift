@@ -1086,6 +1086,7 @@ struct ReflectionRow: View {
         .menuIndicator(.hidden)
         .fixedSize()
         .help("부분 달성·건너뜀으로 표시")
+        .accessibilityLabel("부분 달성·건너뜀으로 표시")
     }
 
     @ViewBuilder
