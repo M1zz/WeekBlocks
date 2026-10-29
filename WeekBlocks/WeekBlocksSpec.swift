@@ -73,7 +73,10 @@ enum WeekBlocksSpec: LeeoAppSpec {
                 productID: giftProductID,
                 grantsProductID: proLifetimeID,
                 containerIdentifier: "iCloud.com.Ysoup.FeedbackHub"
-            )
+            ),
+            // 개발자 응원하기(팁). 기능을 열지 않는 소모성 상품 셋 — 이미 Pro 인 사람이 조금 더 내고 싶을 때.
+            // ⚠️ 팁 상품도 productIDs · entitlementIDs 에 넣지 않는다. 넣으면 팁을 낸 사람이 Pro 가 된다.
+            tipJar: LeeoTipJarConfig(productIDs: tipProductIDs)
         )
     )
 
@@ -101,6 +104,12 @@ enum WeekBlocksSpec: LeeoAppSpec {
     /// ⚠️ `saleProductIDs` · 권한 목록에 넣지 않는다 — 넣으면 선물을 산 사람이 Pro 가 되고, 결제가 코드 없이 끝난다.
     /// App Store Connect 에 소모성 상품으로 만들어야 뜬다. 없으면 설정의 선물 줄이 숨는다.
     static let giftProductID = "com.devkoan.ScheduleDensityApp.gift.pro"
+
+    /// 팁 (소모성, 작은 것부터). 아무것도 열지 않는다 — 고마움을 보태는 값이다(`LeeoTipJar`).
+    /// App Store Connect 에 소모성 상품으로 만들어야 뜬다. 없으면 설정의 응원 줄과 부탁 카드가 숨는다.
+    static let tipProductIDs = ["com.devkoan.ScheduleDensityApp.tip.small",
+                                "com.devkoan.ScheduleDensityApp.tip.medium",
+                                "com.devkoan.ScheduleDensityApp.tip.large"]
 
     /// 불러올 상품. 페이월의 칸 차례(Plus 연 → Plus 평생 → Pro 연 → Pro 평생)에 올리기 · 졸업이 붙는다.
     static let saleProductIDs = [plusYearlyID, plusLifetimeID, proYearlyID, proLifetimeID,

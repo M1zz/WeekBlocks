@@ -17573,6 +17573,149 @@
         }
       }
     },
+    "지금까지 계획한 일을 %lld개 해냈어요" : {
+      "comment" : "팁 부탁 카드: 회고에서 달성으로 찍은 할 일 수",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splněné naplánované bloky: už %lld"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du har indtil nu klaret %lld planlagte blokke"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast bisher %lld geplante Blöcke geschafft"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Μέχρι τώρα έχεις ολοκληρώσει %lld προγραμματισμένα μπλοκ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You've done %lld planned blocks so far"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You've done %lld planned blocks so far"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya has cumplido %lld bloques planificados"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olet tähän mennessä saanut tehtyä %lld suunniteltua lohkoa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez déjà accompli %lld blocs prévus"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sejauh ini kamu sudah menuntaskan %lld rencana"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finora hai portato a termine %lld blocchi pianificati"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これまでに予定したことを%lld個やり遂げました"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du har så langt fått gjort %lld planlagte blokker"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt tot nu toe %lld geplande blokken afgerond"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zrealizowane zaplanowane bloki: już %lld"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Até agora você concluiu %lld blocos planejados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выполнено запланированных блоков: уже %lld"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hittills har du klarat %lld planerade block"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "จนถึงตอนนี้คุณทำสิ่งที่วางแผนไว้สำเร็จแล้ว %lld อย่าง"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdiye kadar planladığın %lld işi tamamladın"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đến nay bạn đã làm xong %lld việc đã lên kế hoạch"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "到目前为止，你已完成 %lld 项计划"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "到目前為止，你已完成 %lld 項計畫"
+          }
+        }
+      }
+    },
     "💡 세 가지를 다 통과한 블록만 또렷한 색으로 섭니다. 비워 두어도 저장되고, 그때는 시간표에서 주황색 '구체성 미검증'으로 남습니다." : {
       "localizations" : {
         "cs" : {

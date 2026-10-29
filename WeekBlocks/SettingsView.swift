@@ -279,6 +279,11 @@ struct SettingsView: View {
                     GiftRows(gift: gift, isPro: isPro)
                 }
 
+                // 개발자 응원하기(팁) — 선물 바로 아래. 상품이 와야 선다 (→ TipRow).
+                if let tipJar = purchases.store.tipJar {
+                    TipRow(tipJar: tipJar)
+                }
+
                 Section {
                     HStack {
                         Text("버전")
@@ -738,6 +743,21 @@ private struct GiftRows: View {
                                                      initialCategory: .purchase)
                 }
                 .frame(minWidth: 480, minHeight: 560)
+            }
+        }
+    }
+}
+
+// MARK: - 팁
+
+/// 설정의 **개발자 응원하기** 줄. 판매 중인 팁이 없으면 칸째 숨는다 — 빈 칸이 서지 않게.
+private struct TipRow: View {
+    @ObservedObject var tipJar: LeeoTipJar
+
+    var body: some View {
+        if tipJar.isAvailable {
+            Section {
+                LeeoTipJarLink<WeekBlocksSpec>(tipJar: tipJar)
             }
         }
     }

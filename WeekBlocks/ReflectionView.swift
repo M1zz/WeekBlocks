@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import AppKit
+import LeeoKit
 
 /// 달성·부분·건너뜀·미회고의 수. 주간 회고와 일간 회고가 같은 셈을 쓴다.
 struct ReflectionStats {
@@ -84,6 +85,11 @@ struct ReflectionView: View {
         return weekBlocks.filter { $0.isUnreviewedPast(weekStart: storedWeek(for: $0.day), routineNames: routineNames) }
     }
 
+    /// 지금까지 '달성'으로 찍은 할 일 줄 — 모든 주를 통틀어. 이 앱이 도운 것이 숫자로 보이는 곳이다.
+    private var doneSoFar: Int {
+        allBlocks.filter { $0.isTodo(routineNames) && $0.reviewStatus == .done }.count
+    }
+
     /// 계획이 하나라도 있는 요일만. 빈 요일까지 머리를 세우면 돌아볼 것이 없는 줄이 끼어든다.
     private var daysWithBlocks: [DayOfWeek] {
         shownDays.filter { day in weekBlocks.contains { $0.day == day } }
@@ -160,6 +166,12 @@ struct ReflectionView: View {
 
                                 ForEach(daysWithBlocks, id: \.self) { day in
                                     dayCard(day).id(day)
+                                }
+
+                                // 밀린 것을 다 찍은 회고 끝에, 이미 Pro 인 사람에게 드물게 — 팁 부탁 (→ WeekBlocksTipMoments).
+                                if unreviewed.isEmpty, purchases.isPro, let tipJar = purchases.store.tipJar {
+                                    LeeoTipAskSlot<WeekBlocksSpec>(
+                                        tipJar: tipJar, reached: WeekBlocksTipMoments.reached(done: doneSoFar))
                                 }
                             }
                             .padding(20)
@@ -1174,6 +1186,23 @@ struct OverdueAskBadge: View {
             .fixedSize()
             .help(String(localized: "시간이 지났는데 아직 안 찍은 일정 \(blocks.count)개"))
             .transition(.pop)
+        }
+    }
+}
+
+// MARK: - 팁 부탁의 순간
+
+/// 이 앱이 그 사람에게 도움이 됐다는 것이 **숫자로 보이는 순간**. 회고에서 '달성'을 찍은 할 일 수다.
+enum WeekBlocksTipMoments {
+    /// 큰 것부터.
+    static let done = [300, 100, 30]
+
+    /// 넘어선 순간, 인상적인 것부터.
+    static func reached(done count: Int) -> [LeeoTipMoment] {
+        done.filter { count >= $0 }.map { threshold in
+            LeeoTipMoment(id: "done.\(threshold)",
+                          message: String(localized: "지금까지 계획한 일을 \(count)개 해냈어요",
+                                          comment: "팁 부탁 카드: 회고에서 달성으로 찍은 할 일 수"))
         }
     }
 }

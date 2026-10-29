@@ -101,6 +101,51 @@
       "productID": "com.devkoan.ScheduleDensityApp.gift.pro",
       "referenceName": "Gift Pro",
       "type": "Consumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "D5F4A916-2407-4795-89E8-CAC1965B6601",
+      "localizations": [
+        {
+          "description": "Support the developer. Unlocks nothing.",
+          "displayName": "Small Tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.tip.small",
+      "referenceName": "Small Tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "0DAA1A73-8D37-4D38-9DDB-7FB6FA3D108D",
+      "localizations": [
+        {
+          "description": "Support the developer. Unlocks nothing.",
+          "displayName": "Medium Tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.tip.medium",
+      "referenceName": "Medium Tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "9.99",
+      "familyShareable": false,
+      "internalID": "10084B35-E22F-405A-93D7-E8D8392FE74C",
+      "localizations": [
+        {
+          "description": "Support the developer. Unlocks nothing.",
+          "displayName": "Large Tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.devkoan.ScheduleDensityApp.tip.large",
+      "referenceName": "Large Tip",
+      "type": "Consumable"
     }
   ],
   "settings": {
