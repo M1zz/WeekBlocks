@@ -77,4 +77,4 @@ xcodebuild -project WeekBlocks.xcodeproj -scheme WeekBlocks \
 
 ## 문의
 
-mizzking75@gmail.com
+leeo@kakao.com
