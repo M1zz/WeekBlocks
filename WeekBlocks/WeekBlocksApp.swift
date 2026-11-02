@@ -107,6 +107,7 @@ struct WeekBlocksApp: App {
                 Color.clear.frame(width: 1, height: 1)
             } else {
                 mainWindow
+                    .storeFallbackNotice()
             }
         }
         .modelContainer(container)
