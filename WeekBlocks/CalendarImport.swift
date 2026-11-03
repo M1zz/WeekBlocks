@@ -48,6 +48,13 @@ final class CalendarBridge {
     @ObservationIgnored private var spanCache: [String: Int] = [:]
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var storeObserver: NSObjectProtocol?
+    @ObservationIgnored private var refreshLoop: Task<Void, Never>?
+    @ObservationIgnored private var lastRemoteRefresh: Date?
+
+    /// 앱이 켜져 있는 동안 서버에 새로 받아 오라고 조르는 간격.
+    private static let remoteRefreshInterval: TimeInterval = 15 * 60
+    /// 앱으로 자주 오갈 때 서버를 너무 자주 두드리지 않게 하는 최소 간격.
+    private static let remoteRefreshMinGap: TimeInterval = 60
 
     /// **캘린더가 바뀌면 알아서 가져온다.** 끄면 예전처럼 '더 보기 → 캘린더에서 가져오기'를 눌러야 한다.
     ///
@@ -112,6 +119,27 @@ final class CalendarBridge {
                 self?.changeTick += 1
             }
         }
+        refreshRemoteSources(force: true)
+        // 앱을 켜 둔 채 오래 두는 사람이 많다 — 앱으로 돌아오지 않아도 구독 캘린더가 따라오게 한다.
+        refreshLoop = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(Self.remoteRefreshInterval))
+                self?.refreshRemoteSources(force: true)
+            }
+        }
+    }
+
+    /// **구독 캘린더 · CalDAV 계정에 새로 받아 오라고 한다.**
+    ///
+    /// ⚠️ 이것을 안 부르면 구독 캘린더(webcal/ics)는 macOS 캘린더가 자기 주기(하루 ~ 일주일)로
+    ///    새로 받을 때까지 **예전 일정만** 보인다. 구독한 곳에 새 일정이 생겨도 앱에는 안 들어왔다.
+    ///    새로 받은 것이 있으면 `.EKEventStoreChanged`가 울리고, 그 신호로 자동 가져오기가 돈다.
+    func refreshRemoteSources(force: Bool = false) {
+        guard hasAccess, !LaunchEnvironment.isUnderTest else { return }
+        let now = Date()
+        if !force, let last = lastRemoteRefresh, now.timeIntervalSince(last) < Self.remoteRefreshMinGap { return }
+        lastRemoteRefresh = now
+        store.refreshSourcesIfNecessary()
     }
 
     /// 읽어 올 캘린더들. 비어 있으면 **아무것도 안 가져온다** — 전부 가져오는 것보다
@@ -167,6 +195,7 @@ final class CalendarBridge {
         status = EKEventStore.authorizationStatus(for: .event)
         reloadCalendarsIfAllowed()
         if hasAccess { failureMessage = nil }
+        refreshRemoteSources()
     }
 
     func reloadCalendarsIfAllowed() {
