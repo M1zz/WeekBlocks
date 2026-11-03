@@ -11,6 +11,7 @@
 		032C842F55D754CDF99B7CEF /* Stores.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CC675B4E440CD50573C3A4 /* Stores.swift */; };
 		036EB7835818A13F6ED0AD7A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7937982B85D41EB42E3064BE /* SwiftUI.framework */; };
 		04A776160C01F496DBB176CF /* DataVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352BBAC09C0B86084BEAE372 /* DataVault.swift */; };
+		0621D9E17001EEFEF3D9BDFC /* AppShortcuts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 87CADA213ABD8831E1D2C477 /* AppShortcuts.xcstrings */; };
 		076A03104420525A517BD699 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC93778BE68B512FD31ECFF /* PaywallView.swift */; };
 		0B6B259A6790F4A36E517BC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BDA503D2542D84A1B0463E28 /* PrivacyInfo.xcprivacy */; };
 		0BD1C74C71E515AFF4762694 /* AppLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1165026AA6E670F7B536CEA5 /* AppLog.swift */; };
@@ -19,6 +20,7 @@
 		1812B03980D0EE5D5C1D52B4 /* WeekBlocksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A593351AF80E4B2090D1D210 /* WeekBlocksUITests.swift */; };
 		1AFF77D8C86DCEDFDFD238A7 /* OverlapRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F14B31687AFBB85553F24C7 /* OverlapRule.swift */; };
 		2073047DFEE26EF78129A0A6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47970A792B8AE57E021D9CB /* Theme.swift */; };
+		2472D8D7A74198CB05A4002B /* TodoIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6577AFDFA1E0F99C65C5B4 /* TodoIntents.swift */; };
 		270666CBD83C49AD428B476E /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9410039673CCA633E86BAC /* TutorialView.swift */; };
 		2A36A3A3D54FD7EBF0C04ABD /* BacklogItem+Fragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6D781D06794C604E1D6CA3 /* BacklogItem+Fragment.swift */; };
 		2BD0550462640DD942B3590F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4A396C6929CB1C576DBA52 /* Models.swift */; };
@@ -218,9 +220,11 @@
 		7937982B85D41EB42E3064BE /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		7970A4DA39D1705294090BDC /* TodoShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodoShare.entitlements; sourceTree = "<group>"; };
 		799F5A31A8D7F0BF9EA76E5B /* TimerWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerWidgetSnapshot.swift; sourceTree = "<group>"; };
+		7A6577AFDFA1E0F99C65C5B4 /* TodoIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodoIntents.swift; sourceTree = "<group>"; };
 		8352F4DD1E7BD1FE8F133624 /* LaunchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchEnvironment.swift; sourceTree = "<group>"; };
 		86EBBF057E9FC39FB6C47955 /* DeletionMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletionMark.swift; sourceTree = "<group>"; };
 		8777BDF75953951A8098B8BC /* TodoSplitAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSplitAdvisor.swift; sourceTree = "<group>"; };
+		87CADA213ABD8831E1D2C477 /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
 		87EB398D348B2377FA8540BF /* WeekGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekGridView.swift; sourceTree = "<group>"; };
 		88EFB1A15FCF0B7D66E1FACD /* DayPanelExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayPanelExpansion.swift; sourceTree = "<group>"; };
 		8F14B31687AFBB85553F24C7 /* OverlapRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapRule.swift; sourceTree = "<group>"; };
@@ -462,6 +466,8 @@
 				C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */,
 				87EB398D348B2377FA8540BF /* WeekGridView.swift */,
 				A55643283CC4AC6A87F6CDD9 /* WhatsNewView.swift */,
+				7A6577AFDFA1E0F99C65C5B4 /* TodoIntents.swift */,
+				87CADA213ABD8831E1D2C477 /* AppShortcuts.xcstrings */,
 			);
 			path = WeekBlocks;
 			sourceTree = "<group>";
@@ -498,8 +504,6 @@
 			dependencies = (
 			);
 			name = TimerWidgetExtension;
-			packageProductDependencies = (
-			);
 			productName = TimerWidgetExtension;
 			productReference = 4526FA347B5468F46351D02F /* TimerWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -541,8 +545,6 @@
 				265341CD356B6774B8F253B9 /* PBXTargetDependency */,
 			);
 			name = WeekBlocksUITests;
-			packageProductDependencies = (
-			);
 			productName = WeekBlocksUITests;
 			productReference = 6748EFE9047B967B8FDF423F /* WeekBlocksUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -580,8 +582,6 @@
 			dependencies = (
 			);
 			name = TodoShareExtension;
-			packageProductDependencies = (
-			);
 			productName = TodoShareExtension;
 			productReference = B30E4F0DBDE964141EDE57D1 /* TodoShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -655,6 +655,7 @@
 				08DDEFB0F275CC298FCC41E9 /* XCRemoteSwiftPackageReference "LeeoKit" */,
 			);
 			preferredProjectObjectVersion = 77;
+			productRefGroup = 5F00D51242891307C101F90D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -685,6 +686,7 @@
 				7750BEAC0768CD61182505EE /* InfoPlist.xcstrings in Resources */,
 				5E079B41299757EB1D8C47D0 /* Localizable.xcstrings in Resources */,
 				C2A5B375AC8D47ACC6A8421C /* PrivacyInfo.xcprivacy in Resources */,
+				0621D9E17001EEFEF3D9BDFC /* AppShortcuts.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -887,6 +889,7 @@
 				AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */,
 				837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */,
 				BD0AAF47D7373BC2D6513D9A /* WhatsNewView.swift in Sources */,
+				2472D8D7A74198CB05A4002B /* TodoIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
