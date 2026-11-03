@@ -60,6 +60,9 @@ struct ContentView: View {
     /// 처음 켠 사람에게 앱을 건네는 자리 (→ OnboardingView.swift).
     /// 메뉴 막대(도움말)에서도 같은 자리를 열기에 스토어를 가운데에 둔다.
     @State private var onboarding = OnboardingPresenter.shared
+    /// 처음 쓰는 사람에게 기능을 하나씩 건넨다 (→ FeatureStage.swift).
+    @State private var featureStage = FeatureStage.shared
+    private var level: FeatureLevel { featureStage.level }
     /// '다음 한 걸음' 줄을 아주 닫았는가. 다 아는 사람에게 계속 말을 걸지 않는다.
     @AppStorage("didDismissNextStep") private var didDismissNextStep = false
     /// 겹친 일정 중 타이머로 고른 것 (→ ScheduleFocus). 바뀌면 알약·위젯이 다시 맞춘다.
@@ -99,11 +102,13 @@ struct ContentView: View {
 
     /// 마지막으로 보던 자리. 앱을 다시 켜도 하던 일을 이어서 한다.
     @AppStorage("weekLens") private var weekLensRaw = WeekLens.plan.rawValue
-    private var weekLens: WeekLens { WeekLens(rawValue: weekLensRaw) ?? .plan }
+    /// 시간축은 일간·타이머와 함께 열린다 (→ FeatureLevel.views). 그 전에는 블록 칸만.
+    private var weekLens: WeekLens { level < .views ? .plan : (WeekLens(rawValue: weekLensRaw) ?? .plan) }
 
     /// 하루를 볼까, 한 주를 볼까. 마지막으로 보던 쪽으로 다시 켠다.
     @AppStorage("calendarScope") private var scopeRaw = CalendarScope.week.rawValue
-    private var scope: CalendarScope { CalendarScope(rawValue: scopeRaw) ?? .week }
+    /// 일간은 '일간 · 시간축 · 타이머' 단계에서 열린다 (→ FeatureLevel.views). 그 전에는 한 주만.
+    private var scope: CalendarScope { level < .views ? .week : (CalendarScope(rawValue: scopeRaw) ?? .week) }
     /// 일간에서 보고 있는 요일 (주는 `selectedWeek`).
     @State private var selectedDay: DayOfWeek = .today
     /// 마지막으로 날을 어느 쪽으로 넘겼는가 — 새 날은 넘긴 쪽에서 들어온다.
@@ -175,18 +180,32 @@ struct ContentView: View {
         routines.contains { $0.kind == .fixed }
     }
 
+    /// 할 일을 적을 수 있는가. 처음 쓰는 사람은 고정 루틴 없이도 할 일부터 적는다 (→ FeatureStage.isGuided) —
+    /// 루틴은 첫 블록을 놓은 뒤에 열린다.
+    private var canPlanTodos: Bool { hasFixedRoutines || featureStage.isGuided }
+
+    /// 사람이 직접 놓은 블록 수 — 기능을 여는 잣대 (캘린더에서 들어온 것은 안 센다).
+    private var placedBlockCount: Int { allBlocks.filter { $0.calendarEventID == nil }.count }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 weekHeader
                 // 무지개는 날짜 줄 바로 아래로 **위에서 펴져 내려온다** (툴바 타이머 옆 단추 · ⌘3).
                 // 윗변을 붙든 채 세로로 펴지고, 스프링이 살짝 지나쳤다 돌아와 쫀득하게 멎는다.
-                if showsRainbow {
+                // 막 열린 기능을 알린다. 다른 안내보다 먼저 — 지금 막 생긴 일이다.
+                if let unlocked = featureStage.justUnlocked {
+                    FeatureUnlockBanner(level: unlocked) {
+                        withAnimation(Motion.banner) { featureStage.justUnlocked = nil }
+                    }
+                    .transition(.scale(scale: 0.92, anchor: .top).combined(with: .opacity))
+                }
+                if showsRainbow, level == .all {
                     rainbowSection
                         .transition(reduceMotion ? .opacity : .unroll)
                 }
                 // 지금 화면에서 다음에 할 일 하나. 흐름을 다 지나면 사라진다.
-                if let step = nextStep {
+                if featureStage.justUnlocked == nil, let step = nextStep {
                     NextStepBanner(step: step,
                                    onAction: { perform(step) },
                                    onDismiss: {
@@ -197,7 +216,7 @@ struct ContentView: View {
                     .transition(.banner)
                 }
                 // 겹침이 **생긴 뒤에** 한 번 묻는다. 처음 온 사람 안내와 겹쳐 두 줄이 서지 않게 그 뒤에.
-                if nextStep == nil, !overlapRuleDecided, let example = weekOverlapExample {
+                if level == .all, nextStep == nil, !overlapRuleDecided, let example = weekOverlapExample {
                     OverlapNudgeBanner(example: example,
                                        onChoose: { rule in
                                            withAnimation(Motion.banner) {
@@ -211,7 +230,7 @@ struct ContentView: View {
                     .transition(.banner)
                 }
                 // 아이폰 앱 권유 — 계획을 몇 칸 세운 뒤, 다른 안내가 다 지나간 자리에 한 번.
-                if showsIPhoneBanner {
+                if level == .all, showsIPhoneBanner {
                     IPhoneNudgeBanner(onLearnMore: { showingIPhoneCompanion = true },
                                       onDismiss: {
                                           withAnimation(Motion.banner) { iphoneBannerDismissed = true }
@@ -219,7 +238,7 @@ struct ContentView: View {
                     .transition(.banner)
                 }
                 // 요약은 접혀 있는 것이 기본이다 (→ weekHeader의 '요약' 버튼).
-                if scope == .week, showsWeekSummary {
+                if scope == .week, showsWeekSummary, level >= .views {
                     VStack(alignment: .leading, spacing: 10) {
                         metricsRow
                         WeekBarChart(routineHours: routineHours, plannedHours: plannedHours)
@@ -256,13 +275,14 @@ struct ContentView: View {
                     BacklogSection(allItems: backlogItems,
                                    weekStart: selectedWeek,
                                    weekBlocks: weekBlocks,
-                                   canPlan: hasFixedRoutines,
-                                   showsCategoryFilter: false)
+                                   canPlan: canPlanTodos,
+                                   showsCategoryFilter: false,
+                                   isSimple: level < .all)
                     .dashboardPanel()
                     .transition(.disclose)
                 }
                 // 고정 루틴은 한 주의 뼈대라 주간에서만. 일간은 그 하루와 끌어다 놓을 할 일만 둔다.
-                if scope == .week {
+                if scope == .week, level >= .routines {
                     routinesSection
                         .dashboardPanel()
                         .transition(.disclose)
@@ -283,6 +303,8 @@ struct ContentView: View {
             // @Query가 스스로 새 값을 물어오는 자리에는 `withAnimation`을 걸 손이 없다.
             // "무엇이 서 있는가"가 바뀌었을 때만 결이 붙도록 값으로 건다.
             .animation(Motion.screen, value: nextStep)
+            .animation(.spring(response: 0.5, dampingFraction: 0.75), value: featureStage.justUnlocked)
+            .animation(Motion.disclose, value: level)
             .animation(Motion.disclose, value: shareStore.received.count)
             // ⚠️ **@AppStorage 값은 `withAnimation`만으로는 안 움직인다.** 값이 UserDefaults를 한 바퀴
             //    돌아 돌아오는 사이에 애니메이션이 떨어져 나가서, 요약이 늘고 줄 때 아래 화면이 툭
@@ -312,6 +334,8 @@ struct ContentView: View {
                 .accessibilityInputLabels([Text("되돌리기"), Text("실행 취소")])
             }
             ToolbarItemGroup(placement: .primaryAction) {
+                // 처음 쓰는 사람에게는 단추를 하나씩 세운다 (→ FeatureLevel). 설정은 늘 있다.
+                if level >= .views {
                 Button {
                     openWindow(id: WeekBlocksWindow.timer)
                 } label: {
@@ -319,6 +343,9 @@ struct ContentView: View {
                 }
                 .help("지금 하는 일에 남은 시간 (⇧⌘R)")
                 .accessibilityInputLabels([Text("타이머"), Text("타이머 창")])
+                }
+
+                if level == .all {
 
                 // 무지개 — 누르면 날짜 줄 아래로 판이 위에서 펴져 내려온다 (→ rainbowSection).
                 // 일간의 판을 펼 때와 같은 스프링(.panelSpring)이라 한 앱의 손짓으로 읽힌다.
@@ -339,6 +366,7 @@ struct ContentView: View {
                     Label("회고", systemImage: "checklist")
                 }
                 .accessibilityInputLabels([Text("회고"), Text("돌아보기")])
+                }
 
                 Button {
                     showingSettings = true
@@ -347,6 +375,7 @@ struct ContentView: View {
                 }
                 .accessibilityInputLabels([Text("설정"), Text("환경설정")])
 
+                if level == .all {
                 Menu {
                     // 할 일 창은 두 창을 나란히 놓고 쓰고 싶을 때의 길이다.
                     // 같은 목록이 이 창에도 있으므로 툴바 자리를 차지하지 않는다.
@@ -413,6 +442,7 @@ struct ContentView: View {
                     Label("더 보기", systemImage: "ellipsis.circle")
                 }
                 .accessibilityInputLabels([Text("더 보기"), Text("메뉴")])
+                }
             }
         }
         .alert("캘린더에서 사라진 일정 \(pendingRemovals.count)개를 지울까요?",
@@ -467,9 +497,14 @@ struct ContentView: View {
             // 크기는 창이 정한다 — 새 블록은 제목 한 줄짜리라 작고, 펼치면 커진다.
         }
         .sheet(isPresented: $onboarding.isPresented) {
-            OnboardingView(onWriteMyOwn: {
-                routineSheet = RoutineSheetContext(routine: nil)
-            }, startPage: onboarding.startPage)
+            // 처음부터 열면 움직이는 튜토리얼, 루틴 걸음으로 부르면 루틴 고르기 (→ OnboardingPresenter).
+            if onboarding.startPage == 0 {
+                TutorialView()
+            } else {
+                OnboardingView(onWriteMyOwn: {
+                    routineSheet = RoutineSheetContext(routine: nil)
+                }, startPage: onboarding.startPage)
+            }
         }
         .sheet(item: $routineSheet) { ctx in
             RoutineEditorView(existing: ctx.routine)
@@ -540,6 +575,13 @@ struct ContentView: View {
         }
         // 캘린더가 바뀌었다(캘린더 앱에서 고쳤거나, 고른 캘린더를 바꿨거나).
         .onChange(of: calendarBridge.changeTick) { _, _ in scheduleCalendarImport() }
+        // 블록을 놓을수록 기능이 하나씩 열린다 (→ FeatureStage).
+        .onChange(of: placedBlockCount, initial: true) { _, count in
+            featureStage.promote(placedBlocks: count, hasRoutines: !routines.isEmpty)
+        }
+        .onChange(of: routines.isEmpty) { _, empty in
+            featureStage.promote(placedBlocks: placedBlockCount, hasRoutines: !empty)
+        }
         // 계획이 바뀌었거나 캘린더에 쓰기를 막 켰다 → '무지개 공방' 캘린더와 맞춘다.
         .onChange(of: calendarExportSignature) { _, _ in scheduleCalendarExport() }
         .onChange(of: calendarBridge.exportTick) { _, _ in scheduleCalendarExport(after: 0) }
@@ -569,6 +611,13 @@ struct ContentView: View {
     /// 세 개를 다 지나면 nil이 되어 줄이 사라진다. 처음 온 사람만 보게 된다.
     private var nextStep: NextStep? {
         guard !didDismissNextStep else { return nil }
+        // 처음 쓰는 사람은 할 일부터 — 적고, 놓고, 그다음에 루틴 (→ FeatureStage).
+        if featureStage.isGuided {
+            let hasOpenTodo = backlogItems.contains { $0.parentToken == nil && !$0.isCompleted }
+            if placedBlockCount == 0 { return hasOpenTodo ? .placeTodos : .writeFirstTodo }
+            if routines.isEmpty, level >= .routines { return .setRoutines }
+            return nil
+        }
         if routines.isEmpty { return .setRoutines }
         guard weekBlocks.isEmpty else { return nil }
         let hasOpenTodo = backlogItems.contains { $0.parentToken == nil && !$0.isCompleted }
@@ -581,6 +630,8 @@ struct ContentView: View {
             onboarding.present(from: 1)
         case .writeTodos:
             openWindow(id: WeekBlocksWindow.todos)
+        case .writeFirstTodo:
+            BacklogAddRequest.shared.request()
         case .placeTodos:
             break
         }
@@ -670,6 +721,8 @@ struct ContentView: View {
         HStack(spacing: 8) {
             // 하루 / 한 주. 날짜 줄 **맨 앞**에 둔다 — 무엇을 보고 있는지가 날짜보다 먼저 읽혀야
             // 옆의 ‹ › 가 하루를 넘기는지 한 주를 넘기는지 헷갈리지 않는다.
+            // 일간은 '일간 · 시간축 · 타이머' 단계에서 열린다 (→ FeatureLevel.views).
+            if level >= .views {
             Picker("", selection: scopeBinding) {
                 ForEach(CalendarScope.allCases) { s in
                     Label(s.label, systemImage: s.symbol).tag(s.rawValue)
@@ -681,6 +734,8 @@ struct ContentView: View {
             .help("일간 (⌘1) · 주간 (⌘2)")
             .background { scopeShortcuts }
             .padding(.trailing, 8)
+            .transition(.control)
+            }
 
             Button { step(-1) } label: {
                 Image(systemName: "chevron.left").font(.body.weight(.semibold))
@@ -729,6 +784,8 @@ struct ContentView: View {
 
             // 지금 세고 있는 일이 있으면 남은 시간이 여기 늘 서 있다.
             // 타이머 창을 닫아 두어도 "무엇을 하는 중이고 얼마 남았는지"는 사라지지 않는다.
+            // 타이머는 '일간 · 시간축 · 타이머' 단계에서 열린다 (→ FeatureLevel.views).
+            if level >= .views {
             TimelineView(.everyMinute) { ctx in
                 let slots = ScheduleClock.slots(routines: routines, blocks: allBlocks,
                                                 occurrences: allOccurrences, placements: allQuotaPlacements,
@@ -750,9 +807,11 @@ struct ContentView: View {
                 }
                 .animation(Motion.row, value: overdue.count)
             }
+            .transition(.control)
+            }
 
             // 블록·시간축과 요약은 **한 주를 볼 때만**. 일간은 하루 한 장뿐이라 고를 것이 없다.
-            if scope == .week {
+            if scope == .week, level >= .views {
                 // 한 주를 보는 두 자리. 날짜 줄에 함께 세운다 —
                 // 세그먼트 하나가 아래에서 한 줄을 통째로 차지하고 있었다.
                 Picker("", selection: lensBinding) {
@@ -950,7 +1009,7 @@ struct ContentView: View {
                     weekStart: storedWeek(for: selectedDay),
                     window: timelineWindow(on: [selectedDay]),
                     sleepNote: sleepFoldNote(on: selectedDay),
-                    canPlan: hasFixedRoutines,
+                    canPlan: canPlanTodos,
                     
                     onDropBacklog: { token, hour in
                         dropBacklogItem(token: token, day: selectedDay, atHour: hour)
@@ -1030,7 +1089,7 @@ struct ContentView: View {
                         blocks: weekBlocks.filter { $0.day == selectedDay },
                         routineNames: routineNames,
                         onOpenWeekly: { showingReflection = true },
-                        canPlan: hasFixedRoutines,
+                        canPlan: canPlanTodos,
                         onDropBacklog: { token in
                             dropBacklogItem(token: token, day: selectedDay)
                         },
@@ -1047,7 +1106,7 @@ struct ContentView: View {
                     BacklogSection(allItems: backlogItems,
                                    weekStart: selectedWeek,
                                    weekBlocks: weekBlocks,
-                                   canPlan: hasFixedRoutines,
+                                   canPlan: canPlanTodos,
                                    externallyTargeted: dayZones.hovering == .backlog,
                                    showsCategoryFilter: false,
                                    // 판의 키는 왼쪽 타임라인이 정한다 — 넘치는 할 일은 판 안에서 스크롤 (→ DayColumnsLayout).
@@ -1741,7 +1800,7 @@ struct ContentView: View {
                         DayColumn(
                             day: day,
                             date: dayDate(day),
-                            canPlan: hasFixedRoutines,
+                            canPlan: canPlanTodos,
                             currentSlot: currentSlot(at: ctx.date),
                         items: dayPlanItems(on: day),
                         countedHours: countedRoutineHours(on: day),
@@ -1787,6 +1846,8 @@ struct ContentView: View {
             showingSettings = true
             return
         }
+        // 구독 캘린더에 새로 생긴 일정은 받아 온 뒤에야 보인다 — 받아 오면 자동 가져오기가 다시 돈다.
+        bridge.refreshRemoteSources(force: true)
         let result = bridge.importWeek(selectedWeek, into: context)
 
         // 캘린더에서 사라진 일정이 있으면 **지우기 전에 묻는다.**
@@ -2319,15 +2380,15 @@ struct ContentView: View {
     @MainActor
     private func offerRoutineOnboardingIfNeeded() async {
         guard !RoutineOnboarding.wasShown else { return }
-        guard routines.isEmpty else {
-            UserDefaults.standard.set(true, forKey: RoutineOnboarding.shownKey)  // 이미 쓰던 사람
-            return
-        }
         try? await Task.sleep(nanoseconds: 3_000_000_000)
         // 기다린 뒤에는 @Query가 아니라 스토어에 직접 묻는다 —
         // 기다리는 동안 뷰가 새로 만들어져 손에 든 값이 옛것일 수 있다.
-        guard PlanStore.shared.fetch(Routine.self).isEmpty else { return }
-        onboarding.present()
+        // 다른 맥에서 쓰던 기록이 내려왔으면 이미 쓰던 사람이다 — 첫 인사 없이 모든 기능을 연다.
+        if featureStage.adoptIfExistingUser(in: PlanStore.shared) || !featureStage.isGuided {
+            UserDefaults.standard.set(true, forKey: RoutineOnboarding.shownKey)
+            return
+        }
+        onboarding.present()   // 움직이는 튜토리얼 (→ TutorialView)
     }
 
     /// 처음 켠 사람에게 깔아 주는 세 가지. 샘플 데이터도 같은 것을 쓴다.

@@ -12,6 +12,7 @@ struct SettingsView: View {
 
     /// '처음 안내 다시 보기' — 부르는 쪽이 설정을 닫고 온보딩을 연다.
     var onReplayOnboarding: () -> Void = { }
+    @State private var featureStage = FeatureStage.shared
 
     @AppStorage("hideSleepInTimeline") private var hideSleepInTimeline = false
     @AppStorage(ColumnMode.storageKey) private var columnMode: ColumnMode = .auto
@@ -310,9 +311,21 @@ struct SettingsView: View {
                         Label("처음 안내 다시 보기", systemImage: "sparkles")
                     }
 
-                    Text("한 주를 짜는 순서(고정 루틴 → 할 일 → 요일에 올리기)를 처음부터 다시 봅니다.")
-                        .font(.caption)
+                    Text("할 일을 적고 요일 칸에 놓는 법을 움직이는 그림으로 다시 봅니다.")
+                        .font(.body)
                         .foregroundStyle(.secondary)
+
+                    // 처음 쓰는 사람은 기능이 하나씩 열린다 (→ FeatureStage). 기다리기 싫은 사람의 길.
+                    if featureStage.level < .all {
+                        Button {
+                            featureStage.unlockAll()
+                        } label: {
+                            Label("모든 기능 바로 열기", systemImage: "lock.open")
+                        }
+                        Text("블록을 놓을수록 기능이 하나씩 열립니다. 기다리지 않고 지금 모두 엽니다.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                    }
 
                     Button {
                         TodoTips.resetAll()

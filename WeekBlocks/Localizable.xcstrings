@@ -17005,6 +17005,432 @@
         }
       }
     },
+    "고정 루틴이 열렸어요" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odemkli jste pevné rutiny"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faste rutiner er låst op"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feste Routinen sind freigeschaltet"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι σταθερές ρουτίνες ξεκλειδώθηκαν"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed routines are unlocked"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed routines are unlocked"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han desbloqueado las rutinas fijas"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiinteät rutiinit avattiin"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les routines fixes sont débloquées"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rutinitas tetap kini terbuka"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le routine fisse sono sbloccate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定ルーティンが使えるようになりました"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faste rutiner er låst opp"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaste routines zijn ontgrendeld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odblokowano stałe rutyny"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As rotinas fixas foram liberadas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыты постоянные рутины"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasta rutiner är upplåsta"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปลดล็อกกิจวัตรประจำแล้ว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sabit rutinler açıldı"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã mở khóa thói quen cố định"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定作息已解锁"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定作息已解鎖"
+          }
+        }
+      }
+    },
+    "나머지는 쓰다 보면 하나씩 열립니다" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zbytek se odemyká postupně, jak aplikaci používáte"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resten låses op, efterhånden som du bruger appen"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Rest schaltet sich nach und nach frei"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Τα υπόλοιπα ξεκλειδώνουν καθώς προχωράς"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The rest unlocks as you go"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The rest unlocks as you go"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El resto se desbloquea a medida que la usas"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loput avautuvat sitä mukaa kuin käytät sovellusta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le reste se débloque au fil de l'usage"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisanya terbuka satu per satu seiring kamu memakainya"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il resto si sblocca man mano che la usi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほかの機能は使ううちにひとつずつ開きます"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resten låses opp etter hvert som du bruker appen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De rest wordt gaandeweg ontgrendeld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reszta odblokowuje się w miarę używania"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O resto é liberado conforme você usa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остальное откроется по ходу дела"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resten låses upp allteftersom du använder appen"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ที่เหลือจะค่อย ๆ ปลดล็อกเมื่อใช้ไปเรื่อย ๆ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerisi kullandıkça tek tek açılır"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phần còn lại sẽ mở dần khi bạn dùng"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其余功能会在使用中逐个解锁"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其餘功能會在使用中逐一解鎖"
+          }
+        }
+      }
+    },
+    "날짜 줄 맨 앞에서 하루와 한 주를 바꾸고, 오른쪽에서 시간축과 요약을 봅니다. 지금 하는 일에 남은 시간은 타이머가 셉니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na začátku řádku s datem přepínáte mezi dnem a týdnem, vpravo vidíte časovou osu a přehled. Časovač odpočítává, kolik zbývá z toho, co právě děláte."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skift mellem dag og uge forrest i datolinjen, og se tidslinjen og oversigten til højre. Timeren tæller ned for det, du er i gang med nu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wechsle vorne in der Datumszeile zwischen Tag und Woche und sieh rechts Zeitachse und Übersicht. Der Timer zählt die verbleibende Zeit deiner aktuellen Aufgabe herunter."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Άλλαξε ανάμεσα σε ημέρα και εβδομάδα στην αρχή της γραμμής ημερομηνίας και δες τη χρονογραμμή και τη σύνοψη δεξιά. Το χρονόμετρο μετρά πόσος χρόνος μένει σε αυτό που κάνεις τώρα."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch between day and week at the start of the date bar, and see the timeline and summary on the right. The timer counts down what's left of what you're doing now."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch between day and week at the start of the date bar, and see the timeline and summary on the right. The timer counts down what's left of what you're doing now."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia entre día y semana al principio de la barra de fecha y consulta la cronología y el resumen a la derecha. El temporizador cuenta lo que queda de lo que estás haciendo ahora."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaihda päivän ja viikon välillä päivämäärärivin alussa, ja katso aikajana ja yhteenveto oikealta. Ajastin laskee, paljonko nykyisestä tehtävästä on jäljellä."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passez du jour à la semaine au début de la barre de date, et consultez la chronologie et le résumé à droite. Le minuteur décompte le temps restant pour ce que vous faites maintenant."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beralih antara hari dan minggu di awal baris tanggal, lalu lihat linimasa dan ringkasan di kanan. Timer menghitung sisa waktu untuk hal yang sedang kamu kerjakan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passa da giorno a settimana all'inizio della barra della data e guarda timeline e riepilogo a destra. Il timer conta il tempo che resta per ciò che stai facendo ora."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付の行の先頭で日と週を切り替え、右側でタイムラインと概要を見ます。いまやっていることの残り時間はタイマーが数えます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bytt mellom dag og uke fremst i datolinjen, og se tidslinjen og oversikten til høyre. Tidtakeren teller ned det som er igjen av det du gjør nå."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wissel vooraan in de datumbalk tussen dag en week, en bekijk rechts de tijdlijn en het overzicht. De timer telt af hoeveel tijd je nog hebt voor waar je nu mee bezig bent."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na początku paska daty przełączaj między dniem a tygodniem, a po prawej zobacz oś czasu i podsumowanie. Timer odlicza, ile zostało z tego, co robisz teraz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterne entre dia e semana no início da barra de data e veja a linha do tempo e o resumo à direita. O timer conta quanto falta do que você está fazendo agora."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В начале строки даты переключайтесь между днём и неделей, а справа смотрите шкалу времени и сводку. Таймер отсчитывает, сколько осталось на текущее дело."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Växla mellan dag och vecka längst fram i datumraden och se tidslinjen och sammanfattningen till höger. Timern räknar ned det som är kvar av det du gör nu."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "สลับระหว่างวันและสัปดาห์ที่ต้นแถบวันที่ และดูไทม์ไลน์กับสรุปทางขวา ตัวจับเวลาจะนับเวลาที่เหลือของสิ่งที่คุณกำลังทำอยู่"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarih çubuğunun başında gün ve hafta arasında geçiş yap, sağda zaman çizelgesini ve özeti gör. Zamanlayıcı şu an yaptığın işin kalan süresini sayar."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuyển giữa ngày và tuần ở đầu thanh ngày, xem dòng thời gian và tóm tắt ở bên phải. Bộ hẹn giờ đếm thời gian còn lại của việc bạn đang làm."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在日期栏最前面切换日和周，在右侧查看时间轴和摘要。计时器会倒数你正在做的事还剩多少时间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在日期列最前面切換日和週，在右側查看時間軸和摘要。計時器會倒數你正在做的事還剩多少時間。"
+          }
+        }
+      }
+    },
     "날짜 줄(2026-10-06 19:00~21:00)과 회차 줄(1세션 · 2H · 메모)을 붙여 넣으세요. 차례대로 짝짓습니다. 시각은 없어도 됩니다." : {
       "localizations" : {
         "cs" : {
@@ -17431,6 +17857,432 @@
         }
       }
     },
+    "모든 기능 바로 열기" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odemknout všechny funkce hned"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lås alle funktioner op nu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Funktionen jetzt freischalten"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ξεκλείδωμα όλων των λειτουργιών τώρα"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock all features now"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock all features now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear todas las funciones ahora"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaa kaikki toiminnot nyt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débloquer toutes les fonctions maintenant"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buka semua fitur sekarang"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sblocca subito tutte le funzioni"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての機能を今すぐ開く"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lås opp alle funksjoner nå"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle functies nu ontgrendelen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odblokuj teraz wszystkie funkcje"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liberar todos os recursos agora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть все функции сейчас"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lås upp alla funktioner nu"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปลดล็อกทุกฟีเจอร์ตอนนี้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tüm özellikleri şimdi aç"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở khóa mọi tính năng ngay"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即解锁所有功能"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即解鎖所有功能"
+          }
+        }
+      }
+    },
+    "모든 기능이 열렸어요" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odemkli jste všechny funkce"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle funktioner er låst op"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Funktionen sind freigeschaltet"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ξεκλειδώθηκαν όλες οι λειτουργίες"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything is unlocked"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything is unlocked"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han desbloqueado todas las funciones"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaikki toiminnot avattiin"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les fonctions sont débloquées"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua fitur kini terbuka"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le funzioni sono sbloccate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての機能が使えるようになりました"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle funksjoner er låst opp"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle functies zijn ontgrendeld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odblokowano wszystkie funkcje"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos os recursos foram liberados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыты все функции"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alla funktioner är upplåsta"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปลดล็อกทุกฟีเจอร์แล้ว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tüm özellikler açıldı"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã mở khóa mọi tính năng"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有功能已解锁"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有功能已解鎖"
+          }
+        }
+      }
+    },
+    "무지개로 한 주가 얼마나 찼는지, 회고로 지난 주를 봅니다. 캘린더 가져오기와 장기 플랜은 '더 보기'에 있습니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duha ukazuje, jak je týden plný, a Ohlédnutí shrnuje minulý týden. Import z kalendáře a dlouhodobé plány najdete v nabídce „Další“."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se med Regnbue, hvor fyldt ugen er, og se tilbage på sidste uge med Gennemgang. Kalenderimport og langsigtede planer finder du under 'Mere'."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dem Regenbogen siehst du, wie voll deine Woche ist, mit dem Rückblick die letzte Woche. Kalenderimport und Langzeitpläne findest du unter „Mehr“."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Δες με το Ουράνιο τόξο πόσο γεμάτη είναι η εβδομάδα και ρίξε μια ματιά στην προηγούμενη με την Ανασκόπηση. Η εισαγωγή ημερολογίου και τα μακροπρόθεσμα πλάνα βρίσκονται στο «Περισσότερα»."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See how full your week is with Rainbow, and look back on last week with Review. Calendar import and long-term plans are under 'More'."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See how full your week is with Rainbow, and look back on last week with Review. Calendar import and long-term plans are under 'More'."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con Arcoíris ves lo llena que está tu semana y con Revisión repasas la anterior. La importación del calendario y los planes a largo plazo están en «Más»."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sateenkaari näyttää, kuinka täysi viikkosi on, ja Katsaus palaa edelliseen viikkoon. Kalenterin tuonti ja pitkän aikavälin suunnitelmat löytyvät kohdasta ”Lisää”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'arc-en-ciel montre à quel point votre semaine est remplie, et le bilan revient sur la semaine passée. L'import de calendrier et les plans à long terme sont dans « Plus »."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lihat seberapa penuh minggumu dengan Pelangi, dan tinjau minggu lalu dengan Tinjauan. Impor kalender dan rencana jangka panjang ada di 'Lainnya'."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con Arcobaleno vedi quanto è piena la settimana, con Revisione ripercorri quella passata. Importazione dal calendario e piani a lungo termine sono in «Altro»."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "虹で一週間の埋まり具合を、振り返りで先週を見ます。カレンダーの読み込みと長期プランは「その他」にあります。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hvor full uken er med Regnbue, og se tilbake på forrige uke med Gjennomgang. Kalenderimport og langsiktige planer finner du under «Mer»."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zie met Regenboog hoe vol je week is en blik met Terugblik terug op vorige week. Agenda-import en langetermijnplannen staan onder 'Meer'."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tęcza pokazuje, jak pełny jest tydzień, a Podsumowanie wraca do poprzedniego. Import z kalendarza i plany długoterminowe znajdziesz w menu „Więcej”."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja com o Arco-íris o quanto sua semana está cheia e revise a semana passada com Revisão. Importar do calendário e planos de longo prazo ficam em \"Mais\"."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Радуга показывает, насколько заполнена неделя, а Итоги — прошлую неделю. Импорт календаря и долгосрочные планы находятся в меню «Ещё»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hur full veckan är med Regnbåge och blicka tillbaka på förra veckan med Genomgång. Kalenderimport och långsiktiga planer finns under ”Mer”."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ดูว่าสัปดาห์เต็มแค่ไหนด้วยสายรุ้ง และย้อนดูสัปดาห์ก่อนด้วยการทบทวน การนำเข้าปฏิทินและแผนระยะยาวอยู่ใน \"เพิ่มเติม\""
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haftanın ne kadar dolu olduğunu Gökkuşağı ile, geçen haftayı Değerlendirme ile gör. Takvimden içe aktarma ve uzun vadeli planlar 'Diğer' altında."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xem tuần của bạn đã kín đến đâu bằng Cầu vồng, và nhìn lại tuần trước bằng Nhìn lại. Nhập lịch và kế hoạch dài hạn nằm trong 'Thêm'."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用彩虹看本周排得有多满，用复盘回看上周。日历导入和长期计划在“更多”里。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用彩虹看本週排得有多滿，用回顧回看上週。行事曆匯入和長期計畫在「更多」裡。"
+          }
+        }
+      }
+    },
     "보라" : {
       "localizations" : {
         "cs" : {
@@ -17569,6 +18421,148 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "紫色"
+          }
+        }
+      }
+    },
+    "블록을 놓을수록 기능이 하나씩 열립니다. 기다리지 않고 지금 모두 엽니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkce se odemykají postupně, jak umisťujete bloky. Tímto je odemknete všechny hned, bez čekání."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktionerne låses op én ad gangen, når du lægger blokke. Dette åbner dem alle nu uden at vente."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktionen werden nach und nach freigeschaltet, wenn du Blöcke setzt. Damit schaltest du alle sofort frei."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι λειτουργίες ξεκλειδώνουν μία μία καθώς βάζεις μπλοκ. Έτσι τις ανοίγεις όλες τώρα, χωρίς αναμονή."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Features unlock one by one as you place blocks. This opens them all now, without waiting."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Features unlock one by one as you place blocks. This opens them all now, without waiting."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las funciones se desbloquean una a una al colocar bloques. Así las abres todas ahora, sin esperar."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toiminnot avautuvat yksi kerrallaan, kun sijoitat lohkoja. Tämä avaa ne kaikki nyt ilman odottelua."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonctions se débloquent une à une à mesure que vous placez des blocs. Ceci les ouvre toutes maintenant, sans attendre."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fitur terbuka satu per satu saat kamu meletakkan blok. Ini membuka semuanya sekarang tanpa menunggu."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le funzioni si sbloccano una alla volta man mano che metti blocchi. Così le apri tutte subito, senza aspettare."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "機能はブロックを置くたびにひとつずつ開きます。待たずに今すべて開きます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funksjonene låses opp én etter én når du legger inn blokker. Dette åpner alle nå, uten å vente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Functies worden een voor een ontgrendeld als je blokken plaatst. Hiermee open je ze nu allemaal, zonder te wachten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkcje odblokowują się po kolei, gdy umieszczasz bloki. Tak otworzysz je wszystkie od razu, bez czekania."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os recursos são liberados um por um conforme você coloca blocos. Isto libera todos agora, sem esperar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Функции открываются по одной по мере того, как вы расставляете блоки. Так вы откроете их все сразу, без ожидания."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktionerna låses upp en i taget när du lägger block. Detta öppnar alla nu, utan att vänta."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ฟีเจอร์จะปลดล็อกทีละอย่างเมื่อคุณวางบล็อก ปุ่มนี้จะเปิดทั้งหมดทันทีโดยไม่ต้องรอ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Özellikler blok yerleştirdikçe tek tek açılır. Bu, beklemeden hepsini şimdi açar."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các tính năng mở dần khi bạn đặt khối. Nút này mở tất cả ngay mà không cần chờ."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放下时间块时功能会逐个解锁。这里可以不必等待，立即全部打开。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放下時間塊時功能會逐一解鎖。這裡可以不必等待，立即全部打開。"
           }
         }
       }
@@ -17999,6 +18993,290 @@
         }
       }
     },
+    "요일 칸" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dny"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dage"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ημέρες"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Días"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päivät"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jours"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giorni"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "曜日の枠"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dager"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dni"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dias"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дни"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagar"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ช่องวัน"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Günler"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các ngày"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每天"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每天"
+          }
+        }
+      }
+    },
+    "요일 칸으로 끌어다 놓으면 끝" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přetáhněte ho na den a je hotovo"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Træk den over på en dag, så er du færdig"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zieh sie auf einen Tag – fertig"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σύρ' την σε μια ημέρα και τελείωσες"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag it onto a day, and you're done"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag it onto a day, and you're done"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrástrala a un día y listo"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vedä se päivälle, ja valmista"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glissez-la sur un jour, c'est tout"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seret ke salah satu hari, selesai"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trascinala su un giorno, ed è fatta"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "曜日の枠へドラッグすれば完了"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dra den over på en dag, så er du ferdig"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep hem naar een dag en klaar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeciągnij je na dzień i gotowe"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arraste para um dia e pronto"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетащите её на день — и готово"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dra den till en dag, så är du klar"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ลากไปวางในช่องวันก็เสร็จ"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir güne sürükle, bu kadar"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kéo vào một ngày là xong"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖到某一天，就完成了"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖到某一天，就完成了"
+          }
+        }
+      }
+    },
     "이 회차를 시작하는 시각 정하기" : {
       "localizations" : {
         "cs" : {
@@ -18137,6 +19415,432 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Set the start time of this session"
+          }
+        }
+      }
+    },
+    "이번 주에 할 일을 요일 칸에 놓아 두면, 언제 무엇을 할지가 한눈에 보입니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozmístěte úkoly tohoto týdne do dnů a na první pohled uvidíte, co a kdy dělat."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Læg ugens opgaver ud på dagene, så kan du med ét blik se, hvad du skal hvornår."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lege die Aufgaben dieser Woche auf die Tage, und du siehst auf einen Blick, was wann dran ist."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Βάλε τις εργασίες της εβδομάδας στις ημέρες και θα βλέπεις με μια ματιά τι κάνεις και πότε."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put this week's to-dos on the days, and you'll see at a glance what to do when."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put this week's to-dos on the days, and you'll see at a glance what to do when."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pon las tareas de esta semana en los días y verás de un vistazo qué hacer y cuándo."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sijoita tämän viikon tehtävät päiville, niin näet yhdellä silmäyksellä, mitä teet ja milloin."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placez les tâches de la semaine sur les jours et voyez d'un coup d'œil quoi faire et quand."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letakkan tugas minggu ini di hari-harinya, dan kamu langsung melihat apa yang dikerjakan dan kapan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metti le attività della settimana sui giorni e vedrai a colpo d'occhio cosa fare e quando."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今週のやることを曜日の枠に置いておけば、いつ何をするかがひと目でわかります。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legg ukens oppgaver på dagene, så ser du med ett blikk hva du skal gjøre når."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zet de taken van deze week op de dagen en je ziet in één oogopslag wat je wanneer doet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozłóż zadania z tego tygodnia na dni, a od razu zobaczysz, co i kiedy robić."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque as tarefas desta semana nos dias e veja de relance o que fazer e quando."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разложите задачи этой недели по дням — и сразу видно, что и когда делать."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägg veckans uppgifter på dagarna, så ser du med en blick vad du ska göra när."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "วางสิ่งที่ต้องทำของสัปดาห์นี้ลงในช่องวัน แล้วจะเห็นทันทีว่าต้องทำอะไรเมื่อไร"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu haftanın görevlerini günlere yerleştir; neyi ne zaman yapacağını bir bakışta gör."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đặt việc cần làm tuần này vào các ngày, bạn sẽ thấy ngay khi nào làm gì."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把本周的待办放进每天的格子里，什么时候做什么一目了然。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把本週的待辦放進每天的格子裡，什麼時候做什麼一目了然。"
+          }
+        }
+      }
+    },
+    "일간 · 시간축 · 타이머가 열렸어요" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odemkli jste den · časovou osu · časovač"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dag · tidslinje · timer er låst op"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag · Zeitachse · Timer sind freigeschaltet"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ξεκλειδώθηκαν Ημέρα · Χρονογραμμή · Χρονόμετρο"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day view · Timeline · Timer are unlocked"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day view · Timeline · Timer are unlocked"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han desbloqueado Día · Cronología · Temporizador"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päivä · aikajana · ajastin avattiin"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jour · Chronologie · Minuteur sont débloqués"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari · Linimasa · Timer kini terbuka"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giorno · Timeline · Timer sono sbloccati"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日・タイムライン・タイマーが使えるようになりました"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dag · tidslinje · tidtaker er låst opp"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dag · tijdlijn · timer zijn ontgrendeld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odblokowano dzień · oś czasu · timer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dia · Linha do tempo · Timer foram liberados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыты день · шкала времени · таймер"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dag · tidslinje · timer är upplåsta"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปลดล็อกมุมมองวัน · ไทม์ไลน์ · ตัวจับเวลาแล้ว"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gün · Zaman çizelgesi · Zamanlayıcı açıldı"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã mở khóa Ngày · Dòng thời gian · Bộ hẹn giờ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日视图 · 时间轴 · 计时器已解锁"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日檢視 · 時間軸 · 計時器已解鎖"
+          }
+        }
+      }
+    },
+    "잠·일처럼 빼놓을 수 없는 시간을 깔아 두면, 남는 자리가 이번 주에 실제로 쓸 수 있는 시간이 됩니다. 아래 '고정 루틴'에서 세워 보세요." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte čas, bez kterého se neobejdete, jako spánek a práce, a co zbude, je čas, který tento týden opravdu máte. Nastavte je níže v části „Pevné rutiny“."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Læg den tid ind, du ikke kan undvære, som søvn og arbejde, så er resten den tid, du reelt har i denne uge. Opret dem under 'Faste rutiner' nedenfor."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trage die Zeit ein, auf die du nicht verzichten kannst, etwa Schlaf und Arbeit – was übrig bleibt, ist die Zeit, die du diese Woche wirklich hast. Lege sie unten unter „Feste Routinen“ an."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Βάλε πρώτα τον χρόνο που δεν μπορείς να παραλείψεις, όπως ύπνο και δουλειά, και ό,τι μένει είναι ο χρόνος που πραγματικά έχεις αυτή την εβδομάδα. Όρισέ τις παρακάτω στις «Σταθερές ρουτίνες»."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lay down the time you can't skip, like sleep and work, and what's left is the time you really have this week. Set them up in 'Fixed routines' below."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lay down the time you can't skip, like sleep and work, and what's left is the time you really have this week. Set them up in 'Fixed routines' below."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca primero el tiempo que no puedes saltarte, como dormir y trabajar, y lo que quede será el tiempo que de verdad tienes esta semana. Créalas abajo en «Rutinas fijas»."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merkitse ensin aika, josta et voi luopua, kuten uni ja työ, niin jäljelle jäävä on aika, joka sinulla todella on tällä viikolla. Lisää ne alla kohdassa ”Kiinteät rutiinit”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placez d'abord le temps incompressible, comme le sommeil et le travail : ce qui reste est le temps dont vous disposez vraiment cette semaine. Créez-les ci-dessous dans « Routines fixes »."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tetapkan dulu waktu yang tidak bisa dilewatkan, seperti tidur dan kerja, maka sisanya adalah waktu yang benar-benar kamu punya minggu ini. Buat di 'Rutinitas tetap' di bawah."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci prima il tempo a cui non puoi rinunciare, come sonno e lavoro: ciò che resta è il tempo che hai davvero questa settimana. Crealo qui sotto in «Routine fisse»."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "睡眠や仕事のように外せない時間を先に置くと、残りが今週ほんとうに使える時間になります。下の「固定ルーティン」で作ってみましょう。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legg inn tiden du ikke kan droppe, som søvn og jobb, så er resten tiden du faktisk har denne uken. Opprett dem under «Faste rutiner» nedenfor."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zet eerst de tijd neer die je niet kunt overslaan, zoals slapen en werken; wat overblijft is de tijd die je deze week echt hebt. Maak ze hieronder aan bij 'Vaste routines'."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Najpierw wpisz czas, z którego nie zrezygnujesz, jak sen i praca – to, co zostanie, to czas, który naprawdę masz w tym tygodniu. Dodaj je poniżej w sekcji „Stałe rutyny”."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque primeiro o tempo que você não pode pular, como sono e trabalho, e o que sobrar é o tempo que você realmente tem nesta semana. Crie-as abaixo em \"Rotinas fixas\"."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала отметьте время, без которого не обойтись, — сон и работу, и всё остальное станет временем, которое у вас действительно есть на этой неделе. Создайте их ниже в разделе «Постоянные рутины»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägg in tiden du inte kan hoppa över, som sömn och jobb, så blir resten den tid du faktiskt har den här veckan. Skapa dem under ”Fasta rutiner” nedan."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "วางเวลาที่ขาดไม่ได้ก่อน เช่น นอนและทำงาน แล้วช่วงที่เหลือคือเวลาที่ใช้ได้จริงในสัปดาห์นี้ ลองสร้างได้ที่ \"กิจวัตรประจำ\" ด้านล่าง"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uyku ve iş gibi vazgeçemeyeceğin zamanı önce yerleştir; geriye kalan, bu hafta gerçekten sahip olduğun zamandır. Aşağıdaki 'Sabit rutinler' bölümünden oluştur."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hãy đặt trước những khoảng thời gian không thể bỏ, như ngủ và làm việc; phần còn lại là thời gian bạn thật sự có trong tuần này. Tạo chúng ở mục 'Thói quen cố định' bên dưới."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "先放下睡觉、工作这类省不掉的时间，剩下的就是本周真正能用的时间。在下方“固定作息”里设置吧。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "先放下睡覺、工作這類省不掉的時間，剩下的就是本週真正能用的時間。在下方「固定作息」裡設定吧。"
           }
         }
       }
@@ -18426,6 +20130,148 @@
         }
       }
     },
+    "처음에는 이 두 가지만 있습니다. 블록을 놓을수록 고정 루틴, 일간, 타이머 같은 기능이 차례로 나타납니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na začátku máte jen tyto dvě věci. Čím víc bloků umístíte, tím víc funkcí se postupně objeví – pevné rutiny, den, časovač a další."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du starter med kun disse to. Jo flere blokke du lægger, jo flere funktioner dukker op én efter én: faste rutiner, dag, timer og mere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am Anfang gibt es nur diese beiden. Je mehr Blöcke du setzt, desto mehr Funktionen erscheinen nacheinander – feste Routinen, Tag, Timer und mehr."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Στην αρχή υπάρχουν μόνο αυτά τα δύο. Όσο περισσότερα μπλοκ βάζεις, τόσο εμφανίζονται μία μία λειτουργίες όπως σταθερές ρουτίνες, ημέρα και χρονόμετρο."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You start with just these two. The more blocks you place, the more features appear, one by one: fixed routines, day view, timer and more."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You start with just these two. The more blocks you place, the more features appear, one by one: fixed routines, day view, timer and more."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al principio solo están estas dos. Cuantos más bloques coloques, más funciones aparecerán una a una: rutinas fijas, día, temporizador y más."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aluksi käytössä on vain nämä kaksi. Mitä enemmän lohkoja sijoitat, sitä enemmän toimintoja ilmestyy yksi kerrallaan: kiinteät rutiinit, päivä, ajastin ja muuta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au début, il n'y a que ces deux-là. Plus vous placez de blocs, plus les fonctions apparaissent une à une : routines fixes, vue jour, minuteur et plus encore."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awalnya hanya ada dua hal ini. Makin banyak blok yang kamu letakkan, makin banyak fitur muncul satu per satu: rutinitas tetap, hari, timer, dan lainnya."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All'inizio ci sono solo queste due. Più blocchi metti, più funzioni compaiono una alla volta: routine fisse, giorno, timer e altro."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最初はこの二つだけです。ブロックを置くほど、固定ルーティン、日、タイマーなどの機能が順に現れます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du starter med bare disse to. Jo flere blokker du legger inn, jo flere funksjoner dukker opp én etter én: faste rutiner, dag, tidtaker og mer."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je begint met alleen deze twee. Hoe meer blokken je plaatst, hoe meer functies er een voor een verschijnen: vaste routines, dag, timer en meer."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na początku są tylko te dwie rzeczy. Im więcej bloków umieścisz, tym więcej funkcji pojawi się po kolei: stałe rutyny, dzień, timer i inne."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No começo há só estas duas coisas. Quanto mais blocos você colocar, mais recursos aparecem, um por um: rotinas fixas, dia, timer e mais."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала есть только эти две вещи. Чем больше блоков вы расставите, тем больше функций появится одна за другой: постоянные рутины, день, таймер и другие."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du börjar med bara de här två. Ju fler block du lägger, desto fler funktioner dyker upp en i taget: fasta rutiner, dag, timer och mer."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ตอนแรกมีแค่สองอย่างนี้ ยิ่งวางบล็อกมาก ฟีเจอร์อย่างกิจวัตรประจำ มุมมองวัน และตัวจับเวลาก็จะปรากฏขึ้นทีละอย่าง"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Başta yalnızca bu ikisi var. Ne kadar çok blok yerleştirirsen sabit rutinler, gün, zamanlayıcı gibi özellikler o kadar sırayla ortaya çıkar."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lúc đầu chỉ có hai thứ này. Càng đặt nhiều khối, các tính năng như thói quen cố định, ngày, bộ hẹn giờ sẽ lần lượt xuất hiện."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一开始只有这两样。放下的时间块越多，固定作息、日视图、计时器等功能就会依次出现。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一開始只有這兩樣。放下的時間塊越多，固定作息、日檢視、計時器等功能就會依序出現。"
+          }
+        }
+      }
+    },
     "초록" : {
       "localizations" : {
         "cs" : {
@@ -18568,6 +20414,148 @@
         }
       }
     },
+    "카드를 잡아 요일 칸에 떨어뜨리면 그날의 계획이 됩니다. 놓은 뒤에도 다른 요일로 옮길 수 있습니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chyťte kartu a pusťte ji na den – stane se plánem toho dne. I potom ji můžete přesunout na jiný den."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag fat i kortet og slip det på en dag, så bliver det dagens plan. Du kan stadig flytte det til en anden dag bagefter."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Greif die Karte und lass sie auf einem Tag los – schon ist sie der Plan für diesen Tag. Du kannst sie danach jederzeit auf einen anderen Tag ziehen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Πιάσε την κάρτα και άφησέ την σε μια ημέρα για να γίνει το πλάνο της. Μπορείς να τη μετακινήσεις σε άλλη ημέρα και μετά."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grab the card and drop it on a day to make it that day's plan. You can still move it to another day afterwards."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grab the card and drop it on a day to make it that day's plan. You can still move it to another day afterwards."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toma la tarjeta y suéltala en un día para convertirla en el plan de ese día. Después también puedes moverla a otro día."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tartu korttiin ja pudota se päivälle, niin siitä tulee sen päivän suunnitelma. Voit siirtää sen myöhemmin toiselle päivälle."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attrapez la carte et déposez-la sur un jour pour en faire le plan de ce jour. Vous pourrez toujours la déplacer ensuite."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambil kartunya dan jatuhkan di salah satu hari, maka jadi rencana hari itu. Setelahnya pun bisa dipindah ke hari lain."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afferra la scheda e rilasciala su un giorno: diventa il piano di quel giorno. Puoi sempre spostarla su un altro giorno."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カードをつかんで曜日の枠に落とすと、その日の計画になります。置いたあとも別の曜日へ動かせます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta tak i kortet og slipp det på en dag, så blir det dagens plan. Du kan fortsatt flytte det til en annen dag etterpå."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pak de kaart en laat hem los op een dag; dan is hij het plan voor die dag. Je kunt hem daarna nog naar een andere dag verplaatsen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chwyć kartę i upuść ją na dzień – stanie się planem tego dnia. Później nadal możesz przenieść ją na inny dzień."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegue o cartão e solte em um dia para virar o plano daquele dia. Depois você ainda pode movê-lo para outro dia."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возьмите карточку и бросьте её на день — она станет планом этого дня. Потом её можно перенести на другой день."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta tag i kortet och släpp det på en dag, så blir det dagens plan. Du kan fortfarande flytta det till en annan dag efteråt."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "จับการ์ดแล้วปล่อยลงในช่องวัน ก็จะกลายเป็นแผนของวันนั้น วางแล้วก็ยังย้ายไปวันอื่นได้"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kartı tutup bir güne bırak, o günün planı olsun. Bıraktıktan sonra da başka bir güne taşıyabilirsin."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nắm thẻ và thả vào một ngày để biến nó thành kế hoạch của ngày đó. Sau đó vẫn có thể chuyển sang ngày khác."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "抓住卡片放到某一天，它就成了那天的计划。放下后也能再挪到别的日子。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "抓住卡片放到某一天，它就成了那天的計畫。放下後也能再挪到別的日子。"
+          }
+        }
+      }
+    },
     "파랑" : {
       "localizations" : {
         "cs" : {
@@ -18706,6 +20694,574 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "藍色"
+          }
+        }
+      }
+    },
+    "한 주를 블록으로 짭니다" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naplánujte týden v blocích"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planlæg ugen i blokke"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plane deine Woche in Blöcken"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σχεδίασε την εβδομάδα σε μπλοκ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan your week in blocks"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan your week in blocks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organiza tu semana en bloques"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suunnittele viikkosi lohkoina"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifiez votre semaine en blocs"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Susun minggumu dalam blok"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pianifica la settimana a blocchi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一週間をブロックで組み立てます"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planlegg uken i blokker"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan je week in blokken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planuj tydzień w blokach"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planeje sua semana em blocos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Планируйте неделю блоками"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planera veckan i block"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "วางแผนสัปดาห์เป็นบล็อก"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haftanı bloklarla planla"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lên kế hoạch tuần bằng các khối"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用时间块安排一周"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用時間塊安排一週"
+          }
+        }
+      }
+    },
+    "할 일을 적고 요일 칸에 놓는 법을 움직이는 그림으로 다시 봅니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Znovu si prohlédněte animovaného průvodce psaním úkolů a jejich umisťováním do dnů."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se den animerede guide til at skrive opgaver og lægge dem på dage igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieh dir noch einmal die animierte Anleitung an, wie du Aufgaben schreibst und auf Tage legst."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Δες ξανά τον κινούμενο οδηγό για το πώς γράφεις εργασίες και τις βάζεις στις ημέρες."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch the animated guide to writing to-dos and placing them on days again."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch the animated guide to writing to-dos and placing them on days again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a ver la guía animada para escribir tareas y colocarlas en los días."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katso uudelleen animoitu opas tehtävien kirjoittamiseen ja päiville sijoittamiseen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revoyez le guide animé pour écrire des tâches et les placer sur les jours."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tonton lagi panduan animasi cara menulis tugas dan meletakkannya di hari."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rivedi la guida animata per scrivere attività e metterle sui giorni."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やることを書いて曜日に置く方法を、動くイラストでもう一度見ます。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se den animerte veiledningen for å skrive oppgaver og legge dem på dager igjen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekijk opnieuw de geanimeerde uitleg over taken schrijven en op dagen zetten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obejrzyj ponownie animowany przewodnik po wpisywaniu zadań i rozkładaniu ich na dni."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja de novo o guia animado de como escrever tarefas e colocá-las nos dias."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Снова посмотреть анимированное руководство: как записывать задачи и раскладывать их по дням."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se den animerade guiden om att skriva uppgifter och lägga dem på dagar igen."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ดูคำแนะนำแบบภาพเคลื่อนไหวเรื่องการเขียนสิ่งที่ต้องทำและวางลงในช่องวันอีกครั้ง"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Görev yazmayı ve günlere yerleştirmeyi anlatan animasyonlu rehberi yeniden izle."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xem lại hướng dẫn động về cách viết việc cần làm và đặt chúng vào các ngày."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用动画再看一遍如何写待办并放进每天的格子。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用動畫再看一遍如何寫待辦並放進每天的格子。"
+          }
+        }
+      }
+    },
+    "할 일을 한 줄 적고" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Napište úkol na jeden řádek"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv en opgave på én linje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib eine Aufgabe in eine Zeile"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Γράψε μια εργασία σε μία γραμμή"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a to-do in one line"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a to-do in one line"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe una tarea en una línea"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kirjoita tehtävä yhdelle riville"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écrivez une tâche en une ligne"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tulis satu tugas dalam satu baris"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrivi un'attività in una riga"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やることを一行書いて"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv en oppgave på én linje"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf een taak op één regel"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wpisz zadanie w jednej linijce"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escreva uma tarefa em uma linha"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запишите задачу одной строкой"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv en uppgift på en rad"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เขียนสิ่งที่ต้องทำหนึ่งบรรทัด"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir görevi tek satırda yaz"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viết một việc cần làm trong một dòng"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写下一行待办"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "寫下一行待辦"
+          }
+        }
+      }
+    },
+    "화면 아래 '할 일'에 적습니다. 언제 할지는 아직 정하지 않아도 됩니다." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Napište ho do části „Úkoly“ dole na obrazovce. Kdy ho uděláte, zatím rozhodovat nemusíte."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv den under 'Opgaver' nederst på skærmen. Du behøver ikke bestemme hvornår endnu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib sie unten unter „Aufgaben“. Wann du sie erledigst, musst du noch nicht festlegen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Γράψ' την στις «Εργασίες» στο κάτω μέρος της οθόνης. Δεν χρειάζεται να αποφασίσεις ακόμη πότε."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write it in 'To-dos' at the bottom of the screen. You don't need to decide when yet."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write it in 'To-dos' at the bottom of the screen. You don't need to decide when yet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escríbela en «Tareas», abajo en la pantalla. Aún no hace falta decidir cuándo."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kirjoita se näytön alaosan kohtaan ”Tehtävät”. Ajankohtaa ei tarvitse vielä päättää."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écrivez-la dans « Tâches » en bas de l'écran. Inutile de décider quand pour l'instant."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tulis di 'Tugas' di bagian bawah layar. Kamu belum perlu menentukan kapan."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrivila in «Attività» in fondo allo schermo. Non serve ancora decidere quando."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画面下の「やること」に書きます。いつやるかはまだ決めなくてかまいません。"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv den under «Oppgaver» nederst på skjermen. Du trenger ikke bestemme når ennå."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf hem onder 'Taken' onderaan het scherm. Wanneer je hem doet, hoef je nog niet te kiezen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wpisz je w sekcji „Zadania” na dole ekranu. Na razie nie musisz decydować, kiedy."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escreva em \"Tarefas\", na parte de baixo da tela. Ainda não precisa decidir quando."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запишите её в разделе «Задачи» внизу экрана. Когда её делать, пока решать не нужно."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv den under ”Uppgifter” längst ned på skärmen. Du behöver inte bestämma när ännu."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เขียนไว้ที่ \"สิ่งที่ต้องทำ\" ด้านล่างของหน้าจอ ยังไม่ต้องตัดสินใจว่าจะทำเมื่อไร"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekranın altındaki 'Görevler' bölümüne yaz. Ne zaman yapacağına henüz karar vermen gerekmez."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viết vào mục 'Việc cần làm' ở cuối màn hình. Chưa cần quyết định khi nào làm."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写在屏幕下方的“待办事项”里。暂时不用决定什么时候做。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "寫在畫面下方的「待辦事項」裡。暫時不用決定什麼時候做。"
           }
         }
       }

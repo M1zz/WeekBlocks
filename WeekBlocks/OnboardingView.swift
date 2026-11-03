@@ -414,12 +414,14 @@ enum RoutineOnboarding {
 enum NextStep: Equatable {
     case setRoutines
     case writeTodos
+    /// 처음 쓰는 사람의 첫 할 일 — 할 일 창을 따로 열지 않고 아래 할 일 판에 빈 칸을 연다.
+    case writeFirstTodo
     case placeTodos
 
     var title: String {
         switch self {
         case .setRoutines: String(localized: "먼저, 빼놓을 수 없는 시간을 세웁니다")
-        case .writeTodos:  String(localized: "이번 주에 할 일을 적어 보세요")
+        case .writeTodos, .writeFirstTodo:  String(localized: "이번 주에 할 일을 적어 보세요")
         case .placeTodos:  String(localized: "할 일을 요일 칸으로 끌어다 놓으세요")
         }
     }
@@ -428,7 +430,7 @@ enum NextStep: Equatable {
         switch self {
         case .setRoutines:
             String(localized: "잠·끼니·일처럼 뺄 수 없는 시간을 먼저 깔면, 남는 자리가 이번 주에 실제로 쓸 수 있는 시간이 됩니다.")
-        case .writeTodos:
+        case .writeTodos, .writeFirstTodo:
             String(localized: "화면 아래 '할 일'에 한 줄씩 적습니다. 언제 할지는 아직 정하지 않아도 됩니다.")
         case .placeTodos:
             String(localized: "할 일 카드를 잡아 요일 칸에 떨어뜨리면 그 요일의 계획이 됩니다. 올려 둔 뒤에도 다른 요일로 다시 끌 수 있습니다.")
@@ -438,7 +440,7 @@ enum NextStep: Equatable {
     var icon: String {
         switch self {
         case .setRoutines: "lock"
-        case .writeTodos:  "square.and.pencil"
+        case .writeTodos, .writeFirstTodo:  "square.and.pencil"
         case .placeTodos:  "hand.draw"
         }
     }
@@ -448,6 +450,7 @@ enum NextStep: Equatable {
         switch self {
         case .setRoutines: String(localized: "안내 받기")
         case .writeTodos:  String(localized: "할 일 창 열기")
+        case .writeFirstTodo: String(localized: "새 할 일")
         case .placeTodos:  nil
         }
     }

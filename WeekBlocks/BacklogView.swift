@@ -17,6 +17,10 @@ struct BacklogSection: View {
     /// 주간 화면에서는 끈다 — 거기서 할 일은 **요일 칸으로 끌어다 놓을 카드**일 뿐이라
     /// 거르는 도구가 앞에 서면 계획을 짜는 손을 방해한다. 거르는 일은 할 일 창에서 한다.
     var showsCategoryFilter: Bool = true
+    /// 처음 쓰는 사람의 할 일 판 — '새 할 일'만 남기고 프로젝트 · 전체 보기 · 정리 메뉴는 감춘다 (→ FeatureLevel).
+    var isSimple: Bool = false
+    /// 위쪽 '다음 한 걸음' 줄이 빈 칸을 열어 달라고 할 때 (→ BacklogAddRequest).
+    @State private var addRequest = BacklogAddRequest.shared
     /// 머리글 아래 목록을 판 안에서 스크롤한다. 일간처럼 판의 키가 바깥(타임라인)에서 정해질 때 켠다 —
     /// 할 일이 늘어도 판이 길어지지 않고, 옆 타임라인 아래가 하얗게 비지 않는다.
     var scrollsContent: Bool = false
@@ -266,6 +270,7 @@ struct BacklogSection: View {
                 // 누를 수 있는 줄 몰랐다. 테두리를 두르고 아이콘을 붙여 버튼으로 세운다.
                 // 이월 개수는 괄호가 아니라 알약 하나로 — 숫자가 글에 섞이지 않게.
                 // 프로젝트 창은 `…` 안에 숨어 있어서 있는 줄 몰랐다. 전체 보기 옆에 세운다.
+                if !isSimple {
                 Button {
                     openProject(nil)
                 } label: {
@@ -289,6 +294,7 @@ struct BacklogSection: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .help("끝낸 것까지 포함한 전체 할 일")
+                }
 
                 if !weekItems.isEmpty {
                     Text("\(filteredItems.count)개 · \(formatDuration(filteredItems.reduce(0) { $0 + $1.durationHours }))")
@@ -298,6 +304,7 @@ struct BacklogSection: View {
 
                 Spacer()
 
+                if !isSimple {
                 // 시간·분류를 표처럼 한꺼번에 고치는 옛 화면. 적는 통로가 아니라
                 // 이따금 쓰는 정리 도구라 메뉴 안으로 넣는다.
                 Menu {
@@ -310,6 +317,10 @@ struct BacklogSection: View {
                 .accessibilityLabel("더 보기")
                 .menuStyle(.borderlessButton)
                 .fixedSize()
+                }
+            }
+            .onChange(of: addRequest.tick) { _, _ in
+                if canPlan { beginAdding() }
             }
 
             scrollingIfNeeded {
@@ -1177,7 +1188,8 @@ struct TodoWindowView: View {
     }
 
     /// 고정 루틴이 하나라도 있어야 할 일을 계획할 수 있다 (주간 화면과 같은 규칙).
-    private var canPlan: Bool { routines.contains { $0.kind == .fixed } }
+    /// 처음 쓰는 사람은 루틴 없이도 할 일부터 적는다 (→ FeatureStage.isGuided).
+    private var canPlan: Bool { routines.contains { $0.kind == .fixed } || FeatureStage.shared.isGuided }
 
     var body: some View {
         ScrollView {
