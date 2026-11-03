@@ -27,6 +27,9 @@ enum WeekBlocksSpec: LeeoAppSpec {
         appIdentifier: "com.devkoan.ScheduleDensityApp"
     )
 
+    /// 백업 금고가 함께 떠 두는 공유 저장소 (위젯 · 공유 메뉴와 나누는 것).
+    static let appGroups = ["QGAQ3AY3R3.group.com.devkoan.ScheduleDensity"]
+
     /// LeeoKit 3부터는 기본값이 없다 — 모든 앱이 한 번은 선언해야 하는 의무 링크.
     ///
     /// ⚠️ 주소도 번역한다. 영어로 쓰는 사람에게 한국어 방침을 열어 주면 읽을 수가 없다.

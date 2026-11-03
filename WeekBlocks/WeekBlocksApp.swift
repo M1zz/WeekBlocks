@@ -75,6 +75,9 @@ struct WeekBlocksApp: App {
             container = PlanStore.shared.container
             return
         }
+        // 백업 금고 (LeeoKit) — 예약된 복원 적용 · 매일/업데이트 직전 백업. 스토어를 열기 전에 먼저.
+        // 아래 bootstrap 도 금고를 켜지만 스토어가 선 뒤라 늦다. 여기서 먼저 켜면 그쪽 부름은 아무것도 안 한다.
+        LeeoVault.start(WeekBlocksSpec.self)
         Self.isSafeMode = Self.launchGuard.beginLaunch()
         if Self.isSafeMode {
             AppLog.launch.fault("직전 실행 \(Self.launchGuard.consecutiveIncompleteLaunches, privacy: .public)번이 첫 화면 전에 끝났다 — 세이프 모드로 연다")
