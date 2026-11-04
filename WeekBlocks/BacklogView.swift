@@ -21,6 +21,8 @@ struct BacklogSection: View {
     var isSimple: Bool = false
     /// 위쪽 '다음 한 걸음' 줄이 빈 칸을 열어 달라고 할 때 (→ BacklogAddRequest).
     @State private var addRequest = BacklogAddRequest.shared
+    /// Spotlight · Siri 가 열어 달라는 할 일 (→ TodoIntents.swift).
+    @State private var openRequest = TodoOpenRequest.shared
     /// 머리글 아래 목록을 판 안에서 스크롤한다. 일간처럼 판의 키가 바깥(타임라인)에서 정해질 때 켠다 —
     /// 할 일이 늘어도 판이 길어지지 않고, 옆 타임라인 아래가 하얗게 비지 않는다.
     var scrollsContent: Bool = false
@@ -321,6 +323,12 @@ struct BacklogSection: View {
             }
             .onChange(of: addRequest.tick) { _, _ in
                 if canPlan { beginAdding() }
+            }
+            // Spotlight · Siri 에서 고른 할 일 — 판이 여럿 떠 있어도 먼저 받은 하나만 연다.
+            .onChange(of: openRequest.dragToken, initial: true) { _, _ in
+                guard let token = openRequest.dragToken else { return }
+                openRequest.dragToken = nil
+                stepsSheetItem = allItems.first { $0.dragToken == token }
             }
 
             scrollingIfNeeded {
@@ -968,6 +976,7 @@ struct BacklogSection: View {
             try? context.save()
         }
         Telemetry.record(.todoAdded)
+        AddTodoIntent.donate(title)
         newTitle = ""
         draftPeriod = nil
         if keepOpen {

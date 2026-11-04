@@ -201,6 +201,8 @@ struct WeekBlocksApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     // 뒤로 갈 때 한 벌 떠 둔다 — 같은 내용이면 금고가 알아서 건너뛴다.
                     if phase == .background { VaultMonitor.shared.snapshotNow(reason: "background") }
+                    // 할 일을 Spotlight 에 다시 싣는다 (→ TodoIntents.swift).
+                    if phase != .inactive { Task { await TodoEntity.reindex() } }
                     guard phase == .active else { return }
                     // 켜 둔 채 날이 바뀌고 다시 앞으로 온 날도 '연 날'이다 (→ Telemetry.recordOpen).
                     Telemetry.recordOpen()
