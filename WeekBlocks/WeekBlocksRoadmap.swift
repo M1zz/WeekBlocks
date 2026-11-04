@@ -33,7 +33,7 @@ extension WeekBlocksSpec {
         .init(id: "gift", status: .building,
               title: String(localized: "Pro 선물하기", comment: "Roadmap item: gift Pro"),
               detail: String(localized: "무지개 공방 Pro를 다른 사람에게 선물할 수 있어요.", comment: "Roadmap item detail: gift Pro")),
-        .init(id: "shortcuts", status: .planned,
+        .init(id: "shortcuts", status: .building,
               title: String(localized: "Siri와 단축어", comment: "Roadmap item: Siri and Shortcuts"),
               detail: String(localized: "Siri에게 말하거나 단축어로 할 일을 바로 더해요.", comment: "Roadmap item detail: Siri and Shortcuts")),
         .init(id: "siri-ai", status: .planned,
