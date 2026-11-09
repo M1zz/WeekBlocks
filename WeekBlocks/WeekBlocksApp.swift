@@ -161,6 +161,8 @@ struct WeekBlocksApp: App {
                 // 서체를 따로 고른 글씨(`design:` 지정)는 그대로 둔다.
                 .fontDesign(.rounded)
                 .leeoSatisfactionCheck(WeekBlocksSpec.self)
+                // 개발자가 보낸 의견에 답장하면, 앱이 앞으로 올 때 답장을 시트로 보여 준다 (LeeoKit).
+                .leeoFeedbackReplyNotice(WeekBlocksSpec.self)
                 // 업데이트 뒤 처음 열 때 한 번 "새로 생긴 것" (→ WhatsNewView.swift).
                 .whatsNewOnUpdate()
                 // 사람이 지우지 않았는데 없어진 것이 있으면 되살릴지 묻는다 (→ VaultMonitor.swift).
