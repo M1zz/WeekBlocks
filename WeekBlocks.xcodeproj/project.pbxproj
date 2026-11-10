@@ -518,6 +518,7 @@
 				066E0521B58884D419671397 /* Frameworks */,
 				AEEA7B0C58E35A18FCB57F8A /* Embed Foundation Extensions */,
 				2BDE107352C4A2F5209245B9 /* 한국어 원문 표 넣기 */,
+				D4EF966E968BB7ADCFA0825F /* 독에 뜨는 이름 맞추기 (NFD) */,
 			);
 			buildRules = (
 			);
@@ -763,6 +764,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/scripts/source-language-strings.py\" \"$SRCROOT/WeekBlocks/Localizable.xcstrings\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/ko.lproj/Localizable.strings\"";
+		};
+		D4EF966E968BB7ADCFA0825F /* 독에 뜨는 이름 맞추기 (NFD) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "독에 뜨는 이름 맞추기 (NFD)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/decompose-display-name.py\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"";
 		};
 		DE380D861F49A0BB7491F8C5 /* 한국어 원문 표 넣기 */ = {
 			isa = PBXShellScriptBuildPhase;

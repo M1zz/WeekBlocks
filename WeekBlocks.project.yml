@@ -95,6 +95,14 @@ targets:
           - $(SRCROOT)/WeekBlocks/Localizable.xcstrings
         outputFiles:
           - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings
+      # 독·파인더가 'Rainbow Craft' 같은 lproj 이름을 쓰려면 폴더 이름과 CFBundleDisplayName 이
+      # 바이트까지 같아야 한다. 스토어는 한글 폴더 이름을 NFD 로 깔므로 이 값도 NFD 로 맞춘다.
+      # (→ scripts/decompose-display-name.py. 빼면 영어 쓰는 사람의 독에 '무지개 공방'이 뜬다)
+      - name: 독에 뜨는 이름 맞추기 (NFD)
+        script: '"$SRCROOT/scripts/decompose-display-name.py" "$TARGET_BUILD_DIR/$INFOPLIST_PATH"'
+        basedOnDependencyAnalysis: false
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp

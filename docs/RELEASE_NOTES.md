@@ -9,6 +9,7 @@ Plus와 Pro는 연 구독과 평생 중에 고릅니다
 구독 중이라면 평생으로 바꿀 수 있습니다
 모든 앱을 여는 언제나 평생 패스가 생겼습니다
 이번 주 회고 복사는 이제 무료입니다
+Dock과 Finder에서 앱 이름이 맥의 언어로 보입니다
 
 ### App Store (English)
 
@@ -17,6 +18,7 @@ Pick yearly or lifetime for Plus and Pro
 Subscribers can switch to lifetime
 New Forever Pass unlocks all our apps
 Copying this week’s review is now free
+The app name now shows in your language in the Dock and Finder
 
 ### App Store (en-GB)
 
@@ -25,6 +27,7 @@ Pick yearly or lifetime for Plus and Pro
 Subscribers can switch to lifetime
 New Forever Pass unlocks all our apps
 Copying this week’s review is now free
+The app name now shows in your language in the Dock and Finder
 
 ### App Store (繁體中文, zh-Hant)
 
@@ -33,6 +36,7 @@ Plus 與 Pro 可選年訂閱或永久
 訂閱中也能改為永久版
 新增可解鎖所有 App 的永久通行證
 複製本週回顧改為免費
+Dock 與 Finder 中的 App 名稱會以你的語言顯示
 
 ### App Store (简体中文, zh-Hans)
 
@@ -41,6 +45,7 @@ Plus 和 Pro 可选年订阅或永久
 订阅中也能改为永久版
 新增可解锁所有 App 的永久通行证
 复制本周复盘改为免费
+程序坞与访达中的 App 名称会以你的语言显示
 
 ### App Store (日本語, ja)
 
@@ -49,6 +54,7 @@ PlusとProは年額か買い切りを選べます
 サブスク中でも買い切りに切り替えられます
 全アプリが使えるずっとパスが登場しました
 今週の振り返りのコピーが無料になりました
+DockとFinderでアプリ名がMacの言語で表示されます
 
 ### App Store (Deutsch, de)
 
@@ -57,6 +63,7 @@ Plus und Pro jährlich oder lebenslang
 Abos lassen sich in Lebenslang umwandeln
 Neuer Für-immer-Pass für alle unsere Apps
 Wochenrückblick kopieren ist jetzt gratis
+Der App-Name erscheint im Dock und im Finder jetzt in deiner Sprache
 
 ### App Store (Español, es)
 
@@ -65,6 +72,7 @@ Elige Plus o Pro anual o de por vida
 Si te suscribes, puedes pasar a de por vida
 Nuevo Pase para siempre para todas las apps
 Copiar la revisión semanal ya es gratis
+El nombre de la app aparece en tu idioma en el Dock y el Finder
 
 ### App Store (Français, fr)
 
@@ -73,6 +81,7 @@ Plus et Pro en annuel ou à vie
 Les abonnés peuvent passer à l’achat à vie
 Nouveau Pass à vie pour toutes nos apps
 Copier le bilan de la semaine est gratuit
+Le nom de l’app s’affiche dans votre langue dans le Dock et le Finder
 
 ### App Store (Italiano, it)
 
@@ -81,6 +90,7 @@ Plus e Pro annuali o a vita
 Gli abbonati possono passare a vita
 Nuovo Pass per sempre per tutte le app
 Copiare la revisione della settimana è gratis
+Il nome dell’app appare nella tua lingua nel Dock e nel Finder
 
 ### App Store (Português (Brasil), pt-BR)
 
@@ -89,6 +99,7 @@ Plus e Pro anuais ou vitalícios
 Assinantes podem mudar para o vitalício
 Novo Passe para sempre para todos os apps
 Copiar a revisão da semana agora é grátis
+O nome do app aparece no seu idioma no Dock e no Finder
 
 ### App Store (Русский, ru)
 
@@ -97,6 +108,7 @@ Plus и Pro на год или навсегда
 Подписку можно сменить на покупку навсегда
 Новый Вечный пропуск для всех наших приложений
 Копировать итоги недели теперь бесплатно
+Название приложения в Dock и Finder теперь на вашем языке
 
 ### App Store (Čeština, cs)
 
@@ -105,6 +117,7 @@ Plus a Pro ročně nebo doživotně
 Předplatné lze převést na doživotní verzi
 Nový Pas navždy pro všechny naše aplikace
 Kopírování ohlédnutí za týden je zdarma
+Název aplikace se v Docku a Finderu zobrazuje ve vašem jazyce
 
 ### App Store (Dansk, da)
 
@@ -113,6 +126,7 @@ Plus og Pro årligt eller på livstid
 Abonnenter kan skifte til livstid
 Nyt Evighedspas til alle vores apps
 Kopiering af ugens gennemgang er gratis
+Appens navn vises nu på dit sprog i Dock og Finder
 
 ### App Store (Ελληνικά, el)
 
@@ -121,6 +135,7 @@ Plus και Pro ετήσια ή εφ’ όρου ζωής
 Οι συνδρομητές περνούν σε εφ’ όρου ζωής
 Νέο Πάσο για πάντα για όλες τις εφαρμογές μας
 Η αντιγραφή της ανασκόπησης εβδομάδας είναι δωρεάν
+Το όνομα της εφαρμογής εμφανίζεται στη γλώσσα σας στο Dock και στο Finder
 
 ### App Store (Suomi, fi)
 
@@ -129,6 +144,7 @@ Plus ja Pro vuosittain tai elinikäisenä
 Tilaajat voivat vaihtaa elinikäiseen
 Uusi Ikuinen passi kaikkiin sovelluksiimme
 Viikon katsauksen kopiointi on nyt ilmaista
+Apin nimi näkyy nyt omalla kielelläsi Dockissa ja Finderissa
 
 ### App Store (Bahasa Indonesia, id)
 
@@ -137,6 +153,7 @@ Plus dan Pro tahunan atau seumur hidup
 Pelanggan bisa beralih ke seumur hidup
 Pass Selamanya baru untuk semua app kami
 Menyalin tinjauan minggu ini kini gratis
+Nama app kini tampil dalam bahasa Anda di Dock dan Finder
 
 ### App Store (Norsk bokmål, nb)
 
@@ -145,6 +162,7 @@ Plus og Pro årlig eller for livstid
 Abonnenter kan bytte til livstid
 Nytt Evighetspass for alle appene våre
 Kopiering av ukens gjennomgang er gratis
+Appnavnet vises nå på ditt språk i Dock og Finder
 
 ### App Store (Nederlands, nl)
 
@@ -153,6 +171,7 @@ Plus en Pro per jaar of levenslang
 Abonnees kunnen overstappen op levenslang
 Nieuwe Altijd-pas voor al onze apps
 Terugblik van de week kopiëren is gratis
+De appnaam staat nu in je eigen taal in het Dock en de Finder
 
 ### App Store (Polski, pl)
 
@@ -161,6 +180,7 @@ Plus i Pro rocznie lub dożywotnio
 Subskrybenci mogą przejść na dożywotni
 Nowa Przepustka na zawsze do wszystkich aplikacji
 Kopiowanie podsumowania tygodnia jest darmowe
+Nazwa aplikacji w Docku i Finderze jest teraz w Twoim języku
 
 ### App Store (Svenska, sv)
 
@@ -169,6 +189,7 @@ Plus och Pro per år eller livstid
 Prenumeranter kan byta till livstid
 Nytt Evighetspass för alla våra appar
 Att kopiera veckans genomgång är gratis
+Appens namn visas nu på ditt språk i Dock och Finder
 
 ### App Store (ไทย, th)
 
@@ -177,6 +198,7 @@ Att kopiera veckans genomgång är gratis
 ผู้สมัครสมาชิกเปลี่ยนเป็นตลอดชีพได้
 พาสตลอดกาลใหม่ใช้ได้ทุกแอปของเรา
 คัดลอกการทบทวนสัปดาห์นี้ได้ฟรีแล้ว
+ชื่อแอปใน Dock และ Finder แสดงเป็นภาษาของคุณแล้ว
 
 ### App Store (Türkçe, tr)
 
@@ -185,6 +207,7 @@ Plus ve Pro yıllık ya da ömür boyu
 Aboneler ömür boyuya geçebilir
 Tüm uygulamalarımız için yeni Sonsuz Geçiş
 Haftalık değerlendirmeyi kopyalamak artık ücretsiz
+Uygulama adı Dock ve Finder’da artık kendi dilinizde görünür
 
 ### App Store (Tiếng Việt, vi)
 
@@ -193,6 +216,7 @@ Plus và Pro theo năm hoặc trọn đời
 Người đăng ký có thể chuyển sang trọn đời
 Vé trọn đời mới mở mọi ứng dụng của chúng tôi
 Chép phần nhìn lại tuần này nay miễn phí
+Tên ứng dụng trong Dock và Finder nay hiển thị bằng ngôn ngữ của bạn
 
 ## 1.1.14
 

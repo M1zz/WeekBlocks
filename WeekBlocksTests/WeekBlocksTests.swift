@@ -10,6 +10,49 @@ import XCTest
 import LeeoKit
 @testable import WeekBlocks
 
+/// 독·파인더·런치패드에 뜨는 앱 이름.
+///
+/// 시스템은 **디스크의 폴더 이름이 CFBundleDisplayName 과 바이트까지 같을 때만** lproj 의 이름을 쓴다.
+/// 스토어는 한글 폴더 이름을 자모로 풀어(NFD) 깔기 때문에, 이 값이 모아쓴 글자(NFC)면
+/// 한국어가 아닌 모든 사람의 독에 '무지개 공방'이 뜬다 (2026-11-10 제보, 1.1.14 까지 그랬다).
+/// 빌드 단계 '독에 뜨는 이름 맞추기'(→ scripts/decompose-display-name.py)가 빠지면 여기서 걸린다.
+final class DockNameTests: XCTestCase {
+
+    private var info: [String: Any] { Bundle.main.infoDictionary ?? [:] }
+
+    func testDisplayNameIsDecomposedLikeTheInstalledFolder() throws {
+        let name = try XCTUnwrap(info["CFBundleDisplayName"] as? String)
+        XCTAssertEqual(Array(name.unicodeScalars), Array(name.decomposedStringWithCanonicalMapping.unicodeScalars),
+                       "CFBundleDisplayName 이 NFD 가 아니다 — 스토어로 깔린 폴더 이름과 달라 독에 한글 이름이 뜬다")
+        // 글자로는 폴더 이름과 같아야 한다. 다르면 정규화를 맞춰도 소용없다.
+        let folder = Bundle.main.bundleURL.deletingPathExtension().lastPathComponent
+        XCTAssertEqual(name.precomposedStringWithCanonicalMapping, folder.precomposedStringWithCanonicalMapping)
+    }
+
+    func testLocalizedNameSwitchIsOn() {
+        XCTAssertEqual(info["LSHasLocalizedDisplayName"] as? Bool, true)
+    }
+
+    /// 번들에 든 언어마다 이름표가 있어야 한다. 하나라도 빠지면 그 언어는 폴더 이름(한글)으로 떨어진다.
+    func testEveryLanguageCarriesAName() throws {
+        let languages = Bundle.main.localizations.filter { $0 != "Base" }
+        XCTAssertFalse(languages.isEmpty)
+        for language in languages {
+            let url = try XCTUnwrap(Bundle.main.url(forResource: "InfoPlist", withExtension: "strings",
+                                                    subdirectory: nil, localization: language),
+                                    "\(language).lproj 에 InfoPlist.strings 가 없다")
+            let table = try XCTUnwrap(NSDictionary(contentsOf: url) as? [String: String])
+            for key in ["CFBundleDisplayName", "CFBundleName"] {
+                XCTAssertFalse((table[key] ?? "").isEmpty, "\(language): \(key) 가 비었다")
+            }
+            if language != "ko" {
+                XCTAssertNotEqual(table["CFBundleDisplayName"]?.precomposedStringWithCanonicalMapping, "무지개 공방",
+                                  "\(language): 한국어 이름이 그대로 들어 있다")
+            }
+        }
+    }
+}
+
 final class WeekBlocksSpecTests: XCTestCase {
 
     /// 출시하면 안 되는 상태(파는데 페이월로 갈 길이 없음, https 아닌 정책 주소, 분석 싱크 없음 …)를 막는다.
