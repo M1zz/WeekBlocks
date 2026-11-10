@@ -12,7 +12,8 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 - [x] 확인: 만든 앱을 NFD 폴더 이름으로 두면 'Rainbow Craft', 서명 검증 통과
 - [x] 다시 안 생기게: `DockNameTests` 셋 (이름이 NFD 인지 · 언어별 이름표가 다 있는지 · 한국어 아닌 언어에 한글 이름이 없는지) — predeploy 가 돌린다
 - [x] 릴리즈 노트 1.1.15 에 한 줄, 24개 언어
-- [ ] 다음 판(1.1.15)에 실어 내보내기
+- [x] 1.1.15(35) 를 App Store Connect 에 올림 (2026-11-10, 이 맥엔 DeployBar 가 없어 xcodebuild 로 아카이브·업로드만)
+- [ ] App Store Connect 에서 1.1.15 버전에 빌드 35 를 고르고 '새로운 기능'(docs/RELEASE_NOTES.md)을 넣어 심사 제출 — 이건 아직 사람이 해야 한다
 - [ ] 스토어/TestFlight 로 깐 뒤 시스템 언어를 영어로 두고 독·파인더·런치패드 이름 확인
 - [ ] Xcode 가 만든 그대로의 앱(NFC 폴더)은 이제 거꾸로 폴더 이름이 보인다 — 개발 맥에서만. 확인은 /Applications 것으로
 - [ ] 아이폰 앱은 해당 없음 (홈 화면은 폴더 이름과 비교하지 않는다)
