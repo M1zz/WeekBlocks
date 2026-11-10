@@ -22,6 +22,10 @@ enum WeekBlocksSpec: LeeoAppSpec {
     /// WeekBlocks.entitlements에 iCloud.com.Ysoup.FeedbackHub 컨테이너가 있어야 한다.
     /// 공용 피드백 허브(FeedbackHub)로 수집 — appIdentifier로 앱을 구분한다.
     /// (앱 데이터는 iCloud.com.devkoan.ScheduleDensity 컨테이너에서 계속 동기화된다.)
+    ///
+    /// ⚠️ **appIdentifier 는 번들 ID 가 아니라 허브의 이름표다. 바꾸지 않는다.**
+    ///    번들 ID 는 아이폰 '욕망의 무지개'와 같은 `com.example.ScheduleDensityApp` 으로 옮겼지만
+    ///    (한 레코드 · 유니버설 구매), 맥의 피드백 · 사용 통계 · 원격 스위치(`flags_…`)는 이 이름표로 계속 갈린다.
     static let feedback = LeeoFeedbackConfig(
         containerIdentifier: "iCloud.com.Ysoup.FeedbackHub",
         appIdentifier: "com.devkoan.ScheduleDensityApp"
@@ -54,7 +58,8 @@ enum WeekBlocksSpec: LeeoAppSpec {
     ///  · Plus: 회고 추세 8주, 요일별·시간대별·계획 대비 실제 카드, 다른 주 계획 가져오기
     ///  · Pro: Plus 전부 + 내 일정 공유 링크 + 아이폰 '욕망의 무지개' Pro
     ///
-    /// ⚠️ 예전에 팔려던 것은 '아이폰으로 건너가기'(`legacySyncProductID`)였다. 그 ID 는 지금 Pro 평생이다.
+    /// ⚠️ **상품은 아이폰 '욕망의 무지개'와 같은 것이다** (한 레코드 · 유니버설 구매). 어느 기기에서 사든
+    ///    양쪽 영수증에 선다. 번들 ID 가 달랐던 옛 맥앱에서 산 사람은 iCloud 에 남은 표로 잇는다 (→ ProMark.swift).
     /// ⚠️ 판매를 멈춘 월 구독(`proMonthlyID`)도 권한 목록에는 남긴다. 구독자는 끝날 때까지 Pro 다.
     /// ⚠️ **여기 선언했다고 팔기 시작하는 게 아니다.** 실제로 파는지는 `MacEntitlement.sellsPro`가 정한다.
     static let monetization = LeeoMonetization.freemiumSubscription(
@@ -85,34 +90,30 @@ enum WeekBlocksSpec: LeeoAppSpec {
 
     // MARK: - 상품 ID
 
-    /// App Store Connect의 상품 ID.
+    /// App Store Connect의 상품 ID. **아이폰 앱의 `ProEntitlement` 와 같은 값이다.**
     /// ⚠️ 콘솔에 만든 것·`WeekBlocks.storekit`에 적은 것과 **글자 하나까지 같아야 한다.**
     /// Plus 연 · Pro 연(· 판매를 멈춘 Pro 월)은 같은 구독 그룹에 있어야 서로 갈아탈 수 있다.
-    static let plusYearlyID = "com.devkoan.ScheduleDensityApp.plus.yearly"
-    static let plusLifetimeID = "com.devkoan.ScheduleDensityApp.plus"
-    static let proYearlyID = "com.devkoan.ScheduleDensityApp.pro.yearly"
-    /// **Pro 평생은 예전 '함께 쓰기' 상품을 이어 쓴다** (2026-10-13). ID에 'sync'가 남지만 사용자에게는 안 보인다.
-    static let proLifetimeID = legacySyncProductID
+    static let plusYearlyID = "com.example.ScheduleDensityApp.plus.annual"
+    static let plusLifetimeID = "com.example.ScheduleDensityApp.plus"
+    static let proYearlyID = "com.example.ScheduleDensityApp.pro.annual"
+    static let proLifetimeID = "com.example.ScheduleDensityApp.pro"
     /// Plus 평생을 산 사람이 Pro 평생으로 올리는 값.
-    static let proUpgradeID = "com.devkoan.ScheduleDensityApp.pro.upgrade"
+    static let proUpgradeID = "com.example.ScheduleDensityApp.pro.upgrade"
     /// 구독 졸업: 구독 중인 사람에게만 보이는 Pro 평생.
-    static let proGraduateID = "com.devkoan.ScheduleDensityApp.pro.graduate"
+    static let proGraduateID = "com.example.ScheduleDensityApp.pro.graduate"
     /// 판매 중지(2026-10). 구독자는 끝날 때까지 Pro 다.
-    static let proMonthlyID = "com.devkoan.ScheduleDensityApp.pro.monthly"
-
-    /// 예전 '함께 쓰기'(비소모성). 지금은 Pro 평생 이용권이다 (→ proLifetimeID).
-    static let legacySyncProductID = "com.devkoan.ScheduleDensityApp.sync"
+    static let proMonthlyID = "com.example.ScheduleDensityApp.pro.monthly"
 
     /// Pro 선물 (소모성). 산 사람이 아니라 **코드를 받은 사람**에게 Pro 평생(`proLifetimeID`)을 연다(`LeeoGiftStore`).
     /// ⚠️ `saleProductIDs` · 권한 목록에 넣지 않는다 — 넣으면 선물을 산 사람이 Pro 가 되고, 결제가 코드 없이 끝난다.
     /// App Store Connect 에 소모성 상품으로 만들어야 뜬다. 없으면 설정의 선물 줄이 숨는다.
-    static let giftProductID = "com.devkoan.ScheduleDensityApp.gift.pro"
+    static let giftProductID = "com.example.ScheduleDensityApp.gift.pro"
 
     /// 팁 (소모성, 작은 것부터). 아무것도 열지 않는다 — 고마움을 보태는 값이다(`LeeoTipJar`).
     /// App Store Connect 에 소모성 상품으로 만들어야 뜬다. 없으면 설정의 응원 줄과 부탁 카드가 숨는다.
-    static let tipProductIDs = ["com.devkoan.ScheduleDensityApp.tip.small",
-                                "com.devkoan.ScheduleDensityApp.tip.medium",
-                                "com.devkoan.ScheduleDensityApp.tip.large"]
+    static let tipProductIDs = ["com.example.ScheduleDensityApp.tip.small",
+                                "com.example.ScheduleDensityApp.tip.medium",
+                                "com.example.ScheduleDensityApp.tip.large"]
 
     /// 불러올 상품. 페이월의 칸 차례(Plus 연 → Plus 평생 → Pro 연 → Pro 평생)에 올리기 · 졸업이 붙는다.
     static let saleProductIDs = [plusYearlyID, plusLifetimeID, proYearlyID, proLifetimeID,

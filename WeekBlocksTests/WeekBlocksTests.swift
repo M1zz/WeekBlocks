@@ -29,12 +29,33 @@ final class WeekBlocksSpecTests: XCTestCase {
         XCTAssertFalse(WeekBlocksSpec.saleProductIDs.contains(WeekBlocksSpec.proMonthlyID))
     }
 
-    /// 예전 '함께 쓰기' 상품과 판매를 멈춘 월 구독을 가진 사람도 Pro 다. 권한 목록에서 빠지면 산 사람이 잠긴다.
+    /// 판매를 멈춘 월 구독을 가진 사람도 Pro 다. 권한 목록에서 빠지면 산 사람이 잠긴다.
     func testLegacyPurchaseStillUnlocksPro() {
-        XCTAssertTrue(WeekBlocksSpec.proEntitlementIDs.contains(WeekBlocksSpec.legacySyncProductID))
-        XCTAssertEqual(WeekBlocksSpec.proLifetimeID, WeekBlocksSpec.legacySyncProductID)
-        XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.legacySyncProductID]), .pro)
         XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.proMonthlyID]), .pro)
+    }
+
+    /// **상품은 아이폰 '욕망의 무지개'와 같은 것이다** (한 레코드 · 유니버설 구매).
+    /// 한 글자라도 어긋나면 아이폰에서 산 사람이 맥에서 잠긴다.
+    func testProductIDsMatchIPhoneApp() {
+        let prefix = "com.example.ScheduleDensityApp."
+        XCTAssertEqual(WeekBlocksSpec.plusYearlyID, prefix + "plus.annual")
+        XCTAssertEqual(WeekBlocksSpec.plusLifetimeID, prefix + "plus")
+        XCTAssertEqual(WeekBlocksSpec.proYearlyID, prefix + "pro.annual")
+        XCTAssertEqual(WeekBlocksSpec.proLifetimeID, prefix + "pro")
+        XCTAssertEqual(WeekBlocksSpec.proUpgradeID, prefix + "pro.upgrade")
+        XCTAssertEqual(WeekBlocksSpec.proGraduateID, prefix + "pro.graduate")
+        XCTAssertEqual(WeekBlocksSpec.proMonthlyID, prefix + "pro.monthly")
+    }
+
+    /// **옛 맥앱(com.devkoan.…)에서 산 사람은 그 앱이 남긴 "mac" 표로 잇는다.** 그래서 내 플랫폼의 표도 친다.
+    func testLegacyMacMarkStillUnlocks() {
+        let now = Date()
+        let oldMac = ProMark(platform: .mac, productID: "com.devkoan.ScheduleDensityApp.sync", validUntil: nil, tier: .pro)
+        let iosPlus = ProMark(platform: .ios, productID: "a", validUntil: nil, tier: .plus)
+        let expired = ProMark(platform: .mac, productID: "b", validUntil: now.addingTimeInterval(-60), tier: .pro)
+        XCTAssertEqual(MacEntitlement.liveMarkTier([oldMac, iosPlus], now: now), .pro)
+        XCTAssertEqual(MacEntitlement.liveMarkTier([iosPlus, expired], now: now), .plus)
+        XCTAssertNil(MacEntitlement.liveMarkTier([expired], now: now))
     }
 
     /// 상품마다 여는 칸. 연 구독은 같은 칸의 평생과 같다.
@@ -47,7 +68,7 @@ final class WeekBlocksSpecTests: XCTestCase {
         // 졸업 상품은 Pro 평생이다.
         XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.proGraduateID]), .pro)
         // 상관없는 상품(패스 · 모르는 것)은 아무것도 열지 않는다.
-        XCTAssertEqual(WeekBlocksSpec.tier(owned: ["com.devkoan.ScheduleDensityApp.forever"]), .free)
+        XCTAssertEqual(WeekBlocksSpec.tier(owned: ["com.example.ScheduleDensityApp.forever"]), .free)
     }
 
     /// Plus 평생에서 올리기를 사면 Pro, Plus 와 Pro 를 함께 가지면 높은 쪽.
@@ -77,11 +98,11 @@ final class WeekBlocksSpecTests: XCTestCase {
 
     /// 패스 상품은 앱의 권한 목록에 넣지 않는다. `LeeoForeverPass` 가 따로 판정한다.
     func testPassProductsAreNotAppEntitlements() {
-        let pass = Set(LeeoForeverPassRule.productIDs(bundleID: "com.devkoan.ScheduleDensityApp"))
+        let pass = Set(LeeoForeverPassRule.productIDs(bundleID: "com.example.ScheduleDensityApp"))
         XCTAssertTrue(pass.isDisjoint(with: WeekBlocksSpec.proEntitlementIDs))
         XCTAssertTrue(pass.isDisjoint(with: WeekBlocksSpec.plusEntitlementIDs))
         XCTAssertTrue(pass.isDisjoint(with: Set(WeekBlocksSpec.saleProductIDs)))
-        XCTAssertTrue(LeeoForeverPassRule.family.contains("com.devkoan.ScheduleDensityApp"))
+        XCTAssertTrue(LeeoForeverPassRule.family.contains("com.example.ScheduleDensityApp"))
     }
 
     /// 원격 스위치 이름은 CloudKit 대시보드의 필드 이름이다. 바꾸면 이미 꺼 둔 스위치가 조용히 켜진다.
@@ -197,11 +218,9 @@ final class ProMarkTierTests: XCTestCase {
         XCTAssertNil(ProMarkStore.bestOtherTier([mine, expiredPro], now: now))
     }
 
-    func testMacTierMapsToMark() {
-        XCTAssertNil(MacTier.free.markTier)
-        XCTAssertEqual(MacTier.plus.markTier, .plus)
-        XCTAssertEqual(MacTier.pro.markTier, .pro)
+    func testMarkMapsToMacTier() {
         XCTAssertEqual(MacTier(ProMarkTier.plus), .plus)
+        XCTAssertEqual(MacTier(ProMarkTier.pro), .pro)
         XCTAssertEqual(MacTier(nil), .free)
     }
 }

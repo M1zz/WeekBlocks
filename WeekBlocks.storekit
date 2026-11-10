@@ -18,7 +18,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.plus",
+      "productID": "com.example.ScheduleDensityApp.plus",
       "referenceName": "Plus 평생",
       "type": "NonConsumable"
     },
@@ -38,8 +38,8 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.sync",
-      "referenceName": "Pro 평생 (예전 '함께 쓰기' 상품을 이어 씀)",
+      "productID": "com.example.ScheduleDensityApp.pro",
+      "referenceName": "Pro 평생",
       "type": "NonConsumable"
     },
     {
@@ -58,7 +58,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.pro.upgrade",
+      "productID": "com.example.ScheduleDensityApp.pro.upgrade",
       "referenceName": "Plus 평생 → Pro 평생",
       "type": "NonConsumable"
     },
@@ -78,7 +78,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.pro.graduate",
+      "productID": "com.example.ScheduleDensityApp.pro.graduate",
       "referenceName": "구독 졸업 Pro 평생",
       "type": "NonConsumable"
     },
@@ -98,7 +98,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.gift.pro",
+      "productID": "com.example.ScheduleDensityApp.gift.pro",
       "referenceName": "Gift Pro",
       "type": "Consumable"
     },
@@ -113,7 +113,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.tip.small",
+      "productID": "com.example.ScheduleDensityApp.tip.small",
       "referenceName": "Small Tip",
       "type": "Consumable"
     },
@@ -128,7 +128,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.tip.medium",
+      "productID": "com.example.ScheduleDensityApp.tip.medium",
       "referenceName": "Medium Tip",
       "type": "Consumable"
     },
@@ -143,7 +143,7 @@
           "locale": "en_US"
         }
       ],
-      "productID": "com.devkoan.ScheduleDensityApp.tip.large",
+      "productID": "com.example.ScheduleDensityApp.tip.large",
       "referenceName": "Large Tip",
       "type": "Consumable"
     }
@@ -189,7 +189,7 @@
               "locale": "en_US"
             }
           ],
-          "productID": "com.devkoan.ScheduleDensityApp.pro.yearly",
+          "productID": "com.example.ScheduleDensityApp.pro.annual",
           "recurringSubscriptionPeriod": "P1Y",
           "referenceName": "Pro 연",
           "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
@@ -216,7 +216,7 @@
               "locale": "en_US"
             }
           ],
-          "productID": "com.devkoan.ScheduleDensityApp.pro.monthly",
+          "productID": "com.example.ScheduleDensityApp.pro.monthly",
           "recurringSubscriptionPeriod": "P1M",
           "referenceName": "Pro 월 (판매 중지, 권한 유지)",
           "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",
@@ -249,7 +249,7 @@
               "locale": "en_US"
             }
           ],
-          "productID": "com.devkoan.ScheduleDensityApp.plus.yearly",
+          "productID": "com.example.ScheduleDensityApp.plus.annual",
           "recurringSubscriptionPeriod": "P1Y",
           "referenceName": "Plus 연",
           "subscriptionGroupID": "9636BCA4-12FE-4833-B73C-6949C85818F7",

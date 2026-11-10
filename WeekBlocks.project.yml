@@ -1,6 +1,6 @@
 name: WeekBlocks
 options:
-  bundleIdPrefix: com.devkoan
+  bundleIdPrefix: com.example
   # 원문은 한국어다. 소스에 적힌 한국어 문장이 그대로 번역 열쇠가 되고,
   # 영어는 WeekBlocks/Localizable.xcstrings · TodoShare/Localizable.xcstrings 에 붙는다.
   # 앱 이름·캘린더 권한 문구처럼 Info.plist 로 나가는 말은 InfoPlist.xcstrings 쪽이다.
@@ -97,7 +97,7 @@ targets:
           - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.ScheduleDensityApp
         # ⚠️ 번들 이름이 곧 사람이 찾는 이름이다.
         #    스포트라이트의 앱 검색은 파일명(`무지개 공방.app`)과 CFBundleName으로 잡는다.
         #    CFBundleDisplayName만 한글로 두면 독과 파인더에만 '무지개 공방'으로 보이고,
@@ -158,7 +158,7 @@ targets:
           - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.TodoShare
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.ScheduleDensityApp.TodoShare
         PRODUCT_NAME: "$(TARGET_NAME)"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: TodoShare/Info.plist
@@ -195,7 +195,7 @@ targets:
           - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ko.lproj/Localizable.strings
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.TimerWidget
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.ScheduleDensityApp.TimerWidget
         PRODUCT_NAME: "$(TARGET_NAME)"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: TimerWidget/Info.plist
@@ -222,7 +222,7 @@ targets:
       - package: LeeoKit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.Tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.ScheduleDensityApp.Tests
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_STYLE: Automatic
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/무지개 공방.app/Contents/MacOS/WeekBlocks"
@@ -238,7 +238,7 @@ targets:
       - target: WeekBlocks
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.devkoan.ScheduleDensityApp.UITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.ScheduleDensityApp.UITests
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_STYLE: Automatic
         TEST_TARGET_NAME: WeekBlocks

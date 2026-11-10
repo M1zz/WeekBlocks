@@ -4,8 +4,11 @@
 //
 //  **어느 칸을 쓰고 있는가.** 무료 · Plus · Pro (2026-10 개편, → WeekBlocksSpec.monetization).
 //
-//  칸을 여는 것은 넷이다: 이 맥의 영수증, 아이폰 '욕망의 무지개'가 남긴 표(→ ProMark.swift),
-//  언제나 평생 패스(→ LeeoForeverPass, 열리면 Pro), 그리고 판매를 멈춘 예전 상품(월 구독 · 'sync').
+//  칸을 여는 것은 셋이다: 영수증, iCloud 에 남은 표(→ ProMark.swift), 언제나 평생 패스(→ LeeoForeverPass).
+//
+//  **영수증은 아이폰 '욕망의 무지개'와 하나다** (같은 번들 ID · 한 레코드 · 유니버설 구매).
+//  어느 기기에서 사든 여기 영수증에 선다. 표는 번들 ID 가 달랐던 시절의 것이라 **읽기만 한다** —
+//  옛 맥앱(com.devkoan.…)에서 산 사람과, 아직 옛 맥앱을 쓰는 기기를 잇는 다리다.
 //
 //  ⚠️ 권한의 근거는 언제나 `Transaction.currentEntitlements`다. 아래 UserDefaults 값은
 //     화면이 빨리 그려지라고 둔 거울이지 근거가 아니다. 켤 때마다 다시 확인해 덮어쓴다.
@@ -16,6 +19,7 @@
 import Foundation
 import Combine
 import StoreKit
+import SwiftData
 import LeeoKit
 
 /// 무지개 공방의 세 칸. Pro 는 Plus 를 전부 포함한다.
@@ -34,16 +38,7 @@ enum MacTier: Int, Comparable, CaseIterable {
         }
     }
 
-    /// 아이폰에 남길 표의 등급. 무료면 표를 지운다.
-    var markTier: ProMarkTier? {
-        switch self {
-        case .free: nil
-        case .plus: .plus
-        case .pro: .pro
-        }
-    }
-
-    /// **영수증 · 아이폰 표 · 패스를 합친 칸.** 셋 중 가장 높은 것.
+    /// **영수증 · 표 · 패스를 합친 칸.** 셋 중 가장 높은 것.
     static func resolve(owned: Set<String>, crossPlatform: ProMarkTier?, foreverPass: Bool) -> MacTier {
         if foreverPass { return .pro }   // 패스는 그 앱의 가장 높은 칸을 연다
         return max(WeekBlocksSpec.tier(owned: owned), MacTier(crossPlatform))
@@ -86,6 +81,14 @@ enum MacEntitlement {
     /// **지금 칸.** 모를 때는 무료 쪽으로 기운다. 문을 여는 판단이라 모르는 채로 열면 안 된다.
     /// 대신 *화면에 뭐라고 쓸지*는 `PurchaseManager.isKnown`을 함께 보고, 아직 모르면 '확인 중'이라고 말한다.
     static var currentTier: MacTier { cachedTier ?? .free }
+
+    /// **살아 있는 표 중 가장 높은 등급.** 어느 앱이 적었든 친다 (순수 함수, 시험용).
+    ///
+    /// ⚠️ 이 앱은 표를 **쓰지도 지우지도 않는다.** "mac" 표는 옛 맥앱이 자기 영수증을 옮겨 적은 것이라,
+    ///    여기서 내 영수증(옛 구매가 없는)에 맞춰 고치면 옛 맥앱에서 산 사람의 권한이 지워진다.
+    static func liveMarkTier(_ marks: [ProMark], now: Date = Date()) -> ProMarkTier? {
+        marks.filter { $0.isValid(at: now) }.map(\.markTier).max()
+    }
 
     /// 영수증 확인 결과를 적는다. `PurchaseManager`만 부른다.
     static func setTier(_ tier: MacTier) {
@@ -171,36 +174,21 @@ final class PurchaseManager {
         if MacEntitlement.sellsPro { await store.loadProducts() }
         await pass.refresh()
         entitlementsChecked = true
-        await syncCrossPlatformMark()
+        readMarks()
         subscription = await LeeoGraduation.currentSubscription(among: WeekBlocksSpec.subscriptionIDs)
         pull()
     }
 
-    // MARK: - 한쪽에서 사면 양쪽이 (→ ProMark.swift)
+    // MARK: - 옛 맥앱에서 산 사람 잇기 (→ ProMark.swift)
 
-    /// 이 맥의 영수증만 본 칸. 아이폰에 남기는 표는 이것이다(남의 표 · 패스를 옮겨 적지 않는다).
-    private var receiptTier: MacTier { WeekBlocksSpec.tier(owned: store.purchasedProductIDs) }
-
-    /// **내 영수증을 아이폰이 읽을 수 있는 표로 옮겨 적고, 아이폰이 적어 둔 표를 읽는다.**
-    ///
-    /// ⚠️ 아이폰의 `PurchaseManager.syncCrossPlatformMark`와 **같은 규칙**이다. 자기 표만
-    ///    쓰고 지우며, 구독은 끝나는 날을, 칸은 등급(plus · pro)을 함께 적는다. 한쪽을 고치면 같이 고칠 것.
-    private func syncCrossPlatformMark() async {
-        let mine = receiptTier
-        markedTier = mine
-        let ids = mine == .pro ? WeekBlocksSpec.proEntitlementIDs : WeekBlocksSpec.plusEntitlementIDs
-        let defaultID = mine == .pro ? WeekBlocksSpec.proYearlyID : WeekBlocksSpec.plusYearlyID
-        crossPlatformTier = await ProMarkStore.sync(tier: mine.markTier,
-                                                    entitlementIDs: ids,
-                                                    defaultProductID: defaultID,
-                                                    in: PlanStore.shared.context)
+    /// iCloud 에 남은 표를 읽는다. 쓰지 않는다 (→ `MacEntitlement.liveMarkTier`).
+    private func readMarks() {
+        let marks = (try? PlanStore.shared.context.fetch(FetchDescriptor<ProMark>())) ?? []
+        crossPlatformTier = MacEntitlement.liveMarkTier(marks)
     }
 
-    /// 아이폰에서 산 것 중 살아 있는 가장 높은 등급.
+    /// 표가 여는 가장 높은 등급.
     @ObservationIgnored private var crossPlatformTier: ProMarkTier?
-
-    /// 내 표에 마지막으로 옮겨 적은 칸. 영수증이 이것과 달라지면 표를 다시 적는다.
-    @ObservationIgnored private var markedTier: MacTier?
 
     /// 고른 상품을 산다. 성공·취소·승인 대기·실패의 갈래와 퍼널 이벤트는 LeeoStore 안에 있다.
     func purchase(_ product: Product) async {
@@ -241,11 +229,6 @@ final class PurchaseManager {
     }
 
     private func pull() {
-        // 사기·복원·리스너(다른 기기, 가족 공유, 환불, 만료)로 영수증이 바뀌었으면 표도 바로 고친다.
-        if entitlementsChecked, let marked = markedTier, marked != receiptTier {
-            markedTier = receiptTier
-            Task { await syncCrossPlatformMark(); pull() }
-        }
         if entitlementsChecked {
             MacEntitlement.setTier(MacTier.resolve(owned: store.purchasedProductIDs,
                                                    crossPlatform: crossPlatformTier,

@@ -3,6 +3,11 @@
 > 2026-10-17. ⚠️ 이 파일은 `욕망의 무지개/docs/IAP_PRODUCTS.md` 와
 > `무지개 공방/docs/IAP_PRODUCTS.md` 에 **같은 내용으로** 있다. 한쪽을 고치면 같이 고칠 것.
 
+> ⚠️ **2026-11-11 부터 맥 쪽 내용은 옛 기록이다.** 맥앱이 아이폰과 같은 번들 ID
+> (`com.example.ScheduleDensityApp`)로 옮겨 한 레코드가 됐다. 맥은 **아이폰 상품을 그대로 쓰고**
+> (→ `WeekBlocksSpec` 의 상품 ID), `com.devkoan.…` 상품은 옛 맥앱 레코드에만 남는다.
+> 옛 맥앱에서 산 사람은 iCloud 에 남은 표로 잇는다 (→ `MacEntitlement.liveMarkTier`).
+
 ## 왜 6개인가
 
 두 앱은 번들 ID가 다르다 — 아이폰 `com.example.ScheduleDensityApp`, 맥 `com.devkoan.ScheduleDensityApp`.

@@ -4,6 +4,11 @@ DeployBar 가 이 파일을 읽어 App Store Connect 의 스토어 페이지를 
 확인은 `DeployBar --storemeta 무지개 공방`.
 '이 버전의 새로운 기능' 은 여기가 아니라 docs/RELEASE_NOTES.md 에 있다.
 
+⚠️ **이 앱은 아이폰 '욕망의 무지개'와 같은 App Store 레코드의 맥판이다** (번들 ID `com.example.ScheduleDensityApp`).
+   이름 · 부제 · 개인정보 처리방침 URL 은 레코드 하나에 하나뿐이라 **아이폰 레포의 APPSTORE.md 와 글자 하나까지 같게** 둔다.
+   여기서 다르게 적으면 배포가 아이폰 쪽 이름까지 바꾼다. 맥에서만 다른 것은 설명 · 키워드 · 프로모션 텍스트 · 지원 URL · 스크린샷이다.
+   (설치된 앱 이름 '무지개 공방'은 그대로다 — 그건 스토어가 아니라 앱 번들의 이름이다.)
+
 <!-- 자수 제한: 이름 30, 부제 30, 키워드 100(쉼표만, 공백 없이), 설명 4000, 프로모션 텍스트 170.
      이름·부제에 있는 낱말은 키워드에 다시 적지 않는다 — 셋이 합쳐져 검색된다.
      설명에는 마크다운·이모지를 쓰지 않는다. 소제목은 한 줄로만 세운다.
@@ -19,13 +24,13 @@ DeployBar 가 이 파일을 읽어 App Store Connect 의 스토어 페이지를 
 ### 이름
 
 ```
-무지개 공방: 주간 계획표
+욕망의 무지개
 ```
 
 ### 부제
 
 ```
-타임블록으로 짜는 일주일 루틴
+5분 단위로 쪼개는 주간 플래너
 ```
 
 ### 프로모션 텍스트
@@ -90,7 +95,7 @@ https://m1zz.github.io/WeekBlocks/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/privacy.html
+https://m1zz.github.io/ScheduleDensity/privacy.html
 
 ## en-US
 
@@ -112,13 +117,13 @@ https://m1zz.github.io/WeekBlocks/privacy.html
 ### 이름
 
 ```
-Rainbow Craft: Week Planner
+Rainbow of Desire
 ```
 
 ### 부제
 
 ```
-Time Blocking & Weekly Routine
+Task Breakdown & Week Planner
 ```
 
 ### 프로모션 텍스트
@@ -183,20 +188,20 @@ https://m1zz.github.io/WeekBlocks/en/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/en/privacy.html
+https://m1zz.github.io/ScheduleDensity/en/privacy.html
 
 ## en-GB
 
 ### 이름
 
 ```
-Rainbow Craft: Week Planner
+Rainbow of Desire
 ```
 
 ### 부제
 
 ```
-Time Blocking & Weekly Routine
+Task Breakdown & Week Planner
 ```
 
 ### 프로모션 텍스트
@@ -261,7 +266,7 @@ https://m1zz.github.io/WeekBlocks/en/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/en/privacy.html
+https://m1zz.github.io/ScheduleDensity/en/privacy.html
 
 ## zh-Hant
 
@@ -273,13 +278,13 @@ https://m1zz.github.io/WeekBlocks/en/privacy.html
 ### 이름
 
 ```
-彩虹工坊：每週計畫
+欲望彩虹
 ```
 
 ### 부제
 
 ```
-看清你一週的 168 小時花在哪裡
+一週行程密度，五分鐘小步驟
 ```
 
 ### 프로모션 텍스트
@@ -344,7 +349,7 @@ https://m1zz.github.io/WeekBlocks/zh-Hant/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html
+https://m1zz.github.io/ScheduleDensity/zh-Hant/privacy.html
 
 ## zh-Hans
 
@@ -353,13 +358,13 @@ https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html
 ### 이름
 
 ```
-彩虹工坊：每周计划
+欲望彩虹：待办清单与周计划
 ```
 
 ### 부제
 
 ```
-看清你一周的 168 小时去了哪里
+日程密度一目了然，五分钟小步骤
 ```
 
 ### 프로모션 텍스트
@@ -424,20 +429,20 @@ https://m1zz.github.io/WeekBlocks/zh-Hans/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/zh-Hans/privacy.html
+https://m1zz.github.io/ScheduleDensity/zh-Hans/privacy.html
 
 ## ja
 
 ### 이름
 
 ```
-Rainbow Craft: 週間プランナー
+Rainbow of Desire: 週間プランナー
 ```
 
 ### 부제
 
 ```
-タイムブロッキングとルーティン
+やることを5分のステップに分ける
 ```
 
 ### 프로모션 텍스트
@@ -501,20 +506,20 @@ https://m1zz.github.io/WeekBlocks/ja/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/ja/privacy.html
+https://m1zz.github.io/ScheduleDensity/ja/privacy.html
 
 ## de
 
 ### 이름
 
 ```
-Rainbow Craft: Wochenplaner
+Rainbow of Desire: To-Do-Liste
 ```
 
 ### 부제
 
 ```
-Timeblocking & feste Routinen
+Wochenplaner in Minischritten
 ```
 
 ### 프로모션 텍스트
@@ -579,20 +584,20 @@ https://m1zz.github.io/WeekBlocks/de/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/de/privacy.html
+https://m1zz.github.io/ScheduleDensity/de/privacy.html
 
 ## es
 
 ### 이름
 
 ```
-Rainbow Craft: Agenda semanal
+Rainbow of Desire: Tareas
 ```
 
 ### 부제
 
 ```
-Bloques de tiempo y rutinas
+Agenda semanal paso a paso
 ```
 
 ### 프로모션 텍스트
@@ -657,20 +662,20 @@ https://m1zz.github.io/WeekBlocks/es/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/es/privacy.html
+https://m1zz.github.io/ScheduleDensity/es/privacy.html
 
 ## fr
 
 ### 이름
 
 ```
-Rainbow Craft: Agenda hebdo
+Rainbow of Desire : Planning
 ```
 
 ### 부제
 
 ```
-Blocs de temps et routines
+Découpez vos tâches en étapes
 ```
 
 ### 프로모션 텍스트
@@ -735,20 +740,20 @@ https://m1zz.github.io/WeekBlocks/fr/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/fr/privacy.html
+https://m1zz.github.io/ScheduleDensity/fr/privacy.html
 
 ## it
 
 ### 이름
 
 ```
-Rainbow Craft: Planner
+Rainbow of Desire: Agenda
 ```
 
 ### 부제
 
 ```
-Settimana a blocchi e routine
+Planner settimanale e attività
 ```
 
 ### 프로모션 텍스트
@@ -813,20 +818,20 @@ https://m1zz.github.io/WeekBlocks/it/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/it/privacy.html
+https://m1zz.github.io/ScheduleDensity/it/privacy.html
 
 ## pt-BR
 
 ### 이름
 
 ```
-Rainbow Craft: Planner Semanal
+Rainbow of Desire: Tarefas
 ```
 
 ### 부제
 
 ```
-Time Blocking e Rotinas
+Agenda semanal passo a passo
 ```
 
 ### 프로모션 텍스트
@@ -891,20 +896,20 @@ https://m1zz.github.io/WeekBlocks/pt-BR/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/pt-BR/privacy.html
+https://m1zz.github.io/ScheduleDensity/pt-BR/privacy.html
 
 ## ru
 
 ### 이름
 
 ```
-Rainbow Craft: планер недели
+Rainbow of Desire: список дел
 ```
 
 ### 부제
 
 ```
-Тайм-блокинг и рутины
+Планер недели и разбивка задач
 ```
 
 ### 프로모션 텍스트
@@ -969,20 +974,20 @@ https://m1zz.github.io/WeekBlocks/ru/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/ru/privacy.html
+https://m1zz.github.io/ScheduleDensity/ru/privacy.html
 
 ## cs
 
 ### 이름
 
 ```
-Rainbow Craft: Týdenní plán
+Rainbow of Desire: plánovač
 ```
 
 ### 부제
 
 ```
-Časové bloky a pevné rutiny
+Úkoly rozložené na malé kroky
 ```
 
 ### 프로모션 텍스트
@@ -1047,20 +1052,20 @@ https://m1zz.github.io/WeekBlocks/cs/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/cs/privacy.html
+https://m1zz.github.io/ScheduleDensity/cs/privacy.html
 
 ## da
 
 ### 이름
 
 ```
-Rainbow Craft: Ugeplanlægger
+Rainbow of Desire: Ugeplan
 ```
 
 ### 부제
 
 ```
-Tidsblokke og faste rutiner
+Del opgaver op i små trin
 ```
 
 ### 프로모션 텍스트
@@ -1125,20 +1130,20 @@ https://m1zz.github.io/WeekBlocks/da/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/da/privacy.html
+https://m1zz.github.io/ScheduleDensity/da/privacy.html
 
 ## el
 
 ### 이름
 
 ```
-Rainbow Craft: Οργάνωση χρόνου
+Rainbow of Desire: Εργασίες
 ```
 
 ### 부제
 
 ```
-Εβδομαδιαίο πλάνο & ρουτίνες
+Εβδομαδιαίο πλάνο σε βήματα
 ```
 
 ### 프로모션 텍스트
@@ -1203,20 +1208,20 @@ https://m1zz.github.io/WeekBlocks/el/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/el/privacy.html
+https://m1zz.github.io/ScheduleDensity/el/privacy.html
 
 ## fi
 
 ### 이름
 
 ```
-Rainbow Craft: Viikkokalenteri
+Rainbow of Desire: Tehtävät
 ```
 
 ### 부제
 
 ```
-Aikablokkaus ja rutiinit
+Viikkoplanneri pienin askelin
 ```
 
 ### 프로모션 텍스트
@@ -1281,20 +1286,20 @@ https://m1zz.github.io/WeekBlocks/fi/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/fi/privacy.html
+https://m1zz.github.io/ScheduleDensity/fi/privacy.html
 
 ## id
 
 ### 이름
 
 ```
-Rainbow Craft: Jadwal Mingguan
+Rainbow of Desire: To Do List
 ```
 
 ### 부제
 
 ```
-Blok Waktu & Rutinitas Tetap
+Planner Mingguan & Pecah Tugas
 ```
 
 ### 프로모션 텍스트
@@ -1359,20 +1364,20 @@ https://m1zz.github.io/WeekBlocks/id/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/id/privacy.html
+https://m1zz.github.io/ScheduleDensity/id/privacy.html
 
 ## nb
 
 ### 이름
 
 ```
-Rainbow Craft: Ukeplanlegger
+Rainbow of Desire: Ukeplan
 ```
 
 ### 부제
 
 ```
-Tidsblokker og faste rutiner
+Del oppgaver opp i små trinn
 ```
 
 ### 프로모션 텍스트
@@ -1437,20 +1442,20 @@ https://m1zz.github.io/WeekBlocks/nb/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/nb/privacy.html
+https://m1zz.github.io/ScheduleDensity/nb/privacy.html
 
 ## nl
 
 ### 이름
 
 ```
-Rainbow Craft: Weekplanner
+Rainbow of Desire: weekplanner
 ```
 
 ### 부제
 
 ```
-Timeblocking & vaste routines
+Grote taken in kleine stappen
 ```
 
 ### 프로모션 텍스트
@@ -1515,20 +1520,20 @@ https://m1zz.github.io/WeekBlocks/nl/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/nl/privacy.html
+https://m1zz.github.io/ScheduleDensity/nl/privacy.html
 
 ## pl
 
 ### 이름
 
 ```
-Rainbow Craft: planer tygodnia
+Rainbow of Desire: Lista zadań
 ```
 
 ### 부제
 
 ```
-Time blocking i stałe rutyny
+Planer tygodnia krok po kroku
 ```
 
 ### 프로모션 텍스트
@@ -1593,20 +1598,20 @@ https://m1zz.github.io/WeekBlocks/pl/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/pl/privacy.html
+https://m1zz.github.io/ScheduleDensity/pl/privacy.html
 
 ## sv
 
 ### 이름
 
 ```
-Rainbow Craft: Veckoplanerare
+Rainbow of Desire: Att göra
 ```
 
 ### 부제
 
 ```
-Tidsblock och fasta rutiner
+Veckoplanerare i små steg
 ```
 
 ### 프로모션 텍스트
@@ -1671,20 +1676,20 @@ https://m1zz.github.io/WeekBlocks/sv/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/sv/privacy.html
+https://m1zz.github.io/ScheduleDensity/sv/privacy.html
 
 ## th
 
 ### 이름
 
 ```
-Rainbow Craft: วางแผนสัปดาห์
+Rainbow of Desire: แพลนเนอร์
 ```
 
 ### 부제
 
 ```
-ไทม์บล็อกกิ้งและกิจวัตรประจำ
+แตกงานเป็นขั้นตอน 5 นาที
 ```
 
 ### 프로모션 텍스트
@@ -1748,20 +1753,20 @@ https://m1zz.github.io/WeekBlocks/th/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/th/privacy.html
+https://m1zz.github.io/ScheduleDensity/th/privacy.html
 
 ## tr
 
 ### 이름
 
 ```
-Rainbow Craft: Haftalık Ajanda
+Rainbow of Desire: Planlayıcı
 ```
 
 ### 부제
 
 ```
-Zaman blokları ve rutinler
+Görevleri Böl, Haftanı Gör
 ```
 
 ### 프로모션 텍스트
@@ -1826,20 +1831,20 @@ https://m1zz.github.io/WeekBlocks/tr/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/tr/privacy.html
+https://m1zz.github.io/ScheduleDensity/tr/privacy.html
 
 ## vi
 
 ### 이름
 
 ```
-Rainbow Craft: Kế hoạch tuần
+Rainbow of Desire: Lịch tuần
 ```
 
 ### 부제
 
 ```
-Chia khối giờ và thói quen
+Chia nhỏ việc, mỗi bước 5 phút
 ```
 
 ### 프로모션 텍스트
@@ -1904,7 +1909,7 @@ https://m1zz.github.io/WeekBlocks/vi/
 
 ### 개인정보 처리방침 URL
 
-https://m1zz.github.io/WeekBlocks/vi/privacy.html
+https://m1zz.github.io/ScheduleDensity/vi/privacy.html
 
 ## 손쉬운 사용
 
