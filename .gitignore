@@ -7,3 +7,6 @@ xcuserdata/
 
 # Xcode 수동 빌드 산출물
 build/
+
+# App Review 녹화 (scripts/record-review-video.sh) — 크고 다시 만들 수 있다
+docs/review/
