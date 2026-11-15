@@ -111,6 +111,8 @@ struct WeekBlocksApp: App {
             } else {
                 mainWindow
                     .storeFallbackNotice()
+                    // 이 맥 앱은 곧 내려간다 — 켤 때마다 맨 먼저 알린다 (→ SunsetNotice.swift).
+                    .sunsetNoticeOnLaunch()
             }
         }
         .modelContainer(container)

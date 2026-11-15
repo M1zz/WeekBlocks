@@ -93,6 +93,7 @@
 		B63B2A1A5A9D82E02ED137D1 /* TodoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD35C8D5A757450762EFDC34 /* TodoTips.swift */; };
 		BC35BB60FFEF1185CB71A744 /* VaultMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127F0D8287DD0A7171DB18CE /* VaultMonitor.swift */; };
 		BD0AAF47D7373BC2D6513D9A /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55643283CC4AC6A87F6CDD9 /* WhatsNewView.swift */; };
+		5A1E7C0D9B2F4E6A8C3D1B01 /* SunsetNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1E7C0D9B2F4E6A8C3D1B02 /* SunsetNotice.swift */; };
 		BD4182ADABF5402CAECCAB0E /* RoutineOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF76D816E0C55144E652474 /* RoutineOccurrence.swift */; };
 		BD742AE2350C7E92902ED2BE /* OfferCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E543F452BE6854C4E48C57 /* OfferCode.swift */; };
 		BFC8522E06BD4CF008D7AB0B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B72BFAC893324616AC725BF2 /* Localizable.xcstrings */; };
@@ -236,6 +237,7 @@
 		9FF423295556BDAC9E8FB687 /* DurationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationPicker.swift; sourceTree = "<group>"; };
 		A47970A792B8AE57E021D9CB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A55643283CC4AC6A87F6CDD9 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
+		5A1E7C0D9B2F4E6A8C3D1B02 /* SunsetNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunsetNotice.swift; sourceTree = "<group>"; };
 		A593351AF80E4B2090D1D210 /* WeekBlocksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekBlocksUITests.swift; sourceTree = "<group>"; };
 		AA8A00620F11E5E0DA035BC8 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		AB645C90135FC303A3A31FA0 /* TodoAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoAccess.swift; sourceTree = "<group>"; };
@@ -466,6 +468,7 @@
 				C80F71B6D854414E3F6D2D77 /* WeekCopyView.swift */,
 				87EB398D348B2377FA8540BF /* WeekGridView.swift */,
 				A55643283CC4AC6A87F6CDD9 /* WhatsNewView.swift */,
+				5A1E7C0D9B2F4E6A8C3D1B02 /* SunsetNotice.swift */,
 				7A6577AFDFA1E0F99C65C5B4 /* TodoIntents.swift */,
 				87CADA213ABD8831E1D2C477 /* AppShortcuts.xcstrings */,
 			);
@@ -889,6 +892,7 @@
 				AAF4FBBA0460A62FF07BB6E0 /* WeekCopyView.swift in Sources */,
 				837589EF39B4862756A1D709 /* WeekGridView.swift in Sources */,
 				BD0AAF47D7373BC2D6513D9A /* WhatsNewView.swift in Sources */,
+				5A1E7C0D9B2F4E6A8C3D1B01 /* SunsetNotice.swift in Sources */,
 				2472D8D7A74198CB05A4002B /* TodoIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

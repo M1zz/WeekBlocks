@@ -1,5 +1,127 @@
 # 릴리즈 노트
 
+## 1.1.16
+
+### 앱스토어 (한국어)
+
+이 앱은 곧 App Store 에서 내려갑니다
+유료로 결제하셨다면 leeo@kakao.com 으로 연락 주세요
+
+### App Store (English)
+
+This app will soon leave the App Store
+If you paid, please email leeo@kakao.com
+
+### App Store (en-GB)
+
+This app will soon leave the App Store
+If you paid, please email leeo@kakao.com
+
+### App Store (繁體中文, zh-Hant)
+
+本 App 即將從 App Store 下架
+若曾付費，請寄信至 leeo@kakao.com
+
+### App Store (简体中文, zh-Hans)
+
+本应用即将从 App Store 下架
+如曾付费，请发邮件至 leeo@kakao.com
+
+### App Store (日本語, ja)
+
+このアプリはまもなく配信を終了します
+購入された方は leeo@kakao.com へご連絡ください
+
+### App Store (Deutsch, de)
+
+Diese App verlässt bald den App Store
+Käufer melden sich bitte bei leeo@kakao.com
+
+### App Store (Español, es)
+
+Esta app saldrá pronto del App Store
+Si pagaste, escribe a leeo@kakao.com
+
+### App Store (Français, fr)
+
+Cette app quittera bientôt l’App Store
+Si vous avez payé, écrivez à leeo@kakao.com
+
+### App Store (Italiano, it)
+
+Questa app lascerà presto l’App Store
+Se hai pagato, scrivi a leeo@kakao.com
+
+### App Store (Português (Brasil), pt-BR)
+
+Este app sairá da App Store em breve
+Se você pagou, escreva para leeo@kakao.com
+
+### App Store (Русский, ru)
+
+Скоро приложение покинет App Store
+Если вы платили, пишите на leeo@kakao.com
+
+### App Store (Čeština, cs)
+
+Aplikace brzy zmizí z App Storu
+Pokud jste platili, pište na leeo@kakao.com
+
+### App Store (Dansk, da)
+
+Appen forsvinder snart fra App Store
+Har du betalt, så skriv til leeo@kakao.com
+
+### App Store (Ελληνικά, el)
+
+Η εφαρμογή σύντομα φεύγει από το App Store
+Αν πληρώσατε, γράψτε στο leeo@kakao.com
+
+### App Store (Suomi, fi)
+
+Appi poistuu pian App Storesta
+Jos maksoit, kirjoita osoitteeseen leeo@kakao.com
+
+### App Store (Bahasa Indonesia, id)
+
+Aplikasi ini segera keluar dari App Store
+Jika sudah membayar, hubungi leeo@kakao.com
+
+### App Store (Norsk bokmål, nb)
+
+Appen forsvinner snart fra App Store
+Har du betalt, skriv til leeo@kakao.com
+
+### App Store (Nederlands, nl)
+
+Deze app verdwijnt binnenkort uit de App Store
+Betaald? Mail naar leeo@kakao.com
+
+### App Store (Polski, pl)
+
+Aplikacja wkrótce zniknie z App Store
+Jeśli płaciłeś, napisz na leeo@kakao.com
+
+### App Store (Svenska, sv)
+
+Appen försvinner snart från App Store
+Har du betalat, mejla leeo@kakao.com
+
+### App Store (ไทย, th)
+
+แอปนี้จะออกจาก App Store เร็วๆ นี้
+หากเคยชำระเงิน โปรดติดต่อ leeo@kakao.com
+
+### App Store (Türkçe, tr)
+
+Bu uygulama yakında App Store’dan kalkıyor
+Ödeme yaptıysanız leeo@kakao.com adresine yazın
+
+### App Store (Tiếng Việt, vi)
+
+Ứng dụng sắp rời App Store
+Nếu đã trả phí, vui lòng gửi thư tới leeo@kakao.com
+
 ## 1.1.15
 
 ### 앱스토어 (한국어)
