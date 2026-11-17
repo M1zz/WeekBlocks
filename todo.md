@@ -4,6 +4,11 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
 
+## ▶ 유리 아이콘 — 아이폰과 같은 그림 (2026-11-17, 빌드 · 독에서 라이트 확인 · 다크는 렌더만 확인 · 커밋 안 함)
+- [x] `WeekBlocks/AppIcon.icon` — 욕망의 무지개의 Icon Composer 아이콘을 그대로 (무지개 벽돌 네 줄, 라이트 흰 바탕 · 다크 짙은 보라)
+- [x] macOS 26 아래용 평면 그림 `AppIcon.appiconset` 을 같은 그림으로 다시 구움 (`scripts/make_app_icon.py`, 라이트 한 벌)
+- [ ] 사람: 시스템을 다크 · 틴트로 바꿔 독에서 직접 보기
+
 ## ▶ 번들 ID를 아이폰과 하나로 — com.example.ScheduleDensityApp (2026-11-17, 서명 없이 빌드 성공 · 서명 빌드 · 실행 확인 안 함 · 커밋 안 함)
 - [x] 본체 · TodoShare · TimerWidget · Tests · UITests 번들 ID `com.devkoan.*` → `com.example.ScheduleDensityApp*` (`WeekBlocks.project.yml` · pbxproj)
 - [ ] 사람: 새 ID의 맥 개발 프로필이 없어 서명 빌드가 막힌다 — Xcode에서 한 번 열어 자동 서명이 프로필을 만들게 한다

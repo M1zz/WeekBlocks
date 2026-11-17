@@ -76,6 +76,15 @@ targets:
     platform: macOS
     sources:
       - path: WeekBlocks
+        # AppIcon.icon 은 소스 폴더가 아니라 한 덩어리 아이콘 파일이다 — 아래에서 따로 넣는다.
+        excludes:
+          - AppIcon.icon
+      # Icon Composer 유리 아이콘 (macOS 26+). 아이폰 '욕망의 무지개'와 같은 그림이다 — 라이트는 흰 바탕, 다크는 짙은 보라.
+      # 이름이 AppIcon 이라 ASSETCATALOG_COMPILER_APPICON_NAME 이 그대로 고른다.
+      # 그보다 아래 macOS 는 Assets.xcassets/AppIcon.appiconset 의 평면 그림을 쓴다 (→ scripts/make_app_icon.py).
+      - path: WeekBlocks/AppIcon.icon
+        type: file
+        buildPhase: resources
     dependencies:
       - package: LeeoKit
       - target: TodoShareExtension
