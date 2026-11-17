@@ -25,7 +25,7 @@
 	     ⚠️ 이 줄을 넣으면 서명 프로필에 Push Notifications 권한이 필요하다.
 	        자동 서명이면 Xcode가 App ID 에 알아서 켜 준다. 안 켜지면 빌드가
 	        "provisioning profile doesn't support..." 로 막히니, 개발자 사이트에서
-	        com.devkoan.ScheduleDensityApp 의 Push Notifications 를 켠다.
+	        com.example.ScheduleDensityApp 의 Push Notifications 를 켠다.
 	     ⚠️ 값은 development 로 둔다. 배포 빌드는 아카이브할 때 Xcode가 production 으로
 	        바꿔 서명한다 (iOS 쪽 파일과 같은 규칙). -->
 	<key>com.apple.developer.aps-environment</key>

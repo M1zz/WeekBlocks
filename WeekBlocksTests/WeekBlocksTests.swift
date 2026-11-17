@@ -72,11 +72,14 @@ final class WeekBlocksSpecTests: XCTestCase {
         XCTAssertFalse(WeekBlocksSpec.saleProductIDs.contains(WeekBlocksSpec.proMonthlyID))
     }
 
-    /// 예전 '함께 쓰기' 상품과 판매를 멈춘 월 구독을 가진 사람도 Pro 다. 권한 목록에서 빠지면 산 사람이 잠긴다.
+    /// Pro 평생과 판매를 멈춘 월 구독을 가진 사람도 Pro 다. 권한 목록에서 빠지면 산 사람이 잠긴다.
     func testLegacyPurchaseStillUnlocksPro() {
-        XCTAssertTrue(WeekBlocksSpec.proEntitlementIDs.contains(WeekBlocksSpec.legacySyncProductID))
-        XCTAssertEqual(WeekBlocksSpec.proLifetimeID, WeekBlocksSpec.legacySyncProductID)
-        XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.legacySyncProductID]), .pro)
+        XCTAssertTrue(WeekBlocksSpec.proEntitlementIDs.contains(WeekBlocksSpec.proLifetimeID))
+        // 아이폰과 같은 상품 ID 여야 한다 (한 앱 레코드).
+        XCTAssertEqual(WeekBlocksSpec.proLifetimeID, "com.example.ScheduleDensityApp.pro")
+        XCTAssertEqual(WeekBlocksSpec.proYearlyID, "com.example.ScheduleDensityApp.pro.annual")
+        XCTAssertEqual(WeekBlocksSpec.plusYearlyID, "com.example.ScheduleDensityApp.plus.annual")
+        XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.proLifetimeID]), .pro)
         XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.proMonthlyID]), .pro)
     }
 
@@ -90,7 +93,7 @@ final class WeekBlocksSpecTests: XCTestCase {
         // 졸업 상품은 Pro 평생이다.
         XCTAssertEqual(WeekBlocksSpec.tier(owned: [WeekBlocksSpec.proGraduateID]), .pro)
         // 상관없는 상품(패스 · 모르는 것)은 아무것도 열지 않는다.
-        XCTAssertEqual(WeekBlocksSpec.tier(owned: ["com.devkoan.ScheduleDensityApp.forever"]), .free)
+        XCTAssertEqual(WeekBlocksSpec.tier(owned: ["com.example.ScheduleDensityApp.forever"]), .free)
     }
 
     /// Plus 평생에서 올리기를 사면 Pro, Plus 와 Pro 를 함께 가지면 높은 쪽.
@@ -120,11 +123,11 @@ final class WeekBlocksSpecTests: XCTestCase {
 
     /// 패스 상품은 앱의 권한 목록에 넣지 않는다. `LeeoForeverPass` 가 따로 판정한다.
     func testPassProductsAreNotAppEntitlements() {
-        let pass = Set(LeeoForeverPassRule.productIDs(bundleID: "com.devkoan.ScheduleDensityApp"))
+        let pass = Set(LeeoForeverPassRule.productIDs(bundleID: "com.example.ScheduleDensityApp"))
         XCTAssertTrue(pass.isDisjoint(with: WeekBlocksSpec.proEntitlementIDs))
         XCTAssertTrue(pass.isDisjoint(with: WeekBlocksSpec.plusEntitlementIDs))
         XCTAssertTrue(pass.isDisjoint(with: Set(WeekBlocksSpec.saleProductIDs)))
-        XCTAssertTrue(LeeoForeverPassRule.family.contains("com.devkoan.ScheduleDensityApp"))
+        XCTAssertTrue(LeeoForeverPassRule.family.contains("com.example.ScheduleDensityApp"))
     }
 
     /// 원격 스위치 이름은 CloudKit 대시보드의 필드 이름이다. 바꾸면 이미 꺼 둔 스위치가 조용히 켜진다.

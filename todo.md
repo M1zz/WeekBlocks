@@ -4,6 +4,18 @@ iOS 앱(ScheduleDensity)과 macOS 앱(WeekBlocks)을 하나의 Xcode 프로젝�
 두 개의 타깃으로 관리하는 "같은 패밀리" 구조.
 
 
+## ▶ 번들 ID를 아이폰과 하나로 — com.example.ScheduleDensityApp (2026-11-17, 서명 없이 빌드 성공 · 서명 빌드 · 실행 확인 안 함 · 커밋 안 함)
+- [x] 본체 · TodoShare · TimerWidget · Tests · UITests 번들 ID `com.devkoan.*` → `com.example.ScheduleDensityApp*` (`WeekBlocks.project.yml` · pbxproj)
+- [ ] 사람: 새 ID의 맥 개발 프로필이 없어 서명 빌드가 막힌다 — Xcode에서 한 번 열어 자동 서명이 프로필을 만들게 한다
+      (App ID `com.example.ScheduleDensityApp`에 iCloud `iCloud.com.devkoan.ScheduleDensity` · App Group · Push, `...TimerWidget` App ID 새로)
+- [x] 상품 ID를 아이폰과 같게 (`WeekBlocksSpec.swift` · `WeekBlocks.storekit` · 시험, 단위 시험 통과):
+      `plus.yearly`→`plus.annual` · `pro.yearly`→`pro.annual` · Pro 평생 `…sync`→`…pro` · 나머지는 접두사만. `legacySyncProductID` 는 지움
+- [ ] 사람: 예전 맥 레코드(`com.devkoan`)에서 산 사람은 새 레코드에서 구매가 안 읽힌다 — 어떻게 넘겨 줄지
+- [ ] `docs/IAP_PRODUCTS.md` 3장 · `docs/engineering/PAYWALL.md` 는 아직 옛 맥 상품 ID 를 적고 있다
+- [ ] 정할 것: `WeekBlocksSpec`의 `appIdentifier` · 원격 스위치 recordName `flags_com.devkoan.ScheduleDensityApp` 도 그대로 둠
+- [ ] 확인: 샌드박스 컨테이너가 번들 ID를 따라 바뀐다 — 쓰던 사람의 이 기기 데이터(`~/Library/Containers/com.devkoan.ScheduleDensityApp`)가 새 판에서 보이는지
+
+
 ## ▶ 영어 쓰는 사람의 독에 '무지개 공방'이 뜸 (2026-11-10 사용자 제보, 맥 Release 빌드 성공 · 스토어로 깔린 앱 확인 전)
 - 원인: 독·파인더는 폴더 이름과 CFBundleDisplayName 이 바이트까지 같을 때만 lproj 이름('Rainbow Craft')을 쓴다.
   스토어는 한글 폴더 이름을 NFD 로 깔고 Info.plist 는 NFC 라 "이름을 바꾼 앱"으로 보고 폴더 이름을 보여 줬다.

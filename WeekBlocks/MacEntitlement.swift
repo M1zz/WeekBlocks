@@ -5,7 +5,7 @@
 //  **어느 칸을 쓰고 있는가.** 무료 · Plus · Pro (2026-10 개편, → WeekBlocksSpec.monetization).
 //
 //  칸을 여는 것은 넷이다: 이 맥의 영수증, 아이폰 '욕망의 무지개'가 남긴 표(→ ProMark.swift),
-//  언제나 평생 패스(→ LeeoForeverPass, 열리면 Pro), 그리고 판매를 멈춘 예전 상품(월 구독 · 'sync').
+//  언제나 평생 패스(→ LeeoForeverPass, 열리면 Pro), 그리고 판매를 멈춘 예전 상품(월 구독).
 //
 //  ⚠️ 권한의 근거는 언제나 `Transaction.currentEntitlements`다. 아래 UserDefaults 값은
 //     화면이 빨리 그려지라고 둔 거울이지 근거가 아니다. 켤 때마다 다시 확인해 덮어쓴다.

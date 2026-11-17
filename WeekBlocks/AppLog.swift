@@ -6,7 +6,7 @@
 //  보이고, 사용자의 맥에서 "할 일이 사라졌어요" 가 오면 아무 흔적도 없었다.
 //  `Logger` 로 남기면 콘솔 앱(또는 `log show`)에서 이 앱만 골라 볼 수 있고, sysdiagnose 에도 실린다.
 //
-//      log show --last 1h --predicate 'subsystem == "com.devkoan.ScheduleDensityApp"'
+//      log show --last 1h --predicate 'subsystem == "com.example.ScheduleDensityApp"'
 //
 //  ⚠️ **적은 내용(할 일 제목·이름)은 남기지 않는다.** 개수·파일 이름·오류만 남긴다.
 //     문자열은 기본이 private 이라 남겨도 가려지지만, 애초에 안 넘기는 편이 확실하다.
@@ -17,7 +17,7 @@ import Foundation
 import OSLog
 
 enum AppLog {
-    private static let subsystem = Bundle.main.bundleIdentifier ?? "com.devkoan.ScheduleDensityApp"
+    private static let subsystem = Bundle.main.bundleIdentifier ?? "com.example.ScheduleDensityApp"
 
     /// 스토어 열기·겹친 것 정리·다시 받기.
     static let store = Logger(subsystem: subsystem, category: "store")

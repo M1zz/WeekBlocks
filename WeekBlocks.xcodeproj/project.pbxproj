@@ -974,7 +974,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.UITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.UITests;
 				SDKROOT = macosx;
 				TEST_TARGET_NAME = WeekBlocks;
 			};
@@ -995,7 +995,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.TimerWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.TimerWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -1015,7 +1015,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.UITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.UITests;
 				SDKROOT = macosx;
 				TEST_TARGET_NAME = WeekBlocks;
 			};
@@ -1035,7 +1035,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.TodoShare;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.TodoShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -1057,7 +1057,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.TodoShare;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.TodoShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -1080,7 +1080,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.TimerWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.TimerWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -1108,7 +1108,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp;
 				PRODUCT_MODULE_NAME = WeekBlocks;
 				PRODUCT_NAME = "무지개 공방";
 				SDKROOT = macosx;
@@ -1196,7 +1196,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp;
 				PRODUCT_MODULE_NAME = WeekBlocks;
 				PRODUCT_NAME = "무지개 공방";
 				SDKROOT = macosx;
@@ -1283,7 +1283,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.Tests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/무지개 공방.app/Contents/MacOS/WeekBlocks";
 			};
@@ -1301,7 +1301,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.devkoan.ScheduleDensityApp.Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.ScheduleDensityApp.Tests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/무지개 공방.app/Contents/MacOS/WeekBlocks";
 			};

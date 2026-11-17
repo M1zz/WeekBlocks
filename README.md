@@ -36,7 +36,7 @@ iOS 앱 **욕망의 무지개** 는 별도 저장소입니다 → https://github
 
 | 타깃 | 번들 ID | 설명 |
 |---|---|---|
-| `WeekBlocks` | `com.devkoan.ScheduleDensityApp` | 본체 (macOS 14+) |
+| `WeekBlocks` | `com.example.ScheduleDensityApp` | 본체 (macOS 14+) |
 | `TodoShareExtension` | `...TodoShare` | 공유 메뉴에서 백로그에 추가 |
 
 ## 빌드
