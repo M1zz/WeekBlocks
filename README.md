@@ -6,8 +6,21 @@
 - **개인정보 처리방침** — https://m1zz.github.io/WeekBlocks/privacy.html
 - **릴리즈 노트** — [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
 
-iOS 앱 **욕망의 무지개** 는 별도 저장소입니다 → https://github.com/M1zz/ScheduleDensity
-같은 CloudKit 컨테이너를 쓰므로 두 앱을 함께 수정해야 하는 변경이 많습니다.
+> ### 📦 이 저장소는 보관용입니다 (2026-11)
+>
+> 맥 앱의 코드는 아이폰 **욕망의 무지개** 저장소의 `macOS/` 로 옮겼습니다 (커밋 기록째).
+> 두 앱이 App Store 한 레코드 · 번들 ID 하나(`com.example.ScheduleDensityApp`)로 합쳐졌고,
+> 프로젝트도 하나(`ScheduleDensityApp.xcodeproj` 의 `WeekBlocks` 스킴)입니다.
+> 데이터 모델은 그 저장소의 `Shared/` 에서 두 앱이 한 벌을 씁니다.
+>
+> → https://github.com/M1zz/ScheduleDensity
+>
+> 여기 남는 것
+> - **GitHub Pages**(`docs/`) — 소개 · 개인정보 처리방침 주소가 스토어에 걸려 있어 그대로 둡니다.
+>   저장소를 GitHub 에서 archive 해도 Pages 는 계속 뜨지만, 문서를 고치려면 archive 를 풀어야 합니다.
+> - **`sunset/old-mac`** — 옛 번들 ID 로 나간 '무지개 공방'을 내리는 동안 쓰는 브랜치.
+>
+> 새 기능 · 수정은 여기 말고 위 저장소에 합니다.
 
 ## 화면
 
