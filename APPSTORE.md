@@ -31,7 +31,7 @@ DeployBar 가 이 파일을 읽어 App Store Connect 의 스토어 페이지를 
 ### 프로모션 텍스트
 
 ```
-잠·끼니·회사를 먼저 깔고 이번 주에 실제로 남은 시간을 봅니다. 이제 일본어·독일어·프랑스어 등 23개 언어로 씁니다.
+연말 약속이 몰리는 때, 수락하기 전에 이번 주에 정말 들어가는지 먼저 보세요. 잠·끼니·회사를 먼저 깔고 남은 시간에 할 일을 끌어다 놓으면 답이 보입니다.
 ```
 
 ### 설명
@@ -124,7 +124,7 @@ Time Blocking & Weekly Routine
 ### 프로모션 텍스트
 
 ```
-Lay down sleep, meals and work first, then see the hours you really have left this week. Now in 23 languages, from Japanese and German to Spanish and French.
+Year-end plans piling up? See whether your week can really hold them before you say yes. Lay down sleep, meals and work first, then drag tasks into the hours left.
 ```
 
 ### 설명
@@ -202,7 +202,7 @@ Time Blocking & Weekly Routine
 ### 프로모션 텍스트
 
 ```
-Lay down sleep, meals and work first, then see the hours you really have left this week. Now in 23 languages, from Japanese and German to Spanish and French.
+Year-end plans piling up? See whether your week can really hold them before you say yes. Lay down sleep, meals and work first, then drag tasks into the hours left.
 ```
 
 ### 설명
@@ -285,7 +285,7 @@ https://m1zz.github.io/WeekBlocks/en/privacy.html
 ### 프로모션 텍스트
 
 ```
-先排好睡眠、用餐、工作這些拿不走的時間，剩下的才是這週真正能用的時間。現在支援 23 種語言，包括繁體中文、簡體中文、英文與日文。
+年底邀約一個接一個？答應之前，先看看這一週到底放不放得下。先排好睡眠、用餐和工作，再把待辦拖進剩下的時間裡。
 ```
 
 ### 설명
@@ -365,7 +365,7 @@ https://m1zz.github.io/WeekBlocks/zh-Hant/privacy.html
 ### 프로모션 텍스트
 
 ```
-先排好睡眠、吃饭、工作这些拿不走的时间，剩下的才是这周真正能用的时间。现已支持 23 种语言，包括简体中文、繁体中文、英文和日文。
+年底邀约一个接一个？答应之前，先看看这一周到底装不装得下。先排好睡眠、吃饭和工作，再把待办拖进剩下的时间里。
 ```
 
 ### 설명
@@ -443,7 +443,7 @@ Rainbow Craft: 週間プランナー
 ### 프로모션 텍스트
 
 ```
-睡眠・食事・仕事を先に置けば、今週本当に残っている時間が見えてきます。いまタイマーのウィジェットも登場し、日本語にも対応しました。
+年末の予定が次々と入るこの時期、引き受ける前に今週に本当に収まるかを確かめましょう。睡眠・食事・仕事を先に置き、残った時間にやることをドラッグするだけです。
 ```
 
 ### 설명
@@ -520,7 +520,7 @@ Timeblocking & feste Routinen
 ### 프로모션 텍스트
 
 ```
-Erst Schlaf, Essen und Arbeit eintragen, dann siehst du, wie viele Stunden dir diese Woche wirklich bleiben. Jetzt auch auf Deutsch.
+Zum Jahresende jagt ein Termin den nächsten? Sieh, ob deine Woche das hergibt, bevor du zusagst. Erst Schlaf, Essen und Arbeit, dann Aufgaben in freie Stunden ziehen.
 ```
 
 ### 설명
@@ -598,7 +598,7 @@ Bloques de tiempo y rutinas
 ### 프로모션 텍스트
 
 ```
-Coloca primero el sueño, las comidas y el trabajo, y descubre las horas que de verdad te quedan esta semana. Ahora también en español.
+¿Se acumulan los planes de fin de año? Mira si tu semana tiene sitio antes de decir que sí. Coloca sueño, comidas y trabajo, y arrastra tus tareas a las horas libres.
 ```
 
 ### 설명
@@ -676,7 +676,7 @@ Blocs de temps et routines
 ### 프로모션 텍스트
 
 ```
-Posez d’abord sommeil, repas et travail, puis voyez les heures qui vous restent vraiment cette semaine. Rainbow Craft est désormais disponible en français.
+Fin d'année chargée ? Voyez si votre semaine peut tout contenir avant de dire oui. Posez sommeil, repas et travail, puis glissez vos tâches dans les heures libres.
 ```
 
 ### 설명
@@ -754,7 +754,7 @@ Settimana a blocchi e routine
 ### 프로모션 텍스트
 
 ```
-Prima sonno, pasti e lavoro, poi scopri quante ore ti restano davvero questa settimana. Nuovo: il widget Timer attuale, e ora Rainbow Craft parla italiano.
+Gli impegni di fine anno si accumulano? Guarda se la settimana li regge prima di dire di sì. Metti prima sonno, pasti e lavoro, poi trascina le attività nelle ore libere.
 ```
 
 ### 설명
@@ -832,7 +832,7 @@ Time Blocking e Rotinas
 ### 프로모션 텍스트
 
 ```
-Defina primeiro sono, refeições e trabalho e veja quantas horas realmente sobram na semana. Novidade: o widget Timer Agora e o app agora em português.
+Compromissos de fim de ano se acumulando? Veja se a semana dá conta antes de dizer sim. Defina sono, refeições e trabalho e arraste as tarefas para as horas livres.
 ```
 
 ### 설명
@@ -910,7 +910,7 @@ Rainbow Craft: планер недели
 ### 프로모션 텍스트
 
 ```
-Сначала сон, еда и работа, затем — сколько часов на неделе у вас действительно осталось. Теперь на русском языке, с виджетом «Таймер „Сейчас“».
+Предновогодние встречи идут одна за другой? Проверьте, поместятся ли они в неделю, прежде чем соглашаться. Сначала сон, еда и работа, затем дела в свободные часы.
 ```
 
 ### 설명
@@ -988,7 +988,7 @@ Rainbow Craft: Týdenní plán
 ### 프로모션 텍스트
 
 ```
-Nejdřív rozložte spánek, jídla a práci a uvidíte, kolik hodin vám tento týden opravdu zbývá. Nově také v češtině, včetně widgetu Časovač Teď.
+Konec roku je plný plánů? Než něco slíbíte, podívejte se, jestli se to do týdne vejde. Nejdřív rozložte spánek, jídla a práci, pak přetáhněte úkoly do volných hodin.
 ```
 
 ### 설명
@@ -1066,7 +1066,7 @@ Tidsblokke og faste rutiner
 ### 프로모션 텍스트
 
 ```
-Læg søvn, måltider og arbejde ind først, og se de timer, du reelt har tilbage i ugen. Nu også på dansk.
+Fyldes kalenderen op op mod jul? Se, om ugen har plads, før du siger ja. Læg søvn, måltider og arbejde ind først, og træk så dine opgaver ind i de ledige timer.
 ```
 
 ### 설명
@@ -1144,7 +1144,7 @@ Rainbow Craft: Οργάνωση χρόνου
 ### 프로모션 텍스트
 
 ```
-Βάλε πρώτα ύπνο, φαγητό και δουλειά και δες πόσες ώρες σού μένουν πραγματικά αυτή την εβδομάδα. Τώρα και στα ελληνικά.
+Οι υποχρεώσεις των γιορτών πληθαίνουν; Δες αν τις χωράει η εβδομάδα σου πριν πεις «ναι». Βάλε πρώτα ύπνο, φαγητό και δουλειά και σύρε τις εργασίες στις ελεύθερες ώρες.
 ```
 
 ### 설명
@@ -1222,7 +1222,7 @@ Aikablokkaus ja rutiinit
 ### 프로모션 텍스트
 
 ```
-Aseta ensin uni, ateriat ja työ, niin näet, paljonko aikaa tällä viikolla oikeasti jää. Uutta: Nyt-ajastin-widget, ja appi on nyt myös suomeksi.
+Vuoden lopun menoja kertyy? Katso, mahtuuko kaikki viikkoosi, ennen kuin lupaat. Aseta ensin uni, ateriat ja työ, ja vedä tehtävät jäljelle jääviin tunteihin.
 ```
 
 ### 설명
@@ -1300,7 +1300,7 @@ Blok Waktu & Rutinitas Tetap
 ### 프로모션 텍스트
 
 ```
-Letakkan dulu tidur, makan, dan kerja, lalu lihat berapa jam yang benar-benar tersisa minggu ini. Kini hadir dalam Bahasa Indonesia.
+Agenda akhir tahun mulai menumpuk? Sebelum mengiyakan, lihat dulu apakah minggu Anda masih muat. Letakkan tidur, makan, dan kerja, lalu seret tugas ke jam yang tersisa.
 ```
 
 ### 설명
@@ -1378,7 +1378,7 @@ Tidsblokker og faste rutiner
 ### 프로모션 텍스트
 
 ```
-Legg inn søvn, måltider og jobb først, og se hvor mange timer du faktisk har igjen denne uken. Nå også på norsk.
+Fylles kalenderen opp mot jul? Se om uken har plass før du sier ja. Legg inn søvn, måltider og jobb først, og dra oppgavene inn i timene som er ledige.
 ```
 
 ### 설명
@@ -1456,7 +1456,7 @@ Timeblocking & vaste routines
 ### 프로모션 텍스트
 
 ```
-Leg eerst slaap, eten en werk vast en zie hoeveel uur er deze week echt overblijft. Nieuw: de Nu-timer-widget, en de app is nu in het Nederlands.
+Stapelen de eindejaarsafspraken zich op? Zie of je week het aankan voordat je ja zegt. Leg eerst slaap, eten en werk vast en sleep je taken naar de uren die overblijven.
 ```
 
 ### 설명
@@ -1534,7 +1534,7 @@ Time blocking i stałe rutyny
 ### 프로모션 텍스트
 
 ```
-Najpierw sen, posiłki i praca, potem widzisz, ile godzin w tym tygodniu naprawdę Ci zostało. Teraz po polsku i z widżetem Timer Teraz.
+Końcówka roku pełna planów? Zanim coś obiecasz, sprawdź, czy tydzień to pomieści. Najpierw sen, posiłki i praca, potem przeciągnij zadania w wolne godziny.
 ```
 
 ### 설명
@@ -1612,7 +1612,7 @@ Tidsblock och fasta rutiner
 ### 프로모션 텍스트
 
 ```
-Lägg in sömn, mat och jobb först och se hur många timmar du faktiskt har kvar i veckan. Nyhet: widgeten Nu-timer – och nu finns appen på svenska.
+Fylls kalendern upp inför jul? Se om veckan har plats innan du tackar ja. Lägg in sömn, mat och jobb först och dra sedan dina uppgifter till timmarna som blir över.
 ```
 
 ### 설명
@@ -1690,7 +1690,7 @@ Rainbow Craft: วางแผนสัปดาห์
 ### 프로모션 텍스트
 
 ```
-วางเวลานอน มื้ออาหาร และงานลงไปก่อน แล้วดูว่าสัปดาห์นี้เหลือเวลาจริงเท่าไร ใหม่: วิดเจ็ตตัวจับเวลาตอนนี้ และรองรับภาษาไทยแล้ว
+ช่วงปลายปีนัดเยอะใช่ไหม ก่อนรับปาก ลองดูว่าสัปดาห์นี้รับไหวหรือเปล่า วางเวลานอน มื้ออาหาร และงานลงไปก่อน แล้วลากสิ่งที่ต้องทำไปไว้ในชั่วโมงที่เหลือ
 ```
 
 ### 설명
@@ -1767,7 +1767,7 @@ Zaman blokları ve rutinler
 ### 프로모션 텍스트
 
 ```
-Önce uyku, yemek ve işi yerleştirin, ardından bu hafta gerçekten kalan saatleri görün. Rainbow Craft artık Türkçe.
+Yıl sonu planları üst üste mi geliyor? Evet demeden önce haftanızın kaldırıp kaldırmadığını görün. Uyku, yemek ve işi yerleştirin, sonra işleri boş saatlere sürükleyin.
 ```
 
 ### 설명
@@ -1845,7 +1845,7 @@ Chia khối giờ và thói quen
 ### 프로모션 텍스트
 
 ```
-Đặt trước giờ ngủ, bữa ăn và công việc, rồi xem tuần này bạn thật sự còn bao nhiêu thời gian. Nay đã có tiếng Việt.
+Cuối năm lịch hẹn dồn dập? Trước khi nhận lời, hãy xem tuần này có chứa nổi không. Đặt trước giờ ngủ, bữa ăn và công việc, rồi kéo việc cần làm vào những giờ còn trống.
 ```
 
 ### 설명
