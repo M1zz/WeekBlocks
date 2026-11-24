@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import LeeoKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
@@ -518,6 +519,8 @@ struct ContentView: View {
             ReflectionView(weekStart: selectedWeek)
                 .frame(minWidth: 640, minHeight: 600)
         }
+        // App Store 이벤트 링크와 할인 배너 단추가 요금제를 연다 (LeeoKit).
+        .leeoPaywallLink { PaywallView(reason: "sale") }
         .sheet(item: $routineDetailSheet) { ctx in
             RoutineDetailView(routine: ctx.routine, dayAction: ctx.dayAction)
                 .frame(minWidth: 560, minHeight: 520)
